@@ -1,0 +1,5 @@
+.idea/*
+.idea/
+python/cli/build/*
+*__pycache__*
+python/cli/mason.egg-info/*
