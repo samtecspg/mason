@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'mason = mason.cli:main'
+            'mason = cli.cli:main'
         ]
     },
     install_requires=requirements,

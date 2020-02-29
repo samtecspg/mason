@@ -1,5 +1,8 @@
 .idea/*
 .idea/
-python/cli/build/*
+build/
+build/*
+dist/
+dist/*
 *__pycache__*
-python/cli/mason.egg-info/*
+mason.egg-info/*
