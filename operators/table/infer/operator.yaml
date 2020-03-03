@@ -1,0 +1,12 @@
+type: "operator"
+namespace: "table"
+command: "infer"
+description:  "Infer metastore tables.  1. Registers a schedule for infering the table.  2.  Does a one time trigger of the refresh."
+parameters:
+  required:
+    - "database_name"
+    - "storage_path"
+    - "schedule_name"
+#	"database_name": "crawler-poc",
+#	"s3_path": "s3://lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/",
+#	"crawler_name": "test_crawler"

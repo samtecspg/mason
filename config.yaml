@@ -1,0 +1,5 @@
+metastore:
+  client: glue
+  configuration:
+    aws_role_arn: "arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue"
+    region: "us-east-1"

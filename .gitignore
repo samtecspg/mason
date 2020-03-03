@@ -6,3 +6,5 @@ dist/
 dist/*
 *__pycache__*
 mason.egg-info/*
+.mypy_cache/
+.mypy_cache/*

@@ -1,0 +1,3 @@
+database_name: "crawler-poc"
+schedule_name: "test_crawler"
+storage_path: "lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/"

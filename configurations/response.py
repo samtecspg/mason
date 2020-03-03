@@ -1,0 +1,46 @@
+from typing import List, Dict
+
+class Response:
+    def __init__(self):
+        self.responses: List[dict] = []
+        self.warnings: List[str] = []
+        self.info: List[str] = []
+        self.errors: List[str] = []
+        self.status_code: int = 200
+        self.data: dict = {}
+
+    def add_warning(self, warning: str):
+        self.warnings.append(warning)
+
+    def add_info(self, info: str):
+        self.info.append(info)
+
+    def add_error(self, error: str):
+        self.errors.append(error)
+
+    def add_response(self, response: dict):
+        self.responses.append(response)
+
+    def set_status(self, status: int):
+        self.status_code = status
+
+
+    def add_data(self, data: dict):
+        self.data = data
+
+    def formatted(self, metadatabase_response: bool = False, data: bool = True):
+        returns = {
+            'Warnings': self.warnings,
+            'Errors': self.errors,
+            'Info': self.info,
+        }
+
+        if data:
+            returns['Data'] = self.data  # type: ignore
+
+        if metadatabase_response:
+            returns['_metadatabase_response'] = self.responses # type: ignore
+
+        return returns
+
+

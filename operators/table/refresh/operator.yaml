@@ -1,0 +1,8 @@
+type: "operator"
+namespace: "table"
+command: "refresh"
+description:  "Refresh metastore tables"
+parameters:
+  required:
+    - "database_name"
+    - "table_name"

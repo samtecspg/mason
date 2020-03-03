@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages # type: ignore
 
 with open('requirements.txt') as f:
     requirements = f.readlines()
@@ -22,6 +22,7 @@ setup(
         ]
     },
     install_requires=requirements,
-    zip_safe=False
+    zip_safe=False,
+    include_package_data=True
 )
 

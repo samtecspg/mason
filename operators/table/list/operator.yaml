@@ -1,0 +1,7 @@
+type: "operator"
+namespace: "table"
+command: "list"
+description:  "Get metastore tables"
+parameters:
+  required:
+    - "database_name"

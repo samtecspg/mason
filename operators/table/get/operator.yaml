@@ -1,0 +1,8 @@
+type: "operator"
+namespace: "table"
+command: "get"
+description:  "Get metastore table contents"
+parameters:
+  required:
+    - "database_name"
+    - "table_name"
