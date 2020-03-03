@@ -1,11 +1,11 @@
 
-import json
+# import json
 # from jsonschema import validate as js_validate
-import os
-from configurations.metastore.glue.client import GlueMetastoreClient
+# import os
+# from configurations.metastore.glue.client import GlueMetastoreClient
 
-def validate(mason_configuration):
-    print("TODO")
+# def validate(mason_configuration):
+#     print("TODO")
     # path = os.path.dirname(os.path.abspath(__file__)) + "/schema.json"
     # with open(path, 'r') as schema_json:
     #     schema = json.load(schema_json)
@@ -19,7 +19,7 @@ def validate(mason_configuration):
     #             validate_metastore_configuration(metastore_configuration)
     #             print(metastore_configuration)
 
-def validate_metastore_configuration(metastore_configuration: dict):
+# def validate_metastore_configuration(metastore_configuration: dict):
     # if metastore_configuration.get("client") == "glue":
-        print("TODO")
+    #     print("TODO")
         # GlueMetastoreClient().validate(metastore_configuration)

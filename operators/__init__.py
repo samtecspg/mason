@@ -1,15 +1,13 @@
 import os
-import yaml
 import itertools
 from operator import itemgetter
 from tabulate import tabulate
 from importlib import import_module
-from configurations import Config
 from util.yaml import parse_yaml
 from typing import Optional
 from configurations import Config
 from parameters import Parameters
-from configurations.response import Response
+from clients.response import Response
 
 class Operators:
 
@@ -40,8 +38,10 @@ class Operators:
         validated = list(parameters.validated_parameters.keys())
         missing = list(sym_diff)
         print(f"Parameters Validation:")
-        print(f"Validated: {validated}")
-        print(f"Missing: {missing}")
+        if len(validated) > 0:
+            print(f"Validated: {validated}")
+        if len(missing) > 0:
+            print(f"Missing: {missing}")
         print()
 
         if len(sym_diff) > 0:

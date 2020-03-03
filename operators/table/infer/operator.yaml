@@ -7,6 +7,3 @@ parameters:
     - "database_name"
     - "storage_path"
     - "schedule_name"
-#	"database_name": "crawler-poc",
-#	"s3_path": "s3://lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/",
-#	"crawler_name": "test_crawler"

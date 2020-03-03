@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List
 
 class Response:
     def __init__(self):

@@ -1,4 +1,6 @@
 from configurations.metastore import MetastoreConfig
+from configurations.storage import StorageConfig
+from configurations.scheduler import SchedulerConfig
 
 from util.yaml import parse_yaml
 
@@ -9,30 +11,16 @@ class Config(object):
         print(f"Reading configuration at {location}:")
         config_doc = parse_yaml(location)
         # TODO: Validate config object structure
-        metastore_config_doc = config_doc.get("metastore", {})
-        metastore_config = MetastoreConfig(metastore_config_doc)
-
-        self.metastore_config = MetastoreConfig(metastore_config_doc)
-        self.storage_config = None
+        self.metastore_config = MetastoreConfig(config_doc)
+        self.storage_config = StorageConfig(config_doc)
+        self.scheduler_config = SchedulerConfig(config_doc)
         self.execution_config = None
-        self.scheduler_config = None
 
         self.print()
 
-    def metastore_client(self):
-        self.metastore_config.client
-
-    def storage_client(self):
-        self.storage_config.client
-
-    def execution_client(self):
-        self.execution_config.client
-
-    def execution_client(self):
-        self.execution_config.client
-
-
     def print(self):
         print({
-            'metastore_config': self.metastore_config.to_dict()
+            'metastore_config': self.metastore_config.to_dict(),
+            'storage_config': self.storage_config.to_dict(),
+            'scheduler_config': self.scheduler_config.to_dict()
         })
