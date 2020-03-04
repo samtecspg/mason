@@ -10,12 +10,13 @@ from parameters import Parameters
 from clients.response import Response
 from util.printer import pprint, banner
 from util import environment as env
-import sys
+from sys import path, modules
+
 
 class Operators:
 
     def run(self, config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, debug: Optional[bool] = False):
-        sys.path.append(env.OPERATOR_HOME)
+
         #  TODO: Allow single step commands without subcommands
         response = Response()
 
@@ -24,7 +25,8 @@ class Operators:
         elif subcmd == None:
             self.tabulate_operators(cmd)
         else:
-            mod = import_module(f'.', f"operators.{cmd}.{subcmd}")
+            path.append(env.MASON_HOME)
+            mod = import_module(f'operators.{cmd}.{subcmd}')
             op = self.get_operator(cmd, subcmd)
             resp = self.validate_parameters(op, parameters, response)
             banner("Operator Response")
@@ -56,7 +58,7 @@ class Operators:
 
 
     def list_operators(self, cmd: Optional[str] = None):
-        path = os.getcwd() + "/operators/"
+        path = env.OPERATOR_HOME
         configs = []
 
         #  TODO: validate operator.yaml structure using json schema

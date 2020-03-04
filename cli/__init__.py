@@ -2,12 +2,13 @@ import click
 import shutil
 import os
 from os import path
-from operators import Operators
+from operator_utils import Operators
 from typing import Optional
 
 from configurations import Config
 from parameters import Parameters
 from util import environment as env
+from sys import path as spath
 
 @click.group()
 def main():
