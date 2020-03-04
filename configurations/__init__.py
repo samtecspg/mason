@@ -1,6 +1,7 @@
 from configurations.metastore import MetastoreConfig
 from configurations.storage import StorageConfig
 from configurations.scheduler import SchedulerConfig
+from configurations.execution import ExecutionConfig
 from util.printer import pprint, banner
 
 from util.yaml import parse_yaml
@@ -16,7 +17,7 @@ class Config(object):
         self.metastore_config = MetastoreConfig(config_doc)
         self.storage_config = StorageConfig(config_doc)
         self.scheduler_config = SchedulerConfig(config_doc)
-        self.execution_config = None
+        self.execution_config = ExecutionConfig(config_doc)
 
         self.print()
 
@@ -24,5 +25,6 @@ class Config(object):
         pprint({
             'metastore_config': self.metastore_config.to_dict(),
             'storage_config': self.storage_config.to_dict(),
-            'scheduler_config': self.scheduler_config.to_dict()
+            'scheduler_config': self.scheduler_config.to_dict(),
+            'execution_config': self.execution_config.to_dict()
         })
