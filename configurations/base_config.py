@@ -9,9 +9,10 @@ class BaseConfig:
 
     def to_dict(self):
         if self.client:
+            filt = {key: value for (key, value) in self.client.__dict__.items() if not key == "client"}
             return {
                 'client': self.client_name,
-                'configuration': self.client.__dict__
+                'configuration': filt
             }
         else:
             return {}

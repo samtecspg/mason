@@ -32,10 +32,12 @@ Using config examples/config/config_example.yaml.  Saving to /Users/kyle/.mason/
 +-------------------------------------------------+
 | Reading configuration at ~/.mason/config.yaml:  |
 +-------------------------------------------------+
-metastore_config: {'client': 'glue', 'configuration': {'region': 'us-east-1', 'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'client': <botocore.client.Glue object at 0x104f5b450>}}
-storage_config: {'client': 's3', 'configuration': {'region': 'us-east-1', 'client': <botocore.client.S3 object at 0x1052e2e90>}}
-scheduler_config: {'client': 'glue', 'configuration': {'region': 'us-east-1', 'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'client': <botocore.client.Glue object at 0x10546bd50>}}
-execution_config: {}
+{
+ "metastore_config": "{'client': 'glue', 'configuration': {'region': 'us-east-1', 'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue'}}",
+ "storage_config": "{'client': 's3', 'configuration': {'region': 'us-east-1'}}",
+ "scheduler_config": "{'client': 'glue', 'configuration': {'region': 'us-east-1', 'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue'}}",
+ "execution_config": "{}"
+}
 ```
 You will begin without any operators registered by default:
 ```

@@ -20,3 +20,9 @@ def print_json(d: dict):
     formatted_json = to_json(d)
     colorful_json = highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
     return print(colorful_json)
+
+def print_json_1level(d: dict):
+    out = {}
+    for key, value in d.items():
+        out[key] = str(value)
+    print_json(out)

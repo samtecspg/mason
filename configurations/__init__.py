@@ -6,7 +6,7 @@ from util.printer import banner
 
 from util.yaml import parse_yaml
 from util import environment as env
-from util.printer import pprint
+from util.json import print_json_1level
 
 class Config(object):
 
@@ -23,7 +23,7 @@ class Config(object):
         self.print()
 
     def print(self):
-        pprint({
+        print_json_1level({
             'metastore_config': self.metastore_config.to_dict(),
             'storage_config': self.storage_config.to_dict(),
             'scheduler_config': self.scheduler_config.to_dict(),
