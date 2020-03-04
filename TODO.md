@@ -1,4 +1,10 @@
 # To-do list
 
-1. Validate operators according to schema
-2. Validate client compatability with operators
+- [x] Basic implementation of table namespace
+- [x] Basic Configuration 
+- [x] Basic Operator Registration 
+- [x] Package configuration
+- [x] Basic Documentation 
+- [ ] Validate operators according to schema 
+- [ ] Validate client compatability with operators 
+- [ ] Advanced Operator Registration Documentation 
