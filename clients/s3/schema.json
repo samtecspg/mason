@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MasonConfiguration",
+  "properties": {
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "region": {
+          "type": "string"
+        }
+      },
+      "required": ["region"]
+    }
+  }
+}

@@ -1,7 +1,6 @@
 from configurations import Config
 from parameters import Parameters
 from clients.response import Response
-from util.printer import banner
 
 def run(config: Config, parameters: Parameters, response: Response):
     database_name: str = parameters.safe_get("database_name")

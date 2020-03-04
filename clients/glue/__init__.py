@@ -3,6 +3,7 @@ from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 
 class GlueClient:
+
     def __init__(self, glue_config: dict):
         self.region = glue_config.get("region")
         self.aws_role_arn = glue_config.get("aws_role_arn", "")

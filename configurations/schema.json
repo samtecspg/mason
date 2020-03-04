@@ -1,39 +1,23 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "MasonSchema",
+  "title": "MasonConfiguration",
   "properties": {
-    "configurations": {
-      "type": "object",
-      "properties": {
-         "metastore": {
-            "type": "object",
-            "properties": {
-               "client": {
-                 "type":  "string",
-                 "enum": ["glue"]
-               }
-            },
-           "required": ["client"]
-         },
-        "execution_engine": {
-          "type": "object"
-        },
-        "scheduler": {
-          "type": "object"
-        },
-        "storage_engine": {
-          "type": "object"
-        }
-      },
-      "required": ["metastore", "execution_engine", "scheduler", "storage_engine"]
+     "metastore_client": {
+       "type": "string",
+       "enum": ["glue"]
+     },
+    "execution_client": {
+      "type": "string",
+      "enum": [""]
     },
-    "operator": {
-      "type": "object",
-      "properties" : {
-        "type": {"type": "string"}
-      },
-      "required": ["type"]
+    "storage_client": {
+      "type": "string",
+      "enum": ["s3"]
+    },
+    "scheduler_client": {
+      "type": "string",
+      "enum": ["glue"]
     }
-  },
-  "required": ["configurations", "operator"]
+  }, "required": ["metastore_client", "storage_client", "scheduler_client"]
 }
+

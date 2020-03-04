@@ -9,7 +9,10 @@ from typing import Optional
 from configurations import Config
 from parameters import Parameters
 from util import environment as env
-from sys import path as spath
+from util.json_schema import validate_schema
+from util.printer import banner
+from util.yaml import parse_yaml
+
 
 @click.group()
 def main():
@@ -32,10 +35,29 @@ def config(config_file: Optional[str] = None):
     if config_file:
         # TODO: Validate config using json_schema
         # TODO: Interactive configuration
-        print()
-        print(f"Using config {config_file}.  Saving to {env.CONFIG_HOME}")
-        shutil.copyfile(config_file, env.CONFIG_HOME)
-        return Config()
+        banner("Config Validation")
+        parsed = parse_yaml(config_file)
+        valid = validate_schema(parsed, "configurations/schema.json")
+        if valid:
+            clients: dict = parsed.get("clients")
+            #  TODO:  Use json schema partials for this
+            valid = True
+            if clients and len(clients) > 0:
+                for name, config in clients.items():
+                    schema = f"clients/{name}/schema.json"
+                    if not validate_schema(config, schema):
+                        print(f"Error validating client schema: {name}")
+                        valid = False
+                        break
+        if valid:
+            print()
+            print(f"Valid Configuration. Saving config {config_file} to {env.CONFIG_HOME}")
+            print()
+            shutil.copyfile(config_file, env.CONFIG_HOME)
+            return Config()
+        else:
+            print()
+            print(f"Invalid Config Schema: {config_file}")
     else:
         if path.exists(env.CONFIG_HOME):
             return Config()

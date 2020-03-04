@@ -3,6 +3,10 @@ import datetime
 import json
 from pygments import highlight, lexers, formatters # type: ignore
 
+def parse_json(file_path: str):
+    with open(file_path) as f:
+      return json.load(f)
+
 def default(o):
     if isinstance(o, (datetime.date, datetime.datetime)):
         return o.isoformat()
