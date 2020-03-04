@@ -7,6 +7,9 @@ fsspec==0.6.2
 importlib-metadata==1.5.0
 jmespath==0.9.5
 jsonschema==3.2.0
+# Editable install with no version control (mason==1.0.0)
+mypy==0.761
+mypy-extensions==0.4.3
 pyrsistent==0.15.7
 python-dateutil==2.8.1
 PyYAML==5.3
@@ -14,5 +17,7 @@ s3fs==0.4.0
 s3transfer==0.3.3
 six==1.14.0
 tabulate==0.8.6
+typed-ast==1.4.1
+typing-extensions==3.7.4.1
 urllib3==1.25.8
 zipp==3.0.0

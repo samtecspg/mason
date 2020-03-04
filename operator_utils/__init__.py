@@ -96,7 +96,7 @@ class Operators:
         if len(array) > 0:
             banner(f"Available {cmd_value} Methods: {env.OPERATOR_HOME}")
             print()
-            print(tabulate(array, headers=["command", "subcommand", "description", "parameters"]))
+            print(tabulate(array, headers=["namespace", "command", "description", "parameters"]))
         else:
             if cmd:
                 print(f"Operator \"{cmd_value}\" not found.  List operators but running \"mason operator\"")

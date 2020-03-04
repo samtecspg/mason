@@ -32,6 +32,7 @@ def config(config_file: Optional[str] = None):
     if config_file:
         # TODO: Validate config using json_schema
         # TODO: Interactive configuration
+        print()
         print(f"Using config {config_file}.  Saving to {env.CONFIG_HOME}")
         shutil.copyfile(config_file, env.CONFIG_HOME)
         return Config()
