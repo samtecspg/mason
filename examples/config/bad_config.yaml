@@ -1,0 +1,10 @@
+metastore_client: glue
+bad_client: glue
+storage_client: s3
+clients:
+  bad_client:
+    configuration:
+      stuff: "test"
+  s3:
+    configuration:
+

@@ -1,6 +1,6 @@
 
 from jsonschema import validate # type: ignore
-from jsonschema.exceptions import SchemaError # type: ignore
+from jsonschema.exceptions import SchemaError, ValidationError # type: ignore
 from util.json import parse_json, print_json
 
 def validate_schema(d: dict, schema_file: str) -> bool:
@@ -9,6 +9,9 @@ def validate_schema(d: dict, schema_file: str) -> bool:
         validate(d, schema)
         return True
     except SchemaError as e:
+        print(f"Schema error: {e.message}")
+        return False
+    except ValidationError as e:
         print(f"Schema error: {e.message}")
         return False
     except FileNotFoundError as e:

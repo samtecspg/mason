@@ -7,6 +7,7 @@ set -e
 # rm -rf ~/.mason/
 # mason operator
 # mason config
+# mason config examples/config/bad_config.yaml
 # mason config examples/config/config_example.yaml
 # mason config
 # mason register
