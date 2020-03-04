@@ -1,4 +1,5 @@
 from typing import List
+from util.json import print_json
 
 class Response:
     def __init__(self):
@@ -27,6 +28,7 @@ class Response:
     def add_data(self, data: dict):
         self.data = data
 
+
     def formatted(self, debug: bool):
         returns = {}
         returns['Errors'] = self.errors
@@ -39,6 +41,7 @@ class Response:
         if debug:
             returns['_client_responses'] = self.responses # type: ignore
 
-        return returns
+
+        return print_json(returns)
 
 

@@ -1,7 +1,8 @@
 #!/bin/sh
+set -e
 
 # remove to speed up when demoing
-#./install
+./install
 
 # rm -rf ~/.mason/
 # mason operator
@@ -13,7 +14,7 @@
 # mason operator
 # mason operator table
 # mason operator table get
-# mason operator table get -p database_name:crawler-poc,table_name:catalog_poc_data
+ mason operator table get -p database_name:crawler-poc,table_name:catalog_poc_data
 # mason operator table list
 # mason operator table list -p database_name:crawler-poc
 # mason operator table refresh -p database_name:crawler-poc,table_name:catalog_poc_data

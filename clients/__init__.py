@@ -10,6 +10,7 @@ class Client:
         elif client_name == "s3":
             return S3Client(config.get("s3", {}).get("configuration", {}))
         else:
-            print(f"Client not found {client_name}")
+            if not client_name == "None":
+                print(f"Client not found {client_name}")
             return None
 

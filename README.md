@@ -88,10 +88,18 @@ Validated: ['database_name', 'table_name']
 +--------------------+
 | Operator Response  |
 +--------------------+
-Errors: []
-Info: []
-Warnings: []
-Data: {'name': 'catalog_poc_data', 'created_at': datetime.datetime(2020, 2, 26, 12, 57, 31, tzinfo=tzlocal()), 'created_by': 'arn:aws:sts::062325279035:assumed-role/AWSGlueServiceRole-anduin-data-glue/AWS-Crawler', 'database_name': 'crawler-poc', 'schema': [{'Name': 'index', 'Type': 'bigint'}, {'Name': 'break1maxqty', 'Type': 'double'}, {'Name': 'break1minqty', 'Type': 'double'}, {'Name': 'break1price', 'Type': 'double'}, {'Name': 'break2maxqty', 'Type': 'double'}, {'Name': 'break2minqty', 'Type': 'double'}, {'Name': 'break2price', 'Type': 'double'}, {'Name': 'break3maxqty', 'Type': 'double'}, {'Name': 'break3minqty', 'Type': 'double'}, {'Name': 'break3price', 'Type': 'double'}, {'Name': 'break4maxqty', 'Type': 'double'}, {'Name': 'break4minqty', 'Type': 'double'}, {'Name': 'break4price', 'Type': 'double'}, {'Name': 'break5maxqty', 'Type': 'double'}, {'Name': 'break5minqty', 'Type': 'double'}, {'Name': 'break5price', 'Type': 'double'}, {'Name': 'maxprice', 'Type': 'double'}, {'Name': 'minprice', 'Type': 'double'}, {'Name': 'packaging', 'Type': 'string'}, {'Name': 'partnumber', 'Type': 'string'}, {'Name': 'qtyperpackage', 'Type': 'double'}, {'Name': 'source', 'Type': 'string'}, {'Name': 'stockqty', 'Type': 'double'}, {'Name': 'timestamp', 'Type': 'string'}, {'Name': 'virtualstockqty', 'Type': 'double'}, {'Name': 'break6maxqty', 'Type': 'double'}, {'Name': 'break6minqty', 'Type': 'double'}, {'Name': 'break6price', 'Type': 'double'}, {'Name': 'break7maxqty', 'Type': 'double'}, {'Name': 'break7minqty', 'Type': 'double'}, {'Name': 'break7price', 'Type': 'double'}, {'Name': 'ts', 'Type': 'string'}]}
+{
+ "Errors": [],
+ "Info": [],
+ "Warnings": [],
+ "Data": {
+  "name": "catalog_poc_data",
+  "created_at": "2020-02-26T12:57:31-05:00",
+  "created_by": "arn:aws:sts::062325279035:assumed-role/AWSGlueServiceRole-anduin-data-glue/AWS-Crawler",
+  "database_name": "crawler-poc",
+  "schema": [...]
+ }
+}
 
 ```
 Running operator with config parameters yaml file:
@@ -102,11 +110,18 @@ mason operator table get -c examples/parameters/table_get.yaml
 +--------------------+
 | Operator Response  |
 +--------------------+
-Errors: []
-Info: []
-Warnings: []
-Data: {'name': 'catalog_poc_data', 'created_at': datetime.datetime(2020, 2, 26, 12, 57, 31, tzinfo=tzlocal()), 'created_by': 'arn:aws:sts::062325279035:assumed-role/AWSGlueServiceRole-anduin-data-glue/AWS-Crawler', 'database_name': 'crawler-poc', 'schema': [{'Name': 'index', 'Type': 'bigint'}, {'Name': 'break1maxqty', 'Type': 'double'}, {'Name': 'break1minqty', 'Type': 'double'}, {'Name': 'break1price', 'Type': 'double'}, {'Name': 'break2maxqty', 'Type': 'double'}, {'Name': 'break2minqty', 'Type': 'double'}, {'Name': 'break2price', 'Type': 'double'}, {'Name': 'break3maxqty', 'Type': 'double'}, {'Name': 'break3minqty', 'Type': 'double'}, {'Name': 'break3price', 'Type': 'double'}, {'Name': 'break4maxqty', 'Type': 'double'}, {'Name': 'break4minqty', 'Type': 'double'}, {'Name': 'break4price', 'Type': 'double'}, {'Name': 'break5maxqty', 'Type': 'double'}, {'Name': 'break5minqty', 'Type': 'double'}, {'Name': 'break5price', 'Type': 'double'}, {'Name': 'maxprice', 'Type': 'double'}, {'Name': 'minprice', 'Type': 'double'}, {'Name': 'packaging', 'Type': 'string'}, {'Name': 'partnumber', 'Type': 'string'}, {'Name': 'qtyperpackage', 'Type': 'double'}, {'Name': 'source', 'Type': 'string'}, {'Name': 'stockqty', 'Type': 'double'}, {'Name': 'timestamp', 'Type': 'string'}, {'Name': 'virtualstockqty', 'Type': 'double'}, {'Name': 'break6maxqty', 'Type': 'double'}, {'Name': 'break6minqty', 'Type': 'double'}, {'Name': 'break6price', 'Type': 'double'}, {'Name': 'break7maxqty', 'Type': 'double'}, {'Name': 'break7minqty', 'Type': 'double'}, {'Name': 'break7price', 'Type': 'double'}, {'Name': 'ts', 'Type': 'string'}]}
-
+{
+ "Errors": [],
+ "Info": [],
+ "Warnings": [],
+ "Data": {
+  "name": "catalog_poc_data",
+  "created_at": "2020-02-26T12:57:31-05:00",
+  "created_by": "arn:aws:sts::062325279035:assumed-role/AWSGlueServiceRole-anduin-data-glue/AWS-Crawler",
+  "database_name": "crawler-poc",
+  "schema": [...]
+ }
+}
 ```
 
 

@@ -2,10 +2,11 @@ from configurations.metastore import MetastoreConfig
 from configurations.storage import StorageConfig
 from configurations.scheduler import SchedulerConfig
 from configurations.execution import ExecutionConfig
-from util.printer import pprint, banner
+from util.printer import banner
 
 from util.yaml import parse_yaml
 from util import environment as env
+from util.printer import pprint
 
 class Config(object):
 

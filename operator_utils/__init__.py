@@ -8,9 +8,9 @@ from typing import Optional
 from configurations import Config
 from parameters import Parameters
 from clients.response import Response
-from util.printer import pprint, banner
+from util.printer import banner
 from util import environment as env
-from sys import path, modules
+from sys import path
 
 class Operators:
 
@@ -31,7 +31,7 @@ class Operators:
             banner("Operator Response")
             if len(resp.errors) == 0:
                 resp = mod.run(config, parameters, resp)  # type: ignore
-            pprint(resp.formatted(debug))
+            resp.formatted(debug)
 
     def validate_parameters(self, op: Optional[dict], parameters: Parameters, response: Response):
         required_params = set((op or {}).get("parameters", {}).get("required"))
