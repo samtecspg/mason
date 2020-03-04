@@ -12,7 +12,6 @@ from util.printer import pprint, banner
 from util import environment as env
 from sys import path, modules
 
-
 class Operators:
 
     def run(self, config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, debug: Optional[bool] = False):
@@ -94,7 +93,13 @@ class Operators:
 
         cmd_value = (cmd or "Operator")
         print()
-        banner(f"Available {cmd_value} Methods:")
-        print()
-        print(tabulate(array, headers=["command", "subcommand", "description", "parameters"]))
+        if len(array) > 0:
+            banner(f"Available {cmd_value} Methods: {env.OPERATOR_HOME}")
+            print()
+            print(tabulate(array, headers=["command", "subcommand", "description", "parameters"]))
+        else:
+            if cmd:
+                print(f"Operator \"{cmd_value}\" not found.  List operators but running \"mason operator\"")
+            else:
+                print("No Operators Registered.  Register operators by running \"mason register\"")
 

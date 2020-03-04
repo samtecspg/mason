@@ -2,6 +2,7 @@ import click
 import shutil
 import os
 from os import path
+from pathlib import Path
 from operator_utils import Operators
 from typing import Optional
 
@@ -20,31 +21,45 @@ def main():
 @main.command()
 @click.argument('config_file', required=False)
 def config(config_file: Optional[str] = None):
-    if config_file:
-        try:
-            os.mkdir(env.MASON_HOME)
-            print(f"Creating MASON_HOME at {env.MASON_HOME}")
-            os.mkdir(env.OPERATOR_HOME)
-            print(f"Creating OPERATOR_HOME at {env.OPERATOR_HOME}")
-        except FileExistsError as e:
-            print(f"Using MASON_HOME at {env.MASON_HOME}")
+    if not path.exists(env.MASON_HOME):
+        print(f"Creating MASON_HOME at {env.MASON_HOME}")
+        os.mkdir(env.MASON_HOME)
+    if not path.exists(env.OPERATOR_HOME):
+        print(f"Creating OPERATOR_HOME at {env.OPERATOR_HOME}")
+        os.mkdir(env.OPERATOR_HOME)
+        Path(env.OPERATOR_HOME + "__init__.py").touch()
 
-        # TODO: Validate config
+    if config_file:
+        # TODO: Validate config using json_schema
         # TODO: Interactive configuration
         print(f"Using config {config_file}.  Saving to {env.CONFIG_HOME}")
         shutil.copyfile(config_file, env.CONFIG_HOME)
+        return Config()
     else:
         if path.exists(env.CONFIG_HOME):
-            Config()
+            return Config()
         else:
-            print("Usage:  mason config <config_file_path>")
+            print()
+            print("Configuration not found.")
+            print("First pass configuration:  \"mason config <config_file_path>\"")
 
 @main.command()
 @click.argument("operator_file")
 def register(operator_file: str):
-    # TODO: Validate Operator using json_schema
-    config()
-    # shutil.copyfile()
+    if path.exists(env.CONFIG_HOME):
+        # TODO: Validate Operator using json_schema
+
+        #  Assumes it is a path
+        basename = path.basename(operator_file)
+        pathname = env.OPERATOR_HOME + f"{basename}/"
+
+        if not path.exists(pathname):
+            print(f"Registering operator at {operator_file} to {pathname}")
+            shutil.copytree(operator_file, pathname)
+        else:
+            print(f"Operator \"{basename}\" already exists at {pathname}")
+    else:
+        print("Configuration not found.  Run \"mason config\" first")
 
 @main.command()
 @click.argument("cmd", required=False)
@@ -54,9 +69,12 @@ def register(operator_file: str):
 @click.option('-d', '--debug', help="Return client responses", is_flag=True)
 def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, debug: bool = False):
     params = Parameters(parameters, param_file)
-    config = Config()
+    if path.exists(env.CONFIG_HOME):
+        configuration = Config()
+        Operators().run(configuration, params, cmd, subcmd, debug)
+    else:
+        print("Configuration not found.  Run \"mason config\" first")
 
-    Operators().run(config, params, cmd, subcmd, debug)
 
 if __name__ == "__main__":
     main()

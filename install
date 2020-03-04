@@ -1,1 +1,4 @@
+set -e
+
+mypy .
 pip3 install .
