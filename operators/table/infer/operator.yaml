@@ -1,7 +1,7 @@
 type: "operator"
 namespace: "table"
 command: "infer"
-description:  "Infer metastore tables.  1. Registers a schedule for infering the table.  2.  Does a one time trigger of the refresh."
+description:  "Registers a schedule for infering the table then does a one time trigger of the refresh."
 parameters:
   required:
     - "database_name"

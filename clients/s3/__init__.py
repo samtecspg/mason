@@ -8,6 +8,8 @@ class S3Client:
 
     def path(self, path: str):
         return "s3://" + path
+
+    # TODO: Validate that the specified path exists before bothering other clients with it
     # def validate_path(self, path: str):
     #     try:
     #         s3 = boto3.resource('s3')

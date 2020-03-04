@@ -10,7 +10,6 @@ def run(config: Config, parameters: Parameters, response: Response):
 
     config.scheduler_config.client.register_schedule
 
-
     path = config.storage_config.client.path(storage_path)
     response = config.scheduler_config.client.register_schedule(database_name, path, schedule_name, response)
 

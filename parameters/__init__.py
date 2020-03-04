@@ -1,6 +1,7 @@
 
 from typing import Optional, List, Tuple, Any
 from util.yaml import parse_yaml
+from util.printer import banner
 
 class Parameters:
 
@@ -17,7 +18,7 @@ class Parameters:
 
         if (self.parsed_parameters == {}) == False:
             print()
-            print("Parsed Parameters")
+            banner("Parsed Parameters")
             print(self.parsed_parameters)
             print()
 

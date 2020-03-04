@@ -8,10 +8,11 @@ from typing import Optional
 from configurations import Config
 from parameters import Parameters
 from clients.response import Response
+from util.printer import pprint, banner
 
 class Operators:
 
-    def run(self, config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
+    def run(self, config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, debug: Optional[bool] = False):
         #  TODO: Allow single step commands without subcommands
         response = Response()
 
@@ -23,9 +24,10 @@ class Operators:
             mod = import_module(f'.', f"operators.{cmd}.{subcmd}")
             op = self.get_operator(cmd, subcmd)
             resp = self.validate_parameters(op, parameters, response)
+            banner("Operator Response")
             if len(resp.errors) == 0:
                 resp = mod.run(config, parameters, resp)  # type: ignore
-            print(resp.formatted())
+            pprint(resp.formatted(debug))
 
     def validate_parameters(self, op: Optional[dict], parameters: Parameters, response: Response):
         required_params = set((op or {}).get("parameters", {}).get("required"))
@@ -37,7 +39,7 @@ class Operators:
         print()
         validated = list(parameters.validated_parameters.keys())
         missing = list(sym_diff)
-        print(f"Parameters Validation:")
+        banner(f"Parameters Validation:")
         if len(validated) > 0:
             print(f"Validated: {validated}")
         if len(missing) > 0:

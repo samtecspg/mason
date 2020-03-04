@@ -1,6 +1,7 @@
 from configurations.metastore import MetastoreConfig
 from configurations.storage import StorageConfig
 from configurations.scheduler import SchedulerConfig
+from util.printer import pprint, banner
 
 from util.yaml import parse_yaml
 
@@ -8,7 +9,7 @@ from util.yaml import parse_yaml
 class Config(object):
 
     def __init__(self, location: str = "config.yaml"):
-        print(f"Reading configuration at {location}:")
+        banner(f"Reading configuration at {location}:")
         config_doc = parse_yaml(location)
         # TODO: Validate config object structure
         self.metastore_config = MetastoreConfig(config_doc)
@@ -19,7 +20,7 @@ class Config(object):
         self.print()
 
     def print(self):
-        print({
+        pprint({
             'metastore_config': self.metastore_config.to_dict(),
             'storage_config': self.storage_config.to_dict(),
             'scheduler_config': self.scheduler_config.to_dict()

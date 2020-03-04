@@ -1,6 +1,7 @@
 from configurations import Config
 from parameters import Parameters
 from clients.response import Response
+from util.printer import banner
 
 def run(config: Config, parameters: Parameters, response: Response):
     database_name: str = parameters.safe_get("database_name")
@@ -8,8 +9,6 @@ def run(config: Config, parameters: Parameters, response: Response):
 
     response = config.metastore_config.client.get_table(database_name, table_name, response)
 
-    print()
-    print(f"{config.metastore_config.client_name.capitalize()} Client Response:")
     return response
 
 

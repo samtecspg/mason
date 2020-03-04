@@ -53,7 +53,6 @@ class GlueClient:
             response.add_error(message)
             response.set_status(status)
 
-
         return response
 
     def trigger_schedule(self, schedule_name: str, response: Response):
@@ -64,10 +63,12 @@ class GlueClient:
 
         if error == "CrawlerRunningException":
             response.add_warning(f"Table crawler {schedule_name} is already refreshing.")
+            response.add_data({})
             response.set_status(202)
         elif status:
             if 200 <= status < 300:
                 response.add_info(f"Refreshing Table Crawler: {schedule_name}")
+                response.add_data({})
                 response.set_status(201)
         else:
             response.add_error(message)

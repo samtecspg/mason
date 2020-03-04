@@ -24,22 +24,20 @@ class Response:
     def set_status(self, status: int):
         self.status_code = status
 
-
     def add_data(self, data: dict):
         self.data = data
 
-    def formatted(self, metadatabase_response: bool = False, data: bool = True):
-        returns = {
-            'Warnings': self.warnings,
-            'Errors': self.errors,
-            'Info': self.info,
-        }
+    def formatted(self, debug: bool):
+        returns = {}
+        returns['Errors'] = self.errors
+        returns['Info'] = self.info
+        returns['Warnings'] = self.warnings
 
-        if data:
+        if len(self.data) > 0:
             returns['Data'] = self.data  # type: ignore
 
-        if metadatabase_response:
-            returns['_metadatabase_response'] = self.responses # type: ignore
+        if debug:
+            returns['_client_responses'] = self.responses # type: ignore
 
         return returns
 

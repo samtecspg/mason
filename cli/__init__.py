@@ -25,11 +25,12 @@ def config(config_file: str):
 @click.argument("subcmd", required=False)
 @click.option('-p', '--parameters', help="Parameters as \",\" delimeted list var=value")
 @click.option('-c', '--param_file', help="Parameters from yaml file path")
-def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None):
+@click.option('-d', '--debug', help="Return client responses", is_flag=True)
+def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, debug: bool = False):
     params = Parameters(parameters, param_file)
     config = Config()
 
-    Operators().run(config, params, cmd, subcmd)
+    Operators().run(config, params, cmd, subcmd, debug)
 
 if __name__ == "__main__":
     main()
