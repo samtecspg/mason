@@ -9,10 +9,13 @@ from configurations import Config
 from parameters import Parameters
 from clients.response import Response
 from util.printer import pprint, banner
+from util import environment as env
+import sys
 
 class Operators:
 
     def run(self, config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, debug: Optional[bool] = False):
+        sys.path.append(env.OPERATOR_HOME)
         #  TODO: Allow single step commands without subcommands
         response = Response()
 
@@ -89,7 +92,7 @@ class Operators:
 
         cmd_value = (cmd or "Operator")
         print()
-        print(f"Available {cmd_value} Methods:")
+        banner(f"Available {cmd_value} Methods:")
         print()
         print(tabulate(array, headers=["command", "subcommand", "description", "parameters"]))
 

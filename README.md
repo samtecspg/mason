@@ -24,6 +24,24 @@ The main concept in mason is something called a "Data Operator".  There are thre
 2.  Transform Operators
 3.  Egress Operators
 
+## Usage
+Local Development:
+```
+./pip_install
+```
+Configuring:
+```
+mason config examples/config/config_example.yaml
+```
+Registering Operators:
+```
+mason operator
+```
+Listing Operators:
+```
+mason operator
+```
+
 
 ### Example: Import Operator
 

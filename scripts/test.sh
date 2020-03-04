@@ -2,10 +2,10 @@
 
 export CLI=./cli/__init__.py
 
-python3 $CLI operator
+#python3 $CLI operator
 #python3 $CLI operator table
 #python3 $CLI operator table list
-#python3 $CLI operator table list -p database_name:crawler-poc
+python3 $CLI operator table list -p database_name:crawler-poc
 #python3 $CLI operator table get -p database_name:crawler-poc
 #python3 $CLI operator table get -p database_name:crawler-poc,table_name:catalog_poc_data
 #python3 $CLI operator table get -c examples/parameters/table_get.yaml

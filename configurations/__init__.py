@@ -4,13 +4,14 @@ from configurations.scheduler import SchedulerConfig
 from util.printer import pprint, banner
 
 from util.yaml import parse_yaml
-
+from util import environment as env
 
 class Config(object):
 
-    def __init__(self, location: str = "config.yaml"):
-        banner(f"Reading configuration at {location}:")
-        config_doc = parse_yaml(location)
+    def __init__(self):
+        config_home = env.CONFIG_HOME
+        banner(f"Reading configuration at {config_home}:")
+        config_doc = parse_yaml(config_home)
         # TODO: Validate config object structure
         self.metastore_config = MetastoreConfig(config_doc)
         self.storage_config = StorageConfig(config_doc)

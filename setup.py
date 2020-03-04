@@ -3,7 +3,7 @@ from setuptools import setup, find_packages # type: ignore
 with open('requirements.txt') as f:
     requirements = f.readlines()
 
-long_description = ''
+long_description = 'Mason Data Operators Framework'
 
 setup(
     name='mason',

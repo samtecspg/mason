@@ -1,1 +1,4 @@
- python3 /Users/kyle/dev/mason/cli.py config config_example.yaml
+./scripts/check
+export CLI=./cli/__init__.py
+
+python3 $CLI config examples/config/config_example.yaml
