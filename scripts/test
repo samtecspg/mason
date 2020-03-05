@@ -4,7 +4,7 @@ set -e
 # full path
 #./install
 # rm -rf ~/.mason/
-# mason operator
+# mason config
 # mason config
 # mason config examples/config/bad_config.yaml
 # mason config examples/config/config_example.yaml

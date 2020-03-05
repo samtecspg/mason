@@ -12,6 +12,7 @@ from util import environment as env
 from util.json_schema import validate_schema
 from util.printer import banner
 from util.yaml import parse_yaml
+from util.logger import Logger, LogLevel
 
 @click.group()
 def main():
@@ -22,7 +23,9 @@ def main():
 
 @main.command()
 @click.argument('config_file', required=False)
-def config(config_file: Optional[str] = None):
+@click.option("-l", "--log_level", help="Log level for mason")
+def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
+    logger = Logger(LogLevel(log_level))
     if not path.exists(env.MASON_HOME):
         print(f"Creating MASON_HOME at {env.MASON_HOME}")
         os.mkdir(env.MASON_HOME)
@@ -66,10 +69,12 @@ def config(config_file: Optional[str] = None):
 
 @main.command()
 @click.argument("operator_file")
-def register(operator_file: str):
+@click.option("-l", "--log_level", help="Log level for mason")
+def register(operator_file: str, log_level: Optional[str] = None):
+    logger = Logger(LogLevel(log_level))
     if path.exists(env.CONFIG_HOME):
 
-        validation = Operators().validate_operators(operator_file)
+        validation = Operators(logger).validate_operators(operator_file)
         if len(validation[1]) == 0:
 
             #  TODO: Assumes it is a path
@@ -92,13 +97,15 @@ def register(operator_file: str):
 @click.option('-p', '--parameters', help="Parameters as \",\" delimeted list var=value")
 @click.option('-c', '--param_file', help="Parameters from yaml file path")
 @click.option('-d', '--debug', help="Return client responses", is_flag=True)
-def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, debug: bool = False):
+@click.option("-l", "--log_level", help="Log level for mason")
+def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, debug: bool = False, log_level: Optional[str] = None):
+    logger = Logger(LogLevel(log_level))
     params = Parameters(parameters, param_file)
     if path.exists(env.CONFIG_HOME):
         configuration = Config()
-        Operators().run(configuration, params, cmd, subcmd, debug)
+        Operators(logger).run(configuration, params, cmd, subcmd, debug)
     else:
-        print("Configuration not found.  Run \"mason config\" first")
+        logger.info("Configuration not found.  Run \"mason config\" first")
 
 
 if __name__ == "__main__":

@@ -13,8 +13,12 @@ from util import environment as env
 from sys import path
 from util.json_schema import validate_schema
 from typing import List
+from util.logger import Logger
 
 class Operators:
+
+    def __init__(self, logger: Logger):
+        self.logger = logger
 
     def run(self, config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, debug: Optional[bool] = False):
 
@@ -47,10 +51,10 @@ class Operators:
                         config = parse_yaml(file_path)
                         schema = "operators/schema.json"
                         if validate_schema(config, schema):
-                            print(f"Valid Operator Definition {file_path}")
+                            self.logger.debug(f"Valid Operator Definition {file_path}")
                             configs.append(config)
                         else:
-                            print(f"Invalid Operator Definition: {file_path}")
+                            self.logger.error(f"Invalid Operator Definition: {file_path}")
                             errors.append(config)
 
         return configs, errors
