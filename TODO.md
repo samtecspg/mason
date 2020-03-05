@@ -50,5 +50,7 @@ Legend
 #### S3
 - [ ] :arrow_up: Basic Setup 
 
+## :arrow_down: Preparing for public
+- [ ] Remove samtec specific examples from examples/ files.  Use public examples
 
 
