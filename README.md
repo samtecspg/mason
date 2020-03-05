@@ -25,10 +25,10 @@ To configure mason run:
 ```
 mason config examples/config/config_example.yaml
 >>
-Creating MASON_HOME at /Users/kyle/.mason/
-Creating OPERATOR_HOME at /Users/kyle/.mason/operators/
+Creating MASON_HOME at ~/.mason/
+Creating OPERATOR_HOME at ~/.mason/operators/
 
-Using config examples/config/config_example.yaml.  Saving to /Users/kyle/.mason/config.yaml
+Using config examples/config/config_example.yaml.  Saving to ~/.mason/config.yaml
 +-------------------------------------------------+
 | Reading configuration at ~/.mason/config.yaml:  |
 +-------------------------------------------------+
