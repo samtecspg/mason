@@ -1,4 +1,4 @@
-# Mason - Data Operator Framework ![Mason Logo](/images/MasonLogo.png) 
+# Mason - Data Operator Framework ![Mason Logo](images/MasonLogo.png) 
 
 Mason is the connecting tissue for your data projects.   It provides a "data aware" analogue to the concept of an airflow operator.   In reality it specifies operators which interact with 4 configuration abstractions:
 
@@ -21,7 +21,7 @@ Local Development:
 ```
 Mason leverages `mypy` heavily for ensuring that function signatures and types are in line. Install will run mypy and stop if it does not succeed.  
 
-To configure mason run:
+To configure mason run `mason config`.  Configurations are validated for basic structure using json_schema.  See `configurations/schema.json`:
 ```
 mason config examples/config/config_example.yaml
 >>
@@ -39,6 +39,7 @@ Using config examples/config/config_example.yaml.  Saving to ~/.mason/config.yam
  "execution_config": "{}"
 }
 ```
+
 You will begin without any operators registered by default:
 ```
 mason operator
@@ -46,7 +47,7 @@ mason operator
 No Operators Registered.  Register operators by running "mason register"
 
 ```
-  You can register some example operators:
+  You can register some example operators.  Operators are validated for basic structure using json_schema.  See `/operators/schema.json` for the schema description.
 ```
 mason register examples/operators/table
 >>
