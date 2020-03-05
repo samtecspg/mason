@@ -1,5 +1,9 @@
 # To-do list
 
+Legend  
+:arrow_up:  Higher Priority  
+:arrow_down: Lower Priority
+
 ## Basic Setup
 - [x] Basic implementation of table namespace: C:4/02/2020
 - [x] Basic Configuration: C:4/03/2020
@@ -10,10 +14,10 @@
 - [x] Validate mason configuration file using json_schema: C:4/04/2020
 - [x] Validate operators according to json_schema C:4/04/2020
 - [x] Add logger with log levels. C:4/05/2020
-- [ ] Validate client compatability with operators 
-- [ ] Advanced Operator Registration Documentation 
-- [ ] New Client Specification Documentation 
-- [ ] Catch up old rest api interface 
+- [ ] :arrow_up: Validate client compatability with operators 
+- [ ] :arrow_up: Advanced Operator Registration Documentation 
+- [ ] :arrow_up: New Client Specification Documentation 
+- [ ] :arrow_up: Catch up old rest api interface 
 
 ## Clients
 
@@ -22,29 +26,29 @@
 #### Glue
 - [x] Basic setup. C: 4/04/2020
 #### Hive
-- [ ] Basic setup
+- [ ] :arrow_down: Basic setup
 ### Execution
-- [ ] Dockerized Execution
-- [ ] Kubernetes Execution
+- [ ] :arrow_up: Dockerized Execution
+- [ ] :arrow_up: Kubernetes Execution
 #### Python
-- [ ] Basic setup
-#### IPython
-- [ ] Basic setup
-- [ ] Papermill integration 
+- [ ] :arrow_up: Basic setup
+#### IPython/Jupyter
+- [ ] :arrow_up: Basic setup
+- [ ] :arrow_up: Papermill integration 
 #### Athena
-- [ ] Basic setup 
+- [ ] :arrow_up: Basic setup 
 #### Spark
 - [ ] Basic setup 
 #### Presto
-- [ ] Basic setup 
+- [ ] :arrow_up: Basic setup 
 
 ### Scheduler
 #### Airflow
-- [ ] Basic setup 
+- [ ] :arrow_up: Basic setup 
 
 ### Storage
 #### S3
-- [ ] Basic Setup 
+- [ ] :arrow_up: Basic Setup 
 
 
 
