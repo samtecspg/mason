@@ -13,7 +13,6 @@ from util.json_schema import validate_schema
 from util.printer import banner
 from util.yaml import parse_yaml
 
-
 @click.group()
 def main():
     """
@@ -33,7 +32,6 @@ def config(config_file: Optional[str] = None):
         Path(env.OPERATOR_HOME + "__init__.py").touch()
 
     if config_file:
-        # TODO: Validate config using json_schema
         # TODO: Interactive configuration
         banner("Config Validation")
         parsed = parse_yaml(config_file)
