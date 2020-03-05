@@ -17,14 +17,13 @@
 
 ## Clients
 
-###Metastore
+### Metastore
 
-####Glue
+#### Glue
 - [x] Basic setup. C: 4/04/2020
-####Hive
+#### Hive
 - [ ] Basic setup
-
-###Execution
+### Execution
 - [ ] Dockerized Execution
 - [ ] Kubernetes Execution
 #### Python
@@ -39,14 +38,13 @@
 #### Presto
 - [ ] Basic setup 
 
-
-###Scheduler
-####Airflow
+### Scheduler
+#### Airflow
 - [ ] Basic setup 
 
-###Storage
-####S3
-- [x] Basic setup 
+### Storage
+#### S3
+- [ ] Basic Setup 
 
 
 
