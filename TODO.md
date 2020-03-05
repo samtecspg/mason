@@ -17,7 +17,7 @@ Legend
 - [ ] :arrow_up: Validate client compatability with operators 
 - [ ] :arrow_up: Advanced Operator Registration Documentation 
 - [ ] :arrow_up: New Client Specification Documentation 
-- [ ] :arrow_up: Catch up old rest api interface 
+- [ ] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators)
 
 ## Clients
 
