@@ -71,6 +71,7 @@ def register(operator_file: str):
 
         validation = Operators().validate_operators(operator_file)
         if len(validation[1]) == 0:
+
             #  TODO: Assumes it is a path
             basename = path.basename(operator_file)
             pathname = env.OPERATOR_HOME + f"{basename}/"

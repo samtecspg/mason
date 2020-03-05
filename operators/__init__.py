@@ -27,7 +27,7 @@ class Operators:
             self.tabulate_operators(cmd)
         else:
             path.append(env.MASON_HOME)
-            mod = import_module(f'operators.{cmd}.{subcmd}')
+            mod = import_module(f'registered_operators.{cmd}.{subcmd}')
             op = self.get_operator(cmd, subcmd)
             resp = self.validate_parameters(op, parameters, response)
             banner("Operator Response")

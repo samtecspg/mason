@@ -10,4 +10,4 @@ def get_mason_home():
 
 MASON_HOME = get_mason_home()
 CONFIG_HOME = MASON_HOME + "config.yaml"
-OPERATOR_HOME = MASON_HOME + "operators/"
+OPERATOR_HOME = MASON_HOME + "registered_operators/"
