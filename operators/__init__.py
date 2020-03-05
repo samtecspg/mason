@@ -11,6 +11,8 @@ from clients.response import Response
 from util.printer import banner
 from util import environment as env
 from sys import path
+from util.json_schema import validate_schema
+from typing import List
 
 class Operators:
 
@@ -32,6 +34,26 @@ class Operators:
             if len(resp.errors) == 0:
                 resp = mod.run(config, parameters, resp)  # type: ignore
             resp.formatted(debug)
+
+    def validate_operators(self, operator_file: str):
+        configs: List[dict] = []
+        errors: List[dict] = []
+
+        for r, d, f in os.walk(operator_file):
+            for file in f:
+                if '.yaml' in file:
+                    file_path = os.path.join(r, file)
+                    if file == "operator.yaml":
+                        config = parse_yaml(file_path)
+                        schema = "operators/schema.json"
+                        if validate_schema(config, schema):
+                            configs.append(config)
+                        else:
+                            print(f"Invalid Operator definition: {file_path}")
+                            errors.append(config)
+
+        return configs, errors
+
 
     def validate_parameters(self, op: Optional[dict], parameters: Parameters, response: Response):
         required_params = set((op or {}).get("parameters", {}).get("required"))
@@ -58,16 +80,8 @@ class Operators:
 
     def list_operators(self, cmd: Optional[str] = None):
         path = env.OPERATOR_HOME
-        configs = []
 
-        #  TODO: validate operator.yaml structure using json schema
-        for r, d, f in os.walk(path):
-            for file in f:
-                if '.yaml' in file:
-                    file_path = os.path.join(r, file)
-                    if file == "operator.yaml":
-                        config = parse_yaml(file_path)
-                        configs.append(config)
+        configs = self.validate_operators(path)[0]
         grouped = dict((k, list(g)) for k, g in itertools.groupby(configs, key=itemgetter('namespace')))
         filtered = {k: v for k, v in grouped.items() if (k == cmd) or (cmd == None)}
 

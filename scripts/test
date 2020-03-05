@@ -1,7 +1,6 @@
 #!/bin/sh
 set -e
 
-
 # full path
 #./install
 # rm -rf ~/.mason/
@@ -21,10 +20,9 @@ set -e
 # mason operator table refresh -p database_name:crawler-poc,table_name:catalog_poc_data
 # mason operator table infer -p schedule_name:test_crawler,database_name:crawler-poc,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/
 
-
 # happy path
 #./install
 # rm -rf ~/.mason/
 # mason config examples/config/config_example.yaml
 # mason register examples/operators/table/get
-# mason operator
+ mason operator

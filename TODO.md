@@ -7,7 +7,7 @@
 - [x] Basic Documentation 
 - [x] Prettify outputs and update documentation
 - [x] Validate mason configuration file using json_schema
-- [ ] Validate operators according to json_schema 
+- [x] Validate operators according to json_schema 
 - [ ] Validate client compatability with operators 
 - [ ] Advanced Operator Registration Documentation 
 - [ ] New Client Specification Documentation 

@@ -3,7 +3,7 @@ import shutil
 import os
 from os import path
 from pathlib import Path
-from operator_utils import Operators
+from operators import Operators
 from typing import Optional
 
 from configurations import Config
@@ -70,17 +70,20 @@ def config(config_file: Optional[str] = None):
 @click.argument("operator_file")
 def register(operator_file: str):
     if path.exists(env.CONFIG_HOME):
-        # TODO: Validate Operator using json_schema
 
-        #  Assumes it is a path
-        basename = path.basename(operator_file)
-        pathname = env.OPERATOR_HOME + f"{basename}/"
+        validation = Operators().validate_operators(operator_file)
+        if len(validation[1]) == 0:
+            #  TODO: Assumes it is a path
+            basename = path.basename(operator_file)
+            pathname = env.OPERATOR_HOME + f"{basename}/"
 
-        if not path.exists(pathname):
-            print(f"Registering operator at {operator_file} to {pathname}")
-            shutil.copytree(operator_file, pathname)
+            if not path.exists(pathname):
+                print(f"Registering operator at {operator_file} to {pathname}")
+                shutil.copytree(operator_file, pathname)
+            else:
+                print(f"Operator \"{basename}\" already exists at {pathname}")
         else:
-            print(f"Operator \"{basename}\" already exists at {pathname}")
+            print(f"Invalid operator configurations found: {validation[1]}")
     else:
         print("Configuration not found.  Run \"mason config\" first")
 

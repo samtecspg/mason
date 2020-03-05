@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MasonOperatorSchema",
+  "properties": {
+    "type": {
+      "type": "string" ,
+      "enum": ["operator"]
+    },
+    "namespace": { "type": "string" },
+    "command": { "type": "string" },
+    "description": { "type": "string" },
+    "parameters": {
+      "type": "object",
+      "properties": {
+         "required": {
+           "type": "array",
+             "items": {
+               "type": "string"
+            }
+         },
+        "optional": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }, "required": ["type", "namespace", "command", "description"]
+}
+
