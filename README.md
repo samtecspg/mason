@@ -1,13 +1,13 @@
 # Mason - Data Operator Framework ![Mason Logo](images/MasonLogo.png) 
 
-Mason is the connecting tissue for your data projects.  You can think of Data Operators as a "data aware" analogue to the concept of an airflow operator, or a data analogue to the react.js concept of a "component".  In reality it specifies operators which interact with 4 configuration abstractions:
+Mason is the connecting tissue for your data projects.  You can think of Data Operators as a "data aware" analogue to the concept of an airflow operator, or a data analogue to the react.js concept of a "component".  In reality it specifies Data Operators which interact with 4 configuration abstractions called "Engines":
 
-1.   Storage Engine - for example S3, HDFS or Kafka
-2.   Metadata Store - Hive, Glue, Iceberg
-3.   Execution Engines -  Spark, Dask, Presto, Athena 
-4.   Schedulers - Glue, Apache Airflow, DigDag
+![Operator Engines](images/OperatorConfigs.png)
 
-![Operator Configs](images/OperatorConfigs.png)
+1.   Storage Engines - Any activity that involves serial (row level) access and storage of data.  Some example storage clients would be S3 or HDFS.
+2.   Metastore Engines - Any activity that involves accessing metadata of datasets such as partitioning or schema information but not the data itself.  Some example metastore clients would be Glue, or Hive.
+3.   Execution Engines - Any activity that involves programatic serial or SQL analytical computation on data.  Example exeuction engines would be spark, presto, or athena.
+4.   Scheduler Engines -  Anything that involves scheduling frequency of data jobs.  Example scheduler clients would be airflow, or aws data pipelines
 
 Mason is heavily inspired by language agnostic configuration driven tools like kubernetes, helm, and terraform.   Mason aims to help to make existing higher level open source big data tools _easier_ to coordinate with one another and make them easier to interact with for individuals of various expertise across organizations.  Mason does not attempt to make provisioning and standing up such services referenced in its configurations easier and thus is meant to be used in conjunction with tools
 like kubernetes and helm.
@@ -132,11 +132,28 @@ mason operator table get -c examples/parameters/table_get.yaml
 ```
 
 
-## Data Operators 
+## Philosophy
 
-### Philosophy
+Mason's main function is to broker the relationship between 3 main objects:
+1. Clients -  Technologies which can be used in various capacities as engines
+2. Engines -  The 4 main types of data operations (storage, execution, metastore and scheduler) which comprise of the main players in an operator definition.
+3. Operators - Parameterized definitions of work which interact with the various engines.
 
-The main concept in mason is something called a "Data Operator".  There are three main types of Data Operators:
+## Engines 
+
+Mason creates a layer of abstraction between these 4 engine types (storage, metastore, scheduler, execution) and the various clients that you could use to execute them.  
+
+For example, S3 is primarily a storage engine but can also be leveraged as a metastore in accessing its partitioning (in this simple sense just the folder heirarchy) information.
+
+Glue is primarily a metastore but can also be used in the capacity of a scheduler or even execution engine via glue crawlers.
+
+## Clients
+
+Clients are being added they include a number of prioprietary technologies such as Athena, Glue, Redshift but are mainly focused on open source technologies such as Presto, Airflow and Spark.
+
+## Operators 
+
+The main concept in mason is something called a "Data Operator".  You can think of there as being are three main types of Data Operators:
 
 1.  Ingress Operators
 2.  Transform Operators

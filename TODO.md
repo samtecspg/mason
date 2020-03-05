@@ -19,12 +19,19 @@ Legend
 - [ ] :arrow_up: New Client Specification Documentation 
 - [ ] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators)
 
+## Operators
+
+- [ ] Dedupe Operator
+- [ ] JSON explode operator
+
 ## Clients
 
 ### Metastore
 
 #### Glue
 - [x] Basic setup. C: 4/04/2020
+- [ ] Redshift
+- [ ] Elasticsearch
 #### Hive
 - [ ] :arrow_down: Basic setup
 ### Execution
@@ -49,6 +56,8 @@ Legend
 ### Storage
 #### S3
 - [ ] :arrow_up: Basic Setup 
+- [ ] Redshift
+- [ ] Elasticsearch
 
 ## :arrow_down: Preparing for public
 - [ ] Remove samtec specific examples from examples/ files.  Use public examples
