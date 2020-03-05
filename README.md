@@ -1,6 +1,6 @@
 # Mason - Data Operator Framework ![Mason Logo](images/MasonLogo.png) 
 
-Mason is the connecting tissue for your data projects.   It provides a "data aware" analogue to the concept of an airflow operator.   You can think of them as the data analogue to the react.js concept of a "component".  In reality it specifies operators which interact with 4 configuration abstractions:
+Mason is the connecting tissue for your data projects.  You can think of Data Operators as a "data aware" analogue to the concept of an airflow operator, or a data analogue to the react.js concept of a "component".  In reality it specifies operators which interact with 4 configuration abstractions:
 
 1.   Storage Engine - for example S3, HDFS or Kafka
 2.   Metadata Store - Hive, Glue, Iceberg
