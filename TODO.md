@@ -14,6 +14,7 @@ Legend
 - [x] Validate mason configuration file using json_schema: C:4/04/2020
 - [x] Validate operators according to json_schema C:4/04/2020
 - [x] Add logger with log levels. C:4/05/2020
+- [ ] :arrow_up: Build and refine "Engines" first order concept
 - [ ] :arrow_up: Validate client compatability with operators 
 - [ ] :arrow_up: Advanced Operator Registration Documentation 
 - [ ] :arrow_up: New Client Specification Documentation 
