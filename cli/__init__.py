@@ -76,7 +76,7 @@ def register(operator_file: str):
             pathname = env.OPERATOR_HOME + f"{basename}/"
 
             if not path.exists(pathname):
-                print(f"Registering operator at {operator_file} to {pathname}")
+                print(f"Registering operator(s) at {operator_file} to {pathname}")
                 shutil.copytree(operator_file, pathname)
             else:
                 print(f"Operator \"{basename}\" already exists at {pathname}")

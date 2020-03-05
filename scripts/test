@@ -25,4 +25,4 @@ set -e
 # rm -rf ~/.mason/
 # mason config examples/config/config_example.yaml
 # mason register examples/operators/table/get
- mason operator
+# mason operator

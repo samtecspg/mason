@@ -51,7 +51,11 @@ No Operators Registered.  Register operators by running "mason register"
 ```
 mason register examples/operators/table
 >>
-Registering operator at examples/operators/table to ~/.mason/operators/table/
+Valid Operator Definition examples/operators/table/refresh/operator.yaml
+Valid Operator Definition examples/operators/table/get/operator.yaml
+Valid Operator Definition examples/operators/table/list/operator.yaml
+Valid Operator Definition examples/operators/table/infer/operator.yaml
+Registering operator(s) at examples/operators/table to ~/.mason/operators/table/
 ```
 Listing Operators:
 ```

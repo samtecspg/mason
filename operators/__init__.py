@@ -47,9 +47,10 @@ class Operators:
                         config = parse_yaml(file_path)
                         schema = "operators/schema.json"
                         if validate_schema(config, schema):
+                            print(f"Valid Operator Definition {file_path}")
                             configs.append(config)
                         else:
-                            print(f"Invalid Operator definition: {file_path}")
+                            print(f"Invalid Operator Definition: {file_path}")
                             errors.append(config)
 
         return configs, errors
