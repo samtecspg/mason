@@ -14,11 +14,12 @@ Legend
 - [x] Validate mason configuration file using json_schema: C:4/04/2020
 - [x] Validate operators according to json_schema C:4/04/2020
 - [x] Add logger with log levels. C:4/05/2020
-- [ ] :arrow_up: Build and refine "Engines" first order concept
 - [ ] :arrow_up: Validate client compatability with operators 
 - [ ] :arrow_up: Advanced Operator Registration Documentation 
 - [ ] :arrow_up: New Client Specification Documentation 
 - [ ] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators)
+- [ ] Build and refine "Engines" first order concept
+- [ ] Establish docker style sha registration for installed operators to fix version conflicts
 
 ## Operators
 

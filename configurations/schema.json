@@ -2,22 +2,30 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "MasonConfiguration",
   "properties": {
-     "metastore_client": {
-       "type": "string",
-       "enum": ["glue"]
-     },
-    "execution_client": {
+    "metastore_engine": {
       "type": "string",
-      "enum": [""]
+      "enum": [
+        "glue"
+      ]
     },
-    "storage_client": {
+    "execution_engine": {
       "type": "string",
-      "enum": ["s3"]
+      "enum": [
+        ""
+      ]
     },
-    "scheduler_client": {
+    "storage_engine": {
       "type": "string",
-      "enum": ["glue"]
+      "enum": [
+        "s3"
+      ]
+    },
+    "scheduler_engine": {
+      "type": "string",
+      "enum": [
+        "glue"
+      ]
     }
-  }, "required": ["metastore_client", "storage_client", "scheduler_client"]
+  }
 }
 

@@ -4,10 +4,9 @@ from botocore.errorfactory import ClientError # type: ignore
 
 class GlueClient:
 
-    def __init__(self, glue_config: dict):
-        self.region = glue_config.get("region")
-        self.aws_role_arn = glue_config.get("aws_role_arn", "")
-        self.client = boto3.client('glue', region_name=self.region)
+    def __init__(self, config: dict):
+        self.client = boto3.client('glue', region_name=config.get("region"))
+        self.aws_role_arn = config.get("aws_role_arn") or "" # TODO: FIX
 
     def list_tables(self, database_name: str, response: Response):
         try:
@@ -162,4 +161,5 @@ class GlueClient:
 
     def parse_table_list_data(self, glue_response: dict):
         return list(map(lambda x: self.parse_table_data(x), glue_response['TableList']))
+
 

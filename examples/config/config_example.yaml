@@ -1,6 +1,6 @@
-metastore_client: glue
-scheduler_client: glue
-storage_client: s3
+metastore_engine: glue
+scheduler_engine: glue
+storage_engine: s3
 clients:
   glue:
     configuration:
@@ -9,4 +9,3 @@ clients:
   s3:
     configuration:
       region: "us-east-1"
-

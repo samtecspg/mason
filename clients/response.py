@@ -1,5 +1,6 @@
 from typing import List
 from util.json import print_json
+from util.logger import logger
 
 class Response:
     def __init__(self):
@@ -9,6 +10,9 @@ class Response:
         self.errors: List[str] = []
         self.status_code: int = 200
         self.data: dict = {}
+
+    def errored(self):
+        return not (len(self.errors) == 0)
 
     def add_warning(self, warning: str):
         self.warnings.append(warning)
@@ -29,7 +33,7 @@ class Response:
         self.data = data
 
 
-    def formatted(self, debug: bool):
+    def formatted(self):
         returns = {}
         returns['Errors'] = self.errors
         returns['Info'] = self.info
@@ -38,7 +42,7 @@ class Response:
         if len(self.data) > 0:
             returns['Data'] = self.data  # type: ignore
 
-        if debug:
+        if logger.log_level.debug():
             returns['_client_responses'] = self.responses # type: ignore
 
 
