@@ -5,20 +5,21 @@ Legend
 :arrow_down: Lower Priority
 
 ## Basic Setup
-- [x] Basic implementation of table namespace: C:4/02/2020
-- [x] Basic Configuration: C:4/03/2020
-- [x] Basic Operator Registration: C:4/04/2020
-- [x] Package configuration: C:4/03/2020
-- [x] Basic Documentation: C:4/04/2020
-- [x] Prettify outputs and update documentation: C:4/04/2020
-- [x] Validate mason configuration file using json_schema: C:4/04/2020
-- [x] Validate operators according to json_schema C:4/04/2020
-- [x] Add logger with log levels. C:4/05/2020
-- [ ] :arrow_up: Validate client compatability with operators 
+- [x] Basic implementation of table namespace: C:03/02/2020
+- [x] Basic Configuration: C:03/03/2020
+- [x] Basic Operator Registration: C:03/04/2020
+- [x] Package configuration: C:03/03/2020
+- [x] Basic Documentation: C:03/04/2020
+- [x] Prettify outputs and update documentation: C:03/04/2020
+- [x] Validate mason configuration file using json_schema: C:03/04/2020
+- [x] Validate operators according to json_schema C:03/04/2020
+- [x] Add logger with log levels. C:03/05/2020
+- [x] :arrow_up: Validate client compatability with operators C:03/06/2020
 - [ ] :arrow_up: Advanced Operator Registration Documentation 
-- [ ] :arrow_up: New Client Specification Documentation 
+- [ ] :arrow_up: New Client Documentation 
+- [ ] :arrow_down: New Engine Documentation 
 - [ ] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators)
-- [ ] Build and refine "Engines" first order concept
+- [x] Build and refine "Engines" first order concept C: 03/06/2020
 - [ ] Establish docker style sha registration for installed operators to fix version conflicts
 
 ## Operators
