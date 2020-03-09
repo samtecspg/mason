@@ -136,20 +136,37 @@ mason operator table get -c examples/parameters/table_get.yaml
 
 Mason's main function is to broker the relationship between 3 main objects:
 1. Clients -  Technologies which can be used in various capacities as engines
-2. Engines -  The 4 main types of data operations (storage, execution, metastore and scheduler) which comprise of the main players in an operator definition.
+2. Engines -  The 4 main types of data engines by default (storage, execution, metastore and scheduler) which comprise of the various ways by which a client can be utilized.
 3. Operators - Parameterized definitions of work which interact with the various engines.
+
+You can think of the interaction between these 3 types of entities as follows:  
+```buildoutcfg
+For <CLIENT> as a <ENGINE TYPE> do <OPERATOR DEFINITION(:parameters)>
+```
+For example:
+```buildoutcfg
+For <Glue> as a <Metastore> do <List Tables>
+For <Glue> as a <Scheduler> do <Trigger schedule(:schedule_name = 'test-crawler')>
+For <S3> as a <Metastore> do <List Partitions(:table_name = 'test-table')>
+```
+
+In other words Engines define the valid operations which can be performed via the various clients and operators implement one or more of those operations.
 
 ## Engines 
 
-Mason creates a layer of abstraction between these 4 engine types (storage, metastore, scheduler, execution) and the various clients that you could use to execute them.  
+Out of the box mason creates a layer of abstraction between these 4 engine types (storage, metastore, scheduler, execution). This is based on the observation that most data pipelines are executing operations which interact with clients serving primarily in these 4 roles.
 
-For example, S3 is primarily a storage engine but can also be leveraged as a metastore in accessing its partitioning (in this simple sense just the folder heirarchy) information.
+### Defining new Engines
 
-Glue is primarily a metastore but can also be used in the capacity of a scheduler or even execution engine via glue crawlers.
+Coming Soon
 
 ## Clients
 
 Clients are being added they include a number of prioprietary technologies such as Athena, Glue, Redshift but are mainly focused on open source technologies such as Presto, Airflow and Spark.
+
+### Defining new Clients
+
+Coming Soon
 
 ## Operators 
 
@@ -161,7 +178,7 @@ The main concept in mason is something called a "Data Operator".  You can think 
 
 ![Data Operators](images/DataOperators.png)
 
-### Defining Data Operators:
+### Defining new Operators:
 COMING SOON
 
 
