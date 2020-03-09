@@ -23,6 +23,7 @@ Legend
 - [ ] :arrow_up: New Client Documentation 
 - [ ] :arrow_down: New Engine Documentation 
 - [ ] Explore graphql for the api?
+- [ ] :arrow_up: Dockerize mason implementation
 - [x] Build and refine "Engines" first order concept C: 03/06/2020
 - [ ] Generalize Engines to be "reisterable" and serial
 - [ ] Establish docker style sha registration for installed operators to fix version conflicts
