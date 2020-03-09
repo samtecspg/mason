@@ -45,7 +45,6 @@ class Response:
         if logger.log_level.debug():
             returns['_client_responses'] = self.responses # type: ignore
 
-
-        return print_json(returns)
+        return returns
 
 

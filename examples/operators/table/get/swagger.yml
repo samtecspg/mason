@@ -1,0 +1,20 @@
+paths:
+  /table/{table_name}:
+    get:
+      operationId: "registered_operators.table.get.api"
+      parameters:
+        - name: table_name
+          in: path
+          type: string
+          required: true
+        - name: database_name
+          in: query
+          type: string
+          required: true
+      tags:
+        - "Table"
+      summary: "List out table contents"
+      description: "List out contents of table by name"
+      responses:
+        200:
+          description: "Successful list"

@@ -5,3 +5,4 @@ description:  "Get metastore tables"
 parameters:
   required:
     - "database_name"
+

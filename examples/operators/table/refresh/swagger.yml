@@ -1,0 +1,24 @@
+paths:
+  '/table/{table_name}/refresh':
+    post:
+      operationId: "registered_operators.table.refresh.api"
+      parameters:
+        - name: table_name
+          in: path
+          format: path
+          type: string
+          required: true
+        - name: database_name
+          in: query
+          format: path
+          type: string
+          required: true
+      tags:
+        - "Table"
+      summary: "Refresh the indicated table by name"
+      description: "Refresh the table indicated by name"
+      responses:
+        200:
+          description: "Successful post"
+          schema:
+            type: "string"

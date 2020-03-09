@@ -1,0 +1,31 @@
+paths:
+  /table/infer:
+    post:
+      operationId: "registered_operators.table.infer.api"
+      tags:
+        - "Table"
+      summary: "Build schedule for schema inference and trigger"
+      description: "Infer schema of data"
+      consumes:
+        - application/json
+      parameters:
+        - name: schedule_name
+          in: query
+          format: path
+          type: string
+          required: true
+        - name: database_name
+          in: query
+          format: path
+          type: string
+          required: true
+        - name: storage_path
+          in: query
+          format: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: "Successful Infer"
+          schema:
+            type: "string"

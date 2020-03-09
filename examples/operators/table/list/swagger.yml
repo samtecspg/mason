@@ -1,0 +1,16 @@
+paths:
+  /tables:
+    get:
+      operationId: "registered_operators.table.list.api"
+      parameters:
+        - name: database_name
+          in: query
+          type: string
+          required: true
+      tags:
+        - "Table"
+      summary: "List out tables in the catalog"
+      description: "List out tables in the catalog"
+      responses:
+        200:
+          description: "Successful list"

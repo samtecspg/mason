@@ -1,0 +1,98 @@
+basePath: /api
+consumes:
+- application/json
+info:
+  description: Swagger UI for catalog API
+  title: Catalog API
+  version: 1.0.0
+paths:
+  /table/infer:
+    post:
+      consumes:
+      - application/json
+      description: Infer schema of data
+      operationId: registered_operators.table.infer.api
+      parameters:
+      - format: path
+        in: query
+        name: schedule_name
+        required: true
+        type: string
+      - format: path
+        in: query
+        name: database_name
+        required: true
+        type: string
+      - format: path
+        in: query
+        name: storage_path
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successful Infer
+          schema:
+            type: string
+      summary: Build schedule for schema inference and trigger
+      tags:
+      - Table
+  /table/{table_name}:
+    get:
+      description: List out contents of table by name
+      operationId: registered_operators.table.get.api
+      parameters:
+      - in: path
+        name: table_name
+        required: true
+        type: string
+      - in: query
+        name: database_name
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successful list
+      summary: List out table contents
+      tags:
+      - Table
+  /table/{table_name}/refresh:
+    post:
+      description: Refresh the table indicated by name
+      operationId: registered_operators.table.refresh.api
+      parameters:
+      - format: path
+        in: path
+        name: table_name
+        required: true
+        type: string
+      - format: path
+        in: query
+        name: database_name
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successful post
+          schema:
+            type: string
+      summary: Refresh the indicated table by name
+      tags:
+      - Table
+  /tables:
+    get:
+      description: List out tables in the catalog
+      operationId: registered_operators.table.list.api
+      parameters:
+      - in: query
+        name: database_name
+        required: true
+        type: string
+      responses:
+        200:
+          description: Successful list
+      summary: List out tables in the catalog
+      tags:
+      - Table
+produces:
+- application/json
+swagger: '2.0'

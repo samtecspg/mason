@@ -15,11 +15,16 @@ Legend
 - [x] Validate operators according to json_schema C:03/04/2020
 - [x] Add logger with log levels. C:03/05/2020
 - [x] :arrow_up: Validate client compatability with operators C:03/06/2020
+- [x] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators): C:/03/09/2020
+- [ ] :arrow_up: Move over tests and mocks
+- [ ] :arrow_up: Clean up rest api implementation, create "mason run" cli command
+- [ ] Pull rest api responses through to swagger spec (200 status example)
 - [ ] :arrow_up: Advanced Operator Registration Documentation 
 - [ ] :arrow_up: New Client Documentation 
 - [ ] :arrow_down: New Engine Documentation 
-- [ ] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators)
+- [ ] Explore graphql for the api?
 - [x] Build and refine "Engines" first order concept C: 03/06/2020
+- [ ] Generalize Engines to be "reisterable" and serial
 - [ ] Establish docker style sha registration for installed operators to fix version conflicts
 
 ## Operators

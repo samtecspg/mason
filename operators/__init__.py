@@ -15,6 +15,37 @@ from util.json_schema import validate_schema
 from typing import List
 from util.logger import logger
 from operators.operation import Operation
+from util.json import print_json
+import yaml
+
+def import_all():
+    path.append(env.MASON_HOME)
+    operators = list_operators()
+    for namespace, ops in operators.items():
+        for op in ops:
+            cmd = op.get("command")
+            import_module(f"registered_operators.{namespace}.{cmd}")
+
+def update_yaml(base_swagger: str):
+    swagger_file = "api/swagger.yml"
+    parsed_swagger = parse_yaml("api/base_swagger.yml") or {}
+    paths: dict = {}
+
+    for r, d, f in os.walk(env.OPERATOR_HOME):
+        for file in f:
+            if '.yml' in file:
+                file_path = os.path.join(r, file)
+                if file == "swagger.yml":
+                    file_parsed = parse_yaml(file_path) or {}
+
+                    parsed_paths = file_parsed.get('paths') or {}
+                    if len(parsed_paths) > 0:
+                        paths.update(parsed_paths)
+
+    parsed_swagger['paths'] = paths
+    with open(swagger_file, 'w+') as file:
+        yaml.dump(parsed_swagger, file)
+
 
 def run(config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
     #  TODO: Allow single step commands without subcommands
@@ -37,7 +68,8 @@ def run(config: Config, parameters: Parameters, cmd: Optional[str] = None, subcm
             response.add_error(f"Operator {cmd} {subcmd} not found.  Check operators with 'mason operator'")
 
         banner("Operator Response")
-        return response.formatted()
+        print_json(response.formatted())
+        return response
 
 def validate_operators(operator_file: str):
     configs: List[dict] = []

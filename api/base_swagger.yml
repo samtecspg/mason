@@ -1,0 +1,10 @@
+basePath: /api
+consumes:
+- application/json
+info:
+  description: Swagger UI for Mason Operator API
+  title: Mason Operator API
+  version: 1.0.0
+produces:
+- application/json
+swagger: '2.0'

@@ -84,11 +84,10 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
 @click.option("-l", "--log_level", help="Log level for mason")
 def register(operator_file: str, log_level: Optional[str] = None):
     logger.set_level(log_level)
-    config = Config()
     validation = Operator.validate_operators(operator_file)
     if len(validation[1]) == 0:
 
-        basename = path.basename(operator_file)
+        basename = path.basename(operator_file.rstrip("/"))
         pathname = env.OPERATOR_HOME + f"{basename}/"
 
         if not path.exists(pathname):

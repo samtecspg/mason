@@ -3,9 +3,11 @@ from typing import Optional, List
 from util.yaml import parse_yaml
 from util.printer import banner
 
+from util.logger import logger
+
 class Parameters:
 
-    def __init__(self, parameters: Optional[str], parameter_path: Optional[str]):
+    def __init__(self, parameters: Optional[str] = None, parameter_path: Optional[str] = None):
         self.parsed_parameters: dict = {}
         self.validated_parameters: dict = {}
         if parameters:
@@ -16,7 +18,7 @@ class Parameters:
         else:
             self.parsed_parameters = {}
 
-        if (self.parsed_parameters == {}) == False:
+        if not (self.parsed_parameters == {}):
             print()
             banner("Parsed Parameters")
             print(self.parsed_parameters)
