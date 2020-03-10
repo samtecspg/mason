@@ -22,7 +22,8 @@ If you are implementing aws clients remember to update `.env` file to include AW
 AWS_ACCESS_KEY_ID=<KEY_ID>
 AWS_SECRET_ACCESS_KEY=<SECRET_KEY>
 ```
-which have the needed permissions for the AWS services you are specifying as engine clients.
+which have the needed permissions for the AWS services you are specifying as engine clients.  You can see all such configurations for various cloud providers in `.env.example`
+
 Then run
 ```
 ./docker_build
@@ -37,10 +38,21 @@ Swagger ui for registered operators can then be found at: `http://localhost:5000
 You can access additional mason commands by shelling into the running docker container and running them via:
 
 ```
-TODO: make a one line shell command for this
-docker imagers <- get SHA for mason
-docker exec -it <SHA> /bin/bash
-> mason operator
+docker exec -it $(docker ps | grep mason | awk '{print $1}') /bin/bash
+> root@<SHA>:/app# mason
+Usage: mason [OPTIONS] COMMAND [ARGS]...
+
+  Mason Data Operator Framework
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  config
+  operator
+  register
+  run
+
 ```
 
 Note that the Dockerfile registers a set of example operators by default.  Comment out these lines and register different operators if you wish to do so during docker build.
