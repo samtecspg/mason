@@ -2,7 +2,6 @@
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.glue import GlueClient
-from util.logger import logger
 
 class GlueMetastoreClient(MetastoreClient):
 

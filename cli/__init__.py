@@ -7,12 +7,12 @@ from typing import Optional
 
 from configurations import Config
 from parameters import Parameters
-from util import environment as env
 from util.json_schema import validate_schema
 from util.yaml import parse_yaml
 from util.logger import logger
 import operators as Operator
 from util.printer import  banner
+from util.environment import MasonEnvironment
 
 @click.group()
 def main():
@@ -26,14 +26,15 @@ def main():
 @click.option("-l", "--log_level", help="Log level for mason")
 def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
     logger.set_level(log_level)
+    env = MasonEnvironment()
 
-    if not path.exists(env.MASON_HOME):
-        print(f"Creating MASON_HOME at {env.MASON_HOME}")
-        os.mkdir(env.MASON_HOME)
-    if not path.exists(env.OPERATOR_HOME):
-        print(f"Creating OPERATOR_HOME at {env.OPERATOR_HOME}")
-        os.mkdir(env.OPERATOR_HOME)
-        Path(env.OPERATOR_HOME + "__init__.py").touch()
+    if not path.exists(env.mason_home):
+        logger.info(f"Creating MASON_HOME at {env.mason_home}")
+        os.mkdir(env.mason_home)
+    if not path.exists(env.operator_home):
+        logger.info(f"Creating OPERATOR_HOME at {env.operator_home}")
+        os.mkdir(env.operator_home)
+        Path(env.operator_home + "__init__.py").touch()
 
     if config_file:
         # TODO: Interactive configuration
@@ -48,49 +49,50 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
                 for name, config in clients.items():
                     schema = f"clients/{name}/schema.json"
                     if not validate_schema(config, schema):
-                        print(f"Error validating client schema: {name}")
+                        logger.error(f"Error validating client schema: {name}")
                         valid = False
                         break
         if valid:
-            print()
-            print(f"Valid Configuration. Saving config {config_file} to {env.CONFIG_HOME}")
-            print()
-            shutil.copyfile(config_file, env.CONFIG_HOME)
-            return Config()
+            logger.info()
+            logger.info(f"Valid Configuration. Saving config {config_file} to {env.config_home}")
+            logger.info()
+            shutil.copyfile(config_file, env.config_home)
+            return Config(env)
         else:
-            print()
-            print(f"Invalid Config Schema: {config_file}")
+            logger.error()
+            logger.error(f"Invalid Config Schema: {config_file}")
     else:
-        if path.exists(env.CONFIG_HOME):
-            return Config()
+        if path.exists(env.config_home):
+            return Config(env)
         else:
-            print()
-            print("Configuration not found.")
-            print("First pass configuration:  \"mason config <config_file_path>\"")
+            logger.error()
+            logger.error("Configuration not found.")
+            logger.error("First pass configuration:  \"mason config <config_file_path>\"")
 
 
 @main.command()
 @click.argument("operator_file")
 @click.option("-l", "--log_level", help="Log level for mason")
 def register(operator_file: str, log_level: Optional[str] = None):
-    if path.exists(env.CONFIG_HOME):
+    env = MasonEnvironment()
+    if path.exists(env.config_home):
         logger.set_level(log_level)
         validation = Operator.validate_operators(operator_file)
         if len(validation[1]) == 0:
 
             basename = path.basename(operator_file.rstrip("/"))
-            pathname = env.OPERATOR_HOME + f"{basename}/"
+            pathname = env.operator_home + f"{basename}/"
 
             if not path.exists(pathname):
-                print(f"Registering operator(s) at {operator_file} to {pathname}")
+                logger.info(f"Registering operator(s) at {operator_file} to {pathname}")
                 shutil.copytree(operator_file, pathname)
             else:
-                print(f"Operator \"{basename}\" already exists at {pathname}")
+                logger.info(f"Operator \"{basename}\" already exists at {pathname}")
         else:
-            print(f"Invalid operator configurations found: {validation[1]}")
+            logger.error(f"Invalid operator configurations found: {validation[1]}")
 
     else:
-        logger.info("Configuration not found.  Run \"mason config\" first")
+        logger.error("Configuration not found.  Run \"mason config\" first")
 
 
 @main.command()
@@ -100,9 +102,11 @@ def register(operator_file: str, log_level: Optional[str] = None):
 @click.option('-c', '--param_file', help="Parameters from yaml file path")
 @click.option("-l", "--log_level", help="Log level for mason")
 def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None):
-    if path.exists(env.CONFIG_HOME):
+    env = MasonEnvironment()
+
+    if path.exists(env.config_home):
         logger.set_level(log_level)
-        config = Config()
+        config = Config(env)
         params = Parameters(parameters, param_file)
         Operator.run(config, params, cmd, subcmd)
 
