@@ -1,14 +1,15 @@
 #!/bin/sh
 set -e
 
-./install
+./scripts/install
  rm -rf ~/.mason/
 # mason config -l debug
 # mason config examples/config/bad_config.yaml
  mason config examples/config/config_example.yaml
 # mason config
 # mason register
- mason register examples/operators/table
+# mason register examples/operators/table
+# mason run
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
 # mason register examples/operators/table/
 # mason operator
@@ -18,6 +19,6 @@ set -e
 # mason operator table get -p database_name:crawler-poc,table_name:catalog_poc_data
 # mason operator table list
 # mason operator table list -p database_name:crawler-poc
- mason operator table refresh -p database_name:crawler-poc,table_name:catalog_poc_data
+# mason operator table refresh -p database_name:crawler-poc,table_name:catalog_poc_data
 # mason operator table infer -p schedule_name:test_crawler,database_name:crawler-poc,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/
 

@@ -3,25 +3,16 @@ import shutil
 import os
 from os import path
 from pathlib import Path
-import operators as Operator
 from typing import Optional
 
 from configurations import Config
 from parameters import Parameters
 from util import environment as env
 from util.json_schema import validate_schema
-from util.printer import banner
 from util.yaml import parse_yaml
 from util.logger import logger
-
-def check_for_config(f):
-    def check_config(*args, **kwargs):
-        if path.exists(env.CONFIG_HOME):
-            return f(config, *args, **kwargs)
-        else:
-            logger.info("Configuration not found.  Run \"mason config\" first")
-    return check_config
-
+import operators as Operator
+from util.printer import  banner
 
 @click.group()
 def main():
@@ -78,28 +69,30 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
             print("First pass configuration:  \"mason config <config_file_path>\"")
 
 
-@check_for_config
 @main.command()
 @click.argument("operator_file")
 @click.option("-l", "--log_level", help="Log level for mason")
 def register(operator_file: str, log_level: Optional[str] = None):
-    logger.set_level(log_level)
-    validation = Operator.validate_operators(operator_file)
-    if len(validation[1]) == 0:
+    if path.exists(env.CONFIG_HOME):
+        logger.set_level(log_level)
+        validation = Operator.validate_operators(operator_file)
+        if len(validation[1]) == 0:
 
-        basename = path.basename(operator_file.rstrip("/"))
-        pathname = env.OPERATOR_HOME + f"{basename}/"
+            basename = path.basename(operator_file.rstrip("/"))
+            pathname = env.OPERATOR_HOME + f"{basename}/"
 
-        if not path.exists(pathname):
-            print(f"Registering operator(s) at {operator_file} to {pathname}")
-            shutil.copytree(operator_file, pathname)
+            if not path.exists(pathname):
+                print(f"Registering operator(s) at {operator_file} to {pathname}")
+                shutil.copytree(operator_file, pathname)
+            else:
+                print(f"Operator \"{basename}\" already exists at {pathname}")
         else:
-            print(f"Operator \"{basename}\" already exists at {pathname}")
+            print(f"Invalid operator configurations found: {validation[1]}")
+
     else:
-        print(f"Invalid operator configurations found: {validation[1]}")
+        logger.info("Configuration not found.  Run \"mason config\" first")
 
 
-@check_for_config
 @main.command()
 @click.argument("cmd", required=False)
 @click.argument("subcmd", required=False)
@@ -107,10 +100,19 @@ def register(operator_file: str, log_level: Optional[str] = None):
 @click.option('-c', '--param_file', help="Parameters from yaml file path")
 @click.option("-l", "--log_level", help="Log level for mason")
 def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None):
-    logger.set_level(log_level)
-    config = Config()
-    params = Parameters(parameters, param_file)
-    Operator.run(config, params, cmd, subcmd)
+    if path.exists(env.CONFIG_HOME):
+        logger.set_level(log_level)
+        config = Config()
+        params = Parameters(parameters, param_file)
+        Operator.run(config, params, cmd, subcmd)
+
+    else:
+        logger.info("Configuration not found.  Run \"mason config\" first")
+
+@main.command()
+def run():
+    os.system('./scripts/run')
+
 
 if __name__ == "__main__":
     main()

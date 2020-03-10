@@ -17,35 +17,36 @@ Legend
 - [x] :arrow_up: Validate client compatability with operators C:03/06/2020
 - [x] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators): C:/03/09/2020
 - [ ] :arrow_up: Move over tests and mocks
-- [ ] :arrow_up: Clean up rest api implementation, create "mason run" cli command
+- [ ] :arrow_up: Clean up rest api implementation, 
+- [x] create "mason run" cli command C: 03/09/2020
 - [ ] Pull rest api responses through to swagger spec (200 status example)
 - [ ] :arrow_up: Advanced Operator Registration Documentation 
 - [ ] :arrow_up: New Client Documentation 
 - [ ] :arrow_down: New Engine Documentation 
-- [ ] Explore graphql for the api?
-- [ ] :arrow_up: Dockerize mason implementation
+- [x] :arrow_up: Dockerize mason implementation C: 03/09/2020
 - [x] Build and refine "Engines" first order concept C: 03/06/2020
-- [ ] Generalize Engines to be "reisterable" and serial
+- [ ] Generalize Engines to be "registerable" and serial
 - [ ] Establish docker style sha registration for installed operators to fix version conflicts
+- [ ] :arrow_down: Explore graphql for the api? Note found a way around this for now.
 
 ## Operators
 
-- [ ] Dedupe Operator
 - [ ] JSON explode operator
+- [ ] S3 -> ES egress operator 
+- [ ] Dedupe Operator
 
 ## Clients
 
-### Metastore
-
+### Metastore  
 #### Glue
 - [x] Basic setup. C: 4/04/2020
-- [ ] Redshift
-- [ ] Elasticsearch
 #### Hive
 - [ ] :arrow_down: Basic setup
+
 ### Execution
 - [ ] :arrow_up: Dockerized Execution
 - [ ] :arrow_up: Kubernetes Execution
+
 #### Python
 - [ ] :arrow_up: Basic setup
 #### IPython/Jupyter
@@ -63,6 +64,8 @@ Legend
 - [ ] :arrow_up: Basic setup 
 
 ### Storage
+#### Redshift
+#### Elasticsearch
 #### S3
 - [ ] :arrow_up: Basic Setup 
 - [ ] Redshift

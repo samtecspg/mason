@@ -1,8 +1,7 @@
-from flask import render_template
 import connexion # type: ignore
 import markdown # type: ignore
 import operators as Operator
-from util.printer import  banner
+from util.printer import banner
 
 try:
     banner("Importing all registered_operator modules for API")
@@ -11,7 +10,7 @@ try:
     banner(f"Regenerating api yaml based on registered_operators to {swagger_yml}")
     Operator.update_yaml(swagger_yml)
 
-    app = connexion.App(__name__, specification_dir='api/')
+    app = connexion.App(__name__, specification_dir='api')
 
     # Read the swagger.yml file to configure the endpoints
     app.add_api('swagger.yml')

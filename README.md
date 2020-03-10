@@ -15,11 +15,45 @@ like kubernetes and helm.
 Mason's mission is to provide ways to build composable self contained functional units called "Data Operators" which companies can stitch together to easily provide end to end data pipelines.   The target demographic of Mason are companies that are just breaking into the enterprise data space, or companies that are looking to consolidate their data operations.
 
 ## Quickstart
-Local Development:
+### Docker
+
+If you are implementing aws clients remember to update `.env` file to include AWS credentials:
+```.env
+AWS_ACCESS_KEY_ID=<KEY_ID>
+AWS_SECRET_ACCESS_KEY=<SECRET_KEY>
 ```
-./install
+which have the needed permissions for the AWS services you are specifying as engine clients.
+Then run
+```
+./docker_build
+```
+Followed by
+```
+docker compose up
+```
+
+Swagger ui for registered operators can then be found at: `http://localhost:5000/api/ui/`  
+
+You can access additional mason commands by shelling into the running docker container and running them via:
+
+```
+TODO: make a one line shell command for this
+docker imagers <- get SHA for mason
+docker exec -it <SHA> /bin/bash
+> mason operator
+```
+
+Note that the Dockerfile registers a set of example operators by default.  Comment out these lines and register different operators if you wish to do so during docker build.
+
+### Python Package
+
+To install the python `mason` package instead first run:
+```
+./scripts/install
 ```
 Mason leverages `mypy` heavily for ensuring that function signatures and types are in line. Install will run mypy and stop if it does not succeed.  
+
+### Basic Mason Commands
 
 To configure mason run `mason config`.  Configurations are validated for basic structure using json_schema.  See `configurations/schema.json`:
 ```
@@ -131,6 +165,11 @@ mason operator table get -c examples/parameters/table_get.yaml
 }
 ```
 
+Running flask web server for registered operator API endpoints:
+```
+mason run
+```
+
 
 ## Philosophy
 
@@ -150,7 +189,7 @@ For <Glue> as a <Scheduler> do <Trigger schedule(:schedule_name = 'test-crawler'
 For <S3> as a <Metastore> do <List Partitions(:table_name = 'test-table')>
 ```
 
-In other words Engines define the valid operations which can be performed via the various clients and operators implement one or more of those operations.  In reality operators actually define sentences like the above in a complete description of work for multiple engines.
+In other words Engines define the valid operations which can be performed via the various clients and operators implement one or more of those operations.  In reality operators actually define sentences like the above in a complete description of work for multiple engines, i.e. one operator can implement several such statements.
 
 ## Engines 
 
@@ -158,7 +197,7 @@ Out of the box mason creates a layer of abstraction between these 4 engine types
 
 ### Defining new Engines
 
-Coming Soon
+COMING SOON
 
 ## Clients
 
@@ -166,7 +205,7 @@ Clients are being added they include a number of prioprietary technologies such 
 
 ### Defining new Clients
 
-Coming Soon
+COMING SOON
 
 ## Operators 
 

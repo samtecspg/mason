@@ -28,7 +28,7 @@ def import_all():
 
 def update_yaml(base_swagger: str):
     swagger_file = "api/swagger.yml"
-    parsed_swagger = parse_yaml("api/base_swagger.yml") or {}
+    parsed_swagger = parse_yaml(base_swagger) or {}
     paths: dict = {}
 
     for r, d, f in os.walk(env.OPERATOR_HOME):
