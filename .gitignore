@@ -9,3 +9,5 @@ mason.egg-info/*
 .mypy_cache/
 .mypy_cache/*
 api/swagger.yml
+.env
+
