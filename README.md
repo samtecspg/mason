@@ -150,7 +150,7 @@ For <Glue> as a <Scheduler> do <Trigger schedule(:schedule_name = 'test-crawler'
 For <S3> as a <Metastore> do <List Partitions(:table_name = 'test-table')>
 ```
 
-In other words Engines define the valid operations which can be performed via the various clients and operators implement one or more of those operations.
+In other words Engines define the valid operations which can be performed via the various clients and operators implement one or more of those operations.  In reality operators actually define sentences like the above in a complete description of work for multiple engines.
 
 ## Engines 
 
