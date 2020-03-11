@@ -33,6 +33,7 @@ Legend
 
 - [ ] Malformed Parameters, extraneous ":".   Improve parameter specification.  Make docs more explicit
 - [ ] Extraneous parameters.  Showing up in "required parameters" error return incorrectly.
+- [ ] Better errors around Permission errors
 
 ## Operators
 
