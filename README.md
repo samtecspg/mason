@@ -30,7 +30,7 @@ Then run
 ```
 Followed by
 ```
-docker compose up
+docker-compose up
 ```
 
 Swagger ui for registered operators can then be found at: `http://localhost:5000/api/ui/`  
