@@ -10,4 +10,5 @@ mason.egg-info/*
 .mypy_cache/*
 api/swagger.yml
 .env
+.DS_Store
 
