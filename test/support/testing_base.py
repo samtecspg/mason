@@ -5,7 +5,7 @@ from configurations import Config
 import operators as Operators
 from configurations.valid_operator import ValidOperator
 from typing import Tuple, Optional
-from testing.mocks.clients.glue import GlueMock
+from test.support.mocks.clients.glue import GlueMock
 from definitions import from_root
 
 LOG_LEVEL = "error"

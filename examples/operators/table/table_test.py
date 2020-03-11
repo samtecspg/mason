@@ -5,7 +5,7 @@ from examples.operators.table.infer import run as table_infer
 from examples.operators.table.refresh import run as table_refresh
 from examples.operators.table.test.expects import table as expects
 from parameters import Parameters
-from testing import mason_testing_base as base
+from test.support import testing_base as base
 
 def test_index():
     config, op = base.before("table", "list")

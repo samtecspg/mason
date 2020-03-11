@@ -1,7 +1,7 @@
 import datetime
 from botocore.exceptions import ClientError # type: ignore
 from dateutil.tz import tzlocal
-from testing.mocks.mock_base import MockBase
+from test.support.mocks.mock_base import MockBase
 from clients.glue.metastore import GlueMetastoreClient
 
 class GlueMock(MockBase, GlueMetastoreClient):
