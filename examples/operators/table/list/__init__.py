@@ -2,6 +2,7 @@ from clients.response import Response
 from parameters import Parameters
 from configurations import Config
 import operators as Operator
+from util.environment import MasonEnvironment
 
 def run(config: Config, parameters: Parameters, response: Response):
     database_name: str = parameters.safe_get("database_name")
@@ -11,7 +12,8 @@ def run(config: Config, parameters: Parameters, response: Response):
 
 # TODO: Automate this
 def api(database_name: str):
-    config = Config()
+    env = MasonEnvironment()
+    config = Config(env)
     parameters = f"database_name:{database_name}"
     params = Parameters(parameters)
     response = Operator.run(config, params, "table", "list")

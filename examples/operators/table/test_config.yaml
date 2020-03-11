@@ -1,0 +1,11 @@
+metastore_engine: glue
+storage_engine: s3
+scheduler_engine: glue
+clients:
+  glue:
+    configuration:
+      aws_role_arn: arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue
+      region: us-east-1
+  s3:
+    configuration:
+      region: us-east-1

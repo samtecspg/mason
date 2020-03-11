@@ -6,7 +6,7 @@ class GlueClient:
 
     def __init__(self, config: dict):
         self.client = boto3.client('glue', region_name=config.get("region"))
-        self.aws_role_arn = config.get("aws_role_arn") or "" # TODO: FIX
+        self.aws_role_arn = config.get("aws_role_arn")
 
     def list_tables(self, database_name: str, response: Response):
         try:

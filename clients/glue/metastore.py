@@ -2,12 +2,12 @@
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.glue import GlueClient
-from util.logger import logger
 
 class GlueMetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
         self.region = config.get("region")
+        self.aws_role_arn = config.get("aws_role_arn")
         self.client = GlueClient(self.get_config())
 
     def list_tables(self, database_name: str, response: Response) -> Response:
@@ -20,7 +20,8 @@ class GlueMetastoreClient(MetastoreClient):
 
     def get_config(self):
         return {
-            'region': self.region
+            'region': self.region,
+            'aws_role_arn': self.aws_role_arn
         }
 
 
