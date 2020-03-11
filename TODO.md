@@ -30,6 +30,11 @@ Legend
 - [ ] Generalize Engines to be "registerable" and serial
 - [ ] Support multiple clients for a single engine type.
 
+## Test Cases
+
+- [ ] Malformed Parameters, extraneous ":".   Improve parameter specification.  Make docs more explicit
+- [ ] Extraneous parameters.  Showing up in "required parameters" error return incorrectly.
+
 ## Operators
 
 - [ ] JSON explode operator
