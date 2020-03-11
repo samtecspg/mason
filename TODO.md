@@ -25,10 +25,9 @@ Legend
 - [ ] :arrow_down: New Engine Documentation 
 - [x] :arrow_up: Dockerize mason implementation C: 03/09/2020
 - [x] Build and refine "Engines" first order concept C: 03/06/2020
+- [ ] Generalize Engines to be "registerable" and serial
 - [ ] Establish docker style sha registration for installed operators to fix version conflicts
 - [ ] :arrow_down: Explore graphql for the api? Note found a way around this for now.
-- [ ] Generalize Engines to be "registerable" and serial
-- [ ] Support multiple clients for a single engine type.
 
 ## Test Cases
 

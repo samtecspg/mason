@@ -47,6 +47,4 @@ class Response:
 
         return returns
 
-    def with_status(self):
-        return (self.formatted(), self.status_code)
 

@@ -2,19 +2,14 @@ import connexion # type: ignore
 import markdown # type: ignore
 import operators as Operator
 from util.printer import banner
-from util.environment import MasonEnvironment
-from configurations import Config
-from util.logger import logger
 
 try:
     banner("Importing all registered_operator modules for API")
-    env = MasonEnvironment()
-    config = Config(env)
-    Operator.import_all(config)
+    Operator.import_all()
     swagger_yml = "api/base_swagger.yml"
-
     banner(f"Regenerating api yaml based on registered_operators to {swagger_yml}")
-    Operator.update_yaml(config, swagger_yml)
+    Operator.update_yaml(swagger_yml)
+
     app = connexion.App(__name__, specification_dir='api')
 
     # Read the swagger.yml file to configure the endpoints
@@ -41,5 +36,5 @@ try:
         app.run(host='0.0.0.0', port=5000, debug=True)
 
 except ModuleNotFoundError as e:
-    logger.error("Mason not configured with registered_operators.  Please run 'mason config' and 'mason register' first.")
-    logger.error(str(e))
+    print("Mason not configured with registered_operators.  Please run 'mason config' and 'mason register' first.")
+    print(e)

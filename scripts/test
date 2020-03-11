@@ -5,7 +5,7 @@ set -e
  rm -rf ~/.mason/
 # mason config -l debug
 # mason config examples/config/bad_config.yaml
-# mason config examples/config/config_example.yaml
+ mason config examples/config/config_example.yaml
 # mason config
 # mason register
 # mason register examples/operators/table

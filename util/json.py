@@ -2,7 +2,6 @@
 import datetime
 import json
 from pygments import highlight, lexers, formatters # type: ignore
-from util.logger import logger
 
 def parse_json(file_path: str):
     with open(file_path) as f:
@@ -24,7 +23,7 @@ def to_json(d: dict):
 def print_json(d: dict):
     formatted_json = to_json(d)
     colorful_json = highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
-    return logger.info(colorful_json)
+    return print(colorful_json)
 
 def print_json_1level(d: dict):
     out = {}

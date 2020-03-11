@@ -1,5 +1,6 @@
 
 from clients import Client
+from abc import abstractmethod
 from clients.response import Response
 from abc import abstractmethod
 
