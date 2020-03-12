@@ -1,7 +1,7 @@
 from clients.response import Response
 from parameters import Parameters
 from configurations import Config
-import operators as Operator
+import operators.operators as Operator
 from util.environment import MasonEnvironment
 
 def run(config: Config, parameters: Parameters, response: Response):

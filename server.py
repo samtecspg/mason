@@ -1,6 +1,6 @@
 import connexion # type: ignore
 import markdown # type: ignore
-import operators as Operator
+import operators.operators as Operator
 from util.printer import banner
 from util.environment import MasonEnvironment
 from configurations import Config

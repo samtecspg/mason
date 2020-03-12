@@ -10,7 +10,7 @@ from parameters import Parameters
 from util.json_schema import validate_schema
 from util.yaml import parse_yaml
 from util.logger import logger
-import operators as Operators
+import operators.operators as Operators
 from util.printer import  banner
 from util.environment import MasonEnvironment
 
@@ -77,6 +77,7 @@ def register(operator_file: str, log_level: Optional[str] = None):
     env = MasonEnvironment()
     if path.exists(env.config_home):
         logger.set_level(log_level)
+
         validation = Operators.validate_operators(operator_file)
         if len(validation[1]) == 0:
 

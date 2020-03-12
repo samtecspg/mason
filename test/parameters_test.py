@@ -1,13 +1,12 @@
 
-from parameters import Parameters, ParameterException
-from configurations.valid_operator import ValidOperator
-import pytest # type: ignore
+from parameters import Parameters
+from operators.valid_operator import ValidOperator
 from test.support import testing_base as base
 
 class TestInit:
     base.set_log_level()
 
-    def test_parameter_strings(self):
+    def test_good_parameter_strings(self):
         good_tests = {
             "param:value": {"param": "value"},
             "param_test-value.with.dots/and/slash:value-test_value.with.dots/and/slash": {"param_test-value.with.dots/and/slash": "value-test_value.with.dots/and/slash"},
@@ -16,6 +15,11 @@ class TestInit:
             "testwith\,inthemiddle:result,param2:andanother\:inthemiddle": {'inthemiddle': 'result', 'param2': 'andanother'}
         }
 
+        for param_string, result in good_tests.items():
+            assert(Parameters(param_string).parsed_parameters == result)
+
+    def test_bad_parameter_strings(self):
+
         bad_tests = [
             "test",
             "test,",
@@ -23,12 +27,10 @@ class TestInit:
             "test:,"
         ]
 
-        for param_string, result in good_tests.items():
-            assert(Parameters(param_string).parsed_parameters == result)
-
         for bad in bad_tests:
             assert(Parameters(bad).parsed_parameters == {})
 
+class TestValidation:
     def test_parameter_validation(self):
 
         tests = {

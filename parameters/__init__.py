@@ -2,18 +2,11 @@ from typing import Optional, List
 from util.yaml import parse_yaml
 from util.printer import banner
 from util.logger import logger
-from configurations.valid_operator import ValidOperator
+from operators.operator import Operator
 from clients.response import Response
-import re
 from util.dict import dedupe
 
-
-class ParameterException(Exception):
-    def __init__(self, message: str):
-        self.message = message
-
-    def __str__(self):
-        self.message
+import re
 
 class Parameters:
 
@@ -27,7 +20,6 @@ class Parameters:
         else:
             logger.error(f"Warning:  Parameter string does not conform to needed pattern: {pattern_guide}")
             return {}
-
 
     def __init__(self, parameters: Optional[str] = None, parameter_path: Optional[str] = None):
         self.parsed_parameters: dict = {}
@@ -59,7 +51,7 @@ class Parameters:
     def unsafe_get(self, attribute: str) -> Optional[str]:
         return self.parsed_parameters.get(attribute, None)
 
-    def validate(self, op: ValidOperator, response: Response = None):
+    def validate(self, op: Operator, response: Response = None):
         response = response or Response()
         required_params = set(op.required_parameters)
         provided_params = set(self.parsed_parameters.keys())
