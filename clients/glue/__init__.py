@@ -129,15 +129,15 @@ class GlueClient:
                 }
             ]
         }
-        schema_change_policy = { 'UpdateBehavior': 'UPDATE_IN_DATABASE' }
+        # schema_change_policy = { 'UpdateBehavior': 'UPDATE_IN_DATABASE' }
 
         try:
             result = self.client.create_crawler(
                 DatabaseName=database,
                 Name=name,
                 Role=role,
-                Targets=targets,
-                SchemaChangePolicy=schema_change_policy
+                Targets=targets
+                # SchemaChangePolicy=schema_change_policy
             )
         except ClientError as e:
             result = e.response

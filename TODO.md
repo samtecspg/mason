@@ -45,15 +45,21 @@ Legend
 
 ## Operators
 
+- [ ] Schema consistency check operator?
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
 - [ ] Dedupe Operator
+- [ ] Jobs operators (scheduler):
+    - [ ] Get
+    - [ ] List
 
 ## Clients
 
 ### Metastore  
 #### Glue
 - [x] Basic setup. C: 4/04/2020
+- [ ] Column casting operator
+- [ ] Fix conflicting schemas error with differing partition data
 #### Hive
 - [ ] :arrow_down: Basic setup
 
@@ -74,6 +80,8 @@ Legend
 - [ ] :arrow_up: Basic setup 
 
 ### Scheduler
+### Glue
+- [x] Basic set up
 #### Airflow
 - [ ] :arrow_up: Basic setup 
 
