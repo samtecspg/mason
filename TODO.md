@@ -45,7 +45,7 @@ Legend
 
 ## Operators
 
-- [ ] Schema consistency check operator?
+- [ ] Schema merge operator
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
 - [ ] Dedupe Operator
