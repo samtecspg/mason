@@ -6,7 +6,8 @@ class Operator:
         self.cmd = cmd
         self.subcommand = subcommand
         self.description = description
-        self.parameters = parameters
+        self.parameters: dict = parameters
         self.supported_clients = supported_clients
 
-    def required_parameters(self): List[str] = self.parameters.get("required", [])
+    def required_parameters(self):
+        return self.parameters.get("required", [])
