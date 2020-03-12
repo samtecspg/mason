@@ -49,9 +49,16 @@ Legend
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
 - [ ] Dedupe Operator
+- [ ] Table Operators
+    - [ ] Delete
+    - [ ] Delete Database
+- [ ] Seperate out database operator?
 - [ ] Jobs operators (scheduler):
     - [ ] Get
     - [ ] List
+- [ ] Scheduler operators:
+    - [ ] List
+    - [ ] Delete
 
 ## Clients
 
