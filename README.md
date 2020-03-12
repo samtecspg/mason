@@ -61,7 +61,7 @@ Note that the Dockerfile registers a set of example operators by default.  Comme
 
 To install the python `mason` package instead first run:
 ```
-./scripts/install
+./scripts/install.sh
 ```
 Mason leverages `mypy` heavily for ensuring that function signatures and types are in line. Install will run mypy and stop if it does not succeed.  
 
