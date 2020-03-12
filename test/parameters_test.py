@@ -20,16 +20,14 @@ class TestInit:
             "test",
             "test,",
             "test:",
-            "test:,",
-            "test:res"
+            "test:,"
         ]
 
         for param_string, result in good_tests.items():
             assert(Parameters(param_string).parsed_parameters == result)
 
-        with pytest.raises(ParameterException):
-            for bad in bad_tests:
-                Parameters(bad)
+        for bad in bad_tests:
+            assert(Parameters(bad).parsed_parameters == {})
 
     def test_parameter_validation(self):
 

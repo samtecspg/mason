@@ -8,7 +8,7 @@ from typing import Tuple, Optional
 from test.support.mocks.clients.glue import GlueMock
 from definitions import from_root
 
-LOG_LEVEL = "error"
+LOG_LEVEL = "info"
 
 def before(cmd: str, sub: str) -> Tuple[Config, Optional[ValidOperator]]:
     set_log_level()
