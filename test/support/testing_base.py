@@ -8,10 +8,9 @@ from typing import Tuple, Optional
 from test.support.mocks.clients.glue import GlueMock
 from definitions import from_root
 
-LOG_LEVEL = "error"
+LOG_LEVEL = "info"
 
 def before(cmd: str, sub: str) -> Tuple[Config, Optional[Operator]]:
-    set_log_level()
     config = get_config()
     op = Operators.get_operator(config, cmd, sub)
     if config and op:
@@ -23,8 +22,8 @@ def before(cmd: str, sub: str) -> Tuple[Config, Optional[Operator]]:
 def set_log_level(level: str = None):
     logger.set_level(level or LOG_LEVEL, False)
 
-def get_config():
-    env = MasonEnvironment(operator_home= from_root("/examples/operators/"), config_home=from_root("/examples/operators/table/test_config.yaml"))
+def get_config(operator_home: str = "/examples/operators", config_home = "/examples/operators/table/test_config.yaml"):
+    env = MasonEnvironment(operator_home= from_root(operator_home), config_home=from_root(config_home))
     return Config(env)
 
 def get_mock(client: str):

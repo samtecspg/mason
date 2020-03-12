@@ -20,7 +20,7 @@ Legend
 - [ ] :arrow_up: More test coverage on basic funcitonality:
     - [x] Parameters C: 03/11/2020
     - [ ] Configurations
-    - [ ] Operators
+    - [x] Operators
     - [ ] Engines
     - [ ] Clients
     - [ ] Cli

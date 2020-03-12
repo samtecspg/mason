@@ -1,0 +1,9 @@
+type: "operator"
+namespace: "namespace1"
+command: "operator1"
+description:  "Test Operator"
+parameters:
+  required:
+    - "test_param"
+supported_clients:
+  - "test_client"

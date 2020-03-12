@@ -1,0 +1,8 @@
+metastore_engine: test
+storage_engine: test
+scheduler_engine: test
+clients:
+  test:
+    configuration:
+      test_param_1: test
+      test_param_2: test

@@ -10,6 +10,7 @@ class Engine:
 
         if len(self.config_doc) == 0 :
             if not self.client_name == "":
+                logger.error()
                 logger.error(f"No {self.client_name} client configuration for specified {engine_type}_engine")
 
     def to_dict(self):

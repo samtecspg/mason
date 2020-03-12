@@ -53,7 +53,7 @@ class Parameters:
 
     def validate(self, op: Operator, response: Response = None):
         response = response or Response()
-        required_params = set(op.required_parameters)
+        required_params = set(op.required_parameters())
         provided_params = set(self.parsed_parameters.keys())
         diff = required_params.difference(provided_params)
         intersection = required_params.intersection(provided_params)

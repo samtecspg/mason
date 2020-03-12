@@ -48,7 +48,14 @@ class Logger:
 
     # special logger method thats the same as info but is specifically intended to be removed before pushing code
     def remove(self, message: str = ""):
+        self.error()
+        self.error("=" * 60 + "REMOVE" + "=" * 60)
+        self.error()
+        self.error()
         self.error(message)
+        self.error()
+        self.error()
+        self.error("=" * 126)
 
     def warning(self, message: str = ""):
         if self.log_level.warning():
