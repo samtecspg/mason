@@ -1,24 +1,46 @@
-
 from typing import Optional, List
 from util.yaml import parse_yaml
 from util.printer import banner
 from util.logger import logger
 from configurations.valid_operator import ValidOperator
 from clients.response import Response
+import re
+from util.dict import dedupe
+
+
+class ParameterException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
+    def __str__(self):
+        self.message
 
 class Parameters:
+
+    def parse_string(self, param_string: str) -> dict:
+        pattern = r"([a-zA-Z0-9\-:_./]+:[a-zA-Z0-9\-:_./]+)"
+        pattern_guide = "<param1>:<value1>,<param2>:<value2>"
+        matches = re.findall(pattern, param_string)
+
+        if len(matches) > 0:
+            return dict(list([tuple(x.split(":")) for x in matches])) # type: ignore
+        else:
+            raise ParameterException(f"Parameter string does not conform to needed pattern: {pattern_guide}")
+
 
     def __init__(self, parameters: Optional[str] = None, parameter_path: Optional[str] = None):
         self.parsed_parameters: dict = {}
         self.validated_parameters: dict = {}
 
         if parameters:
-            parameter_dict: dict = dict(list([tuple(x.split(':')) for x in parameters.split(',')])) # type: ignore
-            self.parsed_parameters = parameter_dict
+            parsed_parameters: dict = self.parse_string(parameters)
         elif parameter_path:
-            self.parsed_parameters = parse_yaml(parameter_path)
+            parsed_parameters = parse_yaml(parameter_path)
         else:
-            self.parsed_parameters = {}
+            logger.warning("Neither parameter string nor parameter path provided.")
+            parsed_parameters = {}
+
+        self.parsed_parameters = dedupe(parsed_parameters)
 
         if not (self.parsed_parameters == {}):
             logger.info()
@@ -40,13 +62,14 @@ class Parameters:
         response = response or Response()
         required_params = set(op.required_parameters)
         provided_params = set(self.parsed_parameters.keys())
-        sym_diff = required_params.symmetric_difference(provided_params)
+        diff = required_params.difference(provided_params)
         intersection = required_params.intersection(provided_params)
         self.add_valid(list(intersection))
 
         logger.info()
         validated = list(self.validated_parameters.keys())
-        missing = list(sym_diff)
+        missing = list(diff)
+
         banner(f"Parameters Validation:")
         if len(validated) > 0:
             logger.info(f"Validated: {validated}")
@@ -54,7 +77,8 @@ class Parameters:
             logger.info(f"Missing: {missing}")
         logger.info()
 
-        if len(sym_diff) > 0:
-            dp = ", ".join(list(sym_diff))
+        if len(diff) > 0:
+            dp = ", ".join(list(diff))
             response.add_error(f"Missing required parameters: {dp}")
+            response.set_status(400)
         return response

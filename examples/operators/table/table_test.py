@@ -3,7 +3,7 @@ from examples.operators.table.get import run as table_get
 from examples.operators.table.list import run as table_list
 from examples.operators.table.infer import run as table_infer
 from examples.operators.table.refresh import run as table_refresh
-from examples.operators.table.test.expects import table as expects
+from examples.operators.table.test.expects import table as expects # type: ignore
 from parameters import Parameters
 from test.support import testing_base as base
 

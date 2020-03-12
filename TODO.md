@@ -16,7 +16,14 @@ Legend
 - [x] Add logger with log levels. C:03/05/2020
 - [x] :arrow_up: Validate client compatability with operators C:03/06/2020
 - [x] :arrow_up: Catch up old rest api interface (migrate https://github.com/samtecspg/data/tree/master/catalog/api to operators): C:/03/09/2020
-- [ ] :arrow_up: Move over tests and mocks
+- [x] :arrow_up: Move over tests and mocks.  C: 03/11/2020
+- [ ] :arrow_up: More test coverage on basic funcitonality:
+    - [x] Parameters C: 03/11/2020
+    - [ ] Configurations
+    - [ ] Operators
+    - [ ] Engines
+    - [ ] Clients
+    - [ ] Cli
 - [ ] :arrow_up: Clean up rest api implementation, 
 - [x] create "mason run" cli command C: 03/09/2020
 - [ ] Pull rest api responses through to swagger spec (200 status example)
@@ -32,8 +39,8 @@ Legend
 
 ## Test Cases
 
-- [ ] Malformed Parameters, extraneous ":".   Improve parameter specification.  Make docs more explicit
-- [ ] Extraneous parameters.  Showing up in "required parameters" error return incorrectly.
+- [x] Malformed Parameters, extraneous ":".   Improve parameter specification.  Make docs more explicit C: 03/11/2020
+- [x] Extraneous parameters.  Showing up in "required parameters" error return incorrectly. C: 03/11/2020
 - [ ] Better errors around Permission errors
 
 ## Operators

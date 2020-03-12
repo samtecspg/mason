@@ -1,1 +1,3 @@
-include configurations/*/*/schema.json
+include operators/schema.json
+include configurations/schema.json
+include clients/*/schema.json

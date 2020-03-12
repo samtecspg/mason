@@ -2,13 +2,13 @@
 set -e
 
 ./scripts/install
- rm -rf ~/.mason/
-# mason config -l debug
+rm -rf ~/.mason/
+mason config -l debug
 # mason config examples/config/bad_config.yaml
-# mason config examples/config/config_example.yaml
+mason config examples/config/config_example.yaml
 # mason config
 # mason register
-# mason register examples/operators/table
+mason register examples/operators/table
 # mason run
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
 # mason register examples/operators/table/

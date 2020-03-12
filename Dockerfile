@@ -9,7 +9,7 @@ RUN pip3 install -r requirements.txt
 COPY . /app
 
 RUN pip3 install mypy
-RUN ./scripts/install
+RUN ./scripts/install.sh
 
 RUN mkdir /mason
 ENV MASON_HOME /mason/

@@ -16,6 +16,7 @@ from util.logger import logger
 from util.json import print_json
 import yaml
 from configurations.valid_operator import ValidOperator
+from definitions import from_root
 
 
 def import_all(config: Config):
@@ -43,8 +44,8 @@ def update_yaml(config: Config, base_swagger: str):
                         paths.update(parsed_paths)
 
     parsed_swagger['paths'] = paths
-    with open(swagger_file, 'w+') as file:
-        yaml.dump(parsed_swagger, file)
+    with open(swagger_file, 'w+') as file: # type: ignore
+        yaml.dump(parsed_swagger, file) # type: ignore
 
 
 def run(config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
@@ -72,8 +73,6 @@ def run(config: Config, parameters: Parameters, cmd: Optional[str] = None, subcm
         return response
 
 
-# TODO: FIX
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def validate_operators(operator_file: str):
     configs: List[dict] = []
@@ -85,7 +84,7 @@ def validate_operators(operator_file: str):
                 file_path = os.path.join(r, file)
                 if file == "operator.yaml":
                     config = parse_yaml(file_path)
-                    schema = ROOT_DIR + "/schema.json"
+                    schema = from_root("/operators/schema.json")
                     if validate_schema(config, schema):
                         logger.debug(f"Valid Operator Definition {file_path}")
                         configs.append(config)

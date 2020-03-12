@@ -1,6 +1,6 @@
+#!/bin/sh
 set -e
 
 ./scripts/test
-pip3 install mypy
 mypy .
 pip3 install .

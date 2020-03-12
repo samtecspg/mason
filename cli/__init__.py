@@ -10,7 +10,7 @@ from parameters import Parameters
 from util.json_schema import validate_schema
 from util.yaml import parse_yaml
 from util.logger import logger
-import operators as Operator
+import operators as Operators
 from util.printer import  banner
 from util.environment import MasonEnvironment
 
@@ -77,7 +77,7 @@ def register(operator_file: str, log_level: Optional[str] = None):
     env = MasonEnvironment()
     if path.exists(env.config_home):
         logger.set_level(log_level)
-        validation = Operator.validate_operators(operator_file)
+        validation = Operators.validate_operators(operator_file)
         if len(validation[1]) == 0:
 
             basename = path.basename(operator_file.rstrip("/"))
@@ -108,14 +108,14 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
         logger.set_level(log_level)
         config = Config(env)
         params = Parameters(parameters, param_file)
-        Operator.run(config, params, cmd, subcmd)
+        Operators.run(config, params, cmd, subcmd)
 
     else:
         logger.info("Configuration not found.  Run \"mason config\" first")
 
 @main.command()
 def run():
-    os.system('./scripts/run')
+    os.system('./scripts/run.sh')
 
 
 if __name__ == "__main__":
