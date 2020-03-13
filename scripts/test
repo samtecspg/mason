@@ -2,5 +2,5 @@
 set -e
 
 mypy .
-pytest --spec -vvvv
+pytest --spec -vvvv --cov=.
 

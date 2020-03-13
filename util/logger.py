@@ -46,7 +46,7 @@ class Logger:
         if self.log_level.info():
             self.log(message)
 
-    # special logger method thats the same as info but is specifically intended to be removed before pushing code
+    # special logger method thats the same as error but is specifically intended to be removed before pushing code
     def remove(self, message: str = ""):
         self.error()
         self.error("=" * 60 + "REMOVE" + "=" * 60)

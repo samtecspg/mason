@@ -1,6 +1,4 @@
 
-from util.logger import logger
-
 def dedupe(d: dict) -> dict:
     result: dict = {}
     i = list(d.items())

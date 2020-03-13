@@ -1,7 +1,5 @@
 metastore_engine: test
-storage_engine: test
-scheduler_engine: test2
-execution_engine: test2
+bad_engine: test
 clients:
   test:
     configuration:
