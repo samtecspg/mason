@@ -135,7 +135,7 @@ def tabulate_operators(config: Config, cmd: Optional[str] = None):
     array = []
     for k in ops:
         for item in ops[k]:
-            command = item.cmd
+            command = item.subcommand
             description = item.description
             parameters = item.parameters
             array.append([k, command, description, parameters])
