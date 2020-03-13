@@ -42,16 +42,23 @@ docker exec -it $(docker ps | grep mason | awk '{print $1}') /bin/bash
 > root@<SHA>:/app# mason
 Usage: mason [OPTIONS] COMMAND [ARGS]...
 
+  ___  ___
+  |  \/  |                      
+  | .  . | __ _ ___  ___  _ __  
+  | |\/| |/ _` / __|/ _ \| '_ \ 
+  | |  | | (_| \__ \ (_) | | | |
+  \_|  |_/\__,_|___/\___/|_| |_|
+
   Mason Data Operator Framework
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  config
-  operator
-  register
-  run
+  config    Configures mason clients and engines
+  operator  Executes and lists mason operators
+  register  Registers mason operator
+  run       Runs mason flask server on port 5000
 
 ```
 
