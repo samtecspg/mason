@@ -23,7 +23,7 @@ def import_all(config: Config):
     operators = list_operators(config)
     for namespace, ops in operators.items():
         for op in ops:
-            cmd = op.cmd
+            cmd = op.subcommand
             import_module(f"registered_operators.{namespace}.{cmd}")
 
 def update_yaml(config: Config, base_swagger: str):
