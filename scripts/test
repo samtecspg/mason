@@ -2,5 +2,4 @@
 set -e
 
 mypy .
-pytest --spec -vvvv --cov=.
-
+pytest --spec -vvvv --cov=. --cov-report html
