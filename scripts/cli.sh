@@ -2,21 +2,21 @@
 set -e
 
 # Reset everything to 0
-# ./scripts/install.sh
-# rm -rf ~/.mason/
+./scripts/install.sh
+rm -rf ~/.mason/
 
 # config examples
 # mason config -l debug
 # mason config examples/config/bad_config.yaml
-# mason config examples/config/config_example.yaml
+#mason config examples/config/config_example.yaml
 # mason config
-# mason register
-# mason register examples/operators/table
-# mason run
 
 # register exampels
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
-# mason register examples/operators/table/
+#mason register examples/operators/table/
+
+# running api server
+# mason run
 
 # operator examples
 # mason operator

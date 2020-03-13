@@ -11,28 +11,42 @@ from util.json_schema import validate_schema
 from util.yaml import parse_yaml
 from util.logger import logger
 import operators.operators as Operators
-from util.printer import  banner
+from util.printer import banner
 from util.environment import MasonEnvironment
+import pyfiglet # type: ignore
 
 @click.group()
 def main():
     """
+    \b
+    ___  ___
+    |  \/  |                      
+    | .  . | __ _ ___  ___  _ __  
+    | |\/| |/ _` / __|/ _ \| '_ \ 
+    | |  | | (_| \__ \ (_) | | | |
+    \_|  |_/\__,_|___/\___/|_| |_|
+    
     Mason Data Operator Framework
     """
-    pass
 
-@main.command()
+@main.command("config", short_help="Configures mason clients and engines")
 @click.argument('config_file', required=False)
 @click.option("-l", "--log_level", help="Log level for mason")
 def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
+    """
+    Configures mason according to [CONFIG_FILE].
+
+    [CONFIG_FILE] is a yaml file.  See examples/config/ for reference implementations.
+    """
+
     logger.set_level(log_level)
     env = MasonEnvironment()
 
     if not path.exists(env.mason_home):
-        logger.info(f"Creating MASON_HOME at {env.mason_home}")
+        banner(f"Creating MASON_HOME at {env.mason_home}")
         os.mkdir(env.mason_home)
     if not path.exists(env.operator_home):
-        logger.info(f"Creating OPERATOR_HOME at {env.operator_home}")
+        banner(f"Creating OPERATOR_HOME at {env.operator_home}")
         os.mkdir(env.operator_home)
         Path(env.operator_home + "__init__.py").touch()
 
@@ -70,10 +84,18 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
             logger.error("First pass configuration:  \"mason config <config_file_path>\"")
 
 
-@main.command()
 @click.argument("operator_file")
 @click.option("-l", "--log_level", help="Log level for mason")
+@main.command('register', short_help="Registers mason operator")
 def register(operator_file: str, log_level: Optional[str] = None):
+    """
+    Registers mason operator using [OPERATOR_FILE].
+
+    See examples/operators/table/ for examples of operators.
+
+    Valid operators will contain an operator.yaml file which defines the compatible clients and parmeters for the operator.
+    """
+
     env = MasonEnvironment()
     if path.exists(env.config_home):
         logger.set_level(log_level)
@@ -96,13 +118,18 @@ def register(operator_file: str, log_level: Optional[str] = None):
         logger.error("Configuration not found.  Run \"mason config\" first")
 
 
-@main.command()
+@main.command("operator", short_help="Executes and lists mason operators")
 @click.argument("cmd", required=False)
 @click.argument("subcmd", required=False)
-@click.option('-p', '--parameters', help="Parameters as \",\" delimeted list var=value")
+@click.option('-p', '--parameters', help="Load parameters from parameters string of the format  <param1>:<value1>,<param2>:<value2>")
 @click.option('-c', '--param_file', help="Parameters from yaml file path")
 @click.option("-l", "--log_level", help="Log level for mason")
 def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None):
+    """
+    Running without cmd or subcmd will list out all mason operators currently registered.
+    Running without subcmd will list out all mason operators under the cmd namespace.
+    Running with both cmd and subcmd will execute the operator or print out missing required parameters.
+    """
     env = MasonEnvironment()
 
     if path.exists(env.config_home):
@@ -114,8 +141,12 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
     else:
         logger.info("Configuration not found.  Run \"mason config\" first")
 
-@main.command()
+@main.command("run", short_help="Runs mason flask server on port 5000")
 def run():
+    """
+    Will run mason flask server on port 5000.
+    To view the mason swagger ui go to: http://localhost:5000/api/ui/
+    """
     os.system('./scripts/run.sh')
 
 

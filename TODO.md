@@ -20,11 +20,11 @@ Legend
 - [ ] :arrow_up: More test coverage on basic funcitonality:
     - [x] Parameters C: 03/11/2020
     - [ ] Configurations
-    - [x] Operators
-    - [ ] Engines
+    - [x] Operators C: 03/12/2020
+    - [x] Engines C: 03/13/2020
     - [ ] Clients
     - [ ] Cli
-- [ ] :arrow_up: Clean up rest api implementation, 
+- [x] :arrow_up: Clean up rest api implementation C:03/13/2020
 - [x] create "mason run" cli command C: 03/09/2020
 - [ ] Pull rest api responses through to swagger spec (200 status example)
 - [ ] :arrow_up: Advanced Operator Registration Documentation 

@@ -1,8 +1,15 @@
 from unittest.mock import patch
-from examples.operators.table.get import run as table_get
+
 from examples.operators.table.list import run as table_list
+from examples.operators.table.get import run as table_get
 from examples.operators.table.infer import run as table_infer
 from examples.operators.table.refresh import run as table_refresh
+
+from examples.operators.table.list import api as table_list_api
+from examples.operators.table.get import api as table_get_api
+from examples.operators.table.refresh import api as table_refresh_api
+from examples.operators.table.infer import api as table_infer_api
+
 from examples.operators.table.test.expects import table as expects # type: ignore
 from parameters import Parameters
 from test.support import testing_base as base
@@ -24,6 +31,10 @@ def test_index():
                 validate = params.validate(op)
                 dne = table_list(config, params, validate)
                 assert(dne.with_status() == expects.index(False))
+
+                # Api
+                response, status = table_list_api(config, database_name="crawler-poc")
+                assert((response, status) == expects.index())
 
 def test_get():
     config, op = base.before("table", "get")
@@ -51,6 +62,10 @@ def test_get():
                 dne2 = table_get(config, params, validate)
                 assert(dne2.with_status() ==expects.get(3))
 
+                # API
+                response, status = table_get_api(config, database_name="crawler-poc", table_name="catalog_poc_data")
+                assert((response, status) == expects.get(1))
+
 def test_post():
     config, op = base.before("table", "infer")
 
@@ -70,6 +85,10 @@ def test_post():
                 validate = params.validate(op)
                 exists = table_infer(config, params, validate)
                 assert(exists.with_status() == expects.post(True))
+
+                # API
+                response, status = table_infer_api(config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
+                assert((response, status) == expects.post(False))
 
 
 def test_refresh():
@@ -91,5 +110,9 @@ def test_refresh():
                 validate = params.validate(op)
                 refreshing = table_refresh(config, params, validate)
                 assert(refreshing.with_status() == expects.refresh(True))
+
+                # API
+                response, status = table_refresh_api(config, table_name="catalog_poc_data", database_name="crawler-poc")
+                assert((response, status) == expects.refresh(False))
 
 

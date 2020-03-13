@@ -17,14 +17,14 @@ from operators.valid_operator import Operator
 from definitions import from_root
 from typing import Dict
 
-
 def import_all(config: Config):
     path.append(config.env.mason_home)
     operators = list_operators(config)
     for namespace, ops in operators.items():
         for op in ops:
             cmd = op.subcommand
-            import_module(f"registered_operators.{namespace}.{cmd}")
+            import_module(f"{config.env.operator_module}.{namespace}.{cmd}")
+
 
 def update_yaml(config: Config, base_swagger: str):
     swagger_file = "api/swagger.yml"
@@ -61,7 +61,7 @@ def run(config: Config, parameters: Parameters, cmd: Optional[str] = None, subcm
         if op:
             response = parameters.validate(op, response)
             if not response.errored():
-                mod = import_module(f'registered_operators.{cmd}.{subcmd}')
+                mod = import_module(f'{config.env.operator_module}.{cmd}.{subcmd}')
                 response = mod.run(config, parameters, response) # type: ignore
 
         else:
