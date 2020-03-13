@@ -2,13 +2,13 @@
 set -e
 
 # Reset everything to 0
-./scripts/install.sh
-rm -rf ~/.mason/
+#./scripts/install.sh
+# rm -rf ~/.mason/
 
 # config examples
 # mason config -l debug
 # mason config examples/config/bad_config.yaml
-#mason config examples/config/config_example.yaml
+# mason config examples/config/config_example.yaml
 # mason config
 
 # register exampels

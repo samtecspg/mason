@@ -46,7 +46,9 @@ class TestListOperators:
           'subcommand': 'operator2',
           'supported_clients': ['test_client']}]
 
-        assert(dicts == expects)
+        d = sorted(dicts, key=lambda i: i['subcommand'])
+        e = sorted(expects, key=lambda e:e['subcommand'])
+        assert(d == e)
 
     def test_namespace_dne(self):
         base.set_log_level("error")

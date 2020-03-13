@@ -13,7 +13,6 @@ from util.logger import logger
 import operators.operators as Operators
 from util.printer import banner
 from util.environment import MasonEnvironment
-import pyfiglet # type: ignore
 
 @click.group()
 def main():
