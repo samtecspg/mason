@@ -57,5 +57,13 @@ class TestListOperators:
         assert(l == None)
 
 
+class TestValidateOperator:
 
+    def test_bad_operator_pat(self):
+        pass
 
+    def test_invalid_operator_definitions(self):
+        pass
+
+    def test_valid_operator_definition(self):
+        pass

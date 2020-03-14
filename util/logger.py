@@ -7,7 +7,8 @@ class LogLevel:
     ERROR = "error"
     DEBUG = "debug"
     TRACE = "trace"
-    LEVELS = [TRACE, DEBUG, INFO, WARNING, ERROR]
+    FATAL = "fatal"
+    LEVELS = [TRACE, DEBUG, INFO, WARNING, ERROR, FATAL]
 
     def __init__(self, level: str):
         if level in self.LEVELS:
@@ -20,6 +21,7 @@ class LogLevel:
     def info(self): return (self.level < 3)
     def warning(self): return (self.level < 4)
     def error(self): return (self.level < 5)
+    def fatal(self): return (self.level < 6)
 
 class Logger:
 
@@ -48,14 +50,14 @@ class Logger:
 
     # special logger method thats the same as error but is specifically intended to be removed before pushing code
     def remove(self, message: str = ""):
-        self.error()
-        self.error("=" * 60 + "REMOVE" + "=" * 60)
-        self.error()
-        self.error()
-        self.error(message)
-        self.error()
-        self.error()
-        self.error("=" * 126)
+        self.fatal()
+        self.fatal("=" * 60 + "REMOVE" + "=" * 60)
+        self.fatal()
+        self.fatal()
+        self.fatal(message)
+        self.fatal()
+        self.fatal()
+        self.fatal("=" * 126)
 
     def warning(self, message: str = ""):
         if self.log_level.warning():
@@ -63,6 +65,10 @@ class Logger:
 
     def error(self, message: str = ""):
         if self.log_level.error():
+            self.log(message)
+
+    def fatal(self, message: str = ""):
+        if self.log_level.fatal():
             self.log(message)
 
 
