@@ -13,4 +13,6 @@ api/swagger.yml
 .DS_Store
 .direnv/
 .direnv/*
+mason_env/
+mason_env/**/*
 
