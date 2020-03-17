@@ -1,0 +1,7 @@
+type: "operator"
+namespace: "table"
+command: "merge"
+description:  "Merge metastore tables"
+parameters: {}
+supported_clients:
+  - "parquet"

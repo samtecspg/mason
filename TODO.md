@@ -36,6 +36,8 @@ Legend
 - [ ] :arrow_down: Explore graphql for the api? Note found a way around this for now.
 - [ ] Generalize Engines to be "registerable" and serial
 - [ ] Support multiple clients for a single engine type.
+- [ ] Parameter aliases:   ex: database_name -> bucket_name
+- [ ] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc
 
 ## Test Cases
 
@@ -44,7 +46,8 @@ Legend
 - [x] Better errors around Permission errors C: 03/13/2020
 
 ## Operators
-
+- [ ] Metastore Database operator
+    - [ ] List databases (~= s3 list buckets)
 - [ ] Schema merge operator
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
@@ -62,13 +65,15 @@ Legend
 
 ## Clients
 
-### Metastore  
+### Metastore
 #### Glue
 - [x] Basic setup. C: 4/04/2020
 - [ ] Column casting operator
 - [ ] Fix conflicting schemas error with differing partition data
 #### Hive
 - [ ] :arrow_down: Basic setup
+#### S3
+- [ ] :arrow_up: Basic Setup
 
 ### Execution
 - [ ] :arrow_up: Dockerized Execution

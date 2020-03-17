@@ -1,0 +1,6 @@
+metastore_engine: s3
+storage_engine: s3
+clients:
+  s3:
+    configuration:
+      region: "us-east-1"

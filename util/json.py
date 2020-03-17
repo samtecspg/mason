@@ -24,7 +24,7 @@ def to_json(d: dict):
 def print_json(d: dict):
     formatted_json = to_json(d)
     colorful_json = highlight(formatted_json, lexers.JsonLexer(), formatters.TerminalFormatter())
-    return logger.info(colorful_json)
+    return logger.fatal(colorful_json)
 
 def print_json_1level(d: dict):
     out = {}

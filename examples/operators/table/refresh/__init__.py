@@ -1,8 +1,6 @@
 from configurations import Config
 from parameters import Parameters
 from clients.response import Response
-import operators.operators as Operator
-from util.environment import MasonEnvironment
 from api import operator_api as OperatorApi
 
 def api(*args, **kwargs): return OperatorApi.get("table", "refresh", *args, **kwargs)
