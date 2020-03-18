@@ -1,5 +1,4 @@
 
-from clients.s3 import S3Client
 
 class Client:
 

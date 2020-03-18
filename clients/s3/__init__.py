@@ -4,12 +4,16 @@ from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 from typing import Optional, List
 from util.logger import logger
-import tempfile
+from definitions import from_root
+from engines.metastore.models import schemas
 
 class S3Client:
     def __init__(self, s3_config: dict):
         self.region = s3_config.get("region")
         self.client = boto3.client('s3', region_name=self.region)
+
+        # self.resource = boto3.resource('s3', region_name=self.region)
+        # self.client = self.resource.meta.client
 
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
@@ -72,13 +76,22 @@ class S3Client:
             keys = list(map(lambda c: c.get("Key"), contents))
             if len(keys) > 0:
                 for key in keys:
-                    response_body: bytes = self.client.get_object(Bucket=database_name, Key=key, Range ='bytes=0-4096')['Body'].read()
-                    tmp = tempfile.NamedTemporaryFile()
-                    tmp.write(response_body)
 
-                    from engines.metastore.models.file import MetastoreFile
-                    metastore_file = MetastoreFile(tmp.name)
-                    print(metastore_file.str())
+                    # get header to infer file type
+                    header_length = 4096
+                    header: bytes = self.client.get_object(Bucket=database_name, Key=key, Range =f'bytes=0-{header_length}')['Body'].read()
+
+                    object_header = self.client.head_object(Bucket=database_name, Key=key)
+                    content_length = int(object_header.get('ResponseMetadata', {}).get("HTTPHeaders", {}).get("content-length", "0"))
+                    if content_length > 0:
+                        footer_length = 20000
+                        footer_start = content_length - footer_length
+
+                        footer: bytes = self.client.get_object(Bucket=database_name, Key=key, Range=f"bytes={footer_start}-{content_length}")['Body'].read()
+
+                        schema = schemas.from_header_and_footer(header, footer)
+                        schema.print()
+
 
         if (len(new_responses) > 0):
             error, status, message = self.parse_responses(new_responses[-1])

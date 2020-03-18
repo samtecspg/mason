@@ -30,3 +30,4 @@ def get_config(operator_home: str = "/examples/operators", config_home = "/examp
 def get_mock(client: str):
     if client == "glue":
         return GlueMock
+
