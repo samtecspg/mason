@@ -17,8 +17,8 @@ set -e
 # register exampels
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
 mason register examples/operators/table/
-mason operator table list -p database_name:lake-working-copy-feb-20-2020 -l trace
-#mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/shipment/ -l trace
+#mason operator table list -p database_name:lake-working-copy-feb-20-2020 -l trace
+mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/shipment/ -l trace
 
 # running api server
 # mason run
