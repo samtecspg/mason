@@ -93,6 +93,7 @@ class S3Client:
                         schema = schemas.from_header_and_footer(header, footer)
                         schema_list.append(schema)
 
+        logger.remove(f"SCHEMA LIST {schema_list}")
         unique_schemas = set(schema_list)
 
         if (len(new_responses) > 0):

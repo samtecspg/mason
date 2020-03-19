@@ -74,6 +74,13 @@ Legend
 - [ ] :arrow_down: Basic setup
 #### S3
 - [ ] :arrow_up: Basic Setup
+- [ ] Schema implementations
+   - [x] ParquetSchema
+   - [ ] CSV Schema
+   - [ ] JsonL schema
+   - [ ] Json schema
+   - [ ] :arrow_down: Avro schema
+   - [ ] :arrow_down: Msgpack pack schema
 
 ### Execution
 - [ ] :arrow_up: Dockerized Execution
