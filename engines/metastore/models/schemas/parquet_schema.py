@@ -7,10 +7,9 @@ from typing import Optional, List
 
 class ParquetElement(SchemaElement):
     def __init__(self, name: str, type: str, converted_type: Optional[str], repitition_type: Optional[str]):
-        self.name = name
-        self.type = type
         self.converted_type = converted_type
         self.repitition_type = repitition_type
+        super().__init__(name, type)
 
     def __eq__(self, other):
         if other:
@@ -24,17 +23,17 @@ class ParquetElement(SchemaElement):
 
     def to_dict(self):
         return {
-            'name': self.name,
-            'type': self.type,
-            'converted_type': self.converted_type,
-            'repitition_type': self.repitition_type
+            'Name': self.name,
+            'Type': self.type,
+            'ConvertedType': self.converted_type,
+            'RepititionType': self.repitition_type
         }
 
 class ParquetSchema(MetastoreSchema):
 
-    def __init__(self, children: List[ParquetElement], schema_helper: Optional[SchemaHelper] = None):
+    def __init__(self, columns: List[SchemaElement], schema_helper: Optional[SchemaHelper] = None):
         self._schema = schema_helper
-        self.children = children
+        self.columns = columns
         self.type = 'parquet'
 
 
@@ -45,7 +44,7 @@ def from_footer(footer: str):
     text = schema.text
     split = text.split("\n")
     split.pop(0)
-    column_elements: List[ParquetElement] = flatten(list(map(lambda line: element_from_text(line), split)))
+    column_elements: List[SchemaElement] = flatten(list(map(lambda line: element_from_text(line), split)))
 
     return ParquetSchema(column_elements, schema)
 

@@ -3,34 +3,34 @@ from abc import abstractmethod
 from typing import List
 
 class SchemaElement:
-    @abstractmethod
-    def __init__(self, attributes: dict):
-        raise(NotImplementedError("Schema Element type not implemented"))
+    def __init__(self, name: str, type: str):
+        self.name = name
+        self.type = type
 
-    @abstractmethod
     def to_dict(self) -> dict:
-        raise(NotImplementedError("Schema Element type not implemented"))
+        return {
+            "Name": self.name,
+            "Type": self.type
+        }
 
 
 class MetastoreSchema:
 
-    @abstractmethod
-    def __init__(self, schema):
-        self._schema = schema
-        self.type = ""
-        self.children = []
+    def __init__(self, columns: List[SchemaElement], type: str):
+        self.type = type
+        self.columns = columns
 
     def __hash__(self):
         return 0
 
     def __eq__(self, other):
         # types are equal and there are no items outside of the intersection of their children
-        symm_diff = set(self.children).symmetric_difference(set(other.children))
+        symm_diff = set(self.columns).symmetric_difference(set(other.columns))
         return self.type == other.type and (len(symm_diff) == 0)
 
     def to_dict(self):
         return {
-            'type': self.type,
-            'children': list(map(lambda c: c.to_dict(), self.children))
+            'SchemaType': self.type,
+            'Columns': list(map(lambda c: c.to_dict(), self.columns))
         }
 

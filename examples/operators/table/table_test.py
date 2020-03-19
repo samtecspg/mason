@@ -50,7 +50,7 @@ def test_get():
                 exists = table_get(config, params, validate)
                 assert(exists.with_status() == expects.get(1))
 
-                # Database DNE
+                # # Database DNE
                 params = Parameters(parameters="database_name:bad-database,table_name:catalog_poc_data")
                 validate = params.validate(op)
                 dne = table_get(config, params, validate)
