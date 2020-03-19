@@ -1,16 +1,63 @@
 
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
+from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
 from fastparquet import ParquetFile #type: ignore
-from fastparquet.schema import SchemaHelper, schema_to_text #type: ignore
+from fastparquet.schema import SchemaHelper #type: ignore
+from util.list import get, flatten
+from typing import Optional, List
 
-def from_footer(footer: str):
-    schema: SchemaHelper = ParquetFile(footer).schema
-    return ParquetSchema(schema)
+class ParquetElement(SchemaElement):
+    def __init__(self, name: str, type: str, converted_type: Optional[str], repitition_type: Optional[str]):
+        self.name = name
+        self.type = type
+        self.converted_type = converted_type
+        self.repitition_type = repitition_type
+
+    def __eq__(self, other):
+        if other:
+            return (self.name == other.name and self.type == other.type and self.converted_type == other.converted_type and self.repitition_type == other.repitition_type)
+        else:
+            False
+
+    def __hash__(self):
+        return 0
+
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'type': self.type,
+            'converted_type': self.converted_type,
+            'repitition_type': self.repitition_type
+        }
 
 class ParquetSchema(MetastoreSchema):
 
-    def __init__(self, schema: SchemaHelper):
-        # elements = schema
-        # schema_elements = {k: print(v.thrift_spec) and v for k, v in elements.items() if not k == "schema"}
-        self.schema = schema
+    def __init__(self, children: List[ParquetElement], schema_helper: Optional[SchemaHelper] = None):
+        self._schema = schema_helper
+        self.children = children
+        self.type = 'parquet'
 
+
+def from_footer(footer: str):
+    schema: SchemaHelper = ParquetFile(footer).schema
+
+    # TODO:  Find a more graceful way to do this than parsing the text
+    text = schema.text
+    split = text.split("\n")
+    split.pop(0)
+    column_elements: List[ParquetElement] = flatten(list(map(lambda line: element_from_text(line), split)))
+
+    return ParquetSchema(column_elements, schema)
+
+def element_from_text(line: str) -> Optional[ParquetElement]:
+    split = line.lstrip("| - ").split(":")
+    name: Optional[str] = get(split, 0)
+    attributes: Optional[str] = get(split, 1)
+    attrs_split = (attributes or "").replace(" ", "").split(",")
+    type = get(attrs_split, 0)
+    converted_type = get(attrs_split, 1)
+    repitition_type = get(attrs_split, 2)
+    if name and type:
+        return ParquetElement(name, type, converted_type, repitition_type)
+    else:
+        return None

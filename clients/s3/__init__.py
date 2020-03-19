@@ -6,6 +6,7 @@ from typing import Optional, List
 from util.logger import logger
 from definitions import from_root
 from engines.metastore.models import schemas
+from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 
 class S3Client:
     def __init__(self, s3_config: dict):
@@ -74,9 +75,9 @@ class S3Client:
         for resp in new_responses:
             contents = resp.get("Contents", [])
             keys = list(map(lambda c: c.get("Key"), contents))
+            schema_list: List[MetastoreSchema] = []
             if len(keys) > 0:
                 for key in keys:
-
                     # get header to infer file type
                     header_length = 4096
                     header: bytes = self.client.get_object(Bucket=database_name, Key=key, Range =f'bytes=0-{header_length}')['Body'].read()
@@ -90,8 +91,9 @@ class S3Client:
                         footer: bytes = self.client.get_object(Bucket=database_name, Key=key, Range=f"bytes={footer_start}-{content_length}")['Body'].read()
 
                         schema = schemas.from_header_and_footer(header, footer)
-                        schema.print()
+                        schema_list.append(schema)
 
+        unique_schemas = set(schema_list)
 
         if (len(new_responses) > 0):
             error, status, message = self.parse_responses(new_responses[-1])
@@ -100,9 +102,9 @@ class S3Client:
                 response.add_error(f"Database {database_name} not found")
                 response.set_status(404)
             elif 200 <= status < 300:
-                # data = self.parse_table_list_data(result)
-                for resp in new_responses:
-                    response.add_data(resp)
+                response.add_data({
+                    'schemas': list(map(lambda x: x.to_dict(), unique_schemas))
+                })
                 response.set_status(status)
             else:
                 response.set_status(status)
