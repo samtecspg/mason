@@ -4,10 +4,10 @@ from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 from typing import Optional, List
 from util.logger import logger
-from definitions import from_root
 from engines.metastore.models import schemas
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from engines.metastore.models.schemas import check_schemas as CheckSchemas
+from util.list import get
 
 class S3Client:
     def __init__(self, s3_config: dict):
@@ -61,7 +61,7 @@ class S3Client:
         except ClientError as e:
             new_responses.append(e.response)
 
-        while continuation_token and len(new_responses) < 2:
+        while continuation_token:
             try:
                 logger.info(f"Continuing fetching keys in {database_name}. Continuation token: {continuation_token}, Responses: {len(new_responses)}")
                 if table_name:
@@ -116,8 +116,11 @@ class S3Client:
         return response
 
 
+    #  List tables for s3 only lists out folders, not schemas in folders.  You can specify subfolders and it will be split out
     def list_tables(self, database_name: str, response: Response):
-        response = self.get_results(response, database_name)
+        split = database_name.split("/", 1)
+        result = self.client.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/').get("CommonPrefixes", {})
+        response.add_data(result)
         return response
 
     #  database_name = bucket, table_name = path

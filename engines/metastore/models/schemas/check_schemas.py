@@ -31,8 +31,9 @@ def find_conflicts(schemas: List[MetastoreSchema]):
 
         return {
             'SchemaConflicts': {
-                'Distinct Schemas': unique_schema_dicts,
-                'Non-overlapping Columns': list(complement_of_intersection)
+                'CountDistinctSchemas': len(unique_schema_dicts),
+                'DistinctSchemas': unique_schema_dicts,
+                'NonOverlappingColumns': list(complement_of_intersection)
             }
         }
     else:
