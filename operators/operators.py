@@ -58,14 +58,19 @@ def run(config: Config, parameters: Parameters, cmd: Optional[str] = None, subcm
     else:
         path.append(config.env.mason_home)
         op: Optional[Operator] = get_operator(config, cmd, subcmd)
+
         if op:
+            op, response = op.validate_configuration(config, response)
+
+        if op and not response.errored():
             response = parameters.validate(op, response)
             if not response.errored():
                 mod = import_module(f'{config.env.operator_module}.{cmd}.{subcmd}')
                 response = mod.run(config, parameters, response) # type: ignore
 
         else:
-            response.add_error(f"Operator {cmd} {subcmd} not found.  Check operators with 'mason operator'")
+            if not response.errored():
+                response.add_error(f"Operator {cmd} {subcmd} not found.  Check operators with 'mason operator'")
 
         banner("Operator Response")
         print_json(response.formatted())

@@ -9,9 +9,10 @@ from engines.scheduler import SchedulerEngine
 from engines.storage import StorageEngine
 from engines.execution import ExecutionEngine
 from util.environment import MasonEnvironment
-from typing import Optional
+from typing import Optional, Set
 from util.json_schema import validate_schema
 from definitions import from_root
+from util.list import flatten_string
 
 class Config:
 
@@ -52,4 +53,13 @@ class Config:
 
     def print(self):
         print_json_1level(self.config)
+
+    # TODO:  Make validation more specific to engine type
+    def client_names(self) -> Set[str]:
+        return set(flatten_string([
+            self.metastore.client_name,
+            self.scheduler.client_name,
+            self.storage.client_name,
+            self.execution.client_name,
+        ]))
 
