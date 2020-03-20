@@ -56,10 +56,12 @@ class Config:
 
     # TODO:  Make validation more specific to engine type
     def client_names(self) -> Set[str]:
-        return set(flatten_string([
-            self.metastore.client_name,
-            self.scheduler.client_name,
-            self.storage.client_name,
-            self.execution.client_name,
-        ]))
+        if not self.config == {}:
+            return set(flatten_string([
+                self.metastore.client_name,
+                self.scheduler.client_name,
+                self.storage.client_name,
+                self.execution.client_name,
+            ]))
+        else: return set([])
 
