@@ -3,20 +3,19 @@ set -e
 
 # Reset everything to 0
 
-#./scripts/install.sh
-
-# rm -rf ~/.mason/
+./scripts/install.sh
+ rm -rf ~/.mason/
 
 # config examples
 # mason config -l debug
 # mason config examples/config/bad_config.yaml
-# mason config examples/config/config_2.yaml
+ mason config examples/config/config_2.yaml
 # mason config examples/config/.yaml
 # mason config
 
 # register exampels
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
-#mason register examples/operators/table/
+mason register examples/operators/table/
 #mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/orders/ -l trace
 mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/orders/
 

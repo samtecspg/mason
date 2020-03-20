@@ -16,3 +16,5 @@ venv/**/*
 .direnv/
 .direnv/**/*
 .direnv/*
+htmlcov/
+htmlcov/*

@@ -5,7 +5,6 @@ from typing import Optional
 from operators import operators as Operators
 from typing import List
 import urllib.parse
-from util.logger import logger
 
 def get(namespace: str, command: str, config: Optional[Config] = None, *args, **kwargs) :
     if not config:

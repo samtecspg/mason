@@ -25,6 +25,15 @@
           }
         }
       }
+    },
+    "supported_clients": {
+      "type": "object",
+      "properties": {
+         "metastore": {"type":  "array", "items":  {"type":  "string"}},
+         "scheduler": {"type":  "array", "items":  {"type":  "string"}},
+         "execution": {"type":  "array", "items":  {"type":  "string"}},
+         "storage":   {"type":  "array", "items":  {"type":  "string"}}
+      }
     }
   }, "required": ["type", "namespace", "command", "description"]
 }

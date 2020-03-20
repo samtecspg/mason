@@ -10,3 +10,11 @@ def flatten(l: List[Optional[Any]]) -> List[Any]:
 
 def flatten_string(l: List[str]) -> List[str]:
     return [string for string in l if string != ""]
+
+def flatten_array(l: List[List[str]]) -> List[str]:
+    values = []
+    for value in l:
+        for subvalue in value:
+            values.append(subvalue)
+    return values
+

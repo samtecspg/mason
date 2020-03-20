@@ -13,13 +13,14 @@ from examples.operators.table.infer import api as table_infer_api
 from examples.operators.table.test.expects import table as expects # type: ignore
 from parameters import Parameters
 from test.support import testing_base as base
+from util.logger import logger
 
 def test_index():
     config, op = base.before("table", "list")
 
     if config and op:
-        assert(op.supported_clients == ["glue"])
-        for client in op.supported_clients:
+        assert(op.supported_clients == {'metastore': ['glue']})
+        for client in op.all_clients():
             with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
                 params = Parameters(parameters="database_name:crawler-poc")
                 validate = params.validate(op)
@@ -40,8 +41,8 @@ def test_get():
     config, op = base.before("table", "get")
 
     if config and op:
-        assert(op.supported_clients == ["glue"])
-        for client in op.supported_clients:
+        assert(op.supported_clients == {'metastore': ['glue']})
+        for client in op.all_clients():
             with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
                 # Database and table Exist
                 params = Parameters(parameters="database_name:crawler-poc,table_name:catalog_poc_data")
@@ -70,8 +71,9 @@ def test_post():
     config, op = base.before("table", "infer")
 
     if config and op:
-        assert (op.supported_clients == ["glue"])
-        for client in op.supported_clients:
+        assert(op.supported_clients == {'metastore': ['glue'], 'scheduler': ['glue'], 'storage': ['s3']})
+        logger.remove(f"ALL CLIENTS {op.all_clients()}")
+        for client in op.all_clients():
             with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
 
                 #  DNE
@@ -95,8 +97,8 @@ def test_refresh():
     config, op = base.before("table", "refresh")
 
     if config and op:
-        assert (op.supported_clients == ["glue"])
-        for client in op.supported_clients:
+        assert(op.supported_clients == {'scheduler': ['glue']})
+        for client in op.all_clients():
             with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
 
                 # valid refresh

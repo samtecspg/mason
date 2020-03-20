@@ -8,4 +8,9 @@ parameters:
     - "storage_path"
     - "schedule_name"
 supported_clients:
-  - "glue"
+  metastore:
+    - "glue"
+  scheduler:
+    - "glue"
+  storage:
+    - "s3"
