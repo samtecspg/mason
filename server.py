@@ -3,13 +3,13 @@ import markdown # type: ignore
 import operators.operators as Operator
 from util.printer import banner
 from util.environment import MasonEnvironment
-from configurations import Config
+from configurations import get_all
 from util.logger import logger
 
 try:
     banner("Importing all registered_operator modules for API")
     env = MasonEnvironment()
-    config = Config(env)
+    config = get_all(env)[0] # return first config by default
     Operator.import_all(config)
     swagger_yml = "api/base_swagger.yml"
 

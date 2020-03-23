@@ -5,6 +5,5 @@ description:  "Get metastore tables"
 parameters:
   required:
     - "database_name"
-supported_clients:
-  metastore:
-    - "glue"
+supported_configurations:
+  - metastore: "glue"

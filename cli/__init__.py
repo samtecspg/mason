@@ -13,6 +13,7 @@ from util.logger import logger
 import operators.operators as Operators
 from util.printer import banner
 from util.environment import MasonEnvironment
+from configurations import get_all
 
 @click.group()
 def main():
@@ -69,14 +70,14 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
             logger.info()
             logger.info(f"Valid Configuration. Saving config {config_file} to {env.config_home}")
             logger.info()
-            shutil.copyfile(config_file, env.config_home)
-            return Config(env)
+            shutil.copyfile(config_file, env.config_home + os.path.basename(config_file))
+            return Config(env, parsed)
         else:
             logger.error()
             logger.error(f"Invalid Config Schema: {config_file}")
     else:
         if path.exists(env.config_home):
-            return Config(env)
+            return get_all(env)
         else:
             logger.error()
             logger.error("Configuration not found.")
@@ -133,7 +134,7 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
 
     if path.exists(env.config_home):
         logger.set_level(log_level)
-        config = Config(env)
+        config = get_all(env)[0] # return first config for now
         params = Parameters(parameters, param_file)
         Operators.run(config, params, cmd, subcmd)
 

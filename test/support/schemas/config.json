@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MasonConfiguration",
+  "properties": {
+    "metastore_engine": {
+      "type": "string",
+      "enum": [
+        "test_client",
+        "test",
+        "test2"
+      ]
+    },
+    "execution_engine": {
+      "type": "string",
+      "enum": [
+        "test_client",
+        "test",
+        "test2"
+      ]
+    },
+    "storage_engine": {
+      "type": "string",
+      "enum": [
+        "test_client",
+        "test",
+        "test2"
+      ]
+    },
+    "scheduler_engine": {
+      "type": "string",
+      "enum": [
+        "test_client",
+        "test",
+        "test2"
+      ]
+    }
+  }
+}
+

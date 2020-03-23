@@ -13,108 +13,109 @@ from examples.operators.table.infer import api as table_infer_api
 from examples.operators.table.test.expects import table as expects # type: ignore
 from parameters import Parameters
 from test.support import testing_base as base
-from util.logger import logger
 
-def test_index():
-    config, op = base.before("table", "list")
-
-    if config and op:
-        assert(op.supported_clients == {'metastore': ['glue']})
-        for client in op.all_clients():
-            with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
-                params = Parameters(parameters="database_name:crawler-poc")
-                validate = params.validate(op)
-                exists = table_list(config, params, validate)
-                assert exists.with_status() == expects.index()
-
-                # Database DNE
-                params = Parameters(parameters="database_name:bad-database")
-                validate = params.validate(op)
-                dne = table_list(config, params, validate)
-                assert(dne.with_status() == expects.index(False))
-
-                # Api
-                response, status = table_list_api(config, database_name="crawler-poc")
-                assert((response, status) == expects.index())
-
-def test_get():
-    config, op = base.before("table", "get")
-
-    if config and op:
-        assert(op.supported_clients == {'metastore': ['glue']})
-        for client in op.all_clients():
-            with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
-                # Database and table Exist
-                params = Parameters(parameters="database_name:crawler-poc,table_name:catalog_poc_data")
-                validate = params.validate(op)
-
-                exists = table_get(config, params, validate)
-                assert(exists.with_status() == expects.get(1))
-
-                # # Database DNE
-                params = Parameters(parameters="database_name:bad-database,table_name:catalog_poc_data")
-                validate = params.validate(op)
-                dne = table_get(config, params, validate)
-                assert(dne.with_status() ==expects.get(2))
-
-                # Table DNE
-                params = Parameters(parameters="database_name:crawler-poc,table_name:bad-table")
-                validate = params.validate(op)
-                dne2 = table_get(config, params, validate)
-                assert(dne2.with_status() ==expects.get(3))
-
-                # API
-                response, status = table_get_api(config, database_name="crawler-poc", table_name="catalog_poc_data")
-                assert((response, status) == expects.get(1))
-
-def test_post():
-    config, op = base.before("table", "infer")
-
-    if config and op:
-        assert(op.supported_clients == {'metastore': ['glue'], 'scheduler': ['glue'], 'storage': ['s3']})
-        logger.remove(f"ALL CLIENTS {op.all_clients()}")
-        for client in op.all_clients():
-            with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
-
-                #  DNE
-                params = Parameters(parameters="database_name:crawler-poc,schedule_name:test_crawler_new,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
-                validate = params.validate(op)
-                exists = table_infer(config, params, validate)
-                assert(exists.with_status() == expects.post(False))
-
-                # Exists
-                params = Parameters(parameters="database_name:crawler-poc,schedule_name:test_crawler,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
-                validate = params.validate(op)
-                exists = table_infer(config, params, validate)
-                assert(exists.with_status() == expects.post(True))
-
-                # API
-                response, status = table_infer_api(config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
-                assert((response, status) == expects.post(False))
+# def test_index():
+#     config, op = base.before("table", "list")
+#     if op:
+#         for ses in op.supported_configurations:
+#
 
 
-def test_refresh():
-    config, op = base.before("table", "refresh")
+    # if config and op:
+    #     assert(op.supported_clients == [{'metastore': 'glue'}])
+        # for engine, clients  in  op.supported_clients.items():
+        #         params = Parameters(parameters="database_name:crawler-poc")
+        #         validate = params.validate(op)
+        #         exists = table_list(config, params, validate)
+        #         assert exists.with_status() == expects.index()
+        #
+        #         # Database DNE
+        #         params = Parameters(parameters="database_name:bad-database")
+        #         validate = params.validate(op)
+        #         dne = table_list(config, params, validate)
+        #         assert(dne.with_status() == expects.index(False))
+        #
+        #         # Api
+        #         response, status = table_list_api(config, database_name="crawler-poc")
+        #         assert((response, status) == expects.index())
 
-    if config and op:
-        assert(op.supported_clients == {'scheduler': ['glue']})
-        for client in op.all_clients():
-            with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
-
-                # valid refresh
-                params = Parameters(parameters="table_name:catalog_poc_data,database_name:crawler-poc")
-                validate = params.validate(op)
-                refresh = table_refresh(config, params, validate)
-                assert(refresh.with_status() == expects.refresh(False))
-
-                # already refreshing
-                params = Parameters(parameters="table_name:catalog_poc_data_refreshing,database_name:crawler-poc")
-                validate = params.validate(op)
-                refreshing = table_refresh(config, params, validate)
-                assert(refreshing.with_status() == expects.refresh(True))
-
-                # API
-                response, status = table_refresh_api(config, table_name="catalog_poc_data", database_name="crawler-poc")
-                assert((response, status) == expects.refresh(False))
-
-
+# def test_get():
+#     config, op = base.before("table", "get")
+#
+#     if config and op:
+#         assert(op.supported_clients == {'metastore': ['glue']})
+#         for client in op.all_clients():
+#             with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
+#                 # Database and table Exist
+#                 params = Parameters(parameters="database_name:crawler-poc,table_name:catalog_poc_data")
+#                 validate = params.validate(op)
+#
+#                 exists = table_get(config, params, validate)
+#                 assert(exists.with_status() == expects.get(1))
+#
+#                 # # Database DNE
+#                 params = Parameters(parameters="database_name:bad-database,table_name:catalog_poc_data")
+#                 validate = params.validate(op)
+#                 dne = table_get(config, params, validate)
+#                 assert(dne.with_status() ==expects.get(2))
+#
+#                 # Table DNE
+#                 params = Parameters(parameters="database_name:crawler-poc,table_name:bad-table")
+#                 validate = params.validate(op)
+#                 dne2 = table_get(config, params, validate)
+#                 assert(dne2.with_status() ==expects.get(3))
+#
+#                 # API
+#                 response, status = table_get_api(config, database_name="crawler-poc", table_name="catalog_poc_data")
+#                 assert((response, status) == expects.get(1))
+#
+# def test_post():
+#     config, op = base.before("table", "infer")
+#
+#     if config and op:
+#         assert(op.supported_clients == {'metastore': ['glue'], 'scheduler': ['glue'], 'storage': ['s3']})
+#         for client in op.all_clients():
+#             with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
+#
+#                 #  DNE
+#                 params = Parameters(parameters="database_name:crawler-poc,schedule_name:test_crawler_new,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
+#                 validate = params.validate(op)
+#                 exists = table_infer(config, params, validate)
+#                 assert(exists.with_status() == expects.post(False))
+#
+#                 # Exists
+#                 params = Parameters(parameters="database_name:crawler-poc,schedule_name:test_crawler,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
+#                 validate = params.validate(op)
+#                 exists = table_infer(config, params, validate)
+#                 assert(exists.with_status() == expects.post(True))
+#
+#                 # API
+#                 response, status = table_infer_api(config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
+#                 assert((response, status) == expects.post(False))
+#
+#
+# def test_refresh():
+#     config, op = base.before("table", "refresh")
+#
+#     if config and op:
+#         assert(op.supported_clients == {'scheduler': ['glue']})
+#         for client in op.all_clients():
+#             with patch('botocore.client.BaseClient._make_api_call', new=base.get_mock(client).method):
+#
+#                 # valid refresh
+#                 params = Parameters(parameters="table_name:catalog_poc_data,database_name:crawler-poc")
+#                 validate = params.validate(op)
+#                 refresh = table_refresh(config, params, validate)
+#                 assert(refresh.with_status() == expects.refresh(False))
+#
+#                 # already refreshing
+#                 params = Parameters(parameters="table_name:catalog_poc_data_refreshing,database_name:crawler-poc")
+#                 validate = params.validate(op)
+#                 refreshing = table_refresh(config, params, validate)
+#                 assert(refreshing.with_status() == expects.refresh(True))
+#
+#                 # API
+#                 response, status = table_refresh_api(config, table_name="catalog_poc_data", database_name="crawler-poc")
+#                 assert((response, status) == expects.refresh(False))
+#
+#

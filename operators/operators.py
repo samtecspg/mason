@@ -81,9 +81,9 @@ def from_config(config: dict):
     command = config.get("command")
     description = config.get("description", "")
     parameters = config.get("parameters", {})
-    supported_clients = config.get("supported_clients", {})
+    supported_configurations = config.get("supported_configurations", [])
     if namespace and command:
-        return Operator(namespace, command, description, parameters, supported_clients)
+        return Operator(namespace, command, description, parameters, supported_configurations)
     else:
         None
 

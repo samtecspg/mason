@@ -6,14 +6,14 @@ from clients.response import Response
 class TestGetOperator:
 
     def test_command_exists(self):
-        base.set_log_level("fatal")
+        base.set_log_level("trace")
         config = base.get_config("/test/support/operators", "/test/support/test_config.yaml")
         op = Operators.get_operator(config, "namespace1", "operator1")
         expects = {'cmd': 'namespace1',
                    'description': 'Test Operator',
                    'parameters': {'required': ['test_param']},
                    'subcommand': 'operator1',
-                   'supported_clients': ['test_client']}
+                   'supported_clients': {'metastore' :['test_client']}}
         assert(op.__dict__ == expects)
 
     def test_namespace_dne(self):
@@ -40,12 +40,12 @@ class TestListOperators:
           'description': 'Test Operator',
           'parameters': {'required': ['test_param']},
           'subcommand': 'operator1',
-          'supported_clients': ['test_client']},
+          'supported_clients': {'metastore' : ['test_client']}},
          {'cmd': 'namespace1',
           'description': 'Test Operator',
           'parameters': {'required': ['test_param']},
           'subcommand': 'operator2',
-          'supported_clients': ['unsupported_client']}]
+          'supported_clients': {'metastore': ['unsupported_client']}}]
 
         d = sorted(dicts, key=lambda i: i['subcommand'])
         e = sorted(expects, key=lambda e:e['subcommand'])

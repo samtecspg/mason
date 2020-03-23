@@ -6,6 +6,5 @@ parameters:
   required:
     - "database_name"
     - "table_name"
-supported_clients:
-  metastore:
-    - "glue"
+supported_engines:
+  - metastore: "glue"

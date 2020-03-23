@@ -26,13 +26,16 @@
         }
       }
     },
-    "supported_clients": {
-      "type": "object",
-      "properties": {
-         "metastore": {"type":  "array", "items":  {"type":  "string"}},
-         "scheduler": {"type":  "array", "items":  {"type":  "string"}},
-         "execution": {"type":  "array", "items":  {"type":  "string"}},
-         "storage":   {"type":  "array", "items":  {"type":  "string"}}
+    "supported_engines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+           "metastore": {"type":  "string"},
+           "scheduler": {"type":  "string"},
+           "storage": {"type":  "string"},
+           "execution": {"type":  "string"},
+        }
       }
     }
   }, "required": ["type", "namespace", "command", "description"]

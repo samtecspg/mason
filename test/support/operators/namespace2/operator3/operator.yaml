@@ -6,4 +6,5 @@ parameters:
   required:
     - "test_param"
 supported_clients:
-  - "test_client"
+  metastore:
+    - "test_client"

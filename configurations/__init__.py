@@ -9,34 +9,38 @@ from engines.scheduler import SchedulerEngine
 from engines.storage import StorageEngine
 from engines.execution import ExecutionEngine
 from util.environment import MasonEnvironment
-from typing import Optional, Set
+from typing import Optional, List
 from util.json_schema import validate_schema
 from definitions import from_root
-from util.list import flatten_string
+import os
+
+def get_all(env: MasonEnvironment):
+    logger.debug(f"Reading configurations at {env.config_home}")
+    configs: List[Config] = []
+    for subdir, dirs, files in os.walk(env.config_home):
+        for file in files:
+            yaml_config_doc: dict = parse_yaml(file) or {}
+            configs.append(Config(env, yaml_config_doc))
+
+    return configs
 
 class Config:
 
-    def __init__(self, env: MasonEnvironment, config_doc: Optional[dict] = None):
-
-        if not config_doc:
-            config_home = env.config_home
-            logger.debug(f"Reading configuration at {config_home}:")
-            yaml_config_doc: dict = parse_yaml(config_home) or {}
-
-
-        cd: dict = config_doc or yaml_config_doc
-
+    def __init__(self, env: MasonEnvironment, config: dict):
         self.env = env
 
-        valid = validate_schema(cd, from_root("/configurations/schema.json"))
+        if config.get("testing") == "True":
+            valid = validate_schema(config, from_root("/configurations/schema.json"))
+        else:
+            valid = validate_schema(config, from_root("/test/support/schemas/config.json"))
 
         if valid:
-            self.metastore = MetastoreEngine(cd)
-            self.scheduler = SchedulerEngine(cd)
-            self.storage = StorageEngine(cd)
-            self.execution = ExecutionEngine(cd)
+            self.metastore = MetastoreEngine(config)
+            self.scheduler = SchedulerEngine(config)
+            self.storage = StorageEngine(config)
+            self.execution = ExecutionEngine(config)
 
-            self.config = {
+            self.engines = {
                 'metastore': self.metastore.to_dict(),
                 'scheduler': self.scheduler.to_dict(),
                 'storage': self.storage.to_dict(),
@@ -44,8 +48,8 @@ class Config:
             }
 
         else:
-            logger.error(f"\nInvalid config schema: {cd}\n")
-            self.config = {}
+            logger.error(f"\nInvalid config schema: {config}\n")
+            self.engines = {}
 
         banner("Configuration")
         self.print()
@@ -54,14 +58,14 @@ class Config:
     def print(self):
         print_json_1level(self.config)
 
-    # TODO:  Make validation more specific to engine type
-    def client_names(self) -> Set[str]:
-        if not self.config == {}:
-            return set(flatten_string([
-                self.metastore.client_name,
-                self.scheduler.client_name,
-                self.storage.client_name,
-                self.execution.client_name,
-            ]))
-        else: return set([])
+    # # TODO:  Make validation more specific to engine type
+    # def client_names(self) -> Set[str]:
+    #     if not self.config == {}:
+    #         return set(flatten_string([
+    #             self.metastore.client_name,
+    #             self.scheduler.client_name,
+    #             self.storage.client_name,
+    #             self.execution.client_name,
+    #         ]))
+    #     else: return set([])
 

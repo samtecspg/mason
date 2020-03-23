@@ -1,3 +1,4 @@
+testing: true
 metastore_engine: test
 storage_engine: test
 scheduler_engine: test2

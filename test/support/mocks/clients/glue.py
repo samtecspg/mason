@@ -16,7 +16,7 @@ class GlueMock(MockBase, GlueMetastoreClient):
         elif operation_name == "CreateCrawler":
             return create_crawler(kwarg)
         else:
-            raise Exception(f"Unmocked API endpoint: {operation_name}")
+            raise Exception(f"Unmocked Glue API endpoint: {operation_name}")
 
 def list_tables(args: dict):
     db_name = args.get("DatabaseName")
