@@ -26,7 +26,7 @@
         }
       }
     },
-    "supported_engines": {
+    "supported_configurations": {
       "type": "array",
       "items": {
         "type": "object",
@@ -34,7 +34,7 @@
            "metastore": {"type":  "string"},
            "scheduler": {"type":  "string"},
            "storage": {"type":  "string"},
-           "execution": {"type":  "string"},
+           "execution": {"type":  "string"}
         }
       }
     }

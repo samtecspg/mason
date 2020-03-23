@@ -3,6 +3,7 @@ from configurations import Config
 from clients.response import Response
 from typing import Dict
 from operators.supported_engines import from_array, SupportedEngineSet
+from util.logger import logger
 
 class Operator:
 
@@ -12,6 +13,7 @@ class Operator:
         self.description = description
         self.parameters: dict = parameters
         self.supported_configurations: List[SupportedEngineSet] = from_array(supported_engine_sets)
+
 
     def required_parameters(self):
         return self.parameters.get("required", [])
@@ -23,5 +25,5 @@ class Operator:
             if test:
                 break
         if not test:
-            response.add_error("Configuration not supported by any supported engine configurations.  Check operator.yaml for supported engine configurations.")
+            response.add_error("Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
         return test, response

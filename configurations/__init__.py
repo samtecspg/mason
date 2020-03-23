@@ -19,7 +19,7 @@ def get_all(env: MasonEnvironment):
     configs: List[Config] = []
     for subdir, dirs, files in os.walk(env.config_home):
         for file in files:
-            yaml_config_doc: dict = parse_yaml(file) or {}
+            yaml_config_doc: dict = parse_yaml(env.config_home + file) or {}
             configs.append(Config(env, yaml_config_doc))
 
     return configs
@@ -29,10 +29,7 @@ class Config:
     def __init__(self, env: MasonEnvironment, config: dict):
         self.env = env
 
-        if config.get("testing") == "True":
-            valid = validate_schema(config, from_root("/configurations/schema.json"))
-        else:
-            valid = validate_schema(config, from_root("/test/support/schemas/config.json"))
+        valid = validate_schema(config, env.config_schema)
 
         if valid:
             self.metastore = MetastoreEngine(config)
@@ -52,11 +49,11 @@ class Config:
             self.engines = {}
 
         banner("Configuration")
-        self.print()
+        logger.info(f"Configuration: {self.engines}")
 
 
-    def print(self):
-        print_json_1level(self.config)
+    # def print(self):
+        # print_json_1level(self.engines)
 
     # # TODO:  Make validation more specific to engine type
     # def client_names(self) -> Set[str]:
