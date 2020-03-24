@@ -13,9 +13,9 @@ def validate_schema(d: dict, schema_file: str) -> bool:
                 validate(d, schema)
                 valid = True
             except SchemaError as e:
-                logger.error(f"\nSchema error: {e.message}")
+                logger.error(f"\nSchema error {schema_file}: {e.message}")
             except ValidationError as e:
-                logger.error(f"\nSchema error: {e.message}")
+                logger.error(f"\nSchema error {schema_file}: {e.message}")
             except FileNotFoundError as e:
                 logger.error(f"\nSchema not found: {e.filename}")
         else:

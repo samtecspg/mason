@@ -111,8 +111,7 @@ def register(operator_file: str, log_level: Optional[str] = None):
             pathname = env.operator_home + f"{basename}/"
 
             if not path.exists(pathname):
-                logger.info(f"Registering operator(s) at {operator_file} to {pathname}")
-                shutil.copytree(operator_file, pathname)
+                shutil.copytree(from_root(operator_file), pathname)
             else:
                 logger.info(f"Operator \"{basename}\" already exists at {pathname}")
         else:

@@ -1,15 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "S3Configuration",
+  "title": "SparkConfiguration",
   "properties": {
     "configuration": {
       "type": "object",
       "properties": {
-        "region": {
+        "threads": {
           "type": "string"
         }
-      },
-      "required": ["region"]
+      }
     }
   }
 }

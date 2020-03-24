@@ -67,8 +67,11 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, cmd: Opti
             o: Operator = op
             response = parameters.validate(o, response)
             if not response.errored():
-                mod = import_module(f'{env.operator_module}.{cmd}.{subcmd}')
-                response = mod.run(env, config, parameters, response) # type: ignore
+                try:
+                    mod = import_module(f'{env.operator_module}.{cmd}.{subcmd}')
+                    response = mod.run(env, config, parameters, response)  # type: ignore
+                except ModuleNotFoundError as e:
+                    response.add_error(f"Module Not Found: {e}")
 
         else:
             if not response.errored():
@@ -92,7 +95,6 @@ def from_config(config: dict):
 def validate_operators(operator_file: str):
     operators: List[Operator] = []
     errors: List[dict] = []
-
     for r, d, f in os.walk(operator_file):
         for file in f:
             if '.yaml' in file:

@@ -105,3 +105,24 @@ def test_refresh():
         assert((response, status) == expects.refresh(False))
 
     run_tests("table", "refresh", tests)
+
+def test_merge():
+
+    def tests(env: MasonEnvironment, config: Config, op: Operator):
+        # valid refresh
+        params = Parameters(parameters="table_name:catalog_poc_data,database_name:crawler-poc")
+        validate = params.validate(op)
+        refresh = table_refresh(env, config, params, validate)
+        assert(refresh.with_status() == expects.refresh(False))
+
+        # already refreshing
+        params = Parameters(parameters="table_name:catalog_poc_data_refreshing,database_name:crawler-poc")
+        validate = params.validate(op)
+        refreshing = table_refresh(env, config, params, validate)
+        assert(refreshing.with_status() == expects.refresh(True))
+
+        # API
+        response, status = table_refresh_api(env, config, table_name="catalog_poc_data", database_name="crawler-poc")
+        assert((response, status) == expects.refresh(False))
+
+    run_tests("table", "merge", tests)

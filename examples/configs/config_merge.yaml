@@ -1,0 +1,10 @@
+metastore_engine: s3
+storage_engine: s3
+execution_engine: spark
+clients:
+  spark:
+    configuration:
+      test: "stuff"
+  s3:
+    configuration:
+      region: "us-east-1"

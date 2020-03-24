@@ -1,0 +1,10 @@
+type: "operator"
+namespace: "table"
+command: "merge"
+description:  "Merge metastore tables"
+parameters:
+  required:
+    - "merge_strategy"
+supported_configurations:
+  - metastore: "s3"
+    execution: "spark"

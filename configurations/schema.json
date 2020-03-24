@@ -12,7 +12,7 @@
     "execution_engine": {
       "type": "string",
       "enum": [
-        ""
+        "spark"
       ]
     },
     "storage_engine": {
