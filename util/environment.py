@@ -17,9 +17,3 @@ class MasonEnvironment:
 
         self.config_schema = from_root("/configurations/schema.json")
 
-        # # ##  TODO: remove
-        # # if not self.test:
-        # # else:
-        #
-        # self.test = test
-

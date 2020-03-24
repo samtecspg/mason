@@ -5,6 +5,5 @@ description:  "Test Operator"
 parameters:
   required:
     - "test_param"
-supported_clients:
-  metastore:
-    - "test_client"
+supported_configurations:
+  - metastore: "test_client"

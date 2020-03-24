@@ -26,3 +26,12 @@ class Operator:
         if not test:
             response.add_error("Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
         return test, response
+
+    def to_dict(self):
+        return {
+            'cmd': self.cmd,
+            'subcommand': self.subcommand,
+            'description': self.description,
+            'parameters': self.parameters,
+            'supported_configurations': list(map(lambda x: x.all, self.supported_configurations))
+        }

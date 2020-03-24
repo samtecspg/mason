@@ -34,7 +34,7 @@ class TestConfiguration:
         assert(conf.engines == {})
 
     def test_configuration_valid(self):
-        conf = self.before("/test/support/valid_config_1.yaml")
+        conf = self.before("/test/support/configs/valid_config_1.yaml")
         expects = {'execution': {'client_name': '', 'configuration': {}},
              'metastore': {'client_name': '', 'configuration': {}},
              'scheduler': {'client_name': '', 'configuration': {}},
