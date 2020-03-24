@@ -14,6 +14,7 @@ import operators.operators as Operators
 from util.printer import banner
 from util.environment import MasonEnvironment
 from configurations import get_all
+from definitions import from_root
 
 @click.group()
 def main():
@@ -49,19 +50,22 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
         banner(f"Creating OPERATOR_HOME at {env.operator_home}")
         os.mkdir(env.operator_home)
         Path(env.operator_home + "__init__.py").touch()
+    if not path.exists(env.config_home):
+        banner(f"Creating CONFIG_HOME at {env.config_home}")
+        os.mkdir(env.config_home)
 
     if config_file:
         # TODO: Interactive configuration
         banner("Config Validation")
         parsed = parse_yaml(config_file)
-        valid = validate_schema(parsed, "configurations/schema.json")
+        valid = validate_schema(parsed, env.config_schema)
         if valid:
             clients: dict = parsed.get("clients")
             #  TODO:  Use json schema partials for this
             valid = True
             if clients and len(clients) > 0:
                 for name, config in clients.items():
-                    schema = f"clients/{name}/schema.json"
+                    schema = from_root(f"/clients/{name}/schema.json")
                     if not validate_schema(config, schema):
                         logger.error(f"Error validating client schema: {name}")
                         valid = False

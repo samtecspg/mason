@@ -3,21 +3,19 @@ set -e
 
 # Reset everything to 0
 
-./scripts/install.sh
- rm -rf ~/.mason/
+#./scripts/install.sh
+export MASON_HOME=".tmp/"
 
 # config examples
 # mason config -l debug
- mason config examples/config/example_config.yaml
-# mason config examples/config/bad_config.yaml
-# mason config examples/config/config_2.yaml
+# mason config examples/configs/config_example.yaml
+# mason config examples/configs/bad_config.yaml
+ mason config examples/configs/config_2.yaml
 # mason config
 
 # register exampels
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
-#mason register examples/operators/table/
-#mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/orders/ -l trace
-#mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/orders/
+mason register examples/operators/table/
 
 # running api server
 # mason run
@@ -31,6 +29,10 @@ set -e
 # mason operator table get -p bad
 # mason operator table get -p database_name:crawler-poc,table_name:catalog_poc_data
 
+# S3 metastore examples
+#mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/orders/ -l trace
+mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/orders/
+
 # list examples
 # mason operator table list
 # mason operator table list -p database_name:crawler-poc
@@ -42,3 +44,4 @@ set -e
 # mason operator table infer -p schedule_name:test_crawler,database_name:crawler-poc,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/
 # mason operator table infer -p schedule_name:crawler-shipment,database_name:crawler-shipment,storage_path:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/
 
+rm -rf .tmp/
