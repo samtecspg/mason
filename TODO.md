@@ -40,6 +40,7 @@ Legend
 - [x] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc C: 03/20/2020
 - [ ] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
 - [ ] Allow for multiple configurations (started, almost done)
+- [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
 
 ## Test Cases
 
