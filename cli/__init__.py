@@ -136,7 +136,7 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
         logger.set_level(log_level)
         config = get_all(env)[0] # return first config for now
         params = Parameters(parameters, param_file)
-        Operators.run(config, params, cmd, subcmd)
+        Operators.run(env, config, params, cmd, subcmd)
 
     else:
         logger.info("Configuration not found.  Run \"mason config\" first")

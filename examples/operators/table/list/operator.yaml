@@ -6,4 +6,5 @@ parameters:
   required:
     - "database_name"
 supported_configurations:
+  - metastore: "s3"
   - metastore: "glue"

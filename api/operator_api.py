@@ -6,12 +6,11 @@ from operators import operators as Operators
 from typing import List
 import urllib.parse
 
-def get(namespace: str, command: str, config: Optional[Config] = None, *args, **kwargs) :
-    if not config:
-        env = MasonEnvironment()
-        registered_config = get_all(env)[0] # Getting first config for now
+def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[Config] = None, *args, **kwargs) :
 
-    c: Config = config or  registered_config
+    env: MasonEnvironment = environment or MasonEnvironment()
+    config: Config = configuration or get_all(env)[0] # Getting first config for now
+
     param_list: List[str] = []
     for k,v in kwargs.items():
         unq = urllib.parse.unquote(v)
@@ -19,6 +18,6 @@ def get(namespace: str, command: str, config: Optional[Config] = None, *args, **
 
     parameters = ",".join(param_list)
     params = Parameters(parameters)
-    response = Operators.run(c, params, namespace, command)
+    response = Operators.run(env, config, params, namespace, command)
 
     return response.formatted(), response.status_code

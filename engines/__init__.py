@@ -5,7 +5,6 @@ class Engine:
 
     def __init__(self, engine_type: str, config: dict):
         self.client_name =  config.get(f"{engine_type}_engine") or ""
-
         self.config_doc = config.get("clients", {}).get(self.client_name, {}).get("configuration", {})
 
         if len(self.config_doc) == 0 :
@@ -18,3 +17,4 @@ class Engine:
             "client_name": self.client_name,
             "configuration": self.config_doc
         }
+

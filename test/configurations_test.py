@@ -1,4 +1,3 @@
-
 from test.support import testing_base as base
 from util.environment import MasonEnvironment
 from definitions import from_root
@@ -20,19 +19,19 @@ class TestConfiguration:
 
     def test_configuration_path_dne(self):
         conf = self.before("path_dne")
-        assert(conf.config == {})
+        assert(conf.engines == {})
 
     def test_configuration_invalid_yaml(self):
         conf = self.before("/test/support/invalid_yaml.yaml")
-        assert(conf.config == {})
+        assert(conf.engines == {})
 
     def test_configuration_invalid_yaml_2(self):
         conf = self.before("/test/support/invalid_yaml_2.yaml")
-        assert(conf.config == {})
+        assert(conf.engines == {})
 
     def test_configuration_invalid_config(self):
         conf = self.before("/test/support/test_bad_config.yaml")
-        assert(conf.config == {})
+        assert(conf.engines == {})
 
     def test_configuration_valid(self):
         conf = self.before("/test/support/valid_config_1.yaml")
@@ -42,4 +41,4 @@ class TestConfiguration:
              'storage': {'client_name': 's3',
              'configuration': {'test_param_1': 'test', 'test_param_2': 'test'}}
        }
-        assert(conf.config == expects)
+        assert(conf.engines == expects)

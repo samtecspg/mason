@@ -1,5 +1,4 @@
 
-from clients.engines.execution import EmptyExecutionClient
 from engines import Engine
 
 class ExecutionEngine(Engine):
@@ -9,5 +8,5 @@ class ExecutionEngine(Engine):
         self.client = self.get_client(self.client_name, self.config_doc)
 
     def get_client(self, client_name: str, config_doc: dict):
-        return EmptyExecutionClient()
+        return None
 

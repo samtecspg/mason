@@ -8,3 +8,4 @@ parameters:
     - "table_name"
 supported_configurations:
   - metastore: "glue"
+  - metastore: "s3"

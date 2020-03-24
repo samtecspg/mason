@@ -14,9 +14,6 @@ class S3Client:
         self.region = s3_config.get("region")
         self.client = boto3.client('s3', region_name=self.region)
 
-        # self.resource = boto3.resource('s3', region_name=self.region)
-        # self.client = self.resource.meta.client
-
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
         status = s3_response.get('ResponseMetadata', {}).get('HTTPStatusCode')
@@ -50,6 +47,8 @@ class S3Client:
         logger.info(f"Fetching keys in {database_name} {table_name}")
 
         new_responses: List[dict] = []
+
+        continuation_token = None
 
         try:
             if table_name:
@@ -112,6 +111,8 @@ class S3Client:
             else:
                 response.set_status(status)
                 response.add_error(message)
+        for r in new_responses:
+            response.add_response(r)
 
         return response
 
@@ -119,8 +120,20 @@ class S3Client:
     #  List tables for s3 only lists out folders, not schemas in folders.  You can specify subfolders and it will be split out
     def list_tables(self, database_name: str, response: Response):
         split = database_name.split("/", 1)
-        result = self.client.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/').get("CommonPrefixes", {})
-        response.add_data(result)
+        try:
+            result = self.client.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
+            response.add_data(result.get("CommonPrefixes", {}))
+        except ClientError as e:
+            result = e.response
+            error = result.get("Error", {})
+            code = error.get("Code", "")
+            if code == "NoSuchBucket":
+                response.add_error(error.get("Message") + f": {database_name}")
+                response.set_status(404)
+            else:
+                raise e
+
+        response.add_response(result)
         return response
 
     #  database_name = bucket, table_name = path

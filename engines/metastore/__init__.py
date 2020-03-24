@@ -1,7 +1,6 @@
 
 from clients.glue.metastore import GlueMetastoreClient
 from clients.s3.metastore import S3MetastoreClient
-from clients.engines.metastore import EmptyMetastoreClient
 from engines import Engine
 
 class MetastoreEngine(Engine):
@@ -15,6 +14,4 @@ class MetastoreEngine(Engine):
             return GlueMetastoreClient(config_doc)
         elif client_name == "s3":
             return S3MetastoreClient(config_doc)
-        else:
-            return EmptyMetastoreClient()
 

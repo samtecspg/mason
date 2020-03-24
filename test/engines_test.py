@@ -17,19 +17,19 @@ class TestExecutionEngine:
         return ee
 
     def test_configuration_exists(self):
-        ee = self.before("/test/support/test_config.yaml")
+        ee = self.before("/test/support/configs/test_config.yaml")
         assert(ee.client_name == "test2")
-        assert(type(ee.client).__name__ == "EmptyExecutionClient")
+        assert(type(ee.client).__name__ == "NoneType")
 
     def test_configuration_dne(self):
-        ee = self.before("/test/support/test_partial_config.yaml")
+        ee = self.before("/test/support/configs/test_partial_config.yaml")
         assert(ee.client_name == "")
-        assert(type(ee.client).__name__ == "EmptyExecutionClient")
+        assert(type(ee.client).__name__ == "NoneType")
 
     def test_bad_config(self):
-        ee = self.before("/test/support/test_bad_config.yaml")
+        ee = self.before("/test/support/configs/test_bad_config.yaml")
         assert(ee.client_name == "")
-        assert(type(ee.client).__name__ == "EmptyExecutionClient")
+        assert(type(ee.client).__name__ == "NoneType")
 
 class TestMetastoreEngine:
     def before(self, config: str):
@@ -41,14 +41,14 @@ class TestMetastoreEngine:
         return me
 
     def test_configuration_exists(self):
-        me = self.before("/test/support/test_config.yaml")
+        me = self.before("/test/support/configs/test_config.yaml")
         assert(me.client_name == "test")
-        assert(type(me.client).__name__ == "EmptyMetastoreClient")
+        assert(type(me.client).__name__ == "NoneType")
 
     def test_configuration_dne(self):
-        me = self.before("/test/support/test_partial_config.yaml")
+        me = self.before("/test/support/configs/test_partial_config.yaml")
         assert(me.client_name == "")
-        assert(type(me.client).__name__ == "EmptyMetastoreClient")
+        assert(type(me.client).__name__ == "NoneType")
 
 
 
@@ -62,14 +62,14 @@ class TestStorageEngine:
         return me
 
     def test_configuration_exists(self):
-        me = self.before("/test/support/test_config.yaml")
+        me = self.before("/test/support/configs/test_config.yaml")
         assert(me.client_name == "test")
-        assert(type(me.client).__name__ == "EmptyStorageClient")
+        assert(type(me.client).__name__ == "NoneType")
 
     def test_configuration_dne(self):
-        me = self.before("/test/support/test_partial_config_2.yaml")
+        me = self.before("/test/support/configs/test_partial_config_2.yaml")
         assert(me.client_name == "")
-        assert(type(me.client).__name__ == "EmptyStorageClient")
+        assert(type(me.client).__name__ == "NoneType")
 
 
 
@@ -83,14 +83,14 @@ class TestSchedulerEngine:
         return me
 
     def test_configuration_exists(self):
-        me = self.before("/test/support/test_config.yaml")
+        me = self.before("/test/support/configs/test_config.yaml")
         assert(me.client_name == "test2")
-        assert(type(me.client).__name__ == "EmptySchedulerClient")
+        assert(type(me.client).__name__ == "NoneType")
 
     def test_configuration_dne(self):
-        me = self.before("/test/support/test_partial_config.yaml")
+        me = self.before("/test/support/configs/test_partial_config.yaml")
         assert(me.client_name == "")
-        assert(type(me.client).__name__ == "EmptySchedulerClient")
+        assert(type(me.client).__name__ == "NoneType")
 
 
 

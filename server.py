@@ -10,7 +10,7 @@ try:
     banner("Importing all registered_operator modules for API")
     env = MasonEnvironment()
     config = get_all(env)[0] # return first config by default
-    Operator.import_all(config)
+    Operator.import_all(env, config)
     swagger_yml = "api/base_swagger.yml"
 
     banner(f"Regenerating api yaml based on registered_operators to {swagger_yml}")

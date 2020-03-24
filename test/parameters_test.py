@@ -3,6 +3,7 @@ from parameters import Parameters
 from operators.operator import Operator
 from test.support import testing_base as base
 
+
 class TestInit:
     base.set_log_level()
 

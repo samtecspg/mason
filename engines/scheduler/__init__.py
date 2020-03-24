@@ -1,7 +1,6 @@
 
 from clients.glue.scheduler import GlueSchedulerClient
 from engines import Engine
-from clients.engines.scheduler import SchedulerClient, EmptySchedulerClient
 
 class SchedulerEngine(Engine):
 
@@ -12,5 +11,3 @@ class SchedulerEngine(Engine):
     def get_client(self, client_name: str, config_doc: dict):
         if client_name == "glue":
             return GlueSchedulerClient(config_doc)
-        else:
-            return EmptySchedulerClient()

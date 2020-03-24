@@ -15,8 +15,11 @@ class MasonEnvironment:
         self.operator_home: str = operator_home or (self.mason_home + "registered_operators/")
         self.operator_module = operator_module or "registered_operators"
 
-        if not test:
-            self.config_schema = from_root("/configurations/schema.json")
-        else:
-            self.config_schema = from_root("/test/support/schemas/config.json")
+        self.config_schema = from_root("/configurations/schema.json")
+
+        # # ##  TODO: remove
+        # # if not self.test:
+        # # else:
+        #
+        # self.test = test
 

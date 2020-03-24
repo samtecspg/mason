@@ -9,13 +9,13 @@ from engines.scheduler import SchedulerEngine
 from engines.storage import StorageEngine
 from engines.execution import ExecutionEngine
 from util.environment import MasonEnvironment
-from typing import Optional, List
+from typing import List
 from util.json_schema import validate_schema
-from definitions import from_root
 import os
 
 def get_all(env: MasonEnvironment):
     logger.debug(f"Reading configurations at {env.config_home}")
+
     configs: List[Config] = []
     for subdir, dirs, files in os.walk(env.config_home):
         for file in files:
@@ -27,8 +27,6 @@ def get_all(env: MasonEnvironment):
 class Config:
 
     def __init__(self, env: MasonEnvironment, config: dict):
-        self.env = env
-
         valid = validate_schema(config, env.config_schema)
 
         if valid:
@@ -51,6 +49,8 @@ class Config:
         banner("Configuration")
         logger.info(f"Configuration: {self.engines}")
 
+    def has_execution(self):
+        self.execution and self.execution.client
 
     # def print(self):
         # print_json_1level(self.engines)

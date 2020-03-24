@@ -9,7 +9,3 @@ class StorageClient(Client):
     def any(self, response: Response):
         raise NotImplementedError("Client method not implemented")
 
-class EmptyExecutionClient(Client):
-    def any(self, response: Response):
-        raise NotImplementedError("Client method not implemented")
-

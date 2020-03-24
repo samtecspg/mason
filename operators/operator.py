@@ -14,7 +14,6 @@ class Operator:
         self.parameters: dict = parameters
         self.supported_configurations: List[SupportedEngineSet] = from_array(supported_engine_sets)
 
-
     def required_parameters(self):
         return self.parameters.get("required", [])
 

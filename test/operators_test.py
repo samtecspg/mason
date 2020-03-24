@@ -7,7 +7,7 @@ class TestGetOperator:
 
     def test_command_exists(self):
         base.set_log_level("trace")
-        config = base.get_config("/test/support/operators", "/test/support/test_config.yaml")
+        config = base.get_configs("/test/support/operators", "/test/support/test_config.yaml")
         op = Operators.get_operator(config, "namespace1", "operator1")
         expects = {'cmd': 'namespace1',
                    'description': 'Test Operator',
