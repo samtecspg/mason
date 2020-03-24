@@ -10,12 +10,12 @@ export MASON_HOME=".tmp/"
 # mason config -l debug
 # mason config examples/configs/config_example.yaml
 # mason config examples/configs/bad_config.yaml
- mason config examples/configs/config_2.yaml
+# mason config examples/configs/config_2.yaml
 # mason config
 
 # register exampels
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
-mason register examples/operators/table/
+# mason register examples/operators/table/
 
 # running api server
 # mason run
@@ -30,8 +30,8 @@ mason register examples/operators/table/
 # mason operator table get -p database_name:crawler-poc,table_name:catalog_poc_data
 
 # S3 metastore examples
-#mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/orders/ -l trace
-mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/orders/
+# mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/orders/ -l trace
+# mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/orders/
 
 # list examples
 # mason operator table list
