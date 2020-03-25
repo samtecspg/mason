@@ -13,12 +13,12 @@ from typing import List
 from engines import Engine
 from clients.response import Response
 
-# LOG_LEVEL = "trace"
 LOG_LEVEL = "fatal"
+# LOG_LEVEL = "trace"
 MOCK = True
 # MOCK = False
 
-def run_tests(cmd: str, sub: str, callable):
+def run_tests(cmd: str, sub: str, mock: bool, callable):
         set_log_level()
         env = get_env()
         response = Response()
@@ -29,7 +29,7 @@ def run_tests(cmd: str, sub: str, callable):
             operator: Operator = op
             config,response = op.find_configuration(configs, response)
             if config:
-                if MOCK:
+                if mock or MOCK:
                     get_mocks(config)
                 callable(env, config, operator)
             else:

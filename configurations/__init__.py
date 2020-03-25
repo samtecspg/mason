@@ -30,8 +30,6 @@ class Config:
     def __init__(self, env: MasonEnvironment, config: dict):
         valid = validate_schema(config, env.config_schema)
 
-        if valid:
-            logger.error(f"\nInvalid config schema: {config}\n")
 
         self.metastore = MetastoreEngine(config, valid)
         self.scheduler = SchedulerEngine(config, valid)
@@ -45,6 +43,10 @@ class Config:
             'execution': self.execution.to_dict()
         }
 
-        banner("Configuration")
-        logger.info(f"Configuration: {self.engines}")
+        if valid:
+            banner("Configuration")
+            logger.info(f"Configuration: {self.engines}")
+        else:
+            logger.error(f"\nInvalid config schema: {config}\n")
+
 

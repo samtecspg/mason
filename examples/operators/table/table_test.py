@@ -35,7 +35,7 @@ def test_index():
         response, status = table_list_api(env, config, database_name="crawler-poc")
         assert((response, status) == expects.index(config.metastore.client_name))
 
-    run_tests("table", "list", tests)
+    run_tests("table", "list", True, tests)
 
 def test_get():
 
@@ -63,7 +63,7 @@ def test_get():
         # response, status = table_get_api(env, config, database_name="crawler-poc", table_name="catalog_poc_data")
         # assert((response, status) == expects.get(1))
 
-    run_tests("table", "get", tests)
+    run_tests("table", "get", True, tests)
 
 def test_post():
 
@@ -84,7 +84,7 @@ def test_post():
         response, status = table_infer_api(env, config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
         assert((response, status) == expects.post(False))
 
-    run_tests("table", "infer", tests)
+    run_tests("table", "infer", True,  tests)
 
 
 
@@ -107,16 +107,16 @@ def test_refresh():
         response, status = table_refresh_api(env, config, table_name="catalog_poc_data", database_name="crawler-poc")
         assert((response, status) == expects.refresh(False))
 
-    run_tests("table", "refresh", tests)
+    run_tests("table", "refresh", True, tests)
 
 
-# def test_merge():
-#
-#     def tests(env: MasonEnvironment, config: Config, op: Operator):
-#         # valid refresh
-#         params = Parameters(parameters="merge_strategy:test")
-#         validate = params.validate(op)
-#         merge = table_merge(env, config, params, validate)
-#         assert(merge.with_status() == expects.refresh(False))
-#
-#     run_tests("table", "merge", tests)
+def test_merge():
+
+    def tests(env: MasonEnvironment, config: Config, op: Operator):
+        # valid refresh
+        params = Parameters(parameters="merge_strategy:test")
+        validate = params.validate(op)
+        merge = table_merge(env, config, params, validate)
+        assert(merge.with_status() == expects.refresh(False))
+
+    run_tests("table", "merge", tests)
