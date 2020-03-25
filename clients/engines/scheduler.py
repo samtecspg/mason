@@ -25,3 +25,19 @@ class SchedulerClient(Client):
         return response
 
 
+class EmptySchedulerClient(SchedulerClient):
+
+    def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client method not implemented")
+        return response
+
+    def trigger_schedule(self, schedule_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client method not implemented")
+        return response
+        # return self.config.scheduler.trigger_schedule(schedule_name, response)
+
+    # TODO: Remove
+    def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client method not implemented")
+        return response
+

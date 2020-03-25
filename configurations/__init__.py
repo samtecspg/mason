@@ -11,6 +11,7 @@ from engines.execution import ExecutionEngine
 from util.environment import MasonEnvironment
 from typing import List
 from util.json_schema import validate_schema
+from typing import Union
 import os
 
 def get_all(env: MasonEnvironment):
@@ -30,21 +31,19 @@ class Config:
         valid = validate_schema(config, env.config_schema)
 
         if valid:
-            self.metastore = MetastoreEngine(config)
-            self.scheduler = SchedulerEngine(config)
-            self.storage = StorageEngine(config)
-            self.execution = ExecutionEngine(config)
-
-            self.engines = {
-                'metastore': self.metastore.to_dict(),
-                'scheduler': self.scheduler.to_dict(),
-                'storage': self.storage.to_dict(),
-                'execution': self.execution.to_dict()
-            }
-
-        else:
             logger.error(f"\nInvalid config schema: {config}\n")
-            self.engines = {}
+
+        self.metastore = MetastoreEngine(config, valid)
+        self.scheduler = SchedulerEngine(config, valid)
+        self.storage = StorageEngine(config, valid)
+        self.execution = ExecutionEngine(config, valid)
+
+        self.engines = {
+            'metastore': self.metastore.to_dict(),
+            'scheduler': self.scheduler.to_dict(),
+            'storage': self.storage.to_dict(),
+            'execution': self.execution.to_dict()
+        }
 
         banner("Configuration")
         logger.info(f"Configuration: {self.engines}")

@@ -110,13 +110,13 @@ def test_refresh():
     run_tests("table", "refresh", tests)
 
 
-def test_merge():
-
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
-        # valid refresh
-        params = Parameters(parameters="merge_strategy:test")
-        validate = params.validate(op)
-        merge = table_merge(env, config, params, validate)
-        assert(merge.with_status() == expects.refresh(False))
-
-    run_tests("table", "merge", tests)
+# def test_merge():
+#
+#     def tests(env: MasonEnvironment, config: Config, op: Operator):
+#         # valid refresh
+#         params = Parameters(parameters="merge_strategy:test")
+#         validate = params.validate(op)
+#         merge = table_merge(env, config, params, validate)
+#         assert(merge.with_status() == expects.refresh(False))
+#
+#     run_tests("table", "merge", tests)

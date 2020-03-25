@@ -9,8 +9,9 @@ from definitions import from_root
 from test.support.mocks.clients.glue import GlueMock
 from test.support.mocks.clients.s3 import S3Mock
 from configurations import Config
-from clients.response import Response
 from typing import List
+from engines import Engine
+from clients.response import Response
 
 # LOG_LEVEL = "trace"
 LOG_LEVEL = "fatal"
@@ -26,16 +27,17 @@ def run_tests(cmd: str, sub: str, callable):
 
         if op:
             operator: Operator = op
-            if MOCK:
-                get_mocks(configs)
             config,response = op.find_configuration(configs, response)
             if config:
+                if MOCK:
+                    get_mocks(config)
                 callable(env, config, operator)
             else:
                 raise Exception(f"No matching configuration found for operator {op.cmd}, {op.subcommand}")
 
         else:
             raise Exception(f"Operator not found {cmd} {sub}")
+
 
 
 def set_log_level(level: str = None):
@@ -48,26 +50,22 @@ def get_configs(env: MasonEnvironment):
     # env.config_schema = from_root("/test/support/schemas/config.json")
     return get_all(env)
 
-def get_mocks(configs: List[Config]):
-    # TODO: Clean this up, not parallel safe
-    for config in configs:
-        if config.metastore and config.metastore.client:
-            config.metastore.client.client.client = get_mock(config.metastore.client_name)
-        if config.storage and config.storage.client:
-            config.storage.client.client.client = get_mock(config.storage.client_name)
-        if config.execution and config.execution.client:
-            config.execution.client.client.client = get_mock(config.execution.client_name)
-        if config.scheduler and config.scheduler.client:
-            config.scheduler.client.client.client = get_mock(config.scheduler.client_name)
+def get_mocks(config: Config):
+    get_mock(config.metastore)
+    get_mock(config.scheduler)
+    get_mock(config.execution)
+    get_mock(config.storage)
 
-def get_mock(client: Optional[str]):
-    if client == "glue":
-        logger.info("Mocking Glue Client")
-        return GlueMock()
-    elif client == "s3":
-        logger.info("Mocking S3 Client")
-        return S3Mock()
-    else:
-        return None
+def get_mock(engine: Engine):
+    client_name = engine.client_name
+    if client_name:
+        if client_name == "glue":
+            logger.info("Mocking Glue Client")
+            engine.set_underlying_client(GlueMock())
+        elif client_name == "s3":
+            logger.info("Mocking S3 Client")
+            engine.set_underlying_client(S3Mock())
+        else:
+            raise Exception(f"Unmocked Client Implementation: {client_name}")
 
 

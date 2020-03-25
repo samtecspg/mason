@@ -125,7 +125,7 @@ def register(operator_file: str, log_level: Optional[str] = None):
 @click.argument("cmd", required=False)
 @click.argument("subcmd", required=False)
 @click.option('-p', '--parameters', help="Load parameters from parameters string of the format  <param1>:<value1>,<param2>:<value2>")
-@click.option('-c', '--param_file', help="Parameters from yaml file path")
+@click.option('-f', '--param_file', help="Parameters from yaml file path")
 @click.option("-l", "--log_level", help="Log level for mason")
 def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None):
     """

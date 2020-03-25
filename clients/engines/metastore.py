@@ -19,3 +19,14 @@ class MetastoreClient(Client):
         return response
 
 
+
+class EmptyMetastoreClient(MetastoreClient):
+
+    def list_tables(self, database_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
+        return response
+
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
+        return response
+

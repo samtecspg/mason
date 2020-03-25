@@ -10,7 +10,7 @@ class SparkExecutionClient(ExecutionClient):
         self.client = SparkClient(self.get_config())
 
     def run_job(self, job_name: str, response: Response):
-        response.add_info(f"Running job {job_name}")
+        response = self.client.run_job(job_name, response)
         return response
 
     def get_config(self):

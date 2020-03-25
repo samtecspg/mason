@@ -19,7 +19,8 @@ class Operator:
     def find_configuration(self, configs: List[Config], response: Response):
         configuration: Optional[Config] = None
         for config in configs:
-            if self.validate_configuration(config, response, False):
+            vc = self.validate_configuration(config, response, False)
+            if vc[0] == True:
                 configuration = config
                 break
         if configuration == None:
