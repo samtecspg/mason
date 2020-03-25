@@ -119,4 +119,4 @@ def test_merge():
         merge = table_merge(env, config, params, validate)
         assert(merge.with_status() == expects.refresh(False))
 
-    run_tests("table", "merge", tests)
+    run_tests("table", "merge", False, tests)

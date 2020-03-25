@@ -15,7 +15,7 @@ RUN mkdir /mason
 ENV MASON_HOME /mason/
 
 # Remove if you do not wish to install the example configuration or operators
-RUN mason config examples/config/config_example.yaml
+RUN mason config examples/configs/
 RUN mason register examples/operators/table/
 
 ENTRYPOINT [ "mason" ]

@@ -9,8 +9,7 @@ rm -rf ~/.mason/
 
 # config examples
 # mason config -l debug
-# mason config examples/configs/config_example.yaml
-# mason config examples/configs/bad_config.yaml
+# mason config examples/configs/config_1.yaml
 # mason config examples/configs/config_2.yaml
 # mason config
 
