@@ -7,8 +7,6 @@ from api import operator_api as OperatorApi
 def api(*args, **kwargs): return OperatorApi.get("table", "refresh", *args, **kwargs)
 
 def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
-    # print("HERE")
-
     ## Initial Go:
     ## Metastore = S3
     ## Execution Engine = Spark
@@ -20,7 +18,11 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     ###  For an s3 path with parquet files.
     ###  Merge the schemas of the parquet files.
     ###  Save back out to parquet
-    response.add_error("Unimplemented")
+
+    # database_name: str = parameters.safe_get("database_name")
+    # response = config.metastore.client.list_tables(database_name, response)
+    # return response
+    response = config.execution.client.run_job("schema_merge")
 
     return response
 

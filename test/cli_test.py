@@ -12,13 +12,17 @@ def assert_multiline(s1: str, s2: str):
     f2 = s1.replace(r"(\s|\n)", "")
     assert (f1 == f2)
 
+def print_result(result):
+    print(result.output)
+    print(result.exception)
+
 class TestCLI:
 
     @pytest.fixture(autouse=True)
     def run_around_tests(self):
         os.environ["MASON_HOME"] = ".tmp/"
         yield
-        # shutil.rmtree(".tmp")
+        shutil.rmtree(".tmp/")
 
     def test_valid_config(self):
       runner = CliRunner()
@@ -122,8 +126,5 @@ class CLITest(unittest.TestCase):
         assert_multiline(expects3, result3.output)
 
         result4 = runner.invoke(operator, ['table', 'merge', "-p merge_strategy:test", "-l", "trace"])
-        print(result4.output)
-
-
-
+        print_result(result4)
 

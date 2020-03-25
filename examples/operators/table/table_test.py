@@ -2,10 +2,12 @@ from examples.operators.table.list import run as table_list
 from examples.operators.table.get import run as table_get
 from examples.operators.table.infer import run as table_infer
 from examples.operators.table.refresh import run as table_refresh
+from examples.operators.table.merge import run as table_merge
 
 from examples.operators.table.list import api as table_list_api
 from examples.operators.table.refresh import api as table_refresh_api
 from examples.operators.table.infer import api as table_infer_api
+
 
 from examples.operators.table.test.expects import table as expects # type: ignore
 from parameters import Parameters
@@ -13,6 +15,7 @@ from configurations import Config
 from operators.operator import Operator
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
+
 
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
@@ -106,23 +109,14 @@ def test_refresh():
 
     run_tests("table", "refresh", tests)
 
+
 def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # valid refresh
-        params = Parameters(parameters="table_name:catalog_poc_data,database_name:crawler-poc")
+        params = Parameters(parameters="merge_strategy:test")
         validate = params.validate(op)
-        refresh = table_refresh(env, config, params, validate)
-        assert(refresh.with_status() == expects.refresh(False))
-
-        # already refreshing
-        params = Parameters(parameters="table_name:catalog_poc_data_refreshing,database_name:crawler-poc")
-        validate = params.validate(op)
-        refreshing = table_refresh(env, config, params, validate)
-        assert(refreshing.with_status() == expects.refresh(True))
-
-        # API
-        response, status = table_refresh_api(env, config, table_name="catalog_poc_data", database_name="crawler-poc")
-        assert((response, status) == expects.refresh(False))
+        merge = table_merge(env, config, params, validate)
+        assert(merge.with_status() == expects.refresh(False))
 
     run_tests("table", "merge", tests)

@@ -9,24 +9,31 @@ from definitions import from_root
 from test.support.mocks.clients.glue import GlueMock
 from test.support.mocks.clients.s3 import S3Mock
 from configurations import Config
+from clients.response import Response
 from typing import List
 
 # LOG_LEVEL = "trace"
 LOG_LEVEL = "fatal"
+MOCK = True
+# MOCK = False
 
 def run_tests(cmd: str, sub: str, callable):
         set_log_level()
         env = get_env()
+        response = Response()
         configs = get_configs(env)
         op: Optional[Operator] = Operators.get_operator(env, cmd, sub)
 
         if op:
             operator: Operator = op
-            get_mocks(configs)
-            for sc in op.supported_configurations:
-                for config in configs:
-                    if sc.validate_coverage(config):
-                        callable(env, config, operator)
+            if MOCK:
+                get_mocks(configs)
+            config,response = op.find_configuration(configs, response)
+            if config:
+                callable(env, config, operator)
+            else:
+                raise Exception(f"No matching configuration found for operator {op.cmd}, {op.subcommand}")
+
         else:
             raise Exception(f"Operator not found {cmd} {sub}")
 

@@ -1,11 +1,14 @@
-
 from clients import Client
 from clients.response import Response
 from abc import abstractmethod
 
-class StorageClient(Client):
+class ExecutionClient(Client):
+
+    ###  IMPORTANT:   This ensures that implemented specific execution client implementations conform to the needed template when 'mypy .' is run
+    ###  which will return Cannot instantiate abstract class 'SparkExecutionClient' with abstract attribute 'run_job' (for example)
 
     @abstractmethod
-    def any(self, response: Response):
-        raise NotImplementedError("Client method not implemented")
+    def run_job(self, job_type: str, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
+        return response
 

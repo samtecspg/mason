@@ -3,8 +3,9 @@ set -e
 
 # Reset everything to 0
 
-#./scripts/install.sh
-export MASON_HOME=".tmp/"
+rm -rf ~/.mason/
+./scripts/install.sh
+#export MASON_HOME=".tmp/"
 
 # config examples
 # mason config -l debug
@@ -44,4 +45,4 @@ export MASON_HOME=".tmp/"
 # mason operator table infer -p schedule_name:test_crawler,database_name:crawler-poc,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/
 # mason operator table infer -p schedule_name:crawler-shipment,database_name:crawler-shipment,storage_path:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/
 
-rm -rf .tmp/
+#rm -rf .tmp/
