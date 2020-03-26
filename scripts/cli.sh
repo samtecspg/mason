@@ -10,12 +10,12 @@ rm -rf ~/.mason/
 # config examples
 # mason config -l debug
 # mason config examples/configs/config_1.yaml
-# mason config examples/configs/config_2.yaml
+ mason config examples/configs/config_2.yaml
 # mason config
 
 # register exampels
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
-# mason register examples/operators/table/
+ mason register /examples/operators/table/ -l trace
 
 # running api server
 # mason run

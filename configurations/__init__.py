@@ -11,7 +11,6 @@ from engines.execution import ExecutionEngine
 from util.environment import MasonEnvironment
 from typing import List
 from util.json_schema import validate_schema
-from typing import Union
 import os
 
 def get_all(env: MasonEnvironment):
@@ -29,7 +28,6 @@ class Config:
 
     def __init__(self, env: MasonEnvironment, config: dict):
         valid = validate_schema(config, env.config_schema)
-
 
         self.metastore = MetastoreEngine(config, valid)
         self.scheduler = SchedulerEngine(config, valid)

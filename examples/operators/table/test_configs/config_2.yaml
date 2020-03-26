@@ -1,4 +1,10 @@
 metastore_engine: s3
-s3:
-  configuration:
-    region: us-east-1
+execution_engine: spark
+clients:
+  s3:
+    configuration:
+      region: us-east-1
+  spark:
+    configuration:
+      threads: 3
+

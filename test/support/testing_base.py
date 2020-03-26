@@ -15,8 +15,8 @@ from clients.response import Response
 
 LOG_LEVEL = "fatal"
 # LOG_LEVEL = "trace"
-MOCK = True
-# MOCK = False
+# MOCK = True
+MOCK = False
 
 def run_tests(cmd: str, sub: str, mock: bool, callable):
         set_log_level()

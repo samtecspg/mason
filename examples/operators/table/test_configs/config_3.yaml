@@ -1,4 +1,0 @@
-metastore_engine: s3
-s3:
-  configuration:
-    region: us-east-1

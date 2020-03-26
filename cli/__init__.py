@@ -104,16 +104,17 @@ def register(operator_file: str, log_level: Optional[str] = None):
     if path.exists(env.config_home):
         logger.set_level(log_level)
 
-        validation = Operators.validate_operators(operator_file)
+        validation = Operators.validate_operators(operator_file, True)
         if len(validation[1]) == 0:
 
             basename = path.basename(operator_file.rstrip("/"))
             pathname = env.operator_home + f"{basename}/"
 
             if not path.exists(pathname):
-                shutil.copytree(from_root(operator_file), pathname)
+                logger.info(f"Registering operators at {operator_file} to {pathname}")
+                shutil.copytree(operator_file, pathname)
             else:
-                logger.info(f"Operator \"{basename}\" already exists at {pathname}")
+                logger.error(f"Operator \"{basename}\" already exists at {pathname}")
         else:
             logger.error(f"Invalid operator configurations found: {validation[1]}")
 

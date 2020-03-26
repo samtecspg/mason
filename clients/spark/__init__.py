@@ -8,5 +8,6 @@ class SparkClient:
 
     def run_job(self, job_name: str, response: Response):
         response.add_info(f"Running job {job_name}")
+        return response
 
 

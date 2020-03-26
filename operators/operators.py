@@ -92,7 +92,7 @@ def from_config(config: dict):
     else:
         None
 
-def validate_operators(operator_file: str):
+def validate_operators(operator_file: str, print_validation: bool = False):
     operators: List[Operator] = []
     errors: List[dict] = []
     for r, d, f in os.walk(operator_file):
@@ -103,7 +103,8 @@ def validate_operators(operator_file: str):
                     config = parse_yaml(file_path)
                     schema = from_root("/operators/schema.json")
                     if validate_schema(config, schema):
-                        logger.debug(f"Valid Operator Definition {file_path}")
+                        if print_validation:
+                            logger.info(f"Valid Operator Definition {file_path}")
                         operator = from_config(config)
                         if operator:
                             operators.append(operator)

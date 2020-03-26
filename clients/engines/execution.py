@@ -15,5 +15,5 @@ class ExecutionClient(Client):
 class EmptyExecutionClient(ExecutionClient):
 
     def run_job(self, job_type: str, response: Response) -> Response:
-        raise NotImplementedError("Client not implemented")
+        # raise NotImplementedError("Client not implemented")
         return response
