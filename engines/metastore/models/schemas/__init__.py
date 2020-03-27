@@ -1,6 +1,8 @@
 import tempfile
 import magic #type: ignore
 from typing import Optional
+from engines.metastore.models.schemas.metastore_schema import emptySchema
+
 from engines.metastore.models.schemas import parquet_schema as ParquetSchema
 
 def from_header_and_footer(header: bytes, footer: bytes):
@@ -13,6 +15,8 @@ def from_header_and_footer(header: bytes, footer: bytes):
 
         if file_type == "Apache Parquet":
             return ParquetSchema.from_footer(footer_file.name)
+        else:
+            return emptySchema()
 
 
 

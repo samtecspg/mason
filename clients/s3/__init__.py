@@ -79,14 +79,17 @@ class S3Client:
             if len(keys) > 0:
                 for key in keys:
                     # get header to infer file type
-                    header_length = 4096
-                    header_response = self.client.get_object(Bucket=database_name, Key=key, Range =f'bytes=0-{header_length}')
-                    response.add_response(header_response)
-                    header: bytes = header_response['Body'].read()
                     object_header_response = self.client.head_object(Bucket=database_name, Key=key)
                     response.add_response(object_header_response)
                     content_length = int(object_header_response.get('ResponseMetadata', {}).get("HTTPHeaders", {}).get("content-length", "0"))
+
                     if content_length > 0:
+                        header_length = min(4096, content_length)
+                        header_response = self.client.get_object(Bucket=database_name, Key=key,
+                                                                 Range=f'bytes=0-{header_length}')
+                        response.add_response(header_response)
+                        header: bytes = header_response['Body'].read()
+
                         footer_length = 20000
                         footer_start = content_length - footer_length
 

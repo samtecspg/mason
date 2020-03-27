@@ -10,4 +10,3 @@ class SparkClient:
         response.add_info(f"Running job {job_name}")
         return response
 
-

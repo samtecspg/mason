@@ -34,3 +34,5 @@ class MetastoreSchema:
             'Columns': list(map(lambda c: c.to_dict(), self.columns))
         }
 
+def emptySchema():
+    return MetastoreSchema([], "")

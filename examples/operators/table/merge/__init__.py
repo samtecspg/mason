@@ -5,7 +5,7 @@ from clients.response import Response
 from api import operator_api as OperatorApi
 from util.logger import logger
 
-def api(*args, **kwargs): return OperatorApi.get("table", "refresh", *args, **kwargs)
+def api(*args, **kwargs): return OperatorApi.get("table", "merge", *args, **kwargs)
 
 def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
     ## Initial Go:
@@ -20,10 +20,8 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     ###  Merge the schemas of the parquet files.
     ###  Save back out to parquet
 
-    # database_name: str = parameters.safe_get("database_name")
-    # response = config.metastore.client.list_tables(database_name, response)
-    # return response
     response = Response()
+    output_path: str = parameters.safe_get("output_path")
     response = config.execution.client.run_job("schema_merge", response)
 
     return response

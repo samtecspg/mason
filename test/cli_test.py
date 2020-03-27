@@ -139,35 +139,11 @@ class TestCLI:
         """
         assert_multiline(result3.output, expects3)
 
+        result4 = runner.invoke(operator, ["table", "get", "-p", "database_name:lake-working-copy-feb-20-2020,table_name:merged", "-l", "trace"], catch_exceptions=False)
+        print(result4.output)
+        print(result4.exception)
 
-        result4 = runner.invoke(operator, ["table", "merge"])
-        expects4 = """
-        Set log level to info
-        +----------------+
-        | Configuration  |
-        +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'threads': 3}}}
-        Neither parameter string nor parameter path provided.
-
-        +-------------------------+
-        | Parameters Validation:  |
-        +-------------------------+
-        Missing: ['merge_strategy']
-
-        +--------------------+
-        | Operator Response  |
-        +--------------------+
-        {
-         "Errors": [
-          "Missing required parameters: merge_strategy"
-         ],
-         "Info": [],
-         "Warnings": []
-        }
-        """
-        assert_multiline(result4.output, expects4)
-
-        result5 = runner.invoke(operator, ["table", "merge", "-p", "merge_strategy:test"])
-        print(result5.output)
+    # def test_config_3(self):
+    #     runner = CliRunner()
 
 

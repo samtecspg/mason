@@ -114,7 +114,7 @@ def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # valid refresh
-        params = Parameters(parameters="merge_strategy:test")
+        params = Parameters(parameters="merge_strategy:test,output_path:test")
         validate = params.validate(op)
         merge = table_merge(env, config, params, validate)
         print(merge.with_status())

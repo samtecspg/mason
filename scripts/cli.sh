@@ -3,9 +3,9 @@ set -e
 
 # Reset everything to 0
 
-rm -rf ~/.mason/
+#rm -rf ~/.mason/
+mypy .
 ./scripts/install.sh
-#export MASON_HOME=".tmp/"
 
 # config examples
 # mason config -l debug
@@ -15,7 +15,7 @@ rm -rf ~/.mason/
 
 # register exampels
 # mason register examples/operators/table/list/  # TODO: PLEASE FIX THIS CASE
- mason register /examples/operators/table/ -l trace
+ mason register examples/operators/table/
 
 # running api server
 # mason run
@@ -30,8 +30,9 @@ rm -rf ~/.mason/
 # mason operator table get -p database_name:crawler-poc,table_name:catalog_poc_data
 
 # S3 metastore examples
-# mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/orders/ -l trace
-# mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/orders/
+# mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/ -l trace
+# mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/shipment/
+ mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:merged/
 
 # list examples
 # mason operator table list
