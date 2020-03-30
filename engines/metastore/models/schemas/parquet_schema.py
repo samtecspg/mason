@@ -4,6 +4,9 @@ from fastparquet import ParquetFile #type: ignore
 from fastparquet.schema import SchemaHelper #type: ignore
 from util.list import get, flatten
 from typing import Optional, List
+from fsspec.spec import AbstractBufferedFile #type: ignore
+from typing import Union
+from util.logger import logger
 
 class ParquetElement(SchemaElement):
     def __init__(self, name: str, type: str, converted_type: Optional[str], repitition_type: Optional[str]):
@@ -36,16 +39,15 @@ class ParquetSchema(MetastoreSchema):
         self.columns = columns
         self.type = 'parquet'
 
+def from_file(file: Union[str, AbstractBufferedFile]):
+    schema: SchemaHelper = ParquetFile(file).schema
+    return schema_from_text(schema)
 
-def from_footer(footer: str):
-    schema: SchemaHelper = ParquetFile(footer).schema
-
-    # TODO:  Find a more graceful way to do this than parsing the text
+def schema_from_text(schema: SchemaHelper):
     text = schema.text
     split = text.split("\n")
     split.pop(0)
     column_elements: List[SchemaElement] = flatten(list(map(lambda line: element_from_text(line), split)))
-
     return ParquetSchema(column_elements, schema)
 
 def element_from_text(line: str) -> Optional[ParquetElement]:

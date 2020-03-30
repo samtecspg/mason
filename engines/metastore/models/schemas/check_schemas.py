@@ -6,7 +6,8 @@ from util.list import get
 
 def find_conflicts(schemas: List[MetastoreSchema]):
     working_schemas = schemas
-    unique_schemas = set(schemas)
+    non_empty_schemas = filter(lambda s: s.columns != [], working_schemas)
+    unique_schemas = set(non_empty_schemas)
     unique_schema_dicts = list(map(lambda s: s.to_dict(), list(unique_schemas)))
 
     if len(unique_schemas) > 1:

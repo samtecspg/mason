@@ -23,6 +23,7 @@ def print_result(result):
     print(result.output)
     print(result.exception)
 
+# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestCLI:
 
     @pytest.fixture(autouse=True)
@@ -139,9 +140,135 @@ class TestCLI:
         """
         assert_multiline(result3.output, expects3)
 
-        result4 = runner.invoke(operator, ["table", "get", "-p", "database_name:lake-working-copy-feb-20-2020,table_name:merged", "-l", "trace"], catch_exceptions=False)
-        print(result4.output)
-        print(result4.exception)
+        result4 = runner.invoke(operator, ["table", "get", "-p", "database_name:lake-working-copy-feb-20-2020,table_name:sample", "-l", "trace"], catch_exceptions=False)
+        expects4 = """
+        Set log level to trace
+        Reading configurations at .tmp/configurations/
+        +----------------+
+        | Configuration  |
+        +----------------+
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'threads': 3}}}
+
+        +--------------------+
+        | Parsed Parameters  |
+        +--------------------+
+        {'table_name': 'sample', 'database_name': 'lake-working-copy-feb-20-2020'}
+
+
+        +-------------------------+
+        | Parameters Validation:  |
+        +-------------------------+
+        Validated: ['table_name', 'database_name']
+
+        Fetching keys in lake-working-copy-feb-20-2020 sample
+        Key lake-working-copy-feb-20-2020/sample/_SUCCESS
+        Key lake-working-copy-feb-20-2020/sample/part-00000-1ab330bd-b4f8-4b65-b0d6-d670479602ea-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/sample/part-00001-1ab330bd-b4f8-4b65-b0d6-d670479602ea-c000.snappy.parquet
+        +--------------------+
+        | Operator Response  |
+        +--------------------+
+        {
+         "Errors": [],
+         "Info": [],
+         "Warnings": [],
+         "Data": {
+          "Schema": {
+           "SchemaType": "parquet",
+           "Columns": [
+            {
+             "Name": "test_column_1",
+             "Type": "INT32",
+             "ConvertedType": "REQUIRED",
+             "RepititionType": null
+            },
+            {
+             "Name": "test_column_2",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            }
+           ]
+          }
+         },
+         "_client_responses": []
+        }
+        """
+        assert_multiline(result4.output, expects4)
+
+        result5 = runner.invoke(operator, ["table", "get", "-p", "database_name:lake-working-copy-feb-20-2020,table_name:merged", "-l", "trace"], catch_exceptions=False)
+        expects5 = """
+        Set log level to trace
+        Reading configurations at .tmp/configurations/
+        +----------------+
+        | Configuration  |
+        +----------------+
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'threads': 3}}}
+
+        +--------------------+
+        | Parsed Parameters  |
+        +--------------------+
+        {'table_name': 'merged', 'database_name': 'lake-working-copy-feb-20-2020'}
+
+
+        +-------------------------+
+        | Parameters Validation:  |
+        +-------------------------+
+        Validated: ['table_name', 'database_name']
+
+        Fetching keys in lake-working-copy-feb-20-2020 merged
+        Key lake-working-copy-feb-20-2020/merged/_SUCCESS
+        Key lake-working-copy-feb-20-2020/merged/part-00000-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00001-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00002-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00003-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00004-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00005-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00006-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00007-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        +--------------------+
+        | Operator Response  |
+        +--------------------+
+        {
+         "Errors": [],
+         "Info": [],
+         "Warnings": [],
+         "Data": {
+          "Schema": {
+           "SchemaType": "parquet",
+           "Columns": [
+            {
+             "Name": "AppId",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "dir_0",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "dir_1",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "dir_2",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            }
+           ]
+          }
+         },
+         "_client_responses": []
+        }
+        """
+        assert_multiline(result5.output, expects5)
+
+
 
     # def test_config_3(self):
     #     runner = CliRunner()

@@ -8,6 +8,7 @@ from engines.metastore.models import schemas
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from engines.metastore.models.schemas import check_schemas as CheckSchemas
 from util.list import get
+import s3fs #type: ignore
 
 class S3Client:
     def __init__(self, s3_config: dict):
@@ -46,76 +47,20 @@ class S3Client:
     def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None) -> Response:
         logger.info(f"Fetching keys in {database_name} {table_name}")
 
-        new_responses: List[dict] = []
+        s3 = s3fs.S3FileSystem()
+        keys = s3.find(database_name + "/" + (table_name or ""))
 
-        continuation_token = None
-
-        try:
-            if table_name:
-                result = self.client.list_objects_v2(Bucket=database_name, Prefix=table_name)
-            else:
-                result = self.client.list_objects_v2(Bucket=database_name)
-            new_responses.append(result)
-            continuation_token = result.get('NextContinuationToken')
-        except ClientError as e:
-            new_responses.append(e.response)
-
-        while continuation_token:
-            try:
-                logger.info(f"Continuing fetching keys in {database_name}. Continuation token: {continuation_token}, Responses: {len(new_responses)}")
-                if table_name:
-                    result = self.client.list_objects_v2(Bucket=database_name, Prefix=table_name)
-                else:
-                    result = self.client.list_objects_v2(Bucket=database_name)
-                new_responses.append(result)
-                continuation_token = result.get('NextContinuationToken')
-            except ClientError as e:
-                new_responses.append(e.response)
-
-        for resp in new_responses:
-            contents = resp.get("Contents", [])
-            keys = list(map(lambda c: c.get("Key"), contents))
-            schema_list: List[MetastoreSchema] = []
-            if len(keys) > 0:
-                for key in keys:
-                    # get header to infer file type
-                    object_header_response = self.client.head_object(Bucket=database_name, Key=key)
-                    response.add_response(object_header_response)
-                    content_length = int(object_header_response.get('ResponseMetadata', {}).get("HTTPHeaders", {}).get("content-length", "0"))
-
-                    if content_length > 0:
-                        header_length = min(4096, content_length)
-                        header_response = self.client.get_object(Bucket=database_name, Key=key,
-                                                                 Range=f'bytes=0-{header_length}')
-                        response.add_response(header_response)
-                        header: bytes = header_response['Body'].read()
-
-                        footer_length = 20000
-                        footer_start = content_length - footer_length
-
-                        footer_response = self.client.get_object(Bucket=database_name, Key=key, Range=f"bytes={footer_start}-{content_length}")
-                        response.add_response(footer_response)
-
-                        footer: bytes = footer_response['Body'].read()
-                        schema = schemas.from_header_and_footer(header, footer)
-                        schema_list.append(schema)
+        schema_list: List[MetastoreSchema] = []
+        if len(keys) > 0:
+            for key in keys:
+                logger.debug(f"Key {key}")
+                k = s3.open(key)
+                schema = schemas.from_file(k)
+                if schema:
+                    schema_list.append(schema)
 
         schemas_checked = CheckSchemas.find_conflicts(list(set(schema_list)))
-
-        if (len(new_responses) > 0):
-            error, status, message = self.parse_responses(new_responses[-1])
-
-            if error == "EntityNotFoundException":
-                response.add_error(f"Database {database_name} not found")
-                response.set_status(404)
-            elif 200 <= status < 300:
-                response.add_data(schemas_checked)
-                response.set_status(status)
-            else:
-                response.set_status(status)
-                response.add_error(message)
-        for r in new_responses:
-            response.add_response(r)
+        response.add_data(schemas_checked)
 
         return response
 
