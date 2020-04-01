@@ -6,5 +6,6 @@ clients:
       region: us-east-1
   spark:
     configuration:
-      threads: 3
+      runner:
+        type: "kubernetes-operator"
 

@@ -101,8 +101,9 @@ class TestCLI:
         +----------------+
         | Configuration  |
         +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'threads': 3}}}
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
         """
+
         assert_multiline(result1.output, expects1)
 
         result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
@@ -123,7 +124,7 @@ class TestCLI:
         +----------------+
         | Configuration  |
         +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'threads': 3}}}
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
         Neither parameter string nor parameter path provided.
 
         +---------------------------------------------------------+
@@ -132,11 +133,11 @@ class TestCLI:
 
         namespace    command    description                                                                               parameters
         -----------  ---------  ----------------------------------------------------------------------------------------  ----------------------------------------------------------------
-        table        merge      Merge metastore tables                                                                    {'required': ['merge_strategy']}
+        table        merge      Merge metastore tables                                                                    {}
         table        refresh    Refresh metastore tables                                                                  {'required': ['database_name', 'table_name']}
         table        get        Get metastore table contents                                                              {'required': ['database_name', 'table_name']}
         table        list       Get metastore tables                                                                      {'required': ['database_name']}
-        table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']}
+        table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']} 
         """
         assert_multiline(result3.output, expects3)
 
@@ -147,7 +148,8 @@ class TestCLI:
         +----------------+
         | Configuration  |
         +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'threads': 3}}}
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
+
 
         +--------------------+
         | Parsed Parameters  |
@@ -202,7 +204,8 @@ class TestCLI:
         +----------------+
         | Configuration  |
         +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'threads': 3}}}
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
+
 
         +--------------------+
         | Parsed Parameters  |
@@ -217,14 +220,14 @@ class TestCLI:
 
         Fetching keys in lake-working-copy-feb-20-2020 merged
         Key lake-working-copy-feb-20-2020/merged/_SUCCESS
-        Key lake-working-copy-feb-20-2020/merged/part-00000-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00001-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00002-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00003-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00004-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00005-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00006-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00007-b3a343e6-3979-4812-8cd4-67b08ca9d19a-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00000-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00001-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00002-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00003-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00004-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00005-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00006-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00007-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
         +--------------------+
         | Operator Response  |
         +--------------------+
@@ -238,6 +241,606 @@ class TestCLI:
            "Columns": [
             {
              "Name": "AppId",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Collection",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TransactionTimeUtc",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Operation",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ModelVersion",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipmentId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipmentReference",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "CustomerId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Freight_ShipVia",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Freight_Carrier",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Freight_ServiceLevel",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Freight_TransportMode",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Freight_FreightCharge",
+             "Type": "DOUBLE",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipmentType",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "IsFreightForwarded",
+             "Type": "BOOLEAN",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "LeadTrackingNumber",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipFromFacility_Code",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipFromFacility_PackingLocation",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_LocationId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipTo_Description",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_AddressLine1",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_AddressLine2",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_AddressLine3",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_Country",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_CountryId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipTo_Address_Id",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipTo_Address_Locality",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_PostalCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_CompanyId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipTo_Address_Name",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_StateId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipTo_Address_StateCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_Address_CountryCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipTo_FacilityCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TotalQtyShipped",
+             "Type": "DOUBLE",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ConsolidationMethod",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "CompletedByUserId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShippedByUserId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Status_StatusId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Status_Description",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Status_ChangedDate",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "PrecisionConfig_Client",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "PrecisionConfig_Locale",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "PrecisionConfig_PackingLocation",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "PrecisionConfig_Language",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "PortOfLading",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ShipDate",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "ReadyToShipDate",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "RealShipDate",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "DispatchDate",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "EndOfDayData_EndOfDayId",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "EndOfDayData_EodStartedDate",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_BillingId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_CustomerBilling_CustomerId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_AddressId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_AddressName",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_Division",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_AddressLine1",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_AddressLine2",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_AddressLine3",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_PostalCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_City",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_IsoCountryCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_Address_StateCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_IsBillTax",
+             "Type": "BOOLEAN",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_CustomerBilling_TermId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_CustomerBilling_IsDistributor",
+             "Type": "BOOLEAN",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_CustomerBilling_IsoCurrencyCode",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Billing_CustomerBilling_CompanyId",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_CustomerBilling_IsSAB",
+             "Type": "BOOLEAN",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "Billing_IsBilled",
+             "Type": "BOOLEAN",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "ShipAttention",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_SoldToAddress_CountryIso",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_SoldToAddress_Name",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_SoldToAddress_Line1",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_SoldToAddress_Line3",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_SoldToAddress_City",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_ShipToAddress_CountryIso",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_ShipToAddress_Name",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_ShipToAddress_Line1",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_ShipToAddress_City",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_ShipToAddress_State",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_BillToAddress_CountryIso",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_BillToAddress_Name",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_BillToAddress_Line1",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_BillToAddress_Line3",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_BillToAddress_City",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_SoldToAddress_Line2",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_ShipToAddress_Line2",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_BillToAddress_Line2",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_SoldToAddress_State",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_BillToAddress_State",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "Itn",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "TranslationInfo_ShipToAddress_Line3",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "OPTIONAL"
+            },
+            {
+             "Name": "year",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "month",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "day",
+             "Type": "INT32",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "filename",
+             "Type": "BYTE_ARRAY",
+             "ConvertedType": "UTF8",
+             "RepititionType": "REQUIRED"
+            },
+            {
+             "Name": "extracted_path",
+             "Type": "LIST",
+             "ConvertedType": "OPTIONAL",
+             "RepititionType": null
+            },
+            {
+             "Name": "list",
+             "Type": "REPEATED",
+             "ConvertedType": null,
+             "RepititionType": null
+            },
+            {
+             "Name": "element",
              "Type": "BYTE_ARRAY",
              "ConvertedType": "UTF8",
              "RepititionType": "OPTIONAL"
@@ -268,6 +871,9 @@ class TestCLI:
         """
         assert_multiline(result5.output, expects5)
 
+
+        result6 = runner.invoke(operator, ["table", "merge", "-l", "trace"], catch_exceptions=False)
+        print(result6.output)
 
 
     # def test_config_3(self):

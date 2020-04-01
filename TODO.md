@@ -85,10 +85,6 @@ Legend
    - [ ] :arrow_down: Avro schema
    - [ ] :arrow_down: Msgpack pack schema
 
-### Execution
-- [ ] :arrow_up: Dockerized Execution
-- [ ] :arrow_up: Kubernetes Execution
-
 #### Python
 - [ ] :arrow_up: Basic setup
 #### IPython/Jupyter
@@ -98,8 +94,15 @@ Legend
 - [ ] :arrow_up: Basic setup 
 #### Spark
 - [ ] Basic setup 
+    - [ ] Kubernetes Operator Runner
+    - [ ] EMR Runner 
+    - [ ] Local Runner
 #### Presto
 - [ ] :arrow_up: Basic setup 
+
+### Dask
+- [ ] Basic Setup
+    - [ ] Kubernetes Runner
 
 ### Scheduler
 ### Glue

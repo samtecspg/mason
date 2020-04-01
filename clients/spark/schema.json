@@ -5,10 +5,14 @@
     "configuration": {
       "type": "object",
       "properties": {
-        "threads": {
-          "type": "integer"
+        "runner": {
+          "type": "object",
+          "properties": {
+            "type": { "type":  "string"}
+          }
         }
-      }
+      },
+      "required": [ "runner" ]
     }
   }
 }
