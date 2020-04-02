@@ -11,8 +11,8 @@ class KubernetesOperator(SparkRunner):
     def run(self, config: SparkConfig, response: Response):
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
-        command0 = ["kubectl", "delete", "sparkapplication", "spark-pi"]
-        command1 = ["kubectl", "describe", "sparkapplication", "spark-pi"]
+        command0 = ["kubectl", "delete", "sparkapplication", "mason-spark"]
+        command1 = ["kubectl", "describe", "sparkapplication", "mason-spark"]
         command2 = ["kubectl", "describe", "sparkapplications"]
         command = ["kubectl", "apply", "-f", from_root("/clients/spark/runner/kubernetes_operator/config.yaml")]
 

@@ -1,15 +1,15 @@
 apiVersion: "sparkoperator.k8s.io/v1beta2"
 kind: SparkApplication
 metadata:
-  name: spark-pi
+  name: mason-spark
   namespace: default
 spec:
   type: Scala
   mode: cluster
   image: "samtecspg/mason-spark:v2.4.5"
   imagePullPolicy: Always
-  mainClass: org.apache.spark.examples.SparkPi
-  mainApplicationFile: "local:///opt/spark/examples/jars/spark-examples_2.11-2.4.5.jar"
+  mainClass: mason.spark.Main
+  mainApplicationFile: "local:///opt/spark/jars/mason-spark-assembly-0.1.jar"
   sparkVersion: "2.4.5"
   restartPolicy:
     type: Never
