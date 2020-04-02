@@ -18,6 +18,7 @@ class KubernetesOperator(SparkRunner):
 
         logger.info("Executing Spark Kubernetes Operator")
 
+        stdout, stderr = run_sys_call(command0, response)
         stdout, stderr = run_sys_call(command, response)
 
 
