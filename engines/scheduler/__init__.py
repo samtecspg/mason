@@ -2,12 +2,13 @@
 from clients.glue.scheduler import GlueSchedulerClient
 from clients.engines.scheduler import EmptySchedulerClient
 from engines import Engine
+from util.logger import logger
 
 class SchedulerEngine(Engine):
 
     def __init__(self, config: dict, valid: bool = True):
         super().__init__("scheduler", config)
-        if valid:
+        if valid and self.valid:
             self.client = self.get_client(self.client_name, self.config_doc)
         else:
             self.client = EmptySchedulerClient()

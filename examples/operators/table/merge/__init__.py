@@ -21,8 +21,9 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     ###  Save back out to parquet
 
     response = Response()
-    output_path: str = parameters.safe_get("output_path")
-    response = config.execution.client.run_job("schema_merge", response)
+    params = parameters.validated_parameters
+
+    response = config.execution.client.run_job("schema_merge", params, response)
 
     return response
 

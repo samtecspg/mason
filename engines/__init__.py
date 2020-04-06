@@ -2,17 +2,33 @@
 from util.logger import logger
 from clients import EmptyClient
 from typing import Optional
+from util.json_schema import validate_schema
+from definitions import from_root
 
 class Engine():
 
     def __init__(self, engine_type: str, config: Optional[dict]):
         self.client_name = (config or {}).get(f"{engine_type}_engine") or ""
         self.config_doc = (config or {}).get("clients", {}).get(self.client_name, {}).get("configuration", {})
+        self.valid = False
+
+        schema_path = from_root(f"/clients/{self.client_name}/schema.json")
 
         if len(self.config_doc) == 0 :
             if not self.client_name == "":
                 logger.error()
                 logger.error(f"No {self.client_name} client configuration for specified {engine_type}_engine")
+                self.config_doc = {}
+                self.client_name = "invalid"
+        else:
+            valid = validate_schema(self.config_doc, schema_path)
+            if not valid:
+                if not self.client_name == "":
+                    logger.error(f"Invalid configuration for client {self.client_name}")
+                    self.client_name = "invalid"
+                    self.config_doc = {}
+            else:
+                self.valid = True
 
     def set_underlying_client(self, client):
         self.client.client.client = client

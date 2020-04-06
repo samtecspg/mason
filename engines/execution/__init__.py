@@ -2,12 +2,13 @@
 from engines import Engine
 from clients.spark.execution import SparkExecutionClient
 from clients.engines.execution import EmptyExecutionClient
+from util.logger import logger
 
 class ExecutionEngine(Engine):
 
     def __init__(self, config: dict, valid: bool = True):
         super().__init__("execution", config)
-        if valid:
+        if valid and self.valid:
             self.client = self.get_client(self.client_name, self.config_doc)
         else:
             self.client = EmptyExecutionClient()
