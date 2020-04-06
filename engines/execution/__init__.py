@@ -2,7 +2,6 @@
 from engines import Engine
 from clients.spark.execution import SparkExecutionClient
 from clients.engines.execution import EmptyExecutionClient
-from util.logger import logger
 
 class ExecutionEngine(Engine):
 

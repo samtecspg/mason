@@ -52,7 +52,12 @@ class TestConfiguration:
 
     def test_valid_spark_config(self):
         conf = self.before("/test/support/configs/valid_spark_config.yaml")
-        expects = {}
+        expects = {'execution': {'client_name': 'spark',
+                       'configuration': {'runner': {'spark_version': '2.4.5',
+                                                    'type': 'kubernetes-operator'}}},
+         'metastore': {'client_name': '', 'configuration': {}},
+         'scheduler': {'client_name': '', 'configuration': {}},
+         'storage': {'client_name': '', 'configuration': {}}}
         assert(conf.engines == expects)
 
     def test_invalid_spark_config(self):
@@ -61,6 +66,14 @@ class TestConfiguration:
          'metastore': {'client_name': '', 'configuration': {}},
          'scheduler': {'client_name': '', 'configuration': {}},
          'storage': {'client_name': '', 'configuration': {}}}
+        assert(conf.engines == expects)
+
+    def test_invalid_spark_config_2(self):
+        conf = self.before("/test/support/configs/invalid_spark_config_2.yaml")
+        expects = {'execution': {'client_name': 'invalid', 'configuration': {}},
+                   'metastore': {'client_name': '', 'configuration': {}},
+                   'scheduler': {'client_name': '', 'configuration': {}},
+                   'storage': {'client_name': '', 'configuration': {}}}
         assert(conf.engines == expects)
 
 

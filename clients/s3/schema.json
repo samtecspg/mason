@@ -2,14 +2,9 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "S3Configuration",
   "properties": {
-    "configuration": {
-      "type": "object",
-      "properties": {
-        "region": {
-          "type": "string"
-        }
-      },
-      "required": ["region"]
+    "region": {
+      "type": "string"
     }
-  }
+  },
+  "required": ["region"]
 }
