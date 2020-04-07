@@ -6,5 +6,6 @@
       "type": "string"
     }
   },
-  "required": ["region"]
+  "required": ["region"],
+  "additionalProperties": false
 }

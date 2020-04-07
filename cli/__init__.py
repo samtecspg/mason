@@ -56,29 +56,15 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
 
     if config_file:
         # TODO: Interactive configuration
-        banner("Config Validation")
         parsed = parse_yaml(config_file)
-        valid = validate_schema(parsed, env.config_schema)
-        if valid:
-            clients: dict = parsed.get("clients")
-            #  TODO:  Use json schema partials for this
-            valid = True
-            if clients and len(clients) > 0:
-                for name, config in clients.items():
-                    schema = from_root(f"/clients/{name}/schema.json")
-                    if not validate_schema(config, schema):
-                        logger.error(f"Error validating client schema: {name}")
-                        valid = False
-                        break
-        if valid:
+        config = Config(env, parsed)
+
+        if config.valid:
             logger.info()
             logger.info(f"Valid Configuration. Saving config {config_file} to {env.config_home}")
             logger.info()
             shutil.copyfile(config_file, env.config_home + os.path.basename(config_file))
-            return Config(env, parsed)
-        else:
-            logger.error()
-            logger.error(f"Invalid Config Schema: {config_file}")
+            return config
     else:
         if path.exists(env.config_home):
             return get_all(env)

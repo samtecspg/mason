@@ -3,7 +3,6 @@ from clients.glue.metastore import GlueMetastoreClient
 from clients.s3.metastore import S3MetastoreClient
 from clients.engines.metastore import EmptyMetastoreClient
 from engines import Engine
-from util.logger import logger
 
 class MetastoreEngine(Engine):
 

@@ -8,7 +8,7 @@ class SparkExecutionClient(ExecutionClient):
     def __init__(self, config: dict):
         self.client = SparkClient(config)
 
-    def run_job(self, job_name: str, response: Response):
-        response = self.client.run_job(job_name, response)
+    def run_job(self, job_name: str, params: dict, response: Response):
+        response = self.client.run_job(job_name, params, response)
         return response
 

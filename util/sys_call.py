@@ -10,12 +10,11 @@ def run_sys_call(command: List[str], response: Response):
         stderr = proc.stderr.read() if proc.stderr is not None else None
 
         if stdin:
-            logger.info(f"STDIN {stdin}")
-
+            logger.info(f"STDIN {str(stdin)}")
         if stdout:
-            logger.info(f"STDOUT: {stdout}")
+            logger.info(f"STDOUT: {str(stdout)}")
             response.add_response({"stdout": stdout.decode()})
         elif stderr:
-            logger.info(f"STDERR: {stderr}")
-            response.add_error(stderr)
+            logger.info(f"STDERR: {str(stderr)}")
+            response.add_error(str(stderr))
         return stdout, stderr

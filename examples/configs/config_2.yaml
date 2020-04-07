@@ -9,4 +9,5 @@ clients:
       region: us-east-1
   spark:
     configuration:
-      test: 1
+      runner:
+        spark_version: "2.4.5"

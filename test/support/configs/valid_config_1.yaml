@@ -2,5 +2,4 @@ storage_engine: s3
 clients:
   s3:
     configuration:
-      test_param_1: test
-      test_param_2: test
+      region: "us-west-2"

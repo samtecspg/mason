@@ -65,6 +65,12 @@ def get_mock(engine: Engine):
         elif client_name == "s3":
             logger.info("Mocking S3 Client")
             engine.set_underlying_client(S3Mock())
+        elif client_name == "spark":
+            # TODO: IMPLMENT THIS
+            logger.info("Mocking Spark Client")
+            engine.set_underlying_client(None)
+        elif client_name == "invalid":
+            pass
         else:
             raise Exception(f"Unmocked Client Implementation: {client_name}")
 

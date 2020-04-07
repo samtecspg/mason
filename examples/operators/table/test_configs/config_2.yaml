@@ -7,5 +7,6 @@ clients:
   spark:
     configuration:
       runner:
+        spark_version: "2.4.5"
         type: "kubernetes-operator"
 

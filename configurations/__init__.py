@@ -33,6 +33,7 @@ class Config:
         self.scheduler = SchedulerEngine(config, valid)
         self.storage = StorageEngine(config, valid)
         self.execution = ExecutionEngine(config, valid)
+        self.valid = valid and self.metastore.valid and self.scheduler.valid and self.storage.valid and self.execution.valid
 
         self.engines = {
             'metastore': self.metastore.to_dict(),
@@ -42,7 +43,7 @@ class Config:
         }
 
         if valid:
-            banner("Configuration")
+            banner("Configuration Valid")
             logger.info(f"Configuration: {self.engines}")
         else:
             logger.error(f"\nInvalid config schema: {config}\n")

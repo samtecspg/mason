@@ -34,12 +34,19 @@ class TestCLI:
 
     def test_config_0(self):
         runner = CliRunner()
-        self.test_valid_config()
-        result = runner.invoke(config,
-                               [from_root('/examples/operators/table/test_configs/config_0.yaml'), '-l', 'info'])
+        result = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_0.yaml'), '-l', 'info'])
         print(result.output)
         expects = """
         Set log level to info
+        +-------------------------------+
+        | Creating MASON_HOME at .tmp/  |
+        +-------------------------------+
+        +-------------------------------------------------------+
+        | Creating OPERATOR_HOME at .tmp/registered_operators/  |
+        +-------------------------------------------------------+
+        +-----------------------------------------------+
+        | Creating CONFIG_HOME at .tmp/configurations/  |
+        +-----------------------------------------------+
         +--------------------+
         | Config Validation  |
         +--------------------+
@@ -47,7 +54,6 @@ class TestCLI:
         Schema error /Users/kyle/dev/mason/configurations/schema.json: 'bad' is not one of ['glue', 's3']
 
         Invalid Config Schema: /Users/kyle/dev/mason/examples/operators/table/test_configs/config_0.yaml
-
         """
         assert_multiline(expects, result.output)
 
@@ -65,17 +71,14 @@ class TestCLI:
         +-----------------------------------------------+
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
-        +--------------------+
-        | Config Validation  |
-        +--------------------+
+        +----------------------+
+        | Configuration Valid  |
+        +----------------------+
+        Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
-
-        +----------------+
-        | Configuration  |
-        +----------------+
-        Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
       """
+      print(result1.output)
       assert_multiline(expect1, result1.output)
 
     def test_config_2(self):
@@ -92,18 +95,13 @@ class TestCLI:
         +-----------------------------------------------+
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
-        +--------------------+
-        | Config Validation  |
-        +--------------------+
+        +----------------------+
+        | Configuration Valid  |
+        +----------------------+
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_2.yaml to .tmp/configurations/
-
-        +----------------+
-        | Configuration  |
-        +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
         """
-
         assert_multiline(result1.output, expects1)
 
         result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
@@ -120,24 +118,24 @@ class TestCLI:
 
         result3 = runner.invoke(operator, [])
         expects3 = """
-        Set log level to info
-        +----------------+
-        | Configuration  |
-        +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
-        Neither parameter string nor parameter path provided.
+            Set log level to info
+            +----------------------+
+            | Configuration Valid  |
+            +----------------------+
+            Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
+            Neither parameter string nor parameter path provided.
 
-        +---------------------------------------------------------+
-        | Available Operator Methods: .tmp/registered_operators/  |
-        +---------------------------------------------------------+
+            +---------------------------------------------------------+
+            | Available Operator Methods: .tmp/registered_operators/  |
+            +---------------------------------------------------------+
 
-        namespace    command    description                                                                               parameters
-        -----------  ---------  ----------------------------------------------------------------------------------------  ----------------------------------------------------------------
-        table        merge      Merge metastore tables                                                                    {}
-        table        refresh    Refresh metastore tables                                                                  {'required': ['database_name', 'table_name']}
-        table        get        Get metastore table contents                                                              {'required': ['database_name', 'table_name']}
-        table        list       Get metastore tables                                                                      {'required': ['database_name']}
-        table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']} 
+            namespace    command    description                                                                               parameters
+            -----------  ---------  ----------------------------------------------------------------------------------------  ----------------------------------------------------------------
+            table        merge      Merge metastore tables                                                                    {}
+            table        refresh    Refresh metastore tables                                                                  {'required': ['database_name', 'table_name']}
+            table        get        Get metastore table contents                                                              {'required': ['database_name', 'table_name']}
+            table        list       Get metastore tables                                                                      {'required': ['database_name']}
+            table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']}
         """
         assert_multiline(result3.output, expects3)
 
@@ -145,11 +143,10 @@ class TestCLI:
         expects4 = """
         Set log level to trace
         Reading configurations at .tmp/configurations/
-        +----------------+
-        | Configuration  |
-        +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
-
+        +----------------------+
+        | Configuration Valid  |
+        +----------------------+
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
 
         +--------------------+
         | Parsed Parameters  |
@@ -193,7 +190,7 @@ class TestCLI:
           }
          },
          "_client_responses": []
-        }
+        }       
         """
         assert_multiline(result4.output, expects4)
 
@@ -201,11 +198,10 @@ class TestCLI:
         expects5 = """
         Set log level to trace
         Reading configurations at .tmp/configurations/
-        +----------------+
-        | Configuration  |
-        +----------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'type': 'kubernetes-operator'}}}}
-
+        +----------------------+
+        | Configuration Valid  |
+        +----------------------+
+        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
 
         +--------------------+
         | Parsed Parameters  |
@@ -220,14 +216,8 @@ class TestCLI:
 
         Fetching keys in lake-working-copy-feb-20-2020 merged
         Key lake-working-copy-feb-20-2020/merged/_SUCCESS
-        Key lake-working-copy-feb-20-2020/merged/part-00000-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00001-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00002-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00003-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00004-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00005-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00006-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/merged/part-00007-dbe4c304-3aee-4540-a5d2-438f98abb110-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00000-83438cb1-3701-49dc-baac-ccf9f2cabb2c-c000.snappy.parquet
+        Key lake-working-copy-feb-20-2020/merged/part-00001-83438cb1-3701-49dc-baac-ccf9f2cabb2c-c000.snappy.parquet
         +--------------------+
         | Operator Response  |
         +--------------------+
@@ -820,48 +810,6 @@ class TestCLI:
              "Type": "INT32",
              "ConvertedType": "OPTIONAL",
              "RepititionType": null
-            },
-            {
-             "Name": "filename",
-             "Type": "BYTE_ARRAY",
-             "ConvertedType": "UTF8",
-             "RepititionType": "REQUIRED"
-            },
-            {
-             "Name": "extracted_path",
-             "Type": "LIST",
-             "ConvertedType": "OPTIONAL",
-             "RepititionType": null
-            },
-            {
-             "Name": "list",
-             "Type": "REPEATED",
-             "ConvertedType": null,
-             "RepititionType": null
-            },
-            {
-             "Name": "element",
-             "Type": "BYTE_ARRAY",
-             "ConvertedType": "UTF8",
-             "RepititionType": "OPTIONAL"
-            },
-            {
-             "Name": "dir_0",
-             "Type": "BYTE_ARRAY",
-             "ConvertedType": "UTF8",
-             "RepititionType": "OPTIONAL"
-            },
-            {
-             "Name": "dir_1",
-             "Type": "BYTE_ARRAY",
-             "ConvertedType": "UTF8",
-             "RepititionType": "OPTIONAL"
-            },
-            {
-             "Name": "dir_2",
-             "Type": "BYTE_ARRAY",
-             "ConvertedType": "UTF8",
-             "RepititionType": "OPTIONAL"
             }
            ]
           }
@@ -869,11 +817,10 @@ class TestCLI:
          "_client_responses": []
         }
         """
-        # assert_multiline(result5.output, expects5)
+        assert_multiline(result5.output, expects5)
 
-
-        result6 = runner.invoke(operator, ["table", "merge", "-l", "trace"], catch_exceptions=False)
-        print(result6.output)
+        # result6 = runner.invoke(operator, ["table", "merge", "-l", "trace"], catch_exceptions=False)
+        # print(result6.output)
 
 
     # def test_config_3(self):

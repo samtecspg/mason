@@ -1,7 +1,7 @@
 
 from clients.spark.runner.kubernetes_operator import merge_config
 from definitions import from_root
-from hiyapyco import dump as hdump
+from hiyapyco import dump as hdump # type: ignore
 from clients.spark import SparkConfig
 
 

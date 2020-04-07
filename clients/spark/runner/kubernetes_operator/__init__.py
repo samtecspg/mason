@@ -5,7 +5,7 @@ from clients.response import Response
 from util.logger import logger
 from definitions import from_root
 from util.sys_call import run_sys_call
-from hiyapyco import load as hload
+from hiyapyco import load as hload # type: ignore
 from typing import List
 import yaml
 
@@ -51,29 +51,9 @@ def merge_config(config: SparkConfig, job_name: str, parameters: dict, base_conf
 
 class KubernetesOperator(SparkRunner):
 
-    def run(self, config: SparkConfig, response: Response):
+    def run(self, config: SparkConfig, params: dict, response: Response):
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
-
-        # >> > import hiyapyco
-        # >> > y1 = """
-        # ... yaml: 1
-        # ... y:
-        # ...   y1: abc
-        # ...   y2: xyz
-        # ... """
-        # >> > y2 = """
-        # ... yaml: 2
-        # ... y:
-        # ...   y2: def
-        # ...   y3: XYZ
-        # ... """
-        # >> > conf = hiyapyco.load([y1, y2], method=hiyapyco.METHOD_MERGE)
-        # >> > print(conf)
-        # OrderedDict([('yaml', 2), ('y', OrderedDict([('y1', 'abc'), ('y2', 'def'), ('y3', 'XYZ')]))])
-        # >> > hiyapyco.dump(conf, default_flow_style=True)
-        # '{yaml: 2, y: {y1: abc, y2: def, y3: XYZ}}\n'
-
 
         conf = hiyapyco.load('base_config.yaml')
 

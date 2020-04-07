@@ -2,8 +2,9 @@ from test.support import testing_base as base
 from util.environment import MasonEnvironment
 from definitions import from_root
 from util.yaml import parse_yaml
-from util.logger import logger
 from configurations import Config
+from test.support.testing_base import get_mocks
+from util.logger import logger
 
 def empty_config():
     return {
@@ -21,6 +22,7 @@ class TestConfiguration:
         env = MasonEnvironment(config_home=config_home)
         config_doc = parse_yaml(env.config_home)
         conf = Config(env, config_doc)
+        get_mocks(conf)
         return conf
 
 
@@ -46,7 +48,7 @@ class TestConfiguration:
              'metastore': {'client_name': '', 'configuration': {}},
              'scheduler': {'client_name': '', 'configuration': {}},
              'storage': {'client_name': 's3',
-             'configuration': {'test_param_1': 'test', 'test_param_2': 'test'}}
+             'configuration': {'region': 'us-west-2'}}
        }
         assert(conf.engines == expects)
 

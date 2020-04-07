@@ -4,6 +4,7 @@ from clients import EmptyClient
 from typing import Optional
 from util.json_schema import validate_schema
 from definitions import from_root
+from os import path
 
 class Engine():
 
@@ -20,13 +21,22 @@ class Engine():
                 logger.error(f"No {self.client_name} client configuration for specified {engine_type}_engine")
                 self.config_doc = {}
                 self.client_name = "invalid"
+            else:
+                self.valid = True
         else:
-            valid = validate_schema(self.config_doc, schema_path)
+            if path.exists(schema_path):
+                valid = validate_schema(self.config_doc, schema_path)
+            else:
+                logger.warning(f"Specified schema at {schema_path} does not exist")
+                valid = True
+
             if not valid:
                 if not self.client_name == "":
                     logger.error(f"Invalid configuration for client {self.client_name}")
                     self.client_name = "invalid"
                     self.config_doc = {}
+                else:
+                    self.valid = True
             else:
                 self.valid = True
 
