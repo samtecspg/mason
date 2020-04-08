@@ -5,7 +5,7 @@ from os import path
 from pathlib import Path
 from typing import Optional
 
-from configurations import Config
+from configurations import Config, tabulate_configs, set_current_config
 from parameters import Parameters
 from util.yaml import parse_yaml
 from util.logger import logger
@@ -31,7 +31,8 @@ def main():
 @main.command("config", short_help="Configures mason clients and engines")
 @click.argument('config_file', required=False)
 @click.option("-l", "--log_level", help="Log level for mason")
-def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
+@click.option("-s", "--set_current", help="Set current config to config id")
+def config(config_file: Optional[str] = None, set_current: Optional[str] = None, log_level: Optional[str] = None):
     """
     Configures mason according to [CONFIG_FILE].
 
@@ -76,9 +77,15 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
                 logger.info(f"Valid Configuration. Saving config {c} to {env.config_home}")
                 logger.info()
                 shutil.copyfile(c, env.config_home + os.path.basename(c))
+        if len(configs) > 0:
+            set_current_config(env, 0)
+    elif set_current:
+        set_current_config(env, int(set_current))
     else:
         if path.exists(env.config_home):
-            return get_all(env)
+            all_configs = get_all(env)
+            tabulate_configs(all_configs, env)
+            return all_configs
         else:
             logger.error()
             logger.error("Configuration not found.")
