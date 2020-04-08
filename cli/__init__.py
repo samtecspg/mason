@@ -7,14 +7,12 @@ from typing import Optional
 
 from configurations import Config
 from parameters import Parameters
-from util.json_schema import validate_schema
 from util.yaml import parse_yaml
 from util.logger import logger
 import operators.operators as Operators
 from util.printer import banner
 from util.environment import MasonEnvironment
 from configurations import get_all
-from definitions import from_root
 
 @click.group()
 def main():
@@ -55,16 +53,29 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
         os.mkdir(env.config_home)
 
     if config_file:
-        # TODO: Interactive configuration
-        parsed = parse_yaml(config_file)
-        config = Config(env, parsed)
+        configs = []
+        if os.path.isdir(config_file):
+            for r, d, f in os.walk(config_file):
+                for file in f:
+                    if '.yaml' in file:
+                        file_path = os.path.join(r, file)
+                        configs.append(file_path)
+        elif os.path.isfile(config_file):
+            if '.yaml' in path:
+                configs.append(config_file)
+        else:
+            logger.error("Invalid configuration file must specify yaml file or directory of yaml files")
 
-        if config.valid:
-            logger.info()
-            logger.info(f"Valid Configuration. Saving config {config_file} to {env.config_home}")
-            logger.info()
-            shutil.copyfile(config_file, env.config_home + os.path.basename(config_file))
-            return config
+        for c in configs:
+            # TODO: Interactive configuration
+            parsed = parse_yaml(c)
+            config = Config(env, parsed)
+
+            if config.valid:
+                logger.info()
+                logger.info(f"Valid Configuration. Saving config {c} to {env.config_home}")
+                logger.info()
+                shutil.copyfile(c, env.config_home + os.path.basename(c))
     else:
         if path.exists(env.config_home):
             return get_all(env)

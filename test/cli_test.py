@@ -14,14 +14,14 @@ def print_result(result):
     print(result.output)
     print(result.exception)
 
-@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestCLI:
 
     @pytest.fixture(autouse=True)
     def run_around_tests(self):
         os.environ["MASON_HOME"] = ".tmp/"
         yield
-        shutil.rmtree(".tmp/")
+        # shutil.rmtree(".tmp/")
 
     def test_config_0(self):
         runner = CliRunner()
@@ -72,6 +72,16 @@ class TestCLI:
       """
       print(result1.output)
       assert_multiline(expect1, result1.output)
+
+    def test_config_multiple(self):
+        runner = CliRunner()
+        result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/'), '-l', 'trace'])
+
+        expect1 = """
+        """
+
+        print(result1.output)
+        # assert_multiline(expect1, result1.output)
 
     def test_config_2(self):
         runner = CliRunner()
