@@ -1,6 +1,7 @@
 from clients import Client
 from clients.response import Response
 from abc import abstractmethod
+from engines.metastore.models.credentials import MetastoreCredentials
 
 class ExecutionClient(Client):
 
@@ -8,12 +9,12 @@ class ExecutionClient(Client):
     ###  which will return Cannot instantiate abstract class 'SparkExecutionClient' with abstract attribute 'run_job' (for example)
 
     @abstractmethod
-    def run_job(self, job_type: str, parameters: dict, response: Response) -> Response:
+    def run_job(self, job_type: str, metastore_credentials: MetastoreCredentials, parameters: dict, response: Response) -> Response:
         raise NotImplementedError("Client not implemented")
         return response
 
 class EmptyExecutionClient(ExecutionClient):
 
-    def run_job(self, job_type: str, parameters: dict, response: Response) -> Response:
-        # raise NotImplementedError("Client not implemented")
+    def run_job(self, job_type: str, metastore_credentials: MetastoreCredentials, parameters: dict, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
         return response

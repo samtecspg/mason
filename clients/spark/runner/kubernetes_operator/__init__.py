@@ -8,6 +8,7 @@ from util.sys_call import run_sys_call
 from hiyapyco import load as hload # type: ignore
 from typing import List
 import yaml
+from engines.metastore.models.credentials import MetastoreCredentials
 
 import hiyapyco
 
@@ -18,8 +19,15 @@ def prep_parameters(params: dict) -> List[str]:
         param_list.append(v)
     return param_list
 
-def merge_config(config: SparkConfig, job_name: str, parameters: dict, base_config: str):
+def merge_config(config: SparkConfig, job_name: str, metastore_credentials: MetastoreCredentials, parameters: dict):
     base_config_file = from_root("/clients/spark/runner/kubernetes_operator/base_config.yaml")
+
+    parameters["job"] = job_name
+    
+    if metastore_credentials.type == "aws":
+        parameters["access_key"] = metastore_credentials.access_key
+        parameters["secret_key"] = metastore_credentials.secret_key
+
     param_list = prep_parameters(parameters)
     merge_document = {
         'metadata' : {
@@ -46,19 +54,23 @@ def merge_config(config: SparkConfig, job_name: str, parameters: dict, base_conf
     }
 
     arguments = yaml.dump(merge_document)
-    conf = hload(base_config_file, arguments, method=hiyapyco.METHOD_MERGE)
+    conf = hload(base_config_file, arguments, method=hiyapyco.METHOD_MERGE, usedefaultyamlloader=True)
     return conf
 
 class KubernetesOperator(SparkRunner):
 
-    def run(self, config: SparkConfig, params: dict, response: Response):
+    def run(self, config: SparkConfig, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response):
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
 
-        conf = hiyapyco.load('base_config.yaml')
+        conf = dict(merge_config(config, job_name, metastore_credentials, params))
+
+        # with tempfile.NamedTemporaryFile(delete=False, mode='w') as yaml_file:
+        with open('test.yaml', 'w') as yaml_file:
+            yaml_dump = yaml.dump(conf, yaml_file)
 
         command0 = ["kubectl", "delete", "sparkapplication", "mason-spark"]
-        command = ["kubectl", "apply", "-f", from_root("/clients/spark/runner/kubernetes_operator/base_config.yaml")]
+        command = ["kubectl", "apply", "-f", 'test.yaml']
 
         logger.info("Executing Spark Kubernetes Operator")
 

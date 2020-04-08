@@ -1,13 +1,13 @@
-import uuid
+from util.uuid import uuid4
 
 class SparkConfig:
     def __init__(self, config: dict):
         self.app_name = "mason-spark"
-        self.script_type = (config.get("script_type") or "scala")
-        self.spark_version = config.get("spark_version")
+        self.script_type = config.get("script_type") or "scala"
+        self.spark_version = config.get("spark_version") or "2.4.5"
         self.main_class = config.get("main_class") or "mason.spark.Main"
         self.docker_image = config.get("docker_image") or f"samtecspg/mason-spark:v{self.spark_version}"
-        self.application_file = config.get("application_file") or f"opt/spark/jars/mason-spark-assembly-0.1.jar"
+        self.application_file = "local://" + (config.get("application_file") or f"/opt/spark/jars/mason-spark-assembly-0.1.jar")
         self.driver_cores = config.get("driver_cores") or 1
         self.driver_memory_mbs = config.get("driver_memory_mbs") or 512
         self.executors = config.get("executors") or 1
@@ -15,4 +15,4 @@ class SparkConfig:
         self.executor_cores = config.get("executor_cores") or 1
 
     def job_name(self, job: str):
-        return self.app_name + "-" + job + "-" + str(uuid.uuid4())
+        return self.app_name + "-" + job + "-" + str(uuid4())

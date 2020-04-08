@@ -9,14 +9,28 @@ from definitions import from_root
 from test.support.mocks.clients.glue import GlueMock
 from test.support.mocks.clients.s3 import S3Mock
 from configurations import Config
-from typing import List
 from engines import Engine
 from clients.response import Response
+import re
+from util.uuid import uuid_regex
 
 LOG_LEVEL = "fatal"
 # LOG_LEVEL = "trace"
 # MOCK = True
 MOCK = False
+
+def clean_uuid(s: str):
+    return uuid_regex().sub('', s)
+
+def ansi_escape(text):
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
+
+def assert_multiline(s1: str, s2: str):
+    e = re.compile(r"(\s|\n|\t)")
+    f1 = e.sub('', ansi_escape(s1))
+    f2 = e.sub('', s2)
+    assert (f1 == f2)
 
 def run_tests(cmd: str, sub: str, mock: bool, callable):
         set_log_level()

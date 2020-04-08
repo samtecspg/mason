@@ -2,6 +2,7 @@
 from clients.response import Response
 from clients import Client
 from abc import abstractmethod
+from engines.metastore.models.credentials import MetastoreCredentials
 
 class MetastoreClient(Client):
 
@@ -18,6 +19,15 @@ class MetastoreClient(Client):
         raise NotImplementedError("Client not implemented")
         return response
 
+    @abstractmethod
+    def credentials(self) -> MetastoreCredentials:
+        raise NotImplementedError("Client not implemented")
+        return MetastoreCredentials()
+
+    @abstractmethod
+    def full_path(self, path: str) -> str:
+        raise NotImplementedError("Client not implemented")
+        return ""
 
 
 class EmptyMetastoreClient(MetastoreClient):
@@ -30,3 +40,10 @@ class EmptyMetastoreClient(MetastoreClient):
         raise NotImplementedError("Client not implemented")
         return response
 
+    def credentials(self) -> MetastoreCredentials:
+        raise NotImplementedError("Client not implemented")
+        return MetastoreCredentials()
+
+    def full_path(self, path: str) -> str:
+        raise NotImplementedError("Client not implemented")
+        return ""
