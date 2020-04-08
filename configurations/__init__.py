@@ -12,10 +12,9 @@ from engines.execution import ExecutionEngine
 from util.environment import MasonEnvironment
 from typing import List, Union, Optional
 from util.json_schema import validate_schema
-import os
+from os import walk
 from tabulate import tabulate
-
-
+from clients.response import Response
 
 class Config:
 
@@ -98,7 +97,7 @@ def get_all(env: MasonEnvironment) -> List[Config]:
     logger.debug(f"Reading configurations at {env.config_home}")
 
     configs: List[Config] = []
-    for subdir, dirs, files in os.walk(env.config_home):
+    for subdir, dirs, files in walk(env.config_home):
         for file in files:
             if '.yaml' in file:
                 yaml_config_doc: dict = parse_yaml(env.config_home + file) or {}
@@ -107,13 +106,15 @@ def get_all(env: MasonEnvironment) -> List[Config]:
     return configs
 
 
-def tabulate_configs(configs: List[Config], env: MasonEnvironment):
+def tabulate_configs(configs: List[Config], env: MasonEnvironment) -> Optional[Config]:
     config_id = get_session_config(env)
+    current_config = None
 
     extended_info: List[List[Union[str, dict, int]]] = []
     for i, c in enumerate(configs):
         if i == config_id:
             current = True
+            current_config = c
         else:
             current = False
 
@@ -125,16 +126,21 @@ def tabulate_configs(configs: List[Config], env: MasonEnvironment):
     logger.info()
     logger.info("* = Current Configuration")
 
+    return current_config
 
-def set_current_config(env: MasonEnvironment, config_id: int):
+def set_current_config(env: MasonEnvironment, config_id: int, response: Response):
     configs = get_all(env)
     config: Optional[Config] = get(configs, config_id)
     if config:
-        banner(f"Setting current config to {config_id}")
+        message = f"Setting current config to {config_id}"
+        banner(message)
+        response.add_info(message)
         set_session_config(env, config_id)
         tabulate_configs(configs, env)
     else:
-        logger.error(f"Config {config_id} not found")
+        message = f"Config {config_id} not found"
+        logger.error(message)
+        response.add_error(message)
 
 def get_current_config(env: MasonEnvironment) -> Optional[Config]:
     config_id = get_session_config(env)
@@ -146,6 +152,5 @@ def get_current_config(env: MasonEnvironment) -> Optional[Config]:
         return config
     else:
         return None
-
 
 

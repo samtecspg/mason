@@ -1,5 +1,4 @@
 from typing import List
-from util.json import print_json
 from util.logger import logger
 
 class Response:
@@ -9,6 +8,7 @@ class Response:
         self.info: List[str] = []
         self.errors: List[str] = []
         self.configs = []
+        self.current_config = None
         self.status_code: int = 200
         self.data: dict = {}
 
@@ -27,8 +27,12 @@ class Response:
     def add_response(self, response: dict):
         self.responses.append(response)
 
-    def add_config(self, config: dict):
+    def add_config(self, i: str, config: dict):
+        config["id"] = i
         self.configs.append(config)
+
+    def add_current_config(self, config):
+        self.current_config = config
 
     def set_status(self, status: int):
         self.status_code = status
@@ -45,6 +49,9 @@ class Response:
 
         if len(self.configs) > 0:
             returns['Configs'] = self.configs
+
+        if self.current_config:
+            returns['Current Config'] = self.current_config.engines
 
         if len(self.data) > 0:
             returns['Data'] = self.data  # type: ignore

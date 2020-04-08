@@ -55,7 +55,6 @@ class TestCLI:
       runner = CliRunner()
       result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_1.yaml'), '-l', 'info'])
       expect1 = """
-        Set log level to info
         +-------------------------------+
         | Creating MASON_HOME at .tmp/  |
         +-------------------------------+
@@ -65,6 +64,8 @@ class TestCLI:
         +-----------------------------------------------+
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
+        
+        Set log level to info
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
 
@@ -89,7 +90,6 @@ class TestCLI:
         result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/'), '-l', 'trace'])
 
         expect1 = """
-        Set log level to trace
         +-------------------------------+
         | Creating MASON_HOME at .tmp/  |
         +-------------------------------+
@@ -99,6 +99,8 @@ class TestCLI:
         +-----------------------------------------------+
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
+        Set log level to trace
+        
         Valid Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
