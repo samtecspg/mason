@@ -178,9 +178,8 @@ class TestCLI:
     @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2(self):
         runner = CliRunner()
-        result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_2.yaml'), '-l', 'info'])
+        result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
         expects1 = """
-        Set log level to info
         +-------------------------------+
         | Creating MASON_HOME at .tmp/  |
         +-------------------------------+
@@ -190,14 +189,28 @@ class TestCLI:
         +-----------------------------------------------+
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
-        +----------------------+
-        | Configuration Valid  |
-        +----------------------+
-        Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
+        Set log level to info
 
-        Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_2.yaml to .tmp/configurations/
+        Valid Configuration. Saving config /Users/kyle/dev/mason/examples/configs/config_1.yaml to .tmp/configurations/
+        Valid Configuration. Saving config /Users/kyle/dev/mason/examples/configs/config_2.yaml to .tmp/configurations/
+
+        +------------------------------+
+        | Setting current config to 0  |
+        +------------------------------+
+        +-----------------+
+        | Configurations  |
+        +-----------------+
+        Config ID    Engine     Client    Configuration
+        -----------  ---------  --------  --------------------------------------------------------------------------------------------------------------------------
+        *  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
+                     scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
+                     storage    s3        {'region': 'us-east-1'}
+        .  1         metastore  s3        {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}
+                     execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
+
+        * = Current Configuration
         """
-        # assert_multiline(result1.output, expects1)
+        assert_multiline(result1.output, expects1)
 
         result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
         expects2 = """
@@ -209,11 +222,10 @@ class TestCLI:
         Valid Operator Definition /Users/kyle/dev/mason/examples/operators/table/infer/operator.yaml
         Registering operators at /Users/kyle/dev/mason/examples/operators/table/ to .tmp/registered_operators/table/
         """
-        # assert_multiline(result2.output, expects2)
+        assert_multiline(result2.output, expects2)
 
         result3 = runner.invoke(operator, [])
         expects3 = """
-        Set log level to info
         Neither parameter string nor parameter path provided.
 
         +---------------------------------------------------------+
@@ -228,58 +240,28 @@ class TestCLI:
         table        list       Get metastore tables                                                                      {'required': ['database_name']}
         table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']}
         """
-        # assert_multiline(result3.output, expects3)
+        assert_multiline(result3.output, expects3)
 
-        result4 = runner.invoke(operator, ["table", "get", "-p", "database_name:lake-working-copy-feb-20-2020,table_name:sample", "-l", "trace"], catch_exceptions=False)
+        result4 = runner.invoke(config, ["-s", "1"])
         expects4 = """
-        Set log level to trace
-        Reading configurations at .tmp/configurations/
+        Set log level to info
+        +------------------------------+
+        | Setting current config to 1  |
+        +------------------------------+
+        +-----------------+
+        | Configurations  |
+        +-----------------+
+        Config ID    Engine     Client    Configuration
+        -----------  ---------  --------  --------------------------------------------------------------------------------------------------------------------------
+        .  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
+                     scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
+                     storage    s3        {'region': 'us-east-1'}
+        *  1         metastore  s3        {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}
+                     execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
 
-        +--------------------+
-        | Parsed Parameters  |
-        +--------------------+
-        {'table_name': 'sample', 'database_name': 'lake-working-copy-feb-20-2020'}
-
-
-        +-------------------------+
-        | Parameters Validation:  |
-        +-------------------------+
-        Validated: ['table_name', 'database_name']
-
-        Fetching keys in lake-working-copy-feb-20-2020 sample
-        Key lake-working-copy-feb-20-2020/sample/_SUCCESS
-        Key lake-working-copy-feb-20-2020/sample/part-00000-1ab330bd-b4f8-4b65-b0d6-d670479602ea-c000.snappy.parquet
-        Key lake-working-copy-feb-20-2020/sample/part-00001-1ab330bd-b4f8-4b65-b0d6-d670479602ea-c000.snappy.parquet
-        +--------------------+
-        | Operator Response  |
-        +--------------------+
-        {
-         "Errors": [],
-         "Info": [],
-         "Warnings": [],
-         "Data": {
-          "Schema": {
-           "SchemaType": "parquet",
-           "Columns": [
-            {
-             "Name": "test_column_1",
-             "Type": "INT32",
-             "ConvertedType": "REQUIRED",
-             "RepititionType": null
-            },
-            {
-             "Name": "test_column_2",
-             "Type": "BYTE_ARRAY",
-             "ConvertedType": "UTF8",
-             "RepititionType": "OPTIONAL"
-            }
-           ]
-          }
-         },
-         "_client_responses": []
-        }       
+        * = Current Configuration 
         """
-        assert_multiline(result4.output, expects4)
+        assert_multiline(expects4, result4.output)
 
         result5 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/,output_path:lake-working-copy-feb-20-2020/merged/"], catch_exceptions=False)
         print(result5.output)

@@ -1,13 +1,13 @@
 metastore_engine: s3
 execution_engine: spark
-s3:
-  configuration:
-    region: us-east-1
 clients:
   s3:
     configuration:
       region: us-east-1
+      access_key: "***REMOVED***"
+      secret_key: "***REMOVED***"
   spark:
     configuration:
       runner:
         spark_version: "2.4.5"
+        type: "kubernetes-operator"

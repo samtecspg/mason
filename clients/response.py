@@ -27,7 +27,7 @@ class Response:
     def add_response(self, response: dict):
         self.responses.append(response)
 
-    def add_config(self, i: str, config: dict):
+    def add_config(self, i: int, config: dict):
         config["id"] = i
         self.configs.append(config)
 

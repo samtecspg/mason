@@ -1,7 +1,7 @@
 apiVersion: sparkoperator.k8s.io/v1beta2
 kind: SparkApplication
 metadata:
-  name: mason-spark-merge-7cd89849-1e54-422a-8208-0c49062c17e9
+  name: mason-spark-merge-e90fc020-1639-48fc-9386-e1d7473e3d25
   namespace: default
 spec:
   arguments:

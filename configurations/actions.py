@@ -28,20 +28,20 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
             response.add_error(message)
             logger.error(message)
 
+        logger.info()
         for c in configs:
             # TODO: Interactive configuration
             parsed = parse_yaml(c)
             config = Config(env, parsed)
 
             if config.valid:
-                logger.info()
                 message = f"Valid Configuration. Saving config {c} to {env.config_home}"
                 logger.info(message)
                 response.add_info(message)
-                logger.info()
                 shutil.copyfile(c, env.config_home + path.basename(c))
+        logger.info()
         if len(configs) > 0:
-            set_current_config(env, 0)
+            set_current_config(env, 0, response)
     elif set_current:
         set_current_config(env, int(set_current), response)
     else:

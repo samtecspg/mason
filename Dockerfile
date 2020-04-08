@@ -13,10 +13,14 @@ RUN ./scripts/install.sh
 
 RUN mkdir /mason
 ENV MASON_HOME /mason/
+ENV KUBECONFIG /home/app/.kube/config
 
 # Remove if you do not wish to install the example configuration or operators
 RUN mason config examples/configs/
 RUN mason register examples/operators/table/
+
+RUN ./scripts/install_kubectl.sh
+
 
 ENTRYPOINT [ "mason" ]
 
