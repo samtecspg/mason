@@ -14,7 +14,7 @@ try:
     swagger_yml = "api/base_swagger.yml"
 
     banner(f"Regenerating api yaml based on registered_operators to {swagger_yml}")
-    Operator.update_yaml(config, swagger_yml)
+    Operator.update_yaml(env, swagger_yml)
     app = connexion.App(__name__, specification_dir='api')
 
     # Read the swagger.yml file to configure the endpoints

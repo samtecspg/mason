@@ -2,7 +2,6 @@ from configurations import Config
 from clients.response import Response
 from typing import Dict, Optional, List
 from operators.supported_engines import from_array, SupportedEngineSet
-from util.logger import logger
 
 class Operator:
 

@@ -3,14 +3,15 @@ set -e
 
 # Reset everything to 0
 
-#rm -rf ~/.mason/
+rm -rf ~/.mason/
 mypy .
 ./scripts/install.sh
 
 # config examples
 # mason config -l debug
+ mason config examples/configs/
 # mason config examples/configs/config_1.yaml
- mason config examples/configs/config_2.yaml
+# mason config examples/configs/config_2.yaml
 # mason config
 
 # register exampels
@@ -32,7 +33,7 @@ mypy .
 # S3 metastore examples
 # mason operator table list -p database_name:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/ -l trace
 # mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:logistics-bi-data-publisher/prod/shipment/
- mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:merged/
+# mason operator table get -p database_name:lake-working-copy-feb-20-2020,table_name:merged/
 
 # list examples
 # mason operator table list

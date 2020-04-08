@@ -61,7 +61,7 @@ def config(config_file: Optional[str] = None, log_level: Optional[str] = None):
                         file_path = os.path.join(r, file)
                         configs.append(file_path)
         elif os.path.isfile(config_file):
-            if '.yaml' in path:
+            if '.yaml' in config_file:
                 configs.append(config_file)
         else:
             logger.error("Invalid configuration file must specify yaml file or directory of yaml files")
