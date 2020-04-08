@@ -2,17 +2,14 @@ import click
 import shutil
 import os
 from os import path
-from pathlib import Path
 from typing import Optional
 
-from configurations import Config, tabulate_configs, set_current_config
 from parameters import Parameters
-from util.yaml import parse_yaml
 from util.logger import logger
 import operators.operators as Operators
-from util.printer import banner
-from util.environment import MasonEnvironment
+from util.environment import MasonEnvironment, initialize_environment
 from configurations import get_all
+from configurations.actions import run_configuration_actions
 
 @click.group()
 def main():
@@ -39,58 +36,9 @@ def config(config_file: Optional[str] = None, set_current: Optional[str] = None,
     [CONFIG_FILE] is a yaml file.  See examples/config/ for reference implementations.
     """
 
-    logger.set_level(log_level)
     env = MasonEnvironment()
-
-    if not path.exists(env.mason_home):
-        banner(f"Creating MASON_HOME at {env.mason_home}")
-        os.mkdir(env.mason_home)
-    if not path.exists(env.operator_home):
-        banner(f"Creating OPERATOR_HOME at {env.operator_home}")
-        os.mkdir(env.operator_home)
-        Path(env.operator_home + "__init__.py").touch()
-    if not path.exists(env.config_home):
-        banner(f"Creating CONFIG_HOME at {env.config_home}")
-        os.mkdir(env.config_home)
-
-    if config_file:
-        configs = []
-        if os.path.isdir(config_file):
-            for r, d, f in os.walk(config_file):
-                for file in f:
-                    if '.yaml' in file:
-                        file_path = os.path.join(r, file)
-                        configs.append(file_path)
-        elif os.path.isfile(config_file):
-            if '.yaml' in config_file:
-                configs.append(config_file)
-        else:
-            logger.error("Invalid configuration file must specify yaml file or directory of yaml files")
-
-        for c in configs:
-            # TODO: Interactive configuration
-            parsed = parse_yaml(c)
-            config = Config(env, parsed)
-
-            if config.valid:
-                logger.info()
-                logger.info(f"Valid Configuration. Saving config {c} to {env.config_home}")
-                logger.info()
-                shutil.copyfile(c, env.config_home + os.path.basename(c))
-        if len(configs) > 0:
-            set_current_config(env, 0)
-    elif set_current:
-        set_current_config(env, int(set_current))
-    else:
-        if path.exists(env.config_home):
-            all_configs = get_all(env)
-            tabulate_configs(all_configs, env)
-            return all_configs
-        else:
-            logger.error()
-            logger.error("Configuration not found.")
-            logger.error("First pass configuration:  \"mason config <config_file_path>\"")
-
+    initialize_environment(env)
+    run_configuration_actions(env, config_file=config_file, set_current=set_current, log_level=log_level)
 
 @click.argument("operator_file")
 @click.option("-l", "--log_level", help="Log level for mason")
