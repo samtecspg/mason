@@ -9,6 +9,7 @@ from util.logger import logger
 try:
     banner("Importing all registered_operator modules for API")
     env = MasonEnvironment()
+    logger.set_level("trace")
     config = get_all(env)[0] # return first config by default
     Operator.import_all(env, config)
     swagger_yml = "api/base_swagger.yml"

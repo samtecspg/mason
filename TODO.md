@@ -39,8 +39,10 @@ Legend
 - [ ] Parameter aliases:   ex: database_name -> bucket_name
 - [x] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc C: 03/20/2020
 - [ ] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
-- [ ] Allow for multiple configurations (started, almost done)
+- [ ] Allow for multiple configurations
 - [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
+- [ ] Establish session for current configuration
+- [ ] Add redis or sqllite for configs and operators
 
 ## Test Cases
 
@@ -71,8 +73,7 @@ Legend
 ### Metastore
 #### Glue
 - [x] Basic setup. C: 4/04/2020
-- [ ] Column casting operator
-- [ ] Fix conflicting schemas error with differing partition data
+- [x] Fix conflicting schemas error with differing partition data. C: 04/2020
 #### Hive
 - [ ] :arrow_down: Basic setup
 #### S3
@@ -93,8 +94,8 @@ Legend
 #### Athena
 - [ ] :arrow_up: Basic setup 
 #### Spark
-- [ ] Basic setup 
-    - [ ] Kubernetes Operator Runner
+- [x] Basic setup 
+    - [x] Kubernetes Operator Runner C: 4/06/2020
     - [ ] EMR Runner 
     - [ ] Local Runner
 #### Presto
