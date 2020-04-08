@@ -8,3 +8,26 @@ info:
 produces:
 - application/json
 swagger: '2.0'
+paths:
+  /configs:
+    get:
+      operationId: "api.config_api.get"
+      parameters:
+        - name: config_fie
+          in: query
+          type: string
+          required: false
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          default: "info"
+          required: false
+          type: string
+      tags:
+        - "Config"
+      summary: "List out current mason configuration"
+      description: "List out mason configuration"
+      responses:
+        200:
+          description: "Successful list"
+

@@ -4,9 +4,7 @@ from cli import config, operator, register
 from definitions import from_root
 import os
 import pytest #type: ignore
-import shutil
 from test.support.testing_base import assert_multiline
-import re
 
 #  TODO: Figure out how to remove references to /Users/kyle/dev from these tests for any user, remove basename from output
 
@@ -14,7 +12,7 @@ def print_result(result):
     print(result.output)
     print(result.exception)
 
-# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestCLI:
 
     @pytest.fixture(autouse=True)

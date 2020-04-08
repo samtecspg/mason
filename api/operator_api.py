@@ -21,9 +21,6 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
     params = Parameters(parameters)
 
     logger.set_level(params.unsafe_get("log_level"))
-
     response = Operators.run(env, config, params, namespace, command)
-    logger.remove(f"PARAMS {params.parsed_parameters}")
-
 
     return response.formatted(), response.status_code

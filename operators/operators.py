@@ -30,13 +30,13 @@ def import_all(env: MasonEnvironment, config: Config):
 def update_yaml(env: MasonEnvironment, base_swagger: str):
     swagger_file = "api/swagger.yml"
     parsed_swagger = parse_yaml(base_swagger) or {}
-    paths: dict = {}
+    paths: dict = parsed_swagger["paths"]
 
     for r, d, f in os.walk(env.operator_home):
         for file in f:
             if '.yml' in file:
                 file_path = os.path.join(r, file)
-                if file == "swagger.yml":
+                if file == "swagger.yml" or file == "swagger.yaml":
                     file_parsed = parse_yaml(file_path) or {}
 
                     parsed_paths = file_parsed.get('paths') or {}
@@ -80,9 +80,7 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, cmd: Opti
         banner("Operator Response")
 
         if logger.log_level.debug():
-            response.set_config({
-                "config": config.engines
-            })
+            response.add_config(config.engines)
 
         print_json(response.formatted())
         return response

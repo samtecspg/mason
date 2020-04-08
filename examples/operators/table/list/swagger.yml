@@ -10,9 +10,8 @@ paths:
         - name: log_level
           in: query
           enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
-          required: false
+          required: true
           type: string
-          default: "info"
       tags:
         - "Table"
       summary: "List out tables in the catalog"
