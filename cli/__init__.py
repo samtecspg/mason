@@ -8,7 +8,7 @@ from parameters import Parameters
 from util.logger import logger
 import operators.operators as Operators
 from util.environment import MasonEnvironment, initialize_environment
-from configurations import get_all
+from configurations import get_current_config
 from configurations.actions import run_configuration_actions
 
 @click.group()
@@ -87,13 +87,11 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
     Running with both cmd and subcmd will execute the operator or print out missing required parameters.
     """
     env = MasonEnvironment()
+    config = get_current_config(env, "debug")  # return first config for now
 
-    if path.exists(env.config_home):
-        logger.set_level(log_level)
-        config = get_all(env)[0] # return first config for now
+    if config:
         params = Parameters(parameters, param_file)
         Operators.run(env, config, params, cmd, subcmd)
-
     else:
         logger.info("Configuration not found.  Run \"mason config\" first")
 

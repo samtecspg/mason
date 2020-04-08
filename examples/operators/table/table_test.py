@@ -15,6 +15,7 @@ from configurations import Config
 from operators.operator import Operator
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
+import pytest # type: ignore
 
 
 def test_index():
@@ -110,6 +111,7 @@ def test_refresh():
     run_tests("table", "refresh", True, tests)
 
 
+@pytest.mark.skip(reason="This is not yet mocked, hits live endpoints")
 def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):

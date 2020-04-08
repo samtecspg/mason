@@ -106,7 +106,7 @@ def get_all(env: MasonEnvironment) -> List[Config]:
     return configs
 
 
-def tabulate_configs(configs: List[Config], env: MasonEnvironment) -> Optional[Config]:
+def tabulate_configs(configs: List[Config], env: MasonEnvironment, log_level: str = "info") -> Optional[Config]:
     config_id = get_session_config(env)
     current_config = None
 
@@ -121,10 +121,10 @@ def tabulate_configs(configs: List[Config], env: MasonEnvironment) -> Optional[C
         for ei in c.extended_info(i, current):
             extended_info.append(ei)
 
-    banner("Configurations")
-    logger.info(tabulate(extended_info, headers=["Config ID", "Engine", "Client", "Configuration"]))
-    logger.info()
-    logger.info("* = Current Configuration")
+    banner("Configurations", log_level)
+    logger.at_level(log_level, tabulate(extended_info, headers=["Config ID", "Engine", "Client", "Configuration"]))
+    logger.at_level(log_level)
+    logger.at_level(log_level, "* = Current Configuration")
 
     return current_config
 
@@ -142,13 +142,13 @@ def set_current_config(env: MasonEnvironment, config_id: int, response: Response
         logger.error(message)
         response.add_error(message)
 
-def get_current_config(env: MasonEnvironment) -> Optional[Config]:
+def get_current_config(env: MasonEnvironment, log_level: str = "info") -> Optional[Config]:
     config_id = get_session_config(env)
     configs = get_all(env)
     config: Optional[Config] = get(configs, config_id)
     if config:
-        banner(f"Current Configuration {config_id}")
-        tabulate_configs(configs, env)
+        banner(f"Current Configuration {config_id}", log_level)
+        tabulate_configs(configs, env, log_level)
         return config
     else:
         return None

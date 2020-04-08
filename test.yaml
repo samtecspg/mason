@@ -1,14 +1,14 @@
 apiVersion: sparkoperator.k8s.io/v1beta2
 kind: SparkApplication
 metadata:
-  name: mason-spark-merge-a1921f5e-ac4e-4ae8-98d4-52e920707cdc
+  name: mason-spark-merge-cb76b6c3-77ee-48c2-a536-3331673de066
   namespace: default
 spec:
   arguments:
   - --input_path
-  - s3a://
+  - s3a://lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment
   - --output_path
-  - s3a://test
+  - s3a://lake-working-copy-feb-20-2020/logistics-bi-data-publisher/merged/
   - --job
   - merge
   - --access_key

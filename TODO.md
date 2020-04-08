@@ -39,11 +39,13 @@ Legend
 - [ ] Parameter aliases:   ex: database_name -> bucket_name
 - [x] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc C: 03/20/2020
 - [ ] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
-- [ ] Allow for multiple configurations
+- [x] Allow for multiple configurations C: 04/08/2020
+- [ ] Clean up multiple configurations -> add id, don't use enumerate
 - [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
 - [ ] Establish session for current configuration
 - [ ] Add redis or sqllite for session 
 - [ ] Move operator/configs over to redis
+- [ ] :arrow_up: Consolidate response.add_  actions and logger._ actions into one command
 
 ## Test Cases
 
