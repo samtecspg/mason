@@ -11,7 +11,7 @@ swagger: '2.0'
 paths:
   /configs:
     get:
-      operationId: "api.config_api.get"
+      operationId: "cli.config"
       parameters:
         - name: config_fie
           in: query

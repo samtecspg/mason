@@ -42,7 +42,8 @@ Legend
 - [ ] Allow for multiple configurations
 - [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
 - [ ] Establish session for current configuration
-- [ ] Add redis or sqllite for configs and operators
+- [ ] Add redis or sqllite for session 
+- [ ] Move operator/configs over to redis
 
 ## Test Cases
 
