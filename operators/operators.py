@@ -78,6 +78,12 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, cmd: Opti
                 response.add_error(f"Operator {cmd} {subcmd} not found.  Check operators with 'mason operator'")
 
         banner("Operator Response")
+
+        if logger.log_level.debug():
+            response.set_config({
+                "config": config.engines
+            })
+
         print_json(response.formatted())
         return response
 

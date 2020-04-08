@@ -8,6 +8,7 @@ class Response:
         self.warnings: List[str] = []
         self.info: List[str] = []
         self.errors: List[str] = []
+        self.config = {}
         self.status_code: int = 200
         self.data: dict = {}
 
@@ -26,6 +27,9 @@ class Response:
     def add_response(self, response: dict):
         self.responses.append(response)
 
+    def set_config(self, config: dict):
+        self.config = config
+
     def set_status(self, status: int):
         self.status_code = status
 
@@ -38,6 +42,9 @@ class Response:
         returns['Errors'] = self.errors
         returns['Info'] = self.info
         returns['Warnings'] = self.warnings
+
+        if not (self.config == {}):
+            returns['Config'] = self.config
 
         if len(self.data) > 0:
             returns['Data'] = self.data  # type: ignore
