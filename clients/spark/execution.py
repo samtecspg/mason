@@ -12,3 +12,8 @@ class SparkExecutionClient(ExecutionClient):
         response = self.client.run_job(job_type, metastore_credentials, parameters, response)
         return response
 
+    def get_job(self, job_id: str, response: Response) -> Response:
+        response = self.client.get_job(job_id, response)
+
+        return response
+

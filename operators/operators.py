@@ -34,7 +34,7 @@ def update_yaml(env: MasonEnvironment, base_swagger: str):
 
     for r, d, f in os.walk(env.operator_home):
         for file in f:
-            if '.yml' in file:
+            if '.yml' in file or '.yaml' in file:
                 file_path = os.path.join(r, file)
                 if file == "swagger.yml" or file == "swagger.yaml":
                     file_parsed = parse_yaml(file_path) or {}

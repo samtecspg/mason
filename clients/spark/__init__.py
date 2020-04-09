@@ -16,8 +16,13 @@ class SparkClient:
         response.add_info(f"Running job {job_name}")
         return response
 
-    # def get_job(self, job_name: str, ):
-    #     if (job_name == "merge"):
+    def get_job(self, job_id: str, response: Response):
+        runner = self.get_runner(self.runner_type)
+        runner.get(job_id, response)
+        return response
+
+
+
 
     def get_runner(self, runner: str):
         if runner == "kubernetes-operator":

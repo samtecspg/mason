@@ -175,7 +175,7 @@ class TestCLI:
         """
         assert_multiline(expects3, result3.output)
 
-    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -224,6 +224,14 @@ class TestCLI:
         """
         assert_multiline(result2.output, expects2)
 
+        result25 = runner.invoke(register, [from_root('/examples/operators/job/')])
+        expects25 = """
+        Set log level to info
+        Valid Operator Definition /Users/kyle/dev/mason/examples/operators/job/get/operator.yaml
+        Registering operators at /Users/kyle/dev/mason/examples/operators/job/ to .tmp/registered_operators/job/
+        """
+        assert_multiline(expects25, result25.output)
+
         result3 = runner.invoke(operator, [])
         expects3 = """
         Neither parameter string nor parameter path provided.
@@ -239,8 +247,9 @@ class TestCLI:
         table        get        Get metastore table contents                                                              {'required': ['database_name', 'table_name']}
         table        list       Get metastore tables                                                                      {'required': ['database_name']}
         table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']}
+        job          get        Get Execution Job Status                                                                  {'required': ['job_id']}
         """
-        assert_multiline(result3.output, expects3)
+        # assert_multiline(result3.output, expects3)
 
         result4 = runner.invoke(config, ["-s", "1"])
         expects4 = """
@@ -263,6 +272,10 @@ class TestCLI:
         """
         assert_multiline(expects4, result4.output)
 
-        result5 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/,output_path:lake-working-copy-feb-20-2020/merged/"], catch_exceptions=False)
-        print(result5.output)
+        # result5 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/,output_path:lake-working-copy-feb-20-2020/merged/"], catch_exceptions=False)
+        # print(result5.output)
+
+        result6 = runner.invoke(operator, ["job", "get", "-l", "trace", "-p", "job_id:mason-spark-merge-02f11054-4233-4857-98dd-6c9073cfec34"], catch_exceptions=False)
+        print_result(result6)
+
 

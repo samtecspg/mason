@@ -1,20 +1,17 @@
 from typing import List
-from clients.response import Response
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from util.logger import logger
 
-def run_sys_call(command: List[str], response: Response):
+def run_sys_call(command: List[str]):
     with Popen(command, stdout=PIPE) as proc:
-        stdin = proc.stdin.read() if proc.stdin is not None else None
-        stdout = proc.stdout.read() if proc.stdout is not None else None
-        stderr = proc.stderr.read() if proc.stderr is not None else None
+        stdin = proc.stdin.read().decode("utf-8").split("\n") if proc.stdin is not None else []
+        stdout = proc.stdout.read().decode("utf-8").split("\n") if proc.stdout is not None else []
+        stderr = proc.stderr.read().decode("utf-8").split("\n") if proc.stderr is not None else []
 
-        if stdin:
-            logger.info(f"STDIN {str(stdin)}")
-        if stdout:
-            logger.info(f"STDOUT: {str(stdout)}")
-            response.add_response({"stdout": stdout.decode()})
-        elif stderr:
-            logger.info(f"STDERR: {str(stderr)}")
-            response.add_error(str(stderr))
+        if len(stdin) >0 :
+            logger.info(f"STDIN {stdin}")
+        if len(stdout) > 0 :
+            logger.info(f"STDOUT: {stdout}")
+        elif len(stderr) > 0:
+            logger.error(f"STDERR: {str(stderr)}")
         return stdout, stderr
