@@ -24,6 +24,12 @@ paths:
           format: path
           type: string
           required: true
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          required: false
+          type: string
+          default: "info"
       responses:
         200:
           description: "Successful Infer"

@@ -2,13 +2,11 @@
 from configurations import Config
 from parameters import Parameters
 from clients.response import Response
-import operators.operators as Operator
-from util.environment import MasonEnvironment
 from api import operator_api as OperatorApi
+from util.environment import MasonEnvironment
 
-def api(*args, **kwargs): return OperatorApi.get("table", "infer", *args, **kwargs)
+def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
 
-def run(config: Config, parameters: Parameters, response: Response):
     database_name: str = parameters.safe_get("database_name")
     storage_path: str = parameters.safe_get("storage_path")
     schedule_name: str = parameters.safe_get("schedule_name")
@@ -23,3 +21,5 @@ def run(config: Config, parameters: Parameters, response: Response):
 
 
     return response
+
+def api(*args, **kwargs): return OperatorApi.get("table", "infer", *args, **kwargs)

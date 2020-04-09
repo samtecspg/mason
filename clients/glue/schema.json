@@ -1,18 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "MasonConfiguration",
+  "title": "GlueConfiguration",
   "properties": {
-    "configuration": {
-      "type": "object",
-      "properties": {
-        "region": {
-          "type": "string"
-        },
-        "aws_role_arn": {
-          "type": "string"
-        }
-      },
-      "required": ["region", "aws_role_arn"]
+    "region": {
+      "type": "string"
+    },
+    "aws_role_arn": {
+      "type": "string"
     }
-  }
+  },
+  "additionalProperties": false,
+  "required": ["region", "aws_role_arn"]
 }

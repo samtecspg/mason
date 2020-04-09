@@ -25,6 +25,18 @@
           }
         }
       }
+    },
+    "supported_configurations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+           "metastore": {"type":  "string"},
+           "scheduler": {"type":  "string"},
+           "storage": {"type":  "string"},
+           "execution": {"type":  "string"}
+        }
+      }
     }
   }, "required": ["type", "namespace", "command", "description"]
 }

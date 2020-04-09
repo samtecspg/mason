@@ -3,18 +3,19 @@ import markdown # type: ignore
 import operators.operators as Operator
 from util.printer import banner
 from util.environment import MasonEnvironment
-from configurations import Config
+from configurations import get_all
 from util.logger import logger
 
 try:
     banner("Importing all registered_operator modules for API")
     env = MasonEnvironment()
-    config = Config(env)
-    Operator.import_all(config)
+    logger.set_level("trace")
+    config = get_all(env)[0] # return first config by default
+    Operator.import_all(env, config)
     swagger_yml = "api/base_swagger.yml"
 
     banner(f"Regenerating api yaml based on registered_operators to {swagger_yml}")
-    Operator.update_yaml(config, swagger_yml)
+    Operator.update_yaml(env, swagger_yml)
     app = connexion.App(__name__, specification_dir='api')
 
     # Read the swagger.yml file to configure the endpoints

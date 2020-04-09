@@ -8,3 +8,43 @@ info:
 produces:
 - application/json
 swagger: '2.0'
+paths:
+  /configs:
+    get:
+      operationId: "api.config_api.get"
+      parameters:
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          default: "info"
+          required: false
+          type: string
+      tags:
+        - "Config"
+      summary: "List out current mason configuration"
+      description: "List out mason configuration"
+      responses:
+        200:
+          description: "Successful list"
+  /config:
+    post:
+      operationId: "api.config_api.set"
+      parameters:
+        - name: set_current
+          in: query
+          required: true
+          description: "Config id you wish to set as current config"
+          type: string
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          default: "info"
+          required: false
+          type: string
+      tags:
+        - "Config"
+      summary: "Set current mason config"
+      description: "Set current mason config by set_current id"
+      responses:
+        200:
+          description: "Successful list"

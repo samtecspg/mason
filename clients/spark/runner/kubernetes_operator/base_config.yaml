@@ -1,0 +1,39 @@
+apiVersion: "sparkoperator.k8s.io/v1beta2"
+kind: SparkApplication
+metadata:
+  name: mason-spark
+  namespace: default
+spec:
+  type: Scala
+  mode: cluster
+  image: "samtecspg/mason-spark:v2.4.5"
+  imagePullPolicy: Always
+  mainClass: mason.spark.Main
+  mainApplicationFile: "local:///opt/spark/jars/mason-spark-assembly-0.1.jar"
+  sparkVersion: "2.4.5"
+  restartPolicy:
+    type: Never
+  volumes:
+    - name: "test-volume"
+      hostPath:
+        path: "/tmp"
+        type: Directory
+  driver:
+    cores: 1
+    coreLimit: "1200m"
+    memory: "512m"
+    labels:
+      version: 2.4.5
+    serviceAccount: spark
+    volumeMounts:
+      - name: "test-volume"
+        mountPath: "/tmp"
+  executor:
+    cores: 1
+    instances: 1
+    memory: "512m"
+    labels:
+      version: 2.4.5
+    volumeMounts:
+      - name: "test-volume"
+        mountPath: "/tmp"

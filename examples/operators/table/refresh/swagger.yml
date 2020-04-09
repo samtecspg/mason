@@ -13,6 +13,12 @@ paths:
           format: path
           type: string
           required: true
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          required: false
+          type: string
+          default: "info"
       tags:
         - "Table"
       summary: "Refresh the indicated table by name"

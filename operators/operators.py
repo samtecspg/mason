@@ -13,29 +13,30 @@ from typing import List
 from util.logger import logger
 from util.json import print_json
 import yaml
-from operators.valid_operator import Operator
+from operators.operator import Operator
 from definitions import from_root
 from typing import Dict
+from util.environment import MasonEnvironment
 
-def import_all(config: Config):
-    path.append(config.env.mason_home)
-    operators = list_operators(config)
+def import_all(env: MasonEnvironment, config: Config):
+    path.append(env.mason_home)
+    operators = list_operators(env)
     for namespace, ops in operators.items():
         for op in ops:
             cmd = op.subcommand
-            import_module(f"{config.env.operator_module}.{namespace}.{cmd}")
+            import_module(f"{env.operator_module}.{namespace}.{cmd}")
 
 
-def update_yaml(config: Config, base_swagger: str):
+def update_yaml(env: MasonEnvironment, base_swagger: str):
     swagger_file = "api/swagger.yml"
     parsed_swagger = parse_yaml(base_swagger) or {}
-    paths: dict = {}
+    paths: dict = parsed_swagger["paths"]
 
-    for r, d, f in os.walk(config.env.operator_home):
+    for r, d, f in os.walk(env.operator_home):
         for file in f:
-            if '.yml' in file:
+            if '.yml' in file or '.yaml' in file:
                 file_path = os.path.join(r, file)
-                if file == "swagger.yml":
+                if file == "swagger.yml" or file == "swagger.yaml":
                     file_parsed = parse_yaml(file_path) or {}
 
                     parsed_paths = file_parsed.get('paths') or {}
@@ -47,25 +48,34 @@ def update_yaml(config: Config, base_swagger: str):
         yaml.dump(parsed_swagger, file) # type: ignore
 
 
-def run(config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
+def run(env: MasonEnvironment, config: Config, parameters: Parameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
     if cmd == None:
-        tabulate_operators(config)
+        tabulate_operators(env)
     elif subcmd == None:
-        tabulate_operators(config, cmd)
+        tabulate_operators(env, cmd)
     else:
-        path.append(config.env.mason_home)
-        op: Optional[Operator] = get_operator(config, cmd, subcmd)
+        path.append(env.mason_home)
+        op: Optional[Operator] = get_operator(env, cmd, subcmd)
+
         if op:
-            response = parameters.validate(op, response)
+            test, response = op.validate_configuration(config, response)
+
+        if op and test and not response.errored():
+            o: Operator = op
+            response = parameters.validate(o, response)
             if not response.errored():
-                mod = import_module(f'{config.env.operator_module}.{cmd}.{subcmd}')
-                response = mod.run(config, parameters, response) # type: ignore
+                try:
+                    mod = import_module(f'{env.operator_module}.{cmd}.{subcmd}')
+                    response = mod.run(env, config, parameters, response)  # type: ignore
+                except ModuleNotFoundError as e:
+                    response.add_error(f"Module Not Found: {e}")
 
         else:
-            response.add_error(f"Operator {cmd} {subcmd} not found.  Check operators with 'mason operator'")
+            if not response.errored():
+                response.add_error(f"Operator {cmd} {subcmd} not found.  Check operators with 'mason operator'")
 
         banner("Operator Response")
         print_json(response.formatted())
@@ -76,16 +86,15 @@ def from_config(config: dict):
     command = config.get("command")
     description = config.get("description", "")
     parameters = config.get("parameters", {})
-    supported_clients = config.get("supported_clients", [])
+    supported_configurations = config.get("supported_configurations", [])
     if namespace and command:
-        return Operator(namespace, command, description, parameters, supported_clients)
+        return Operator(namespace, command, description, parameters, supported_configurations)
     else:
         None
 
-def validate_operators(operator_file: str):
+def validate_operators(operator_file: str, print_validation: bool = False):
     operators: List[Operator] = []
     errors: List[dict] = []
-
     for r, d, f in os.walk(operator_file):
         for file in f:
             if '.yaml' in file:
@@ -94,7 +103,8 @@ def validate_operators(operator_file: str):
                     config = parse_yaml(file_path)
                     schema = from_root("/operators/schema.json")
                     if validate_schema(config, schema):
-                        logger.debug(f"Valid Operator Definition {file_path}")
+                        if print_validation:
+                            logger.info(f"Valid Operator Definition {file_path}")
                         operator = from_config(config)
                         if operator:
                             operators.append(operator)
@@ -105,10 +115,11 @@ def validate_operators(operator_file: str):
     return operators, errors
 
 
-def list_operators(config: Config, cmd: Optional[str] = None) -> Dict[str, List[Operator]]:
-    path = config.env.operator_home
+def list_operators(env: MasonEnvironment, cmd: Optional[str] = None) -> Dict[str, List[Operator]]:
+    path = env.operator_home
     operators = validate_operators(path)[0]
     grouped: Dict[str, List[Operator]] = {}
+
     for operator in operators:
         ops = grouped.get(operator.cmd) or []
         ops.append(operator)
@@ -116,12 +127,11 @@ def list_operators(config: Config, cmd: Optional[str] = None) -> Dict[str, List[
 
     filtered = {k: v for k, v in grouped.items() if (k == cmd) or (cmd == None)}
 
-
     return filtered
 
-def get_operator(config: Config, cmd: Optional[str], subcmd: Optional[str]) -> Optional[Operator]:
+def get_operator(env: MasonEnvironment, cmd: Optional[str], subcmd: Optional[str]) -> Optional[Operator]:
     if cmd and subcmd:
-        ops: List[Operator] = list_operators(config, cmd).get(cmd) or []
+        ops: List[Operator] = list_operators(env, cmd).get(cmd) or []
         filtered = list(filter(lambda x: x.subcommand == subcmd, ops))
         if len(filtered) == 0:
             return None
@@ -130,8 +140,8 @@ def get_operator(config: Config, cmd: Optional[str], subcmd: Optional[str]) -> O
     else:
         return None
 
-def tabulate_operators(config: Config, cmd: Optional[str] = None):
-    ops = list_operators(config)
+def tabulate_operators(env: MasonEnvironment, cmd: Optional[str] = None):
+    ops = list_operators(env)
     array = []
     for k in ops:
         for item in ops[k]:
@@ -143,7 +153,7 @@ def tabulate_operators(config: Config, cmd: Optional[str] = None):
     cmd_value = (cmd or "Operator")
     logger.info()
     if len(array) > 0:
-        banner(f"Available {cmd_value} Methods: {config.env.operator_home}")
+        banner(f"Available {cmd_value} Methods: {env.operator_home}")
         logger.info()
         logger.info(tabulate(array, headers=["namespace", "command", "description", "parameters"]))
     else:

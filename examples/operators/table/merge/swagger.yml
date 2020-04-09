@@ -1,0 +1,38 @@
+paths:
+  /table/merge:
+    post:
+      operationId: "registered_operators.table.merge.api"
+      tags:
+        - "Table"
+      summary: "Trigger an execution engine job to merge schemas in specified table"
+      description: "Infer schema of data"
+      consumes:
+        - application/json
+      parameters:
+        - name: input_path
+          in: query
+          required: true
+          type: string
+        - name: output_path
+          in: query
+          required: true
+          type: string
+        - name: extract_paths
+          in: query
+          required: false
+          type: boolean
+        - name: repartition_keys
+          in: query
+          required: false
+          type: string
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          required: false
+          type: string
+          default: "info"
+      responses:
+        200:
+          description: "Successful Merge"
+          schema:
+            type: "string"
