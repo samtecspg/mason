@@ -65,7 +65,7 @@ Legend
     - [ ] Delete Database
 - [ ] Seperate out database operator?
 - [ ] Jobs operators (scheduler):
-    - [ ] Get
+    - [x] Get C: 04/08/2020
     - [ ] List
 - [ ] Scheduler operators:
     - [ ] List
