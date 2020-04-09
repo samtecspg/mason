@@ -56,7 +56,7 @@ Legend
 ## Operators
 - [ ] Metastore Database operator
     - [ ] List databases (~= s3 list buckets)
-- [ ] Schema merge operator
+- [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
 - [ ] Dedupe Operator
