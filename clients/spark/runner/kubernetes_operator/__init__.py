@@ -66,7 +66,7 @@ class KubernetesOperator(SparkRunner):
 
         merged_config = merge_config(config, job_name, metastore_credentials, params)
         job_id = merged_config["metadata"]["name"]
-        conf = dict(merge_config(config, job_name, metastore_credentials, params))
+        conf = dict(merged_config)
 
         with tempfile.NamedTemporaryFile(delete=False, mode='w') as yaml_file:
             yaml_dump = yaml.dump(conf, yaml_file)
@@ -78,7 +78,6 @@ class KubernetesOperator(SparkRunner):
             response.add_info(message)
 
             stdout, stderr = run_sys_call(command)
-            logger.remove("HERE")
             response.add_response({"STDOUT": stdout})
             response.add_response({"STDERR": stderr})
             return response
@@ -87,7 +86,6 @@ class KubernetesOperator(SparkRunner):
         command = ["kubectl", "logs", job_id + "-driver"]
 
         stdout, stderr = run_sys_call(command)
-        response.add_response({"STDOUT": stdout})
         response.add_response({"STDERR": stderr})
         if len(stdout) > 0:
             response.add_info({"Logs": "\n".join(stdout[-100:])})

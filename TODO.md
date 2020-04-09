@@ -101,6 +101,7 @@ Legend
     - [x] Kubernetes Operator Runner C: 4/06/2020
     - [ ] EMR Runner 
     - [ ] Local Runner
+- [ ] Check that file format is supported
 #### Presto
 - [ ] :arrow_up: Basic setup 
 
