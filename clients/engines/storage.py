@@ -11,8 +11,9 @@ class StorageClient(Client):
     def path(self, path: str) -> str:
         raise NotImplementedError("Client method not implemented")
 
-class EmptyStorageClient(Client):
+class EmptyStorageClient(StorageClient):
 
-    def path(self, path: str):
+    def path(self, path: str) -> str:
         raise NotImplementedError("Client method not implemented")
+
 

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "SparkConfiguration",
+  "properties": {
+    "runner": {
+      "type": "object",
+      "properties": {
+        "type": { "type":  "string", "enum": ["kubernetes-operator"] },
+        "spark_version": {"type":  "string"},
+        "main_class": {"type":  "string"},
+        "docker_image": {"type":  "string"},
+        "application_file": {"type":  "string"},
+        "driver_cores": {"type":  "integer"},
+        "driver_memory_mbs": {"type":  "integer"},
+        "executors": {"type":  "integer"},
+        "executor_cores": {"type":  "integer"},
+        "executor_memory_mb": {"type":  "integer"}
+      },
+      "additionalProperties": false,
+      "required": ["type", "spark_version"]
+    }
+  },
+  "required": [ "runner" ]
+}
+

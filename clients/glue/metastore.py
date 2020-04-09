@@ -2,6 +2,8 @@
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.glue import GlueClient
+from engines.metastore.models.credentials import MetastoreCredentials
+
 
 class GlueMetastoreClient(MetastoreClient):
 
@@ -24,5 +26,11 @@ class GlueMetastoreClient(MetastoreClient):
             'aws_role_arn': self.aws_role_arn
         }
 
+    def credentials(self) -> MetastoreCredentials:
+        raise NotImplementedError("Client not implemented")
+        return MetastoreCredentials()
 
+    def full_path(self, path: str) -> str:
+        raise NotImplementedError("Client not implemented")
+        return ""
 

@@ -1,0 +1,14 @@
+type: "operator"
+namespace: "table"
+command: "merge"
+description:  "Merge metastore tables"
+parameters:
+  required:
+    - output_path
+    - input_path
+  optional:
+    - extract_paths
+    - repartition_keys
+supported_configurations:
+  - metastore: "s3"
+    execution: "spark"

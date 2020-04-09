@@ -7,6 +7,11 @@ paths:
           in: query
           type: string
           required: true
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          required: true
+          type: string
       tags:
         - "Table"
       summary: "List out tables in the catalog"

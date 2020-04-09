@@ -6,5 +6,5 @@ parameters:
   required:
     - "database_name"
     - "table_name"
-supported_clients:
-  - "glue"
+supported_configurations:
+  - scheduler: "glue"

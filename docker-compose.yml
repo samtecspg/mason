@@ -8,8 +8,9 @@ services:
         volumes:
             - .:/app
             - $HOME/.aws/credentials:/home/app/.aws/credentials:ro
+            - $HOME/.kube/:/home/app/.kube/
         environment:
             - MASON_HOME=/mason/
         env_file:
             - .env
-        image: mason:1.0
+        image: mason:1.01

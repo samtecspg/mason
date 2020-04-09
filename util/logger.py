@@ -36,6 +36,23 @@ class Logger:
 
     def log(self, message: str = ""): print(message)
 
+    def at_level(self, level: str, message: str = ""):
+        if level == "trace":
+            self.trace(message)
+        elif level == "debug":
+            self.debug(message)
+        elif level == "info":
+            self.info(message)
+        elif level == "warning":
+            self.warning(message)
+        elif level == "error":
+            self.error(message)
+        elif level == "fatal":
+            self.fatal(message)
+        else:
+            pass
+
+
     def trace(self, message: str = ""):
         if self.log_level.trace():
             self.log(message)

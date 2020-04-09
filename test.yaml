@@ -1,0 +1,50 @@
+apiVersion: sparkoperator.k8s.io/v1beta2
+kind: SparkApplication
+metadata:
+  name: mason-spark-merge-cb76b6c3-77ee-48c2-a536-3331673de066
+  namespace: default
+spec:
+  arguments:
+  - --input_path
+  - s3a://lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment
+  - --output_path
+  - s3a://lake-working-copy-feb-20-2020/logistics-bi-data-publisher/merged/
+  - --job
+  - merge
+  - --access_key
+  - ***REMOVED***
+  - --secret_key
+  - ***REMOVED***
+  driver:
+    coreLimit: 1200m
+    cores: 1
+    labels:
+      version: 2.4.5
+    memory: 512m
+    serviceAccount: spark
+    volumeMounts:
+    - mountPath: /tmp
+      name: test-volume
+  executor:
+    cores: 1
+    instances: 1
+    labels:
+      version: 2.4.5
+    memory: 512m
+    volumeMounts:
+    - mountPath: /tmp
+      name: test-volume
+  image: samtecspg/mason-spark:v2.4.5
+  imagePullPolicy: Always
+  mainApplicationFile: local:///opt/spark/jars/mason-spark-assembly-0.1.jar
+  mainClass: mason.spark.Main
+  mode: cluster
+  restartPolicy:
+    type: Never
+  sparkVersion: 2.4.5
+  type: Scala
+  volumes:
+  - hostPath:
+      path: /tmp
+      type: Directory
+    name: test-volume

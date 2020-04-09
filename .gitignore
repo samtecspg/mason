@@ -11,8 +11,12 @@ mason.egg-info/*
 api/swagger.yml
 .env
 .DS_Store
+venv/
+venv/**/*
 .direnv/
+.direnv/**/*
 .direnv/*
-mason_env/
-mason_env/**/*
-
+htmlcov/
+htmlcov/*
+.tmp/
+.tmp/*

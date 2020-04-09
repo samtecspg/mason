@@ -1,6 +1,7 @@
 import boto3 # type: ignore
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
+from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
 
 class GlueClient:
 
@@ -129,7 +130,6 @@ class GlueClient:
                 }
             ]
         }
-        # schema_change_policy = { 'UpdateBehavior': 'UPDATE_IN_DATABASE' }
 
         try:
             result = self.client.create_crawler(
@@ -137,7 +137,6 @@ class GlueClient:
                 Name=name,
                 Role=role,
                 Targets=targets
-                # SchemaChangePolicy=schema_change_policy
             )
         except ClientError as e:
             result = e.response
@@ -151,12 +150,20 @@ class GlueClient:
         return error, status, message
 
     def parse_table_data(self, glue_response: dict):
+        columns_response = glue_response.get("StorageDescriptor", {}).get("Columns")
+        if columns_response:
+            columns = list(map(lambda c: SchemaElement(c.get("Name"), c.get("Type")), columns_response))
+        else:
+            columns = []
+
+        schema = MetastoreSchema(columns, "glue")
+
         table_parsed = {
-            "name": glue_response.get("Name"),
-            "created_at": glue_response.get("CreateTime"),
-            "created_by": glue_response.get("CreatedBy"),
-            "database_name": glue_response.get("DatabaseName"),
-            "schema": glue_response.get("StorageDescriptor", {}).get("Columns"),
+            "Name": glue_response.get("Name"),
+            "CreatedAt": glue_response.get("CreateTime"),
+            "CreatedBy": glue_response.get("CreatedBy"),
+            "DatabaseName": glue_response.get("DatabaseName"),
+            "Schema": schema.to_dict(),
 
         }
         return table_parsed
