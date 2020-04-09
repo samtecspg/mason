@@ -9,9 +9,9 @@ def run_sys_call(command: List[str]):
         stderr = proc.stderr.read().decode("utf-8").split("\n") if proc.stderr is not None else []
 
         if len(stdin) >0 :
-            logger.info(f"STDIN {stdin}")
+            logger.debug(f"STDIN {stdin}")
         if len(stdout) > 0 :
-            logger.info(f"STDOUT: {stdout}")
+            logger.debug(f"STDOUT: {stdout}")
         elif len(stderr) > 0:
             logger.error(f"STDERR: {str(stderr)}")
         return stdout, stderr
