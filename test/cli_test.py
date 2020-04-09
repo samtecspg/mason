@@ -6,6 +6,8 @@ import os
 import pytest #type: ignore
 import shutil
 from test.support.testing_base import assert_multiline
+from util.uuid import uuid_regex
+import time
 
 #  TODO: Figure out how to remove references to /Users/kyle/dev from these tests for any user, remove basename from output
 
@@ -175,7 +177,7 @@ class TestCLI:
         """
         assert_multiline(expects3, result3.output)
 
-    # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -272,10 +274,23 @@ class TestCLI:
         """
         assert_multiline(expects4, result4.output)
 
-        # result5 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:lake-working-copy-feb-20-2020/logistics-bi-data-publisher/prod/shipment/,output_path:lake-working-copy-feb-20-2020/merged/"], catch_exceptions=False)
-        # print(result5.output)
+        result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
 
-        result6 = runner.invoke(operator, ["job", "get", "-l", "trace", "-p", "job_id:mason-spark-merge-02f11054-4233-4857-98dd-6c9073cfec34"], catch_exceptions=False)
-        print_result(result6)
+        # result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data/,output_path:spg-mason-demo/merged/"])
+        # print_result(result6)
+
+        # uuid = uuid_regex().findall(result6.output)[0]
+        # uuid = "f412dd60-b6f7-449e-9ac4-2f592f74fd1f"
+        # print(uuid)
+
+        # job_id = f"mason-spark-merge-{uuid}"
+
+        # time.sleep(10)
+
+        # # result7 = runner.invoke(operator, ["job", "get", "-l", "trace", "-p", f"job_id:{job_id}"], catch_exceptions=False)
+        # print_result(result7)
+
+        # result8 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", f"database_name:spg-mason-demo,table_name:merged"])
+        # print_result(result8)
 
 
