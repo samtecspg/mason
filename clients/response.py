@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Union
 from util.logger import logger
 
 class Response:
     def __init__(self):
         self.responses: List[dict] = []
         self.warnings: List[str] = []
-        self.info: List[str] = []
+        self.info: List[Union[str, dict]] = []
         self.errors: List[str] = []
         self.configs = []
         self.current_config = None
@@ -18,7 +18,7 @@ class Response:
     def add_warning(self, warning: str):
         self.warnings.append(warning)
 
-    def add_info(self, info: str):
+    def add_info(self, info: Union[dict, str]):
         self.info.append(info)
 
     def add_error(self, error: str):

@@ -24,11 +24,16 @@ AWS_SECRET_ACCESS_KEY=<SECRET_KEY>
 ```
 which have the needed permissions for the AWS services you are specifying as engine clients.  You can see all such configurations for various cloud providers in `.env.example`
 
-Then run
+If you are using a kubernetes based execution engine or scheduler make sure that your kubernetes config is located at 
+```
+~/.kube/config
+```
+
+To build the docker image run:
 ```
 ./docker_build
 ```
-Followed by
+Then run docker compose to start a mason server locally:
 ```
 docker-compose up
 ```
@@ -38,7 +43,7 @@ Swagger ui for registered operators can then be found at: `http://localhost:5000
 You can access additional mason commands by shelling into the running docker container and running them via:
 
 ```
-docker exec -it $(docker ps | grep mason | awk '{print $1}') /bin/bash
+./docker_attach
 > root@<SHA>:/app# mason
 Usage: mason [OPTIONS] COMMAND [ARGS]...
 

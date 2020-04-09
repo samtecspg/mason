@@ -13,8 +13,17 @@ class ExecutionClient(Client):
         raise NotImplementedError("Client not implemented")
         return response
 
+    @abstractmethod
+    def get_job(self, job_id: str, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
+        return response
+
 class EmptyExecutionClient(ExecutionClient):
 
     def run_job(self, job_type: str, metastore_credentials: MetastoreCredentials, parameters: dict, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
+        return response
+
+    def get_job(self, job_id: str, response: Response) -> Response:
         raise NotImplementedError("Client not implemented")
         return response

@@ -9,6 +9,7 @@ from hiyapyco import load as hload # type: ignore
 from typing import List
 import yaml
 from engines.metastore.models.credentials import MetastoreCredentials
+import tempfile
 
 import hiyapyco
 
@@ -63,24 +64,35 @@ class KubernetesOperator(SparkRunner):
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
 
+        merged_config = merge_config(config, job_name, metastore_credentials, params)
+        job_id = merged_config["metadata"]["name"]
         conf = dict(merge_config(config, job_name, metastore_credentials, params))
 
-        # with tempfile.NamedTemporaryFile(delete=False, mode='w') as yaml_file:
-        with open('test.yaml', 'w') as yaml_file:
+        with tempfile.NamedTemporaryFile(delete=False, mode='w') as yaml_file:
             yaml_dump = yaml.dump(conf, yaml_file)
 
-        command0 = ["kubectl", "delete", "sparkapplication", "mason-spark"]
-        command = ["kubectl", "apply", "-f", 'test.yaml']
+            command = ["kubectl", "apply", "-f", yaml_file.name]
 
-        logger.info("Executing Spark Kubernetes Operator")
+            message = f"Executing Spark Kubernetes Operator. job_id:  {job_id}"
+            logger.info(message)
+            response.add_info(message)
 
-        stdout, stderr = run_sys_call(command0, response)
-        stdout, stderr = run_sys_call(command, response)
+            stdout, stderr = run_sys_call(command)
+            logger.remove("HERE")
+            response.add_response({"STDOUT": stdout})
+            response.add_response({"STDERR": stderr})
+            return response
 
-    def get(self, config: SparkConfig, response: Response):
+    def get(self, job_id: str, response: Response):
+        command = ["kubectl", "logs", job_id + "-driver"]
 
-        command1 = ["kubectl", "describe", "sparkapplication", "mason-spark"]
-        command2 = ["kubectl", "logs", "mason-spark-driver"]
+        stdout, stderr = run_sys_call(command)
+        response.add_response({"STDOUT": stdout})
+        response.add_response({"STDERR": stderr})
+        if len(stdout) > 0:
+            response.add_info({"Logs": "\n".join(stdout[-100:])})
+        if len(stderr) > 0:
+            response.add_error(stderr)
 
 
 
