@@ -8,6 +8,7 @@ from typing import Optional
 from definitions import from_root
 from test.support.mocks.clients.glue import GlueMock
 from test.support.mocks.clients.s3 import S3Mock
+from test.support.mocks.clients.kubernetes import KubernetesMock
 from configurations import Config
 from engines import Engine
 from clients.response import Response
@@ -16,8 +17,6 @@ from util.uuid import uuid_regex
 
 LOG_LEVEL = "fatal"
 # LOG_LEVEL = "trace"
-# MOCK = True
-MOCK = False
 
 def clean_uuid(s: str):
     return uuid_regex().sub('', s)
@@ -43,7 +42,7 @@ def run_tests(cmd: str, sub: str, mock: bool, callable):
         operator: Operator = op
         config,response = op.find_configuration(configs, response)
         if config:
-            if mock or MOCK:
+            if mock:
                 get_mocks(config)
             callable(env, config, operator)
         else:
@@ -79,12 +78,13 @@ def get_mock(engine: Engine):
             logger.info("Mocking S3 Client")
             engine.set_underlying_client(S3Mock())
         elif client_name == "spark":
-            # TODO: IMPLMENT THIS
-            logger.info("Mocking Spark Client")
-            engine.set_underlying_client(None)
+            if (engine.underlying_client().__class__.__name__ == "KubernetesOperator"):
+                logger.info("Mocking Spark Kubernetes Operator")
+                engine.set_underlying_client(KubernetesMock())
+            else:
+                raise Exception("Unmocked Spark Runner Client")
         elif client_name == "invalid":
             pass
         else:
             raise Exception(f"Unmocked Client Implementation: {client_name}")
-
 

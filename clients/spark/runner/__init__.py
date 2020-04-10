@@ -4,7 +4,6 @@ from clients.spark.config import SparkConfig
 from clients.response import Response
 from engines.metastore.models.credentials import MetastoreCredentials
 
-
 class SparkRunner:
 
     @abstractmethod

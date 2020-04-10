@@ -6,10 +6,11 @@ import os
 import pytest #type: ignore
 import shutil
 from test.support.testing_base import assert_multiline
-from util.uuid import uuid_regex
 import time
 
 #  TODO: Figure out how to remove references to /Users/kyle/dev from these tests for any user, remove basename from output
+from util.logger import logger
+
 
 def print_result(result):
     print()
@@ -27,6 +28,7 @@ class TestCLI:
 
     def test_config_0(self):
         runner = CliRunner()
+
         result = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_0.yaml'), '-l', 'info'])
         expects = """
         +-------------------------------+
@@ -138,7 +140,6 @@ class TestCLI:
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
         * = Current Configuration
         """
-        print_result(result1)
         assert_multiline(expect1, result1.output)
         result2 = runner.invoke(config, ['-l', 'info'])
         expects2 = """

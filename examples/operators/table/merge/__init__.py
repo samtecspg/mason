@@ -10,6 +10,7 @@ def api(*args, **kwargs): return OperatorApi.get("table", "merge", *args, **kwar
 def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
     response = Response()
 
+    #  TODO: Make this consistent, use metastore database and table terminology, verify that the metastore table exists before sending to execution engine
     metastore_client = config.metastore.client
     metastore_credentials: MetastoreCredentials = metastore_client.credentials()
     input_path = metastore_client.full_path(parameters.safe_get("input_path"))
