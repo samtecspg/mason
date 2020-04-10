@@ -102,8 +102,8 @@ def test_merge():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # valid merge
         params = Parameters(parameters="input_path:test,output_path:test")
-        refreshing = op.run(env, config, params, Response())
-        print(refreshing.formatted())
+        merging = op.run(env, config, params, Response())
+        print(merging.formatted())
 
 
-    run_tests("table", "merge", False, tests)
+    run_tests("table", "merge", True, tests)

@@ -21,9 +21,6 @@ class SparkClient:
         runner.get(job_id, response)
         return response
 
-
-
-
     def get_runner(self, runner: str):
         if runner == "kubernetes-operator":
             return KubernetesOperator()

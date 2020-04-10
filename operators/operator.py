@@ -24,7 +24,7 @@ class Operator:
     def find_configuration(self, configs: List[Config], response: Response):
         configuration: Optional[Config] = None
         for config in configs:
-            vc = self.validate_configuration(config, response, False)
+            vc = self.validate_configuration(config, Response())
             if not vc.errored():
                 configuration = config
                 break
@@ -74,13 +74,13 @@ class Operator:
             response.set_status(400)
         return response
 
-    def validate_configuration(self, config: Config, response: Response, log_error: bool = True):
+    def validate_configuration(self, config: Config, response: Response):
         test = False
         for ses in self.supported_configurations:
             test = ses.validate_coverage(config)
             if test:
                 break
-        if not test and log_error:
+        if not test:
             response.add_error("Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
         return response
 
