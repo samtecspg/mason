@@ -33,25 +33,24 @@ def assert_multiline(s1: str, s2: str):
     assert (f1 == f2)
 
 def run_tests(cmd: str, sub: str, mock: bool, callable):
-        set_log_level()
-        env = get_env()
-        response = Response()
-        configs = get_configs(env)
-        op: Optional[Operator] = Operators.get_operator(env, cmd, sub)
+    set_log_level()
+    env = get_env()
+    response = Response()
+    configs = get_configs(env)
+    op: Optional[Operator] = Operators.get_operator(env, cmd, sub)
 
-        if op:
-            operator: Operator = op
-            config,response = op.find_configuration(configs, response)
-            if config:
-                if mock or MOCK:
-                    get_mocks(config)
-                callable(env, config, operator)
-            else:
-                raise Exception(f"No matching configuration found for operator {op.cmd}, {op.subcommand}")
-
+    if op:
+        operator: Operator = op
+        config,response = op.find_configuration(configs, response)
+        if config:
+            if mock or MOCK:
+                get_mocks(config)
+            callable(env, config, operator)
         else:
-            raise Exception(f"Operator not found {cmd} {sub}")
+            raise Exception(f"No matching configuration found for operator {op.cmd}, {op.subcommand}")
 
+    else:
+        raise Exception(f"Operator not found {cmd} {sub}")
 
 
 def set_log_level(level: str = None):

@@ -65,7 +65,7 @@ class TestListOperators:
         env = base.get_env("/test/support/operators/")
         config = base.get_configs(env)[0]
         op = Operators.get_operator(env, "namespace1", "operator2")
-        op, response = op.validate_configuration(config, response)
+        response = op.validate_configuration(config, response)
         expects = {'Errors': ['Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.'], 'Info': [], 'Warnings': []}
         assert(response.formatted() == expects)
 

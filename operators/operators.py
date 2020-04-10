@@ -61,18 +61,7 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, cmd: Opti
         op: Optional[Operator] = get_operator(env, cmd, subcmd)
 
         if op:
-            test, response = op.validate_configuration(config, response)
-
-        if op and test and not response.errored():
-            o: Operator = op
-            response = parameters.validate(o, response)
-            if not response.errored():
-                try:
-                    mod = import_module(f'{env.operator_module}.{cmd}.{subcmd}')
-                    response = mod.run(env, config, parameters, response)  # type: ignore
-                except ModuleNotFoundError as e:
-                    response.add_error(f"Module Not Found: {e}")
-
+            response = op.run(env, config, parameters, response)
         else:
             if not response.errored():
                 response.add_error(f"Operator {cmd} {subcmd} not found.  Check operators with 'mason operator'")
