@@ -29,7 +29,6 @@ class TestCLI:
         runner = CliRunner()
         result = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_0.yaml'), '-l', 'info'])
         expects = """
-        Set log level to info
         +-------------------------------+
         | Creating MASON_HOME at .tmp/  |
         +-------------------------------+
@@ -39,6 +38,7 @@ class TestCLI:
         +-----------------------------------------------+
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
+        Set log level to info
 
         Schema error /Users/kyle/dev/mason/configurations/schema.json: 'bad' is not one of ['glue', 's3']
 
@@ -51,7 +51,7 @@ class TestCLI:
         Config 0 not found
         """
         print_result(result)
-        # assert_multiline(expects, result.output)
+        assert_multiline(expects, result.output)
 
     def test_config_1(self):
       runner = CliRunner()
@@ -116,13 +116,13 @@ class TestCLI:
 
         Invalid config schema: {'metastore_engine': 'bad', 'storage_engine': 's3'}
 
-        Valid Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
+        Valid Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_2.yaml to .tmp/configurations/
 
         Reading configurations at .tmp/configurations/
         Valid Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
-        Valid Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
+        Valid Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
         +------------------------------+
         | Setting current config to 0  |
         +------------------------------+
@@ -134,10 +134,11 @@ class TestCLI:
         *  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      storage    s3        {'region': 'us-east-1'}
-        .  1         metastore  s3        {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}
+        .  1         metastore  s3        {'region': 'us-east-1'}
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
         * = Current Configuration
         """
+        print_result(result1)
         assert_multiline(expect1, result1.output)
         result2 = runner.invoke(config, ['-l', 'info'])
         expects2 = """
@@ -150,7 +151,7 @@ class TestCLI:
         *  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      storage    s3        {'region': 'us-east-1'}
-        .  1         metastore  s3        {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}
+        .  1         metastore  s3        {'region': 'us-east-1'}
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
 
         * = Current Configuration
@@ -170,7 +171,7 @@ class TestCLI:
         .  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      storage    s3        {'region': 'us-east-1'}
-        *  1         metastore  s3        {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}
+        *  1         metastore  s3        {'region': 'us-east-1'}
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
 
         * = Current Configuration
@@ -207,7 +208,7 @@ class TestCLI:
         *  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      storage    s3        {'region': 'us-east-1'}
-        .  1         metastore  s3        {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}
+        .  1         metastore  s3        {'region': 'us-east-1'}
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
 
         * = Current Configuration
@@ -267,7 +268,7 @@ class TestCLI:
         .  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      storage    s3        {'region': 'us-east-1'}
-        *  1         metastore  s3        {'region': 'us-east-1', 'access_key': '***REMOVED***', 'secret_key': '***REMOVED***'}
+        *  1         metastore  s3        {'region': 'us-east-1'}
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
 
         * = Current Configuration 

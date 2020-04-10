@@ -4,8 +4,6 @@ clients:
   s3:
     configuration:
       region: us-east-1
-      access_key: "***REMOVED***"
-      secret_key: "***REMOVED***"
   spark:
     configuration:
       runner:
