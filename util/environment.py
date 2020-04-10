@@ -21,14 +21,14 @@ def get_mason_home() -> str:
 
 def initialize_environment(env: MasonEnvironment):
     if not path.exists(env.mason_home):
-        banner(f"Creating MASON_HOME at {env.mason_home}")
+        banner(f"Creating MASON_HOME at {env.mason_home}", "fatal")
         os.mkdir(env.mason_home)
     if not path.exists(env.operator_home):
-        banner(f"Creating OPERATOR_HOME at {env.operator_home}")
+        banner(f"Creating OPERATOR_HOME at {env.operator_home}", "fatal")
         os.mkdir(env.operator_home)
         Path(env.operator_home + "__init__.py").touch()
     if not path.exists(env.config_home):
-        banner(f"Creating CONFIG_HOME at {env.config_home}")
+        banner(f"Creating CONFIG_HOME at {env.config_home}", "fatal")
         os.mkdir(env.config_home)
 
 

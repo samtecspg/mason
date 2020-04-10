@@ -10,8 +10,6 @@ from configurations import Config
 from operators.operator import Operator
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
-import pytest # type: ignore
-
 
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
@@ -96,14 +94,20 @@ def test_refresh():
     run_tests("table", "refresh", True, tests)
 
 
-@pytest.mark.skip(reason="This is not yet mocked, hits live endpoints")
 def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
-        # valid merge
-        params = Parameters(parameters="input_path:test,output_path:test")
-        merging = op.run(env, config, params, Response())
-        print(merging.formatted())
+        # valid merge config
+        params = Parameters(parameters="input_path:good_input_path,output_path:good_output_path")
+        valid = op.run(env, config, params, Response())
+        assert(valid.with_status() == ({'Errors': [], 'Info': ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge'], 'Warnings': []}, 200))
+
+        # invalid merge params
+        params = Parameters(parameters="input_path:test,bad:test")
+        invalid = op.run(env, config, params, Response())
+        assert(invalid.with_status() == ({'Errors': ['Missing required parameters: output_path'], 'Info': [], 'Warnings': []}, 400))
+
+        # TODO: test bad spark merged config file
 
 
     run_tests("table", "merge", True, tests)

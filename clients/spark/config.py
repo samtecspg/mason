@@ -8,11 +8,11 @@ class SparkConfig:
         self.main_class = config.get("main_class") or "mason.spark.Main"
         self.docker_image = config.get("docker_image") or f"samtecspg/mason-spark:v{self.spark_version}"
         self.application_file = "local://" + (config.get("application_file") or f"/opt/spark/jars/mason-spark-assembly-0.1.jar")
-        self.driver_cores = config.get("driver_cores") or 1
-        self.driver_memory_mbs = config.get("driver_memory_mbs") or 512
-        self.executors = config.get("executors") or 1
-        self.executor_memory_mb = config.get("executor_memory_mb") or 512
-        self.executor_cores = config.get("executor_cores") or 1
+        self.driver_cores = int(config.get("driver_cores") or 1)
+        self.driver_memory_mbs = int(config.get("driver_memory_mbs") or 512)
+        self.executors = int(config.get("executors") or 1)
+        self.executor_memory_mb = int(config.get("executor_memory_mb") or 512)
+        self.executor_cores = int(config.get("executor_cores") or 1)
 
     def job_name(self, job: str):
         return self.app_name + "-" + job + "-" + str(uuid4())

@@ -2,7 +2,6 @@
 from clients.glue.scheduler import GlueSchedulerClient
 from clients.engines.scheduler import EmptySchedulerClient
 from engines import Engine
-from util.logger import logger
 
 class SchedulerEngine(Engine):
 

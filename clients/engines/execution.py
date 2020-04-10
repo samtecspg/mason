@@ -1,4 +1,4 @@
-from clients import Client
+from clients import Client, EmptyClient
 from clients.response import Response
 from abc import abstractmethod
 from engines.metastore.models.credentials import MetastoreCredentials

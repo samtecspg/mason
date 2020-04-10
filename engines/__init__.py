@@ -43,6 +43,9 @@ class Engine():
     def set_underlying_client(self, client):
         self.client.client.client = client
 
+    def underlying_client(self):
+        return self.client.client.client
+
     def to_dict(self):
         return {
             "client_name": self.client_name,
