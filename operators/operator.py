@@ -2,6 +2,12 @@ from configurations import Config
 from clients.response import Response
 from typing import Dict, Optional, List
 from operators.supported_engines import from_array, SupportedEngineSet
+from parameters import Parameters
+from util.logger import logger
+from util.printer import banner
+from importlib import import_module
+from util.environment import MasonEnvironment
+
 
 class Operator:
 
@@ -19,12 +25,54 @@ class Operator:
         configuration: Optional[Config] = None
         for config in configs:
             vc = self.validate_configuration(config, response, False)
-            if vc[0] == True:
+            if not vc.errored():
                 configuration = config
                 break
         if configuration == None:
             response.add_error(f"No matching configuration for operator {self.cmd} {self.subcommand}.  Check operator.yml for supported configurations.")
         return configuration, response
+
+    def run(self, env: MasonEnvironment, config: Config, parameters: Parameters, response: Response) -> Response:
+
+        self.validate(config, parameters, response)
+
+        if not response.errored():
+            try:
+                mod = import_module(f'{env.operator_module}.{self.cmd}.{self.subcommand}')
+                response = mod.run(env, config, parameters, response)  # type: ignore
+            except ModuleNotFoundError as e:
+                response.add_error(f"Module Not Found: {e}")
+
+        return response
+
+    def validate(self, config: Config, parameters: Parameters, response: Response) -> Response:
+        response = self.validate_params(parameters, response)
+        response = self.validate_configuration(config, response)
+        return response
+
+    def validate_params(self, params: Parameters, response: Response):
+        required_params = set(self.required_parameters())
+        provided_params = set(params.parsed_parameters.keys())
+        diff = required_params.difference(provided_params)
+        intersection = required_params.intersection(provided_params)
+        params.add_valid(list(intersection))
+
+        logger.info()
+        validated = list(params.validated_parameters.keys())
+        missing = list(diff)
+
+        banner(f"Parameters Validation:")
+        if len(validated) > 0:
+            logger.info(f"Validated: {validated}")
+        if len(missing) > 0:
+            logger.info(f"Missing: {missing}")
+        logger.info()
+
+        if len(diff) > 0:
+            dp = ", ".join(list(diff))
+            response.add_error(f"Missing required parameters: {dp}")
+            response.set_status(400)
+        return response
 
     def validate_configuration(self, config: Config, response: Response, log_error: bool = True):
         test = False
@@ -34,7 +82,7 @@ class Operator:
                 break
         if not test and log_error:
             response.add_error("Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
-        return test, response
+        return response
 
     def to_dict(self):
         return {

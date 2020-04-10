@@ -2,6 +2,7 @@
 from parameters import Parameters
 from operators.operator import Operator
 from test.support import testing_base as base
+from clients.response import Response
 
 
 class TestInit:
@@ -43,7 +44,7 @@ class TestValidation:
         for param_string,results in tests.items():
             param = Parameters(param_string)
             op = Operator("cmd", "subcmd", "", {"required": results[1]}, [])
-            validated = param.validate(op)
+            validated = op.validate_params(param, Response())
             assert(validated.status_code == results[2])
             assert(param.validated_parameters == results[0])
 
