@@ -35,9 +35,7 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
             config = Config(env, parsed)
 
             if config.valid:
-                message = f"Valid Configuration. Saving config {c} to {env.config_home}"
-                logger.info(message)
-                response.add_info(message)
+                response.add_info(f"Valid Configuration. Saving config {c} to {env.config_home}")
                 shutil.copyfile(c, env.config_home + path.basename(c))
         logger.info()
         if len(configs) > 0:

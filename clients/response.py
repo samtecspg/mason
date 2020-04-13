@@ -15,23 +15,33 @@ class Response:
     def errored(self):
         return not (len(self.errors) == 0)
 
-    def add_warning(self, warning: str):
+    def add_warning(self, warning: str, log: bool = True):
+        if log:
+            logger.warning(warning)
         self.warnings.append(warning)
 
-    def add_info(self, info: Union[dict, str]):
+    def add_info(self, info: Union[dict, str], log: bool = True):
+        if log:
+            logger.info(str(info))
         self.info.append(info)
 
-    def add_error(self, error: str):
+    def add_error(self, error: str, log: bool = True):
+        if log:
+            logger.error(error)
         self.errors.append(error)
 
-    def add_response(self, response: dict):
+    def add_response(self, response: dict, log: bool = False):
+        if log:
+            logger.debug(f"Response {str(response)}")
         self.responses.append(response)
 
     def add_config(self, i: int, config: dict):
         config["id"] = i
         self.configs.append(config)
 
-    def add_current_config(self, config):
+    def add_current_config(self, config, log: bool = True):
+        if log:
+            logger.debug(f"Set current config to {config}")
         self.current_config = config
 
     def set_status(self, status: int):

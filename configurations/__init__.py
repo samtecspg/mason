@@ -132,15 +132,11 @@ def set_current_config(env: MasonEnvironment, config_id: int, response: Response
     configs = get_all(env)
     config: Optional[Config] = get(configs, config_id)
     if config:
-        message = f"Setting current config to {config_id}"
-        banner(message)
-        response.add_info(message)
+        response.add_info(f"Setting current config to {config_id}")
         set_session_config(env, config_id)
         tabulate_configs(configs, env)
     else:
-        message = f"Config {config_id} not found"
-        logger.error(message)
-        response.add_error(message)
+        response.add_error(f"Config {config_id} not found")
 
 def get_current_config(env: MasonEnvironment, log_level: str = "info") -> Optional[Config]:
     config_id = get_session_config(env)
