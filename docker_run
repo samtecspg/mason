@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-docker run -it mason:1.01 /bin/bash
+docker run -it mason:1.02 /bin/bash

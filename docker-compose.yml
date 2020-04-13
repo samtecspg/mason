@@ -13,4 +13,4 @@ services:
             - MASON_HOME=/mason/
         env_file:
             - .env
-        image: mason:1.01
+        image: mason:1.02
