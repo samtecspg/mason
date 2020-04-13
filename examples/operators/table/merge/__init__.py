@@ -13,6 +13,7 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     #  TODO: Make this consistent, use metastore database and table terminology, verify that the metastore table exists before sending to execution engine
     metastore_client = config.metastore.client
     metastore_credentials: MetastoreCredentials = metastore_client.credentials()
+
     input_path = metastore_client.full_path(parameters.safe_get("input_path"))
     output_path = metastore_client.full_path(parameters.safe_get("output_path"))
     p = {'input_path': input_path, 'output_path': output_path}

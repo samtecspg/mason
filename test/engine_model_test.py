@@ -39,3 +39,11 @@ class TestEngineModel():
             assert(schema.__class__.__name__ == "ParquetSchema")
             assert(response.formatted() == {'Errors': [], 'Info': [], 'Warnings': []})
 
+    def test_file_not_supproted(self):
+        logger.set_level("info")
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/unsupported_file_type.usf')) as f:
+            response, schema = from_file(f, Response())
+            expect = {'Errors': [], 'Info': [], 'Warnings': ['File type not supported for file /Users/kyle/dev/mason/test/unsupported_file_type.usf']}
+            assert(response.formatted() == expect)
+            assert(schema.__class__.__name__ == "MetastoreSchema")
