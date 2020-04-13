@@ -203,9 +203,7 @@ class TestCLI:
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/configs/config_1.yaml to .tmp/configurations/
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/configs/config_2.yaml to .tmp/configurations/
 
-        +------------------------------+
-        | Setting current config to 0  |
-        +------------------------------+
+        Setting current config to 0
         +-----------------+
         | Configurations  |
         +-----------------+
@@ -263,9 +261,7 @@ class TestCLI:
         result4 = runner.invoke(config, ["-s", "1"])
         expects4 = """
         Set log level to info
-        +------------------------------+
-        | Setting current config to 1  |
-        +------------------------------+
+        Setting current config to 1
         +-----------------+
         | Configurations  |
         +-----------------+
@@ -282,6 +278,7 @@ class TestCLI:
         assert_multiline(expects4, result4.output)
 
         result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
+        print_result(result5)
 
         # result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data/,output_path:spg-mason-demo/merged/"])
         # print_result(result6)
