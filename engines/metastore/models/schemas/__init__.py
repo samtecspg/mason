@@ -1,16 +1,19 @@
 import magic #type: ignore
+
+from clients.response import Response
 from engines.metastore.models.schemas.metastore_schema import emptySchema
 
 from engines.metastore.models.schemas import parquet_schema as ParquetSchema
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from fsspec.spec import AbstractBufferedFile # type: ignore
 
-def from_file(file: AbstractBufferedFile):
+def from_file(file: AbstractBufferedFile, response: Response):
     header_size = 1000
     header = file.read(header_size)
     file_type = magic.from_buffer(header)
     if file_type == "Apache Parquet":
-        return ParquetSchema.from_file(file)
+        return response, ParquetSchema.from_file(file)
     else:
-        return emptySchema()
+        response.add_warning(f"No file type detected for file {file.path}")
+        return response, emptySchema()
 
