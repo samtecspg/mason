@@ -173,6 +173,18 @@ class TestCLI:
         assert_multiline(expects3, result3.output)
 
     @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    def test_config_1_unmocked(self):
+        runner = CliRunner()
+        result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_1.yaml'), '-l', 'info'])
+        result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
+        result3 = runner.invoke(operator, ["table", "list", "-p", "database_name:crawler-poc", "-l", "trace"])
+        result4 = runner.invoke(operator, ["table", "get", "-p", "database_name:crawler-poc,table_name:catalog_poc_data", "-l", "trace"])
+        result5 = runner.invoke(operator, ["table", "refresh", "-p", "database_name:crawler-poc,table_name:catalog_poc_data", "-l", "trace"])
+        print_result(result3)
+        print_result(result4)
+        print_result(result5)
+
+    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2_csv(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -284,8 +296,6 @@ class TestCLI:
         # print_result(result6)
 
         # uuid = uuid_regex().findall(result6.output)[0]
-        # uuid = "f412dd60-b6f7-449e-9ac4-2f592f74fd1f"
-        # print(uuid)
 
         # job_id = f"mason-spark-merge-{uuid}"
 
