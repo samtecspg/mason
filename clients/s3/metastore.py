@@ -2,6 +2,8 @@ from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.s3 import S3Client
 from engines.metastore.models.credentials.aws import AWSCredentials
+from urllib.parse import urlparse
+import os
 
 class S3MetastoreClient(MetastoreClient):
 
@@ -24,6 +26,13 @@ class S3MetastoreClient(MetastoreClient):
 
     def full_path(self, path: str) -> str:
         return "s3a://" + path
+
+    def parse_path(self, path: str) -> (str, str):
+        parsed = urlparse(self.full_path(path), allow_fragments=False)
+        key = parsed.path.lstrip("/")
+        path = os.path.split(key)[0]
+        bucket = parsed.netloc
+        return bucket, path
 
     def get_config(self):
         return {

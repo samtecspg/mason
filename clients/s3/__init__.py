@@ -84,7 +84,6 @@ class S3Client:
         response.add_response(result)
         return response
 
-    #  database_name = bucket, table_name = path
     def get_table(self, database_name: str, table_name: str, response: Response):
         response = self.get_results(response, database_name, table_name)
         return response

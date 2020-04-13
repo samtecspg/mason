@@ -1,6 +1,5 @@
-
+from clients.s3.metastore import S3MetastoreClient
 from clients.spark.runner.kubernetes_operator import merge_config
-from definitions import from_root
 from hiyapyco import dump as hdump # type: ignore
 from clients.spark import SparkConfig
 from engines.metastore.models.credentials import MetastoreCredentials
@@ -8,6 +7,11 @@ from test.support.testing_base import assert_multiline, clean_uuid
 
 
 class TestClients:
+
+    def test_s3_metastore(self):
+        s3_metastore_client = S3MetastoreClient({})
+        parsed = s3_metastore_client.parse_path("test_bucket/test_path/test_file.csv")
+        assert(parsed == ("",""))
 
     def test_spark_kubernetes_operator(self):
 
