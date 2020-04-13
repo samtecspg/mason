@@ -14,6 +14,6 @@ def from_file(file: AbstractBufferedFile, response: Response):
     if file_type == "Apache Parquet":
         return response, ParquetSchema.from_file(file)
     else:
-        response.add_warning(f"No file type detected for file {file.path}")
+        response.add_warning(f"File type not supported for file {file.name}")
         return response, emptySchema()
 
