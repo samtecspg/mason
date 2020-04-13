@@ -29,6 +29,11 @@ class MetastoreClient(Client):
         raise NotImplementedError("Client not implemented")
         return ""
 
+    @abstractmethod
+    def parse_path(self, path: str) -> (str, str):
+        raise NotImplementedError("Client not implemented")
+        return ("", "")
+
 
 class EmptyMetastoreClient(MetastoreClient):
 
@@ -47,3 +52,8 @@ class EmptyMetastoreClient(MetastoreClient):
     def full_path(self, path: str) -> str:
         raise NotImplementedError("Client not implemented")
         return ""
+
+    def parse_path(self, path: str) -> (str, str):
+        raise NotImplementedError("Client not implemented")
+        return ("", "")
+
