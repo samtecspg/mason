@@ -1,7 +1,6 @@
 from clients.response import Response
 from engines.metastore.models.credentials import MetastoreCredentials
 
-from util.logger import logger
 from clients.spark import SparkConfig
 
 class KubernetesMock:

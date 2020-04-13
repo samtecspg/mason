@@ -3,14 +3,12 @@ import threading
 import subprocess
 
 from clients.response import Response
-from util.logger import logger
-
 
 def run_sys_call(command: List[str], response: Response):
     sys_call = SysCall(command)
     sys_call.run()
-    stdout = sys_call.stdout.decode('utf-8').replace("\n", '')
-    stderr = sys_call.stderr.decode('utf-8').replace("\n", '')
+    stdout = (sys_call.stdout or "").replace("\n", '')
+    stderr = (sys_call.stderr or "").replace("\n", '')
 
     if len(stdout) > 0:
         response.add_info({"Logs": "\n".join(stdout[-100:])})
