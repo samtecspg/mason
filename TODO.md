@@ -45,7 +45,7 @@ Legend
 - [ ] Establish session for current configuration
 - [ ] Add redis or sqllite for session 
 - [ ] Move operator/configs over to redis
-- [ ] :arrow_up: Consolidate response.add_  actions and logger._ actions into one command
+- [X] :arrow_up: Consolidate response.add_  actions and logger._ actions into one command C: 04/13/2020
 
 ## Test Cases
 
