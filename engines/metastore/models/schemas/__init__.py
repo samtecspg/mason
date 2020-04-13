@@ -5,7 +5,7 @@ from engines.metastore.models.schemas.metastore_schema import emptySchema
 
 from engines.metastore.models.schemas import parquet_schema as ParquetSchema
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
-from fsspec.spec import AbstractBufferedFile # type: ignore
+from fsspec.spec import AbstractBufferedFile  # type: ignore
 
 def from_file(file: AbstractBufferedFile, response: Response):
     header_size = 1000
@@ -14,6 +14,14 @@ def from_file(file: AbstractBufferedFile, response: Response):
     if file_type == "Apache Parquet":
         return response, ParquetSchema.from_file(file)
     else:
-        response.add_warning(f"File type not supported for file {file.name}")
+        try:
+            name = file.path
+        except AttributeError:
+            try:
+                name = file.name
+            except AttributeError:
+                name = file
+
+        response.add_warning(f"File type not supported for file {name}")
         return response, emptySchema()
 
