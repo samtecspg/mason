@@ -17,6 +17,11 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     input_path = metastore_client.full_path(parameters.safe_get("input_path"))
     output_path = metastore_client.full_path(parameters.safe_get("output_path"))
 
+    input_database, input_table = metastore_client.parse_path(input_path)
+    output_database, output_table = metastore_client.parse_path(output_path)
+
+
+
     p = {'input_path': input_path, 'output_path': output_path}
     response = config.execution.client.run_job("merge", metastore_credentials, p, response)
 

@@ -3,6 +3,7 @@ from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.glue import GlueClient
 from engines.metastore.models.credentials import MetastoreCredentials
+from typing import Tuple
 
 
 class GlueMetastoreClient(MetastoreClient):
@@ -33,4 +34,8 @@ class GlueMetastoreClient(MetastoreClient):
     def full_path(self, path: str) -> str:
         raise NotImplementedError("Client not implemented")
         return ""
+
+    def parse_path(self, path: str) -> Tuple[str, str]:
+        raise NotImplementedError("Client not implemented")
+        return ("", "")
 
