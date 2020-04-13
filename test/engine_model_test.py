@@ -1,5 +1,5 @@
-from fsspec.compression import SnappyFile
-from fsspec.spec import AbstractBufferedFile
+# from fsspec.compression import SnappyFile
+# from fsspec.spec import AbstractBufferedFile
 
 from engines.metastore.models.schemas.parquet_schema import ParquetSchema, ParquetElement
 
