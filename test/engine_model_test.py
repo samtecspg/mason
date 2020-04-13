@@ -1,7 +1,11 @@
-# from fsspec.compression import SnappyFile
-# from fsspec.spec import AbstractBufferedFile
-
+from clients.response import Response
+from definitions import from_root
+from engines.metastore.models.schemas import from_file
 from engines.metastore.models.schemas.parquet_schema import ParquetSchema, ParquetElement
+from fsspec.implementations.local import LocalFileSystem # type: ignore
+
+from util.logger import logger
+
 
 class TestEngineModel():
 
@@ -27,5 +31,11 @@ class TestEngineModel():
         s = set([schema1, schema2, schema3])
         assert(len(s) == 2)
 
-
+    def test_snappy_parquet_schema_support(self):
+        logger.set_level("info")
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/sample.snappy.parquet')) as f:
+            response, schema = from_file(f, Response())
+            assert(schema.__class__.__name__ == "ParquetSchema")
+            assert(response.formatted() == {'Errors': [], 'Info': [], 'Warnings': []})
 
