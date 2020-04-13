@@ -3,6 +3,7 @@ from clients.response import Response
 from clients import Client, EmptyClient
 from abc import abstractmethod
 from engines.metastore.models.credentials import MetastoreCredentials
+from typing import Tuple
 
 class MetastoreClient(Client):
 
@@ -30,7 +31,7 @@ class MetastoreClient(Client):
         return ""
 
     @abstractmethod
-    def parse_path(self, path: str) -> (str, str):
+    def parse_path(self, path: str) -> Tuple[str, str]:
         raise NotImplementedError("Client not implemented")
         return ("", "")
 
@@ -53,7 +54,7 @@ class EmptyMetastoreClient(MetastoreClient):
         raise NotImplementedError("Client not implemented")
         return ""
 
-    def parse_path(self, path: str) -> (str, str):
+    def parse_path(self, path: str) -> Tuple[str, str]:
         raise NotImplementedError("Client not implemented")
         return ("", "")
 

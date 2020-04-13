@@ -1,19 +1,17 @@
-from clients.s3.metastore import S3MetastoreClient
 from clients.spark.runner.kubernetes_operator import merge_config
+
+from engines.metastore.models.credentials import MetastoreCredentials
+
+from configurations import Config
+from test.support.testing_base import assert_multiline, clean_uuid
+from util.environment import MasonEnvironment
 from hiyapyco import dump as hdump # type: ignore
 from clients.spark import SparkConfig
-from engines.metastore.models.credentials import MetastoreCredentials
-from test.support.testing_base import assert_multiline, clean_uuid
 
 
-class TestClients:
+class TestSpark:
 
-    def test_s3_metastore(self):
-        s3_metastore_client = S3MetastoreClient({})
-        parsed = s3_metastore_client.parse_path("test_bucket/test_path/test_file.csv")
-        assert(parsed == ("",""))
-
-    def test_spark_kubernetes_operator(self):
+    def test_kubernetes_operator(self):
 
         config = SparkConfig({
             'script_type': 'scala-test',
@@ -89,4 +87,15 @@ class TestClients:
         assert_multiline(clean_uuid(dumped), clean_uuid(expects))
 
 
+
+class TestS3:
+
+    def test_parse_path(self):
+        env = MasonEnvironment()
+        conf = Config(env, {"metastore_engine": "s3", "clients": {"s3": {"configuration": {"region": "test"}}}})
+        assert(conf.metastore.client.__class__.__name__ == "S3MetastoreClient")
+        client = conf.metastore.client
+        parsed = client.parse_path("test_bucket/test_path/test_file.csv")
+        assert(parsed[0] == "test_bucket")
+        assert(parsed[1] == "test_path/test_file.csv")
 
