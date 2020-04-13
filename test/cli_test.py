@@ -52,7 +52,6 @@ class TestCLI:
         
         Config 0 not found
         """
-        print_result(result)
         assert_multiline(expects, result.output)
 
     def test_config_1(self):
@@ -73,9 +72,7 @@ class TestCLI:
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
 
-        +------------------------------+
-        | Setting current config to 0  |
-        +------------------------------+
+        Setting current config to 0
         +-----------------+
         | Configurations  |
         +-----------------+
@@ -125,9 +122,7 @@ class TestCLI:
         Reading configurations at .tmp/configurations/
         Valid Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
         Valid Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
-        +------------------------------+
-        | Setting current config to 0  |
-        +------------------------------+
+        Setting current config to 0
         +-----------------+
         | Configurations  |
         +-----------------+
@@ -161,9 +156,7 @@ class TestCLI:
         result3 = runner.invoke(config, ['-s', '1', '-l', 'info'])
         expects3 = """
         Set log level to info
-        +------------------------------+
-        | Setting current config to 1  |
-        +------------------------------+
+        Setting current config to 1
         +-----------------+
         | Configurations  |
         +-----------------+
@@ -180,9 +173,21 @@ class TestCLI:
         assert_multiline(expects3, result3.output)
 
     @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    def test_config_2_csv(self):
+        runner = CliRunner()
+        result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
+        result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
+        result25 = runner.invoke(register, [from_root('/examples/operators/job/')])
+        result4 = runner.invoke(config, ["-s", "1"])
+        result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data_csv/"])
+        print_result(result5)
+
+
+    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
+
         expects1 = """
         +-------------------------------+
         | Creating MASON_HOME at .tmp/  |
