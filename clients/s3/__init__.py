@@ -55,7 +55,7 @@ class S3Client:
             for key in keys:
                 logger.debug(f"Key {key}")
                 k = s3.open(key)
-                schema = schemas.from_file(k)
+                response, schema = schemas.from_file(k, response)
                 if schema:
                     schema_list.append(schema)
 

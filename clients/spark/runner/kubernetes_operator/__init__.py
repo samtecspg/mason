@@ -74,26 +74,14 @@ class KubernetesOperator(SparkRunner):
             command = ["kubectl", "apply", "-f", yaml_file.name]
 
             message = f"Executing Spark Kubernetes Operator. job_id:  {job_id}"
-            logger.info(message)
             response.add_info(message)
 
-            stdout, stderr = run_sys_call(command)
-            response.add_response({"STDOUT": stdout})
-            response.add_response({"STDERR": stderr})
+            response = run_sys_call(command, response)
+
             return response
 
     def get(self, job_id: str, response: Response):
         command = ["kubectl", "logs", job_id + "-driver"]
-
-        stdout, stderr = run_sys_call(command)
-        response.add_response({"STDERR": stderr})
-        if stdout == ['']:
-            response.add_warning("Blank response from kubectl, kubectl error handling is not good for this case, its possible the job_id is incorrect.  Check job_id")
-        if len(stdout) > 0:
-            response.add_info({"Logs": "\n".join(stdout[-100:])})
-        if len(stderr) > 0:
-            response.add_error(stderr)
-
-
-
+        response = run_sys_call(command, response)
+        return response
 

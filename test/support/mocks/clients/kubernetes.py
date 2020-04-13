@@ -21,7 +21,8 @@ class KubernetesMock:
             message = {'Errors': [], 'Info': [{"Logs": "<LOG_DATA>"}], 'Warnings': []}
             response.add_info(message)
         elif job_id == "bad_job_id":
-            response.add_warning('Blank response from kubectl, kubectl error handling is not good for this case, its possible the job_id is incorrect.  Check job_id')
+            response.add_error("Error from server (NotFound): pods \"bad_job_id-driver\" not found")
+            response.set_status(500)
         else:
             raise Exception("Mock parameters not implemented for spark kubernetes implementation")
 

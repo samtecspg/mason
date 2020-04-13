@@ -5,6 +5,7 @@ from operators.operator import Operator
 from parameters import Parameters
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
+from util.logger import logger
 
 
 def test_get():
@@ -20,8 +21,7 @@ def test_get():
         # invalid job_id
         params = Parameters(parameters="job_id:bad_job_id")
         bad = op.run(env, config, params, Response())
-        expect = {'Errors': [], 'Info': [], 'Warnings': ['Blank response from kubectl, kubectl error handling is not good for this case, its possible the job_id is incorrect.  Check job_id']}
-        assert(bad.with_status() == (expect, 200))
-
+        expect = {'Errors': ["Error from server (NotFound): pods \"bad_job_id-driver\" not found"], 'Info': [], 'Warnings': []}
+        assert(bad.with_status() == (expect, 500))
 
     run_tests("job", "get", True, tests)
