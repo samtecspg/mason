@@ -89,6 +89,8 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
     env = MasonEnvironment()
     config = get_current_config(env, "debug")  # return first config for now
 
+    logger.set_level(log_level or "info")
+
     if config:
         params = Parameters(parameters, param_file)
         Operators.run(env, config, params, cmd, subcmd)
