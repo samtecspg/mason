@@ -1,10 +1,10 @@
 
 
-from typing import List, Set
+from typing import List, Set, Tuple
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
 from util.list import get
 
-def find_conflicts(schemas: List[MetastoreSchema]):
+def find_conflicts(schemas: List[MetastoreSchema]) -> Tuple[List[MetastoreSchema], dict]:
     working_schemas = schemas
     non_empty_schemas = filter(lambda s: s.columns != [], working_schemas)
     unique_schemas = set(non_empty_schemas)
@@ -29,18 +29,17 @@ def find_conflicts(schemas: List[MetastoreSchema]):
                 last_schema = set(map(lambda s: s.name, children))
 
         complement_of_intersection = cummulative_union.difference(cummulative_intersection)
-
-        return {
+        data = {
             'SchemaConflicts': {
                 'CountDistinctSchemas': len(unique_schema_dicts),
                 'DistinctSchemas': unique_schema_dicts,
                 'NonOverlappingColumns': list(complement_of_intersection)
             }
         }
+
+        return list(unique_schemas), data
     else:
-        return {
-            'Schema': (get(list(unique_schema_dicts), 0) or [])
-        }
+        return [], { 'Schema': (get(list(unique_schema_dicts), 0) or []) }
 
 
 
