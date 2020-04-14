@@ -1,9 +1,12 @@
 
 from clients.response import Response
-from clients import Client, EmptyClient
+from clients import Client
 from abc import abstractmethod
 from engines.metastore.models.credentials import MetastoreCredentials
-from typing import Tuple
+from typing import Tuple, List
+
+from engines.metastore.models.schemas import MetastoreSchema, emptySchema
+
 
 class MetastoreClient(Client):
 
@@ -16,9 +19,9 @@ class MetastoreClient(Client):
         return response
 
     @abstractmethod
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Response:
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[MetastoreSchema, Response]:
         raise NotImplementedError("Client not implemented")
-        return response
+        return emptySchema(), response
 
     @abstractmethod
     def credentials(self) -> MetastoreCredentials:
@@ -42,9 +45,9 @@ class EmptyMetastoreClient(MetastoreClient):
         raise NotImplementedError("Client not implemented")
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Response:
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
         raise NotImplementedError("Client not implemented")
-        return response
+        return emptySchema(), response
 
     def credentials(self) -> MetastoreCredentials:
         raise NotImplementedError("Client not implemented")

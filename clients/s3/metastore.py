@@ -3,9 +3,10 @@ from clients.response import Response
 from clients.s3 import S3Client
 from engines.metastore.models.credentials.aws import AWSCredentials
 from urllib.parse import urlparse
-from typing import Tuple
+from typing import Tuple, List
 import os
 
+from engines.metastore.models.schemas import MetastoreSchema
 from util.logger import logger
 
 
@@ -21,7 +22,7 @@ class S3MetastoreClient(MetastoreClient):
         response = self.client.list_tables(database_name, response)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Response:
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
         response = self.client.get_table(database_name, table_name, response)
         return response
 
@@ -32,7 +33,7 @@ class S3MetastoreClient(MetastoreClient):
         return "s3a://" + path
 
     def parse_path(self, path: str) -> Tuple[str, str]:
-        parsed = urlparse(self.full_path(path), allow_fragments=False)
+        parsed = urlparse(path, allow_fragments=False)
         key = parsed.path.lstrip("/")
         bucket = parsed.netloc
         return bucket, key

@@ -6,7 +6,6 @@ import os
 import pytest #type: ignore
 import shutil
 from test.support.testing_base import assert_multiline
-import time
 
 #  TODO: Figure out how to remove references to /Users/kyle/dev from these tests for any user, remove basename from output
 from util.logger import logger
@@ -195,7 +194,7 @@ class TestCLI:
         print_result(result5)
 
 
-    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -290,7 +289,10 @@ class TestCLI:
         assert_multiline(expects4, result4.output)
 
         result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
-        print_result(result5)
+        # print_result(result5)
+
+        result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data_csv/,output_path:spg-mason-demo/merged_csv/"])
+        print_result(result6)
 
         # result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data/,output_path:spg-mason-demo/merged/"])
         # print_result(result6)

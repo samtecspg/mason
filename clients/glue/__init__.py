@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import boto3 # type: ignore
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
@@ -77,7 +79,7 @@ class GlueClient:
         return response
 
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response):
-        get_glue_table_response = self.get_table(database_name, table_name, response)
+        schema, get_glue_table_response = self.get_table(database_name, table_name, response)
 
         crawler_name = None
         if 200 <= get_glue_table_response.status_code < 300:
@@ -91,16 +93,16 @@ class GlueClient:
 
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response):
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[MetastoreSchema, Response]:
 
         try:
-            result = self.client.get_table(DatabaseName=database_name, Name=table_name)
+            schemas, result = self.client.get_table(DatabaseName=database_name, Name=table_name)
         except ClientError as e:
             result = e.response
 
         response.add_response(result)
         error, status, message = self.parse_response(result)
-        data = self.parse_table_data(result.get("Table", {}))
+        data, schema = self.parse_table_data(result.get("Table", {}))
 
         if error == "EntityNotFoundException":
             response.add_error(f"Database {database_name} or table {table_name} not found")
@@ -112,7 +114,7 @@ class GlueClient:
             response.add_error(message)
             response.set_status(status)
 
-        return response
+        return schema, response
 
     def refresh_glue_table(self, crawler_name: str):
         try:
@@ -166,7 +168,7 @@ class GlueClient:
             "Schema": schema.to_dict(),
 
         }
-        return table_parsed
+        return table_parsed, schema
 
     def parse_table_list_data(self, glue_response: dict):
         return list(map(lambda x: self.parse_table_data(x), glue_response['TableList']))

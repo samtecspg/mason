@@ -3,7 +3,9 @@ from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.glue import GlueClient
 from engines.metastore.models.credentials import MetastoreCredentials
-from typing import Tuple
+from typing import Tuple, List
+
+from engines.metastore.models.schemas import MetastoreSchema
 
 
 class GlueMetastoreClient(MetastoreClient):
@@ -17,9 +19,9 @@ class GlueMetastoreClient(MetastoreClient):
         response = self.client.list_tables(database_name, response)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Response:
-        response = self.client.get_table(database_name, table_name, response)
-        return response
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
+        schema, response = self.client.get_table(database_name, table_name, response)
+        return [schema], response
 
     def get_config(self):
         return {

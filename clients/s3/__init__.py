@@ -2,7 +2,7 @@
 import boto3 # type: ignore
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from util.logger import logger
 from engines.metastore.models import schemas
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
@@ -44,7 +44,7 @@ class S3Client:
     def parse_items(self, s3_response: dict):
         return list(map(lambda x: self.parse_item(x), s3_response.get('Contents', [])))
 
-    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None) -> Response:
+    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None) -> Tuple[List[MetastoreSchema], Response]:
         logger.info(f"Fetching keys in {database_name} {table_name}")
 
         s3 = s3fs.S3FileSystem()
@@ -59,10 +59,10 @@ class S3Client:
                 if schema:
                     schema_list.append(schema)
 
-        schemas_checked = CheckSchemas.find_conflicts(list(set(schema_list)))
-        response.add_data(schemas_checked)
+        schema_listing, schema_data = CheckSchemas.find_conflicts(list(set(schema_list)))
+        response.add_data(schema_data)
 
-        return response
+        return schema_listing, response
 
 
     #  List tables for s3 only lists out folders, not schemas in folders.  You can specify subfolders and it will be split out
@@ -84,9 +84,8 @@ class S3Client:
         response.add_response(result)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response):
-        response = self.get_results(response, database_name, table_name)
-        return response
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
+       return self.get_results(response, database_name, table_name)
 
     def path(self, path: str):
         return "s3://" + path
