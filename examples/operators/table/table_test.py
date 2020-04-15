@@ -97,17 +97,27 @@ def test_refresh():
 def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
-        # valid merge config
-        params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_input_bucket/good_input_path")
-        valid = op.run(env, config, params, Response())
-        assert(valid.with_status() == ({'Errors': [], 'Info': ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge'], 'Warnings': []}, 200))
+        # unsupported merge schema
+        params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path")
+        unsupported = op.run(env, config, params, Response())
+        expect = ({'Data': {'SchemaConflicts': {'CountDistinctSchemas': 2, 'DistinctSchemas': [{'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}],'SchemaType': 'text'}, {'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'},{'Name': 'availabile','Type': 'boolean'},{'Name': 'date', 'Type': 'date'}],'SchemaType': 'text'}], 'NonOverlappingColumns': ['price', 'type']}}, 'Errors': ['Unsupported schemas for merge operator: text'],'Info': [],'Warnings': []}, 200)
+        assert(unsupported.with_status() == expect)
 
         # invalid merge params
         params = Parameters(parameters="input_path:test,bad:test")
         invalid = op.run(env, config, params, Response())
         assert(invalid.with_status() == ({'Errors': ['Missing required parameters: output_path'], 'Info': [], 'Warnings': []}, 400))
 
-        # TODO: test bad spark merged config file
+        # valid merge
+        params = Parameters(parameters="input_path:good_input_bucket_2/good_input_path,output_path:good_output_bucket/good_output_path")
+        valid = op.run(env, config, params, Response())
+        expect = ({'Errors': [],
+         'Info': ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge'],
+         'Warnings': [], 'Data': {'Schema': {'SchemaType': 'parquet', 'Columns': [
+            {'Name': 'test_column_1', 'Type': 'INT32', 'ConvertedType': 'REQUIRED', 'RepititionType': None},
+            {'Name': 'test_column_2', 'Type': 'BYTE_ARRAY', 'ConvertedType': 'UTF8', 'RepititionType': 'OPTIONAL'}]}}}, 200)
+
+        assert(valid.with_status() == expect)
 
 
     run_tests("table", "merge", True, tests)

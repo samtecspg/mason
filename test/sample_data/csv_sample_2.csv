@@ -1,0 +1,4 @@
+type,price,availabile,date
+wrench,20.0,true,2019-10-10
+hammer,10.0,true,2020-01-01
+wrench2,19.0,false,2019-10-01

@@ -30,18 +30,19 @@ def find_conflicts(schemas: List[MetastoreSchema]) -> Tuple[List[MetastoreSchema
                 children = working_schemas.pop().columns
                 last_schema = set(map(lambda s: s.name, children))
 
-        complement_of_intersection = cummulative_union.difference(cummulative_intersection)
+        complement_of_intersection = list(cummulative_union.difference(cummulative_intersection))
+        complement_of_intersection.sort()
         data = {
             'SchemaConflicts': {
                 'CountDistinctSchemas': len(unique_schema_dicts),
                 'DistinctSchemas': unique_schema_dicts,
-                'NonOverlappingColumns': list(complement_of_intersection)
+                'NonOverlappingColumns': complement_of_intersection
             }
         }
 
         return list(unique_schemas), data
     else:
-        return [], { 'Schema': (get(list(unique_schema_dicts), 0) or []) }
+        return list(unique_schemas), { 'Schema': (get(list(unique_schema_dicts), 0) or []) }
 
 
 

@@ -34,6 +34,16 @@ class S3Mock:
         if (key == "crawler-poc/catalog_poc_data/test1.csv" or key == "crawler-poc/catalog_poc_data/test2.csv"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
+        elif (key == "test-data/test-path/test1.csv"):
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/csv_sample.csv'))
+        elif (key == "test-data/test-path/test2.csv"):
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/csv_sample_2.csv'))
+        elif (key == "test-data/test-path/sample.snappy.parquet"):
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
+
         else:
             raise Exception(f"Unmocked S3 API endpoint: {key}")
 
@@ -43,6 +53,10 @@ class S3Mock:
             return ["crawler-poc/catalog_poc_data/test1.csv", "crawler-poc/catalog_poc_data/test2.csv"]
         elif path == "bad-database/catalog_poc_data":
             return []
+        elif path == "good_input_bucket/good_input_path":
+            return ["test-data/test-path/test1.csv", "test-data/test-path/test2.csv"]
+        elif path == "good_input_bucket_2/good_input_path":
+            return ["test-data/test-path/sample.snappy.parquet"]
         elif path == "crawler-poc/bad-table":
             return []
         else:
