@@ -1,6 +1,6 @@
 from configurations import Config
 from clients.response import Response
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Tuple
 from operators.supported_engines import from_array, SupportedEngineSet
 from parameters import Parameters
 from util.logger import logger
@@ -21,7 +21,7 @@ class Operator:
     def required_parameters(self):
         return self.parameters.get("required", [])
 
-    def find_configurations(self, configs: List[Config], response: Response) -> List[Config]:
+    def find_configurations(self, configs: List[Config], response: Response) -> Tuple[List[Config], Response]:
         configurations: List[Config] = []
         for config in configs:
             vc = self.validate_configuration(config, Response())
