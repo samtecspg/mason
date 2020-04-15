@@ -56,6 +56,7 @@ Legend
 
 ## Execution Engine
 - [ ]  Look into using calcite or coral to extend spark operators to presto and hive
+- [ ]  Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Operators
 - [ ] Metastore Database operator
