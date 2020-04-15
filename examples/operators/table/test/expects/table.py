@@ -27,9 +27,10 @@ def get(client_type: str, switch: int):
             return {}
     elif client_type == "s3":
         if switch == 1:
-            return ({'Data': {'Schema': []}, 'Errors': [], 'Info': [], 'Warnings': []}, 200)
+            return ({'Data': {'Schema': {'Columns': [{'ConvertedType': 'REQUIRED',  'Name': 'test_column_1', 'RepititionType': None, 'Type': 'INT32'}, {'ConvertedType': 'UTF8', 'Name': 'test_column_2','RepititionType': 'OPTIONAL','Type': 'BYTE_ARRAY'}],'SchemaType': 'parquet'}},'Errors': [], 'Info': [], 'Warnings': []}, 200)
         elif switch == 2:
-            return ({'Errors': ['The specified bucket does not exist'],          'Info': [],          'Warnings': []},         404)
+            #  TODO: fix this case to be more verbose
+            return ({'Data': {'Schema': []}, 'Errors': [], 'Info': [], 'Warnings': []}, 200)
         elif switch == 3:
             return ({'Data': {'Schema': []}, 'Errors': [], 'Info': [], 'Warnings': []}, 200)
 

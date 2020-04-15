@@ -184,18 +184,18 @@ class TestCLI:
         print_result(result5)
 
     @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
-    def test_config_2_csv(self):
+    def test_config_2_csv_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
         result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
         result25 = runner.invoke(register, [from_root('/examples/operators/job/')])
         result4 = runner.invoke(config, ["-s", "1"])
-        result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data_csv/"])
+        result5 = runner.invoke(operator, ["table", "get", "-l", "error", "-p", "database_name:spg-mason-demo,table_name:part_data_csv/"])
         print_result(result5)
 
 
-    # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
-    def test_config_2(self):
+    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    def test_config_2_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
 
@@ -288,10 +288,10 @@ class TestCLI:
         """
         assert_multiline(expects4, result4.output)
 
-        result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
+        result5 = runner.invoke(operator, ["table", "get", "-l", "fatal", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
         # print_result(result5)
 
-        result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data_csv/,output_path:spg-mason-demo/merged_csv/"])
+        result6 = runner.invoke(operator, ["table", "merge", "-l", "fatal", "-p", "input_path:spg-mason-demo/part_data_csv/,output_path:spg-mason-demo/merged_csv/"])
         print_result(result6)
 
         # result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data/,output_path:spg-mason-demo/merged/"])

@@ -1,9 +1,10 @@
 
-from util.logger import logger
 from botocore.errorfactory import ClientError # type: ignore
+from fsspec.implementations.local import LocalFileSystem # type: ignore
 
-class S3Mock:
+from definitions import from_root
 
+class S3ClientMock:
     def list_objects(self, Bucket:str, Prefix: str, Delimiter: str):
         if Bucket == "crawler-poc":
             return {'CommonPrefixes':[{'Prefix':'/user-data/'}],'Delimiter':'/','EncodingType':'url','IsTruncated':False,'Marker':'','MaxKeys':1000,'Name':'lake-working-copy-feb-20-2020','Prefix':'/','ResponseMetadata':{'HTTPHeaders':{'content-type':'application/xml','date':'Tue,24''Mar''2020''04:49:53''GMT','server':'AmazonS3','transfer-encoding':'chunked','x-amz-bucket-region':'us-east-1','x-amz-id-2':'ILdl+HMfa03glzOhQnvuDBnUDsbc+JvMPmPqle6n6LaRrno0ZbnkC8yh8Ey4luBj4W5qW1h+Ox0=','x-amz-request-id':'C2D08B65B1491B10'},'HTTPStatusCode':200,'HostId':'ILdl+HMfa03glzOhQnvuDBnUDsbc+JvMPmPqle6n6LaRrno0ZbnkC8yh8Ey4luBj4W5qW1h+Ox0=','RequestId':'C2D08B65B1491B10','RetryAttempts':0}}
@@ -22,4 +23,30 @@ class S3Mock:
             return {'ResponseMetadata': {'HTTPStatusCode': 200}}
         else:
             raise Exception(f"Unmocked S3 API endpoint: {Bucket} {Prefix}")
+
+
+class S3Mock:
+
+    def __init__(self):
+        self.s3 = S3ClientMock()
+
+    def open(self, key: str):
+        if (key == "crawler-poc/catalog_poc_data/test1.csv" or key == "crawler-poc/catalog_poc_data/test2.csv"):
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
+        else:
+            raise Exception(f"Unmocked S3 API endpoint: {key}")
+
+
+    def find(self, path: str):
+        if path == "crawler-poc/catalog_poc_data":
+            return ["crawler-poc/catalog_poc_data/test1.csv", "crawler-poc/catalog_poc_data/test2.csv"]
+        elif path == "bad-database/catalog_poc_data":
+            return []
+        elif path == "crawler-poc/bad-table":
+            return []
+        else:
+            raise Exception(f"Unmocked S3 API endpoint: {path}")
+
+
 

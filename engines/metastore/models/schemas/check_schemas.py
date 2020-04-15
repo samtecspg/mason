@@ -3,6 +3,8 @@
 from typing import List, Set, Tuple
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
 from util.list import get
+from util.logger import logger
+
 
 def find_conflicts(schemas: List[MetastoreSchema]) -> Tuple[List[MetastoreSchema], dict]:
     working_schemas = schemas

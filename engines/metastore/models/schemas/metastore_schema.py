@@ -1,6 +1,7 @@
 
 from abc import abstractmethod
-from typing import List
+from typing import Sequence
+
 
 class SchemaElement:
     def __init__(self, name: str, type: str):
@@ -16,7 +17,7 @@ class SchemaElement:
 
 class MetastoreSchema:
 
-    def __init__(self, columns: List[SchemaElement], type: str):
+    def __init__(self, columns: Sequence[SchemaElement], type: str):
         self.type = type
         self.columns = columns
 

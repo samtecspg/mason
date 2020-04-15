@@ -23,8 +23,7 @@ class S3MetastoreClient(MetastoreClient):
         return response
 
     def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
-        response = self.client.get_table(database_name, table_name, response)
-        return response
+        return self.client.get_table(database_name, table_name, response)
 
     def credentials(self):
         return AWSCredentials(self.access_key, self.secret_key)
@@ -33,7 +32,7 @@ class S3MetastoreClient(MetastoreClient):
         return "s3a://" + path
 
     def parse_path(self, path: str) -> Tuple[str, str]:
-        parsed = urlparse(path, allow_fragments=False)
+        parsed = urlparse(self.full_path(path), allow_fragments=False)
         key = parsed.path.lstrip("/")
         bucket = parsed.netloc
         return bucket, key

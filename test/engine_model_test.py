@@ -6,8 +6,29 @@ from fsspec.implementations.local import LocalFileSystem # type: ignore
 
 from util.logger import logger
 
+class TestUnsupportedSchema:
 
-class TestEngineModel():
+    def test_file_not_supported(self):
+        logger.set_level("error")
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/sample_data/unsupported_file_type.usf')) as f:
+            response, schema = from_file(f, Response())
+            expect = {'Errors': [], 'Info': [], 'Warnings': ['File type not supported for file /Users/kyle/dev/mason/test/sample_data/unsupported_file_type.usf']}
+            assert(response.formatted() == expect)
+            assert(schema.__class__.__name__ == "MetastoreSchema")
+
+class TestTextSchema:
+
+    def test_valid_csv(self):
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/sample_data/csv_sample.csv')) as f:
+            response, schema = from_file(f, Response())
+            assert(schema.__class__.__name__ == "TextSchema")
+            assert(response.formatted() == {'Errors': [], 'Info': [], 'Warnings': []})
+            assert(list(map(lambda c: c.name,schema.columns)) == ["type","price"])
+            assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
+
+class TestParquetSchema:
 
     def test_parquet_schema_equality(self):
         columns1 = [
@@ -34,16 +55,8 @@ class TestEngineModel():
     def test_snappy_parquet_schema_support(self):
         logger.set_level("info")
         fs = LocalFileSystem()
-        with fs.open(from_root('/test/sample.snappy.parquet')) as f:
+        with fs.open(from_root('/test/sample_data/sample.snappy.parquet')) as f:
             response, schema = from_file(f, Response())
             assert(schema.__class__.__name__ == "ParquetSchema")
             assert(response.formatted() == {'Errors': [], 'Info': [], 'Warnings': []})
 
-    def test_file_not_supproted(self):
-        logger.set_level("info")
-        fs = LocalFileSystem()
-        with fs.open(from_root('/test/unsupported_file_type.usf')) as f:
-            response, schema = from_file(f, Response())
-            expect = {'Errors': [], 'Info': [], 'Warnings': ['File type not supported for file /Users/kyle/dev/mason/test/unsupported_file_type.usf']}
-            assert(response.formatted() == expect)
-            assert(schema.__class__.__name__ == "MetastoreSchema")
