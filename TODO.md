@@ -53,6 +53,10 @@ Legend
 - [x] Extraneous parameters.  Showing up in "required parameters" error return incorrectly. C: 03/11/2020
 - [x] Better errors around Permission errors C: 03/13/2020
 
+
+## Execution Engine
+- [ ]  Look into using calcite or coral to extend spark operators to presto and hive
+
 ## Operators
 - [ ] Metastore Database operator
     - [ ] List databases (~= s3 list buckets)
