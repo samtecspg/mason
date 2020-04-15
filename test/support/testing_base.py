@@ -40,11 +40,12 @@ def run_tests(cmd: str, sub: str, mock: bool, callable):
 
     if op:
         operator: Operator = op
-        config,response = op.find_configuration(configs, response)
-        if config:
-            if mock:
-                get_mocks(config)
-            callable(env, config, operator)
+        configs,response = op.find_configurations(configs, response)
+        if configs:
+            for config in configs:
+                if mock:
+                    get_mocks(config)
+                callable(env, config, operator)
         else:
             raise Exception(f"No matching configuration found for operator {op.cmd}, {op.subcommand}")
 

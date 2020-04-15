@@ -6,7 +6,6 @@ from util.list import get, flatten
 from typing import Optional, List
 from fsspec.spec import AbstractBufferedFile #type: ignore
 from typing import Union
-from util.logger import logger
 
 class ParquetElement(SchemaElement):
     def __init__(self, name: str, type: str, converted_type: Optional[str], repitition_type: Optional[str]):

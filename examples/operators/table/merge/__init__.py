@@ -21,13 +21,14 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     metastore_client = config.metastore.client
     metastore_credentials: MetastoreCredentials = metastore_client.credentials()
 
-    input_path = metastore_client.full_path(parameters.safe_get("input_path"))
-    output_path = metastore_client.full_path(parameters.safe_get("output_path"))
+    input_path = parameters.safe_get("input_path")
+    output_path =parameters.safe_get("output_path")
 
     input_database, input_table = metastore_client.parse_path(input_path)
 
     schemas, response = metastore_client.get_table(input_database, input_table, response)
     schema_types: Set[str] = set(map(lambda schema: schema.type, schemas))
+
     if len(schemas) > 0 and schema_types.issubset(SUPPORTED_SCHEMAS):
         p = {'input_path': input_path, 'output_path': output_path}
         response = config.execution.client.run_job("merge", metastore_credentials, p, response)

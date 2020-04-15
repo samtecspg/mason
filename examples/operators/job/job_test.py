@@ -5,8 +5,6 @@ from operators.operator import Operator
 from parameters import Parameters
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
-from util.logger import logger
-
 
 def test_get():
 

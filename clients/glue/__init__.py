@@ -4,6 +4,8 @@ import boto3 # type: ignore
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
+from util.logger import logger
+
 
 class GlueClient:
 
@@ -96,7 +98,7 @@ class GlueClient:
     def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[MetastoreSchema, Response]:
 
         try:
-            schemas, result = self.client.get_table(DatabaseName=database_name, Name=table_name)
+            result = self.client.get_table(DatabaseName=database_name, Name=table_name)
         except ClientError as e:
             result = e.response
 
@@ -171,6 +173,6 @@ class GlueClient:
         return table_parsed, schema
 
     def parse_table_list_data(self, glue_response: dict):
-        return list(map(lambda x: self.parse_table_data(x), glue_response['TableList']))
+        return list(map(lambda x: self.parse_table_data(x)[0], glue_response['TableList']))
 
 

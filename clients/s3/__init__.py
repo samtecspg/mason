@@ -13,7 +13,7 @@ import s3fs #type: ignore
 class S3Client:
     def __init__(self, s3_config: dict):
         self.region = s3_config.get("region")
-        self.client = boto3.client('s3', region_name=self.region)
+        self.client = s3fs.S3FileSystem(client_kwargs={'region_name': self.region})
 
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
@@ -44,18 +44,17 @@ class S3Client:
     def parse_items(self, s3_response: dict):
         return list(map(lambda x: self.parse_item(x), s3_response.get('Contents', [])))
 
-    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None) -> Tuple[List[MetastoreSchema], Response]:
+    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None, read_headers: bool = True) -> Tuple[List[MetastoreSchema], Response]:
         logger.info(f"Fetching keys in {database_name} {table_name}")
 
-        s3 = s3fs.S3FileSystem()
-        keys = s3.find(database_name + "/" + (table_name or ""))
+        keys = self.client.find(database_name + "/" + (table_name or ""))
 
         schema_list: List[MetastoreSchema] = []
         if len(keys) > 0:
             for key in keys:
                 logger.debug(f"Key {key}")
-                k = s3.open(key)
-                response, schema = schemas.from_file(k, response)
+                k = self.client.open(key)
+                response, schema = schemas.from_file(k, response, read_headers)
                 if schema:
                     schema_list.append(schema)
 
@@ -69,7 +68,7 @@ class S3Client:
     def list_tables(self, database_name: str, response: Response):
         split = database_name.split("/", 1)
         try:
-            result = self.client.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
+            result = self.client.s3.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
             response.add_data(result.get("CommonPrefixes", {}))
         except ClientError as e:
             result = e.response
@@ -85,15 +84,8 @@ class S3Client:
         return response
 
     def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
-       return self.get_results(response, database_name, table_name)
+        return self.get_results(response, database_name, table_name)
 
     def path(self, path: str):
         return "s3://" + path
 
-    # TODO: Validate that the specified path exists before bothering other clients with it
-    # def validate_path(self, path: str):
-    #     try:
-    #         s3 = boto3.resource('s3')
-    #         object = s3.Object('bucket_name', 'key')
-    #     except ClientError as e:
-    #         result = e.response
