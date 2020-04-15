@@ -8,8 +8,6 @@ from engines.metastore.models.schemas import text_schema as TextSchema
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from fsspec.spec import AbstractBufferedFile  # type: ignore
 
-from util.logger import logger
-
 
 def from_file(file: AbstractBufferedFile, response: Response, read_headers: bool = True):
     header_size = 1000

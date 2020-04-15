@@ -6,7 +6,7 @@ from clients.spark import SparkConfig
 class KubernetesMock:
 
     def run(self, config: SparkConfig, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response):
-        if params["input_path"] == "s3a://good_input_path" and params["output_path"] == "s3a://good_output_path":
+        if params["input_path"] == "good_input_bucket_2/good_input_path" and params["output_path"] == "good_output_bucket/good_output_path":
             stdout = 'sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created'
             response.add_response({"STDOUT": stdout})
             response.add_info(stdout)
