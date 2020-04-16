@@ -1,4 +1,7 @@
+from typing import Union
+
 import magic #type: ignore
+from s3fs import S3File #type: ignore
 
 from clients.response import Response
 from engines.metastore.models.schemas.metastore_schema import emptySchema
@@ -17,23 +20,20 @@ def from_file(file: AbstractBufferedFile, response: Response, read_headers: bool
     if file_type == "Apache Parquet":
         return response, ParquetSchema.from_file(file)
     elif file_type == "CSV text":
+        # header = file.readuntil('\n')
         return response, TextSchema.from_file(get_name(file), "csv", read_headers, response)
     elif file_type == "ASCII text":
+        # header = file.readuntil('\n')
         return response, TextSchema.from_file(get_name(file), "none", read_headers, response)
     else:
         name = get_name(file)
         response.add_warning(f"File type not supported for file {name}")
         return response, emptySchema()
 
-def get_name(file):
-    try:
-        if file.__class__.__name__ == "S3File":
-            name = "s3://" + file.path
-        else:
-            name = file.path
-    except AttributeError:
-        try:
-            name = file.name
-        except AttributeError:
-            name = file
+def get_name(file: Union[S3File, AbstractBufferedFile]):
+    if file.__class__.__name__ == "S3File":
+        name = "s3://" + file.path
+    else:
+        name = file.name
     return name
+
