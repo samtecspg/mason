@@ -54,6 +54,7 @@ Legend
 - [x] Better errors around Permission errors C: 03/13/2020
 
 ## Operators
+- [ ] Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
 - [ ] Metastore Database operator
     - [ ] List databases (~= s3 list buckets)
 - [x] Schema merge operator C:09/04/2020
