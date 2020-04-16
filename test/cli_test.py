@@ -289,11 +289,14 @@ class TestCLI:
         """
         assert_multiline(expects4, result4.output)
 
-        result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
-        print_result(result5)
+        # result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
+        # print_result(result5)
 
-        # result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data/,output_path:spg-mason-demo/merged/"])
-        # print_result(result6)
+        in_path = "samtec-datalake-working/user-data/caleb.keller/datasets/logistics/shipments/"
+        out_path =  "samtec-datalake-working/user-data/caleb.keller/datasets/logistics/shipments_merged/"
+
+        result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", f"input_path:{in_path},output_path:{out_path}"])
+        print_result(result6)
 
         # uuid = uuid_regex().findall(result6.output)[0]
 

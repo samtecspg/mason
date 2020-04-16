@@ -2,7 +2,6 @@
 from clients.spark.runner import SparkRunner
 from clients.spark.config import SparkConfig
 from clients.response import Response
-from util.logger import logger
 from definitions import from_root
 from util.sys_call import run_sys_call
 from hiyapyco import load as hload # type: ignore
