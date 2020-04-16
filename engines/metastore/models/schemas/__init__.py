@@ -27,7 +27,10 @@ def from_file(file: AbstractBufferedFile, response: Response, read_headers: bool
 
 def get_name(file):
     try:
-        name = file.path
+        if file.__class__.__name__ == "S3File":
+            name = "s3://" + file.path
+        else:
+            name = file.path
     except AttributeError:
         try:
             name = file.name
