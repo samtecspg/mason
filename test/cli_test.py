@@ -288,20 +288,11 @@ class TestCLI:
         """
         assert_multiline(expects4, result4.output)
 
-        result5 = runner.invoke(operator, ["table", "get", "-l", "fatal", "-p", "database_name:spg-mason-demo,table_name:part_data/"])
-        # print_result(result5)
-
-        result6 = runner.invoke(operator, ["table", "merge", "-l", "fatal", "-p", "input_path:spg-mason-demo/part_data_csv/,output_path:spg-mason-demo/merged_csv/"])
-        print_result(result6)
+        result5 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", "database_name:samtec-datalake-working,table_name:user-data/caleb.keller/datasets/logistics/shipments/"])
+        print_result(result5)
 
         # result6 = runner.invoke(operator, ["table", "merge", "-l", "trace", "-p", "input_path:spg-mason-demo/part_data/,output_path:spg-mason-demo/merged/"])
         # print_result(result6)
-
-        # uuid = uuid_regex().findall(result6.output)[0]
-
-        # job_id = f"mason-spark-merge-{uuid}"
-
-        # time.sleep(10)
 
         # # result7 = runner.invoke(operator, ["job", "get", "-l", "trace", "-p", f"job_id:{job_id}"], catch_exceptions=False)
         # print_result(result7)

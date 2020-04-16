@@ -16,11 +16,15 @@ class TextElement(SchemaElement):
 
 class TextSchema(MetastoreSchema):
 
-    def __init__(self, columns: Sequence[TextElement]):
+    def __init__(self, columns: Sequence[TextElement], type: str):
         self.columns = columns
-        self.type = 'text'
+        if type == "none":
+            self.type = 'text'
+        else:
+            self.type = 'text' + "-" + type
 
-def from_file(file_name: str, read_headers: bool, response: Response) -> TextSchema:
+
+def from_file(file_name: str, type: str, read_headers: bool, response: Response) -> TextSchema:
     table = Table(file_name, headers=read_headers)
     try:
         table.infer()
@@ -31,7 +35,7 @@ def from_file(file_name: str, read_headers: bool, response: Response) -> TextSch
         for e in errors:
             response.add_error(e)
 
-        return TextSchema(columns)
+        return TextSchema(columns, type)
     except FormatError as e:
         response.add_warning(f'File type not supported for file {file_name}')
         return emptySchema()

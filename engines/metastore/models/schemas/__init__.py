@@ -16,8 +16,10 @@ def from_file(file: AbstractBufferedFile, response: Response, read_headers: bool
 
     if file_type == "Apache Parquet":
         return response, ParquetSchema.from_file(file)
-    elif file_type == "CSV text" or file_type == "ASCII text":
-        return response, TextSchema.from_file(get_name(file), read_headers, response)
+    elif file_type == "CSV text":
+        return response, TextSchema.from_file(get_name(file), "csv", read_headers, response)
+    elif file_type == "ASCII text":
+        return response, TextSchema.from_file(get_name(file), "none", read_headers, response)
     else:
         name = get_name(file)
         response.add_warning(f"File type not supported for file {name}")

@@ -6,10 +6,10 @@ metadata:
 spec:
   type: Scala
   mode: cluster
-  image: "samtecspg/mason-spark:v2.4.5"
+  image: "samtecspg/mason-spark:2.4.5_v1.02"
   imagePullPolicy: Always
   mainClass: mason.spark.Main
-  mainApplicationFile: "local:///opt/spark/jars/mason-spark-assembly-0.1.jar"
+  mainApplicationFile: "local:///opt/spark/jars/mason-spark-assembly-1.02.jar"
   sparkVersion: "2.4.5"
   restartPolicy:
     type: Never

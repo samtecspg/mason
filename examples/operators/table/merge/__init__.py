@@ -13,7 +13,8 @@ def api(*args, **kwargs): return OperatorApi.get("table", "merge", *args, **kwar
 
 def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
     SUPPORTED_SCHEMAS = {
-        "parquet"
+        "parquet",
+        "text-csv"
     }
 
     response = Response()
