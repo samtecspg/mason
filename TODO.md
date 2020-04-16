@@ -88,7 +88,7 @@ Legend
 - [x] :arrow_up: Basic Setup C: 3/20/2020
 - [x] Schema implementations
    - [x] ParquetSchema C: 3/17/2020
-   - [ ] CSV Schema
+   - [X] CSV Schema C: 4/16/2020
    - [ ] JsonL schema
    - [ ] Json schema
    - [ ] :arrow_down: Avro schema
