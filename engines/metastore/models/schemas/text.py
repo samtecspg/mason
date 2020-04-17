@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Tuple
 
 from tabulator import FormatError # type: ignore
 
@@ -24,7 +24,7 @@ class TextSchema(MetastoreSchema):
             self.type = 'text' + "-" + type
 
 
-def from_file(file_name: str, type: str, read_headers: bool, response: Response) -> TextSchema:
+def from_file(file_name: str, type: str, read_headers: bool, response: Response) -> Tuple[Response, TextSchema]:
     table = Table(file_name, headers=read_headers)
     try:
         table.infer()
@@ -35,10 +35,10 @@ def from_file(file_name: str, type: str, read_headers: bool, response: Response)
         for e in errors:
             response.add_error(e)
 
-        return TextSchema(columns, type)
+        return response, TextSchema(columns, type)
     except FormatError as e:
         response.add_warning(f'File type not supported for file {file_name}')
-        return emptySchema()
+        return response, emptySchema()
 
 
 

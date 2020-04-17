@@ -100,7 +100,8 @@ def test_merge():
         # unsupported merge schema
         params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path")
         unsupported = op.run(env, config, params, Response())
-        expect = ({'Data': {'SchemaConflicts': {'CountDistinctSchemas': 2, 'DistinctSchemas': [{'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}],'SchemaType': 'text'}, {'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'},{'Name': 'availabile','Type': 'boolean'},{'Name': 'date', 'Type': 'date'}],'SchemaType': 'text'}], 'NonOverlappingColumns': ['price', 'type']}}, 'Errors': ['Unsupported schemas for merge operator: text'],'Info': [],'Warnings': []}, 200)
+        info = ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge']
+        expect = ({'Data': {'SchemaConflicts': {'CountDistinctSchemas': 2, 'DistinctSchemas': [{'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}],'SchemaType': 'text-csv'}, {'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'},{'Name': 'availabile','Type': 'boolean'},{'Name': 'date', 'Type': 'date'}],'SchemaType': 'text-csv'}], 'NonOverlappingColumns': ['price', 'type']}}, 'Errors': [],'Info': info,'Warnings': []}, 200)
         assert(unsupported.with_status() == expect)
 
         # invalid merge params
