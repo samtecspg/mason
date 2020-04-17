@@ -194,7 +194,7 @@ class TestCLI:
         print_result(result5)
 
 
-    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -287,8 +287,7 @@ class TestCLI:
         * = Current Configuration 
         """
         assert_multiline(expects4, result4.output)
-        result45 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", f"database_name:spg-mason-demo,table_name:part_data_json"], catch_exceptions=False)
-        logger.remove("HERE")
+        result45 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", f"database_name:spg-mason-demo,table_name:part_data_csv"], catch_exceptions=False)
         print_result(result45)
 
 
