@@ -11,23 +11,30 @@ from engines.metastore.models.schemas import json as JsonSchema
 from engines.metastore.models.schemas import text as TextSchema
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from fsspec.spec import AbstractBufferedFile  # type: ignore
+from itertools import islice
+
+from util.logger import logger
 
 
 def from_file(file: AbstractBufferedFile, response: Response, options: dict = {}):
     header_size = 1000
     header = file.read(header_size)
     file_type = magic.from_buffer(header)
+    file.seek(0)
 
     if file_type == "Apache Parquet":
         return response, ParquetSchema.from_file(file)
     elif file_type == "JSON data":
         return JsonSchema.from_file(get_name(file), response)
     elif file_type == "CSV text":
-        # header = file.readuntil('\n')
-        return TextSchema.from_file(get_name(file), "csv", response, options.get("read_headers"))
+        head = []
+        for i in range(4):
+            head.append(file.readline().decode("utf-8"))
+        file.seek(0)
+        header_length = max(list(map(lambda l: len(l.split(",")), head)))
+        return TextSchema.from_file(get_name(file), "csv", response, header_length, options.get("read_headers"))
     elif file_type == "ASCII text":
-        # header = file.readuntil('\n')
-        return TextSchema.from_file(get_name(file), "none", response, options.get("read_headers"))
+        return TextSchema.from_file(get_name(file), "none", response, 0, options.get("read_headers"))
     else:
         name = get_name(file)
         response.add_warning(f"File type not supported for file {name}")

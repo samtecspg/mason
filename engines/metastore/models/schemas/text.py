@@ -24,9 +24,11 @@ class TextSchema(MetastoreSchema):
             self.type = 'text' + "-" + type
 
 
-def from_file(file_name: str, type: str, response: Response, read_headers: Optional[bool]) -> Tuple[Response, TextSchema]:
-    rh = read_headers or False
-    table = Table(file_name, headers=rh)
+def from_file(file_name: str, type: str, response: Response, header_length: int, read_headers: Optional[str]) -> Tuple[Response, TextSchema]:
+    headers = read_headers or False
+    if (headers == False):
+        headers = list(map(lambda i: f"col_{i}", list(range(header_length))))
+    table = Table(file_name, headers=headers)
     try:
         table.infer()
         fields = table.schema.descriptor.get('fields')
@@ -34,7 +36,7 @@ def from_file(file_name: str, type: str, response: Response, read_headers: Optio
 
         errors = table.schema.errors
         for e in errors:
-            response.add_error(e)
+            response.add_error(str(e) + f" File: {file_name}")
 
         return response, TextSchema(columns, type)
     except FormatError as e:
