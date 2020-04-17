@@ -10,16 +10,16 @@ def find_conflicts(schemas: List[MetastoreSchema], response: Response) -> Tuple[
 
     working_schemas = schemas
     def get_name(s: MetastoreSchema) -> Optional[str]:
-        name = s.__class__.__name__
-        if not name == "MetastoreSchema":
-            return name
+        stype = s.type
+        if not stype == "":
+            return stype
     st = set(map(lambda s: get_name(s), schemas))
     schema_types = [x for x in st if x is not None]
 
     if len(schema_types) > 1:
         response.add_error("Mixed type schemas not supported at this time.  Ensure that files are of one type")
         return [], {'Schemas': []}, response
-    elif schema_types == {'JsonSchema'}:
+    elif schema_types == {'json'}:
         # TODO: fix types here
         response, schema = merge_schemas(schemas, response) #type: ignore
         return [schema], {'Schema': schema.schema}, response #type: ignore
