@@ -50,6 +50,15 @@ class TestJSONSchema:
             assert(schema.schema == expect)
             expect = {'Errors': [], 'Info': [], 'Warnings': []}
 
+    def test_jsonl(self):
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/sample_data/json_lines.jsonl')) as f:
+            response, schema = from_file(f, Response())
+            assert(schema.__class__.__name__ == "JsonSchema")
+            expect = {'$schema': 'http://json-schema.org/schema#', 'properties': {'field': {'type': 'string'},'field2': {'type': 'string'},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'type': 'string'},'field6': {'type': 'string'},'field7': {'type': 'string'}}, 'type': 'object'}
+            assert(schema.schema == expect)
+            expect = {'Errors': [], 'Info': [], 'Warnings': []}
+
     def test_file_dne(self):
         response, schema = json_from_file('test/sample_data/dne.json', Response())
         assert(schema.__class__.__name__ == "MetastoreSchema")
@@ -73,6 +82,12 @@ class TestJSONSchema:
         with fs.open(from_root('/test/sample_data/csv_sample.csv')) as f:
             response, schema5 = from_file(f, Response(), {"read_headers": True})
 
+        with fs.open(from_root('/test/sample_data/json_lines.jsonl')) as f:
+            response, schema6 = from_file(f, Response())
+
+        with fs.open(from_root('/test/sample_data/json_lines2.jsonl')) as f:
+            response, schema7 = from_file(f, Response())
+
         schema, data, response = find_conflicts([schema1, schema2], response)
         expect = {'$schema': 'http://json-schema.org/schema#','properties': {'data': {'items': {'properties': {'field1': {'type': 'string'},'field2': {'type': ['integer','string']},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'properties': {'some_other_stuff': {'type': 'string'}},'required': ['some_other_stuff'],'type': 'object'},'field6': {'type': 'string'}},'type': 'object'},'type': 'array'}},'required': ['data'],'type': 'object'}
         assert(schema[0].schema == expect)
@@ -85,6 +100,10 @@ class TestJSONSchema:
         assert(schema == [])
         assert(data == {'Schemas': []})
         assert(response.formatted() == {'Errors': ['Mixed type schemas not supported at this time.  Ensure that files are of one type'], 'Info': [], 'Warnings': []})
+
+        schema, data, response = find_conflicts([schema6, schema7], response)
+        expect = {'$schema': 'http://json-schema.org/schema#', 'properties': {'field': {'type': 'string'},'field2': {'type': 'string'},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'type': 'string'},'field6': {'type': 'string'},'field7': {'type': 'string'},'other': {'type': 'string'},'other2': {'type': 'string'},'other3': {'type': 'string'}}, 'required': ['other'], 'type': 'object'}
+        assert(schema[0].schema == expect)
 
 class TestTextSchema:
 
