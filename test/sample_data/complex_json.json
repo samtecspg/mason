@@ -1,0 +1,19 @@
+{
+  "data": [
+    {
+      "field1": "test",
+      "field2": "test2"
+    },
+    {
+      "field1": "test",
+      "field2": 5,
+      "field3": "test3",
+      "field4": "test4"
+    },
+    {
+      "field3": "test3",
+      "field4": "test4",
+      "field5": {"some_other_stuff":  "going on here"}
+    }
+  ]
+}

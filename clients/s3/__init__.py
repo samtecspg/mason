@@ -58,7 +58,7 @@ class S3Client:
                 if schema:
                     schema_list.append(schema)
 
-        schema_listing, schema_data = CheckSchemas.find_conflicts(list(set(schema_list)))
+        schema_listing, schema_data, response = CheckSchemas.find_conflicts(list(set(schema_list)), response)
         response.add_data(schema_data)
 
         return schema_listing, response
