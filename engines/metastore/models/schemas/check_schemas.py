@@ -26,6 +26,10 @@ def find_conflicts(schemas: List[MetastoreSchema], response: Response) -> Tuple[
         # TODO: fix types here
         response, schema = merge_schemas(schemas, response) #type: ignore
         return [schema], {'Schema': schema.schema}, response #type: ignore
+    elif schema_types == ['jsonl']:
+        # TODO: fix types here
+        response, schema = merge_schemas(schemas, response) #type: ignore
+        return [schema], {'Schema': schema.schema}, response #type: ignore
     else:
         non_empty_schemas = filter(lambda s: s.columns != [], working_schemas)
         unique_schemas = set(non_empty_schemas)
