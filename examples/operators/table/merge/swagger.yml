@@ -25,6 +25,10 @@ paths:
           in: query
           required: false
           type: string
+        - name: parse_headers
+          in: query
+          required: false
+          type: boolean
         - name: log_level
           in: query
           enum: [ "info", "warning", "error", "debug", "trace", "fatal"]

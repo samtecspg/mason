@@ -44,7 +44,7 @@ class S3Client:
     def parse_items(self, s3_response: dict):
         return list(map(lambda x: self.parse_item(x), s3_response.get('Contents', [])))
 
-    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None, read_headers: bool = True) -> Tuple[List[MetastoreSchema], Response]:
+    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
         logger.info(f"Fetching keys in {database_name} {table_name}")
 
         keys = self.client.find(database_name + "/" + (table_name or ""))
@@ -54,7 +54,7 @@ class S3Client:
             for key in keys:
                 logger.debug(f"Key {key}")
                 k = self.client.open(key)
-                response, schema = schemas.from_file(k, response, read_headers)
+                response, schema = schemas.from_file(k, response, options)
                 if schema:
                     schema_list.append(schema)
 
@@ -83,8 +83,8 @@ class S3Client:
         response.add_response(result)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
-        return self.get_results(response, database_name, table_name)
+    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
+        return self.get_results(response, database_name, table_name, options)
 
     def path(self, path: str):
         return "s3://" + path

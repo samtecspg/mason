@@ -13,7 +13,7 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from fsspec.spec import AbstractBufferedFile  # type: ignore
 
 
-def from_file(file: AbstractBufferedFile, response: Response, read_headers: bool = True):
+def from_file(file: AbstractBufferedFile, response: Response, options: dict = {}):
     header_size = 1000
     header = file.read(header_size)
     file_type = magic.from_buffer(header)
@@ -24,10 +24,10 @@ def from_file(file: AbstractBufferedFile, response: Response, read_headers: bool
         return JsonSchema.from_file(get_name(file), response)
     elif file_type == "CSV text":
         # header = file.readuntil('\n')
-        return TextSchema.from_file(get_name(file), "csv", read_headers, response)
+        return TextSchema.from_file(get_name(file), "csv", response, options.get("read_headers"))
     elif file_type == "ASCII text":
         # header = file.readuntil('\n')
-        return TextSchema.from_file(get_name(file), "none", read_headers, response)
+        return TextSchema.from_file(get_name(file), "none", response, options.get("read_headers"))
     else:
         name = get_name(file)
         response.add_warning(f"File type not supported for file {name}")

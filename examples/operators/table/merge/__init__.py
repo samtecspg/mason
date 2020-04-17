@@ -24,14 +24,15 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
 
     input_path = parameters.safe_get("input_path")
     output_path =parameters.safe_get("output_path")
+    parse_headers = bool(parameters.unsafe_get("parse_headers"))
 
     input_database, input_table = metastore_client.parse_path(input_path)
 
-    schemas, response = metastore_client.get_table(input_database, input_table, response)
-    schema_types: Set[str] = set(map(lambda schema: schema.type, schemas))
+    schemas, response = metastore_client.get_table(input_database, input_table, response, {"read_headers": parse_headers})
+    schema_types: Set[str] = set(map(lambda schema: schema.type, schemas)) # TODO: Ensure this has length one, collapse list to singleton earlier
 
     if len(schemas) > 0 and schema_types.issubset(SUPPORTED_SCHEMAS):
-        p = {'input_path': input_path, 'output_path': output_path}
+        p = {'input_path': input_path, 'output_path': output_path, 'input_format': next(iter(schema_types))}
         response = config.execution.client.run_job("merge", metastore_credentials, p, response)
     else:
         response.add_error(f"Unsupported schemas for merge operator: {', '.join(list(schema_types.difference(SUPPORTED_SCHEMAS)))}")

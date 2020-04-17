@@ -71,7 +71,7 @@ class TestJSONSchema:
             response, schema4 = from_file(f, Response())
 
         with fs.open(from_root('/test/sample_data/csv_sample.csv')) as f:
-            response, schema5 = from_file(f, Response())
+            response, schema5 = from_file(f, Response(), {"read_headers": True})
 
         schema, data, response = find_conflicts([schema1, schema2], response)
         expect = {'$schema': 'http://json-schema.org/schema#','properties': {'data': {'items': {'properties': {'field1': {'type': 'string'},'field2': {'type': ['integer','string']},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'properties': {'some_other_stuff': {'type': 'string'}},'required': ['some_other_stuff'],'type': 'object'},'field6': {'type': 'string'}},'type': 'object'},'type': 'array'}},'required': ['data'],'type': 'object'}
@@ -91,7 +91,7 @@ class TestTextSchema:
     def test_valid_csv(self):
         fs = LocalFileSystem()
         with fs.open(from_root('/test/sample_data/csv_sample.csv')) as f:
-            response, schema = from_file(f, Response())
+            response, schema = from_file(f, Response(), {"read_headers": True})
             assert(schema.__class__.__name__ == "TextSchema")
             assert(response.formatted() == {'Errors': [], 'Info': [], 'Warnings': []})
             assert(list(map(lambda c: c.name,schema.columns)) == ["type","price"])

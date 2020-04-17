@@ -22,8 +22,8 @@ class S3MetastoreClient(MetastoreClient):
         response = self.client.list_tables(database_name, response)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
-        return self.client.get_table(database_name, table_name, response)
+    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
+        return self.client.get_table(database_name, table_name, response, options)
 
     def credentials(self):
         return AWSCredentials(self.access_key, self.secret_key)
