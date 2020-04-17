@@ -97,6 +97,15 @@ class TestTextSchema:
             assert(list(map(lambda c: c.name,schema.columns)) == ["type","price"])
             assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
 
+    def test_csv_no_header(self):
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/sample_data/csv_no_header.csv')) as f:
+            response, schema = from_file(f, Response())
+            assert(schema.__class__.__name__ == "TextSchema")
+            assert(response.formatted() == {'Errors': [], 'Info': [], 'Warnings': []})
+            assert(list(map(lambda c: c.name,schema.columns)) == ["col_0","col_1"])
+            assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
+
 class TestParquetSchema:
 
     def test_parquet_schema_equality(self):

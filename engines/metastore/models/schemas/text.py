@@ -33,7 +33,7 @@ def from_file(file_name: str, type: str, response: Response, header_length: int,
     else:
         header_list = True
 
-    table = Table(file_name, headers=headers)
+    table = Table(file_name, headers=header_list)
     try:
         table.infer()
         fields = table.schema.descriptor.get('fields')
