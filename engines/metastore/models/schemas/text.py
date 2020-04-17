@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple, Optional
+from typing import Sequence, Tuple, Optional, Union, List
 
 from tabulator import FormatError # type: ignore
 
@@ -26,8 +26,13 @@ class TextSchema(MetastoreSchema):
 
 def from_file(file_name: str, type: str, response: Response, header_length: int, read_headers: Optional[str]) -> Tuple[Response, TextSchema]:
     headers = read_headers or False
+    header_list: Union[List[str], bool]
+
     if (headers == False):
-        headers = list(map(lambda i: f"col_{i}", list(range(header_length))))
+        header_list = list(map(lambda i: f"col_{i}", list(range(header_length))))
+    else:
+        header_list = True
+
     table = Table(file_name, headers=headers)
     try:
         table.infer()
