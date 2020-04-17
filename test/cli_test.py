@@ -194,7 +194,7 @@ class TestCLI:
         print_result(result5)
 
 
-    # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])

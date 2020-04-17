@@ -9,6 +9,7 @@ parameters:
   optional:
     - extract_paths
     - repartition_keys
+    - parse_headers
 supported_configurations:
   - metastore: "s3"
     execution: "spark"

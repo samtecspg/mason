@@ -19,7 +19,7 @@ class GlueMetastoreClient(MetastoreClient):
         response = self.client.list_tables(database_name, response)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[List[MetastoreSchema], Response]:
+    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
         schema, response = self.client.get_table(database_name, table_name, response)
         return [schema], response
 

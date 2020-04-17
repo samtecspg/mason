@@ -98,7 +98,7 @@ def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # unsupported merge schema
-        params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path")
+        params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
         unsupported = op.run(env, config, params, Response())
         info = ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge']
         expect = ({'Data': {'SchemaConflicts': {'CountDistinctSchemas': 2, 'DistinctSchemas': [{'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}],'SchemaType': 'text-csv'}, {'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'},{'Name': 'availabile','Type': 'boolean'},{'Name': 'date', 'Type': 'date'}],'SchemaType': 'text-csv'}], 'NonOverlappingColumns': ['price', 'type']}}, 'Errors': [],'Info': info,'Warnings': []}, 200)
@@ -110,7 +110,7 @@ def test_merge():
         assert(invalid.with_status() == ({'Errors': ['Missing required parameters: output_path'], 'Info': [], 'Warnings': []}, 400))
 
         # valid merge
-        params = Parameters(parameters="input_path:good_input_bucket_2/good_input_path,output_path:good_output_bucket/good_output_path")
+        params = Parameters(parameters="input_path:good_input_bucket_2/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
         valid = op.run(env, config, params, Response())
         expect = ({'Errors': [],
          'Info': ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge'],

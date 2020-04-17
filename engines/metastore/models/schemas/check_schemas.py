@@ -2,8 +2,8 @@
 from typing import List, Set, Tuple, Optional
 
 from clients.response import Response
-from engines.metastore.models.schemas.json import merge_schemas, JsonSchema
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
+from engines.metastore.models.schemas.json import merge_schemas
+from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from util.list import get
 
 def find_conflicts(schemas: List[MetastoreSchema], response: Response) -> Tuple[List[MetastoreSchema], dict, Response]:
@@ -13,13 +13,16 @@ def find_conflicts(schemas: List[MetastoreSchema], response: Response) -> Tuple[
         stype = s.type
         if not stype == "":
             return stype
+        else:
+            return None
+
     st = set(map(lambda s: get_name(s), schemas))
     schema_types = [x for x in st if x is not None]
 
     if len(schema_types) > 1:
         response.add_error("Mixed type schemas not supported at this time.  Ensure that files are of one type")
         return [], {'Schemas': []}, response
-    elif schema_types == {'json'}:
+    elif schema_types == ['json']:
         # TODO: fix types here
         response, schema = merge_schemas(schemas, response) #type: ignore
         return [schema], {'Schema': schema.schema}, response #type: ignore

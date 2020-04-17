@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple
+from typing import Sequence, Tuple, Optional
 
 from tabulator import FormatError # type: ignore
 
@@ -24,8 +24,9 @@ class TextSchema(MetastoreSchema):
             self.type = 'text' + "-" + type
 
 
-def from_file(file_name: str, type: str, read_headers: bool, response: Response) -> Tuple[Response, TextSchema]:
-    table = Table(file_name, headers=read_headers)
+def from_file(file_name: str, type: str, response: Response, read_headers: Optional[bool]) -> Tuple[Response, TextSchema]:
+    rh = read_headers or False
+    table = Table(file_name, headers=rh)
     try:
         table.infer()
         fields = table.schema.descriptor.get('fields')
