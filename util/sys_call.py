@@ -7,11 +7,11 @@ from clients.response import Response
 def run_sys_call(command: List[str], response: Response):
     sys_call = SysCall(command)
     sys_call.run()
-    stdout = (sys_call.stdout or "").replace("\n", '')
-    stderr = (sys_call.stderr or "").replace("\n", '')
+    stdout = (sys_call.stdout or b"").decode("utf-8").replace("\n", '')
+    stderr = (sys_call.stderr or b"").decode("utf-8").replace("\n", '')
 
     if len(stdout) > 0:
-        response.add_info({"Logs": "\n".join(stdout[-100:])})
+        response.add_info({"Logs": "".join(stdout[-100:])})
         response.add_response({"STDOUT": stdout})
     if len(stderr) > 0:
         response.add_error(stderr)

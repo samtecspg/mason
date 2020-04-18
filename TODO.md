@@ -59,6 +59,7 @@ Legend
 - [ ]  Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Operators
+- [ ] Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
 - [ ] Metastore Database operator
     - [ ] List databases (~= s3 list buckets)
 - [x] Schema merge operator C:09/04/2020
