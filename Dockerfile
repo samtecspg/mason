@@ -8,6 +8,8 @@ RUN pip3 install -r requirements.txt
 
 COPY . /app
 
+RUN chmod +x /app/demos/run_demo.sh
+
 RUN pip3 install mypy
 RUN ./scripts/install.sh
 
@@ -22,7 +24,4 @@ RUN mason register examples/operators/job/
 
 RUN ./scripts/install_kubectl.sh
 
-
-ENTRYPOINT [ "mason" ]
-
-CMD [ "run" ]
+CMD ["mason run"]

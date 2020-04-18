@@ -1,1 +1,1 @@
-docker image build -t mason:1.02 .
+docker image build -t samtecspg/mason:v1.02 .
