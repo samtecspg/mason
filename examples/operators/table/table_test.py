@@ -98,6 +98,9 @@ def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # unsupported merge schema
+        import os
+        os.environ["AWS_SECRET_ACCESS_KEY"]="test"
+        os.environ["AWS_ACCESS_KEY_ID"]="test"
         params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
         unsupported = op.run(env, config, params, Response())
         info = ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge']

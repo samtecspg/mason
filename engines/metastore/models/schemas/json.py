@@ -7,7 +7,7 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, e
 from genson import SchemaBuilder #type: ignore
 import json
 import fsspec #type: ignore
-import jsonlines
+import jsonlines #type: ignore
 import os
 
 def from_file(file: str, response: Response):
