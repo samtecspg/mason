@@ -47,8 +47,8 @@ class TestCLI:
 
         No s3 client configuration for specified storage_engine
 
-        Invalid config schema: {'metastore_engine': 'bad', 'storage_engine': 's3'}
-
+        Invalid config schema: {'metastore_engine': 'bad', 'storage_engine': 's3'}        
+        
         Config 0 not found
         """
         assert_multiline(expects, result.output)
@@ -66,7 +66,7 @@ class TestCLI:
         +-----------------------------------------------+
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
-
+        
         Set log level to info
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
@@ -81,7 +81,7 @@ class TestCLI:
                      scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
                      storage    s3        {'region': 'us-east-1'}
 
-        * = Current Configuration
+        * = Current Configuration      
       """
       assert_multiline(expect1, result1.output)
 
@@ -100,7 +100,7 @@ class TestCLI:
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
         Set log level to trace
-
+        
         Valid Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
 
         Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
@@ -194,7 +194,7 @@ class TestCLI:
         print_result(result5)
 
 
-    # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -284,7 +284,7 @@ class TestCLI:
         *  1         metastore  s3        {'region': 'us-east-1'}
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
 
-        * = Current Configuration
+        * = Current Configuration 
         """
         assert_multiline(expects4, result4.output)
         # result45 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", f"database_name:spg-mason-demo,table_name:part_data_json"], catch_exceptions=False)
