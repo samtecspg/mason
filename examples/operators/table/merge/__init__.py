@@ -37,7 +37,7 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
         schema_types: Set[str] = set(map(lambda schema: schema.type, schemas)) # TODO: Ensure this has length one, collapse list to singleton earlier
 
         if len(schemas) > 0 and schema_types.issubset(SUPPORTED_SCHEMAS):
-            p = {'input_path': input_path, 'output_path': output_path, 'input_format': next(iter(schema_types))}
+            p = {'input_path': metastore_client.full_path(input_path), 'output_path': metastore_client.full_path(output_path), 'input_format': next(iter(schema_types))}
             response = config.execution.client.run_job("merge", metastore_credentials, p, response)
         else:
             response.add_error(f"Unsupported schemas for merge operator: {', '.join(list(schema_types.difference(SUPPORTED_SCHEMAS)))}")
