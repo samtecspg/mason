@@ -4,8 +4,6 @@ import boto3 # type: ignore
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
-from util.logger import logger
-
 
 class GlueClient:
 

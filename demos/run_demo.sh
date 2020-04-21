@@ -1,15 +1,17 @@
 #!/bin/bash
 set -e
 
-trap 'rm -rf ../.tmp/' EXIT
+rm -rf '.tmp/'
+mkdir '.tmp'
+export MASON_HOME='.tmp/'
 
 if [ $1 == "1.02" ]
 then
   commands=(
     "mason"
     "mason config"
-    "mason config examples/configs"
-    "mason config -s 1"
+    "mason config examples/configs/"
+    "mason config -s 0"
     "mason operator"
     "mason register examples/operators/table"
     "mason register examples/operators/job"
@@ -25,10 +27,6 @@ else
   commands=()
 fi
 
-cd ..
-rm -rf '.tmp/'
-mkdir '.tmp'
-export MASON_HOME='.tmp/'
 
 for i in "${commands[@]}"
 do
