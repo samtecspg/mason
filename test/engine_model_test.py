@@ -15,7 +15,7 @@ class TestUnsupportedSchema:
         fs = LocalFileSystem()
         with fs.open(from_root('/test/sample_data/unsupported_file_type.usf')) as f:
             response, schema = from_file(f, Response())
-            expect = {'Errors': [], 'Info': [], 'Warnings': ['File type not supported for file /Users/kyle/dev/mason/test/sample_data/unsupported_file_type.usf']}
+            expect = {'Errors': [], 'Info': [], 'Warnings': [f"File type not supported for file {from_root('/test/sample_data/unsupported_file_type.usf')}"]}
             assert(response.formatted() == expect)
             assert(schema.__class__.__name__ == "MetastoreSchema")
 
@@ -38,7 +38,7 @@ class TestJSONSchema:
         with fs.open(from_root('/test/sample_data/bad_json.json')) as f:
             response, schema = from_file(f, Response())
             assert(schema.__class__.__name__ == "MetastoreSchema")
-            expect = {'Errors': [], 'Info': [], 'Warnings': ['File type not supported for file /Users/kyle/dev/mason/test/sample_data/bad_json.json']}
+            expect = {'Errors': [], 'Info': [], 'Warnings': [f"File type not supported for file {from_root('/test/sample_data/bad_json.json')}"]}
             assert(response.formatted() == expect)
 
     def test_complex_json(self):

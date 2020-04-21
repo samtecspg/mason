@@ -5,9 +5,7 @@ from definitions import from_root
 import os
 import pytest #type: ignore
 import shutil
-from test.support.testing_base import assert_multiline
-
-#  TODO: Figure out how to remove references to /Users/kyle/dev from these tests for any user, remove basename from output
+from test.support.testing_base import clean_string
 from util.logger import logger
 
 
@@ -16,6 +14,8 @@ def print_result(result):
     print(result.output)
     print(result.exception)
 
+
+@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestCLI:
 
     @pytest.fixture(autouse=True)
@@ -41,17 +41,17 @@ class TestCLI:
         +-----------------------------------------------+
         Set log level to info
 
-        Schema error /Users/kyle/dev/mason/configurations/schema.json: 'bad' is not one of ['glue', 's3']
+        Schema error """ + from_root("/configurations/schema.json") + """: 'bad' is not one of ['glue', 's3']
 
         No bad client configuration for specified metastore_engine
 
         No s3 client configuration for specified storage_engine
 
-        Invalid config schema: {'metastore_engine': 'bad', 'storage_engine': 's3'}        
+        Invalid config schema: {'metastore_engine': 'bad', 'storage_engine': 's3'}
         
         Config 0 not found
         """
-        assert_multiline(expects, result.output)
+        assert clean_string(expects) == clean_string(result.output)
 
     def test_config_1(self):
       runner = CliRunner()
@@ -69,7 +69,7 @@ class TestCLI:
         
         Set log level to info
 
-        Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
+        Valid Configuration. Saving config """ + from_root("/examples/operators/table/test_configs/config_1.yaml") + """ to .tmp/configurations/
 
         Setting current config to 0
         +-----------------+
@@ -83,7 +83,7 @@ class TestCLI:
 
         * = Current Configuration      
       """
-      assert_multiline(expect1, result1.output)
+      assert clean_string(expect1) == clean_string(result1.output)
 
     def test_set_current_config(self):
         runner = CliRunner()
@@ -100,13 +100,9 @@ class TestCLI:
         | Creating CONFIG_HOME at .tmp/configurations/  |
         +-----------------------------------------------+
         Set log level to trace
-        
-        Valid Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
-
-        Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_1.yaml to .tmp/configurations/
 
 
-        Schema error /Users/kyle/dev/mason/configurations/schema.json: 'bad' is not one of ['glue', 's3']
+        Schema error """ + from_root("/configurations/schema.json") + """: 'bad' is not one of ['glue', 's3']
 
         No bad client configuration for specified metastore_engine
 
@@ -114,9 +110,10 @@ class TestCLI:
 
         Invalid config schema: {'metastore_engine': 'bad', 'storage_engine': 's3'}
 
+        Valid Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
+        Valid Configuration. Saving config """ + from_root("/examples/operators/table/test_configs/config_1.yaml") + """ to .tmp/configurations/
         Valid Configuration: {'metastore': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'scheduler': {'client_name': '', 'configuration': {}}, 'storage': {'client_name': '', 'configuration': {}}, 'execution': {'client_name': 'spark', 'configuration': {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}}}
-
-        Valid Configuration. Saving config /Users/kyle/dev/mason/examples/operators/table/test_configs/config_2.yaml to .tmp/configurations/
+        Valid Configuration. Saving config """ + from_root("/examples/operators/table/test_configs/config_2.yaml") + """ to .tmp/configurations/
 
         Reading configurations at .tmp/configurations/
         Valid Configuration: {'metastore': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'scheduler': {'client_name': 'glue', 'configuration': {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}}, 'storage': {'client_name': 's3', 'configuration': {'region': 'us-east-1'}}, 'execution': {'client_name': '', 'configuration': {}}}
@@ -132,9 +129,11 @@ class TestCLI:
                      storage    s3        {'region': 'us-east-1'}
         .  1         metastore  s3        {'region': 'us-east-1'}
                      execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
+
         * = Current Configuration
         """
-        assert_multiline(expect1, result1.output)
+        assert clean_string(expect1) == clean_string(result1.output)
+
         result2 = runner.invoke(config, ['-l', 'info'])
         expects2 = """
         Set log level to info
@@ -151,7 +150,7 @@ class TestCLI:
 
         * = Current Configuration
         """
-        assert_multiline(expects2, result2.output)
+        assert clean_string(expects2) == clean_string(result2.output)
         result3 = runner.invoke(config, ['-s', '1', '-l', 'info'])
         expects3 = """
         Set log level to info
@@ -169,9 +168,8 @@ class TestCLI:
 
         * = Current Configuration
         """
-        assert_multiline(expects3, result3.output)
+        assert clean_string(expects3) == clean_string(result3.output)
 
-    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_1_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_1.yaml'), '-l', 'info'])
@@ -179,11 +177,7 @@ class TestCLI:
         result3 = runner.invoke(operator, ["table", "list", "-p", "database_name:crawler-poc", "-l", "trace"])
         result4 = runner.invoke(operator, ["table", "get", "-p", "database_name:crawler-poc,table_name:catalog_poc_data", "-l", "trace"])
         result5 = runner.invoke(operator, ["table", "refresh", "-p", "database_name:crawler-poc,table_name:catalog_poc_data", "-l", "trace"])
-        print_result(result3)
-        print_result(result4)
-        print_result(result5)
 
-    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2_csv_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -194,7 +188,6 @@ class TestCLI:
         print_result(result5)
 
 
-    @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
     def test_config_2_unmocked(self):
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
@@ -228,7 +221,8 @@ class TestCLI:
 
         * = Current Configuration
         """
-        assert_multiline(result1.output, expects1)
+        assert clean_string(expects1) == clean_string(result1.output)
+
 
         result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
         expects2 = """
@@ -240,7 +234,8 @@ class TestCLI:
         Valid Operator Definition /Users/kyle/dev/mason/examples/operators/table/infer/operator.yaml
         Registering operators at /Users/kyle/dev/mason/examples/operators/table/ to .tmp/registered_operators/table/
         """
-        assert_multiline(result2.output, expects2)
+        assert clean_string(expects2) == clean_string(result2.output)
+
 
         result25 = runner.invoke(register, [from_root('/examples/operators/job/')])
         expects25 = """
@@ -248,7 +243,7 @@ class TestCLI:
         Valid Operator Definition /Users/kyle/dev/mason/examples/operators/job/get/operator.yaml
         Registering operators at /Users/kyle/dev/mason/examples/operators/job/ to .tmp/registered_operators/job/
         """
-        assert_multiline(expects25, result25.output)
+        assert clean_string(expects25) == clean_string(result25.output)
 
         result3 = runner.invoke(operator, [])
         expects3 = """
@@ -286,7 +281,8 @@ class TestCLI:
 
         * = Current Configuration 
         """
-        assert_multiline(expects4, result4.output)
+        assert clean_string(expects4) == clean_string(result4.output)
+
         # result45 = runner.invoke(operator, ["table", "get", "-l", "trace", "-p", f"database_name:spg-mason-demo,table_name:part_data_json"], catch_exceptions=False)
         # print_result(result45)
 
