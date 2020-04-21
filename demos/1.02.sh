@@ -2,7 +2,7 @@
 #!/bin/bash
 set -e
 
-echo "Requirements:  docker.  Run docker_build in parent directory."
+echo "Requirements:  docker, .env file with AWS credentials and .kube config.  Run docker_build in parent directory.  Run script from demos root."
 echo "Press [Enter] to continue demo:"
 read -p "$*"
 
