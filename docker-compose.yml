@@ -1,4 +1,5 @@
 #  Note:  Dont forget to edit .env file to add AWS_CREDENTIALS
+#  Note:  Dont forget to configure .kube/config if you are using kubernetes
 version: '2'
 services:
     web:
@@ -7,8 +8,8 @@ services:
             - "5000:5000"
         volumes:
             - .:/app
-            - $HOME/.aws/credentials:/home/app/.aws/credentials:ro
-            - $HOME/.kube/:/home/app/.kube/
+            - $HOME/.aws/credentials:/app/.aws/credentials:ro
+            - $HOME/.kube/:/app/.kube/
         environment:
             - MASON_HOME=/mason/
         env_file:
