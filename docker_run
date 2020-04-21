@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-docker run -it --env-file=.env samtecspg/mason:v1.02 /bin/bash
+docker run -it --env-file=.env samtecspg/mason:v1.02
