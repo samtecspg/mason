@@ -14,7 +14,7 @@ def api(*args, **kwargs): return OperatorApi.get("table", "merge", *args, **kwar
 def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
     SUPPORTED_SCHEMAS = {
         "parquet",
-        "text-csv",
+        "text",
         "json",
         "jsonl"
     }

@@ -25,11 +25,10 @@ def ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)
 
-def assert_multiline(s1: str, s2: str):
+def clean_string(s1: str):
     e = re.compile(r"(\s|\n|\t)")
     f1 = e.sub('', ansi_escape(s1))
-    f2 = e.sub('', s2)
-    assert (f1 == f2)
+    return f1
 
 def run_tests(cmd: str, sub: str, mock: bool, callable):
     set_log_level()

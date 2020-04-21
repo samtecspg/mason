@@ -12,7 +12,7 @@ RUN chmod +x /app/demos/run_demo.sh
 
 RUN pip3 install mypy
 RUN ./scripts/test.sh
-#RUN ./scripts/install.sh  TODO: fix this
+RUN ./scripts/install.sh
 
 RUN mkdir /mason
 ENV MASON_HOME /mason/

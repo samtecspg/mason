@@ -3,7 +3,7 @@ from clients.spark.runner.kubernetes_operator import merge_config
 from engines.metastore.models.credentials import MetastoreCredentials
 
 from configurations import Config
-from test.support.testing_base import assert_multiline, clean_uuid
+from test.support.testing_base import clean_uuid, clean_string
 from util.environment import MasonEnvironment
 from hiyapyco import dump as hdump # type: ignore
 from clients.spark import SparkConfig
@@ -84,7 +84,7 @@ class TestSpark:
                   type: Directory
                 name: test-volume
         """
-        assert_multiline(clean_uuid(dumped), clean_uuid(expects))
+        assert clean_string(clean_uuid(dumped)) == clean_string(clean_uuid(expects))
 
 
 

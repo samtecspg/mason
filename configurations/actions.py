@@ -29,7 +29,7 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
             logger.error(message)
 
         logger.info()
-        for c in configs:
+        for c in sorted(configs):
             # TODO: Interactive configuration
             parsed = parse_yaml(c)
             config = Config(env, parsed)
