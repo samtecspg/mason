@@ -130,6 +130,7 @@ Legend
 #### Redshift
 #### Elasticsearch
 #### S3
+- [ ] Move some metastore concepts over here like "paths"
 - [ ] :arrow_up: Basic Setup 
 - [ ] Redshift
 - [ ] Elasticsearch
