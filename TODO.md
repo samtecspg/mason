@@ -2,9 +2,9 @@
 
 Legend  
 :arrow_up:  Higher Priority  
-:arrow_down: Lower Priority
-:large_blue_circle:  In Progress
-:large_blue_diamond: On Deck
+:arrow_down: Lower Priority  
+:large_blue_circle:  In Progress  
+:large_blue_diamond: On Deck  
 
 ## Basic Setup
 - [x] Basic implementation of table namespace: C:03/02/2020
