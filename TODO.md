@@ -3,6 +3,8 @@
 Legend  
 :arrow_up:  Higher Priority  
 :arrow_down: Lower Priority
+:large_blue_circle:  In Progress
+:large_blue_diamond: On Deck
 
 ## Basic Setup
 - [x] Basic implementation of table namespace: C:03/02/2020
@@ -38,7 +40,7 @@ Legend
 - [ ] Support multiple clients for a single engine type.
 - [ ] Parameter aliases:   ex: database_name -> bucket_name
 - [x] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc C: 03/20/2020
-- [ ] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
+- [x] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
 - [x] Allow for multiple configurations C: 04/08/2020
 - [ ] Clean up multiple configurations -> add id, don't use enumerate
 - [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
@@ -59,23 +61,25 @@ Legend
 - [ ]  Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Operators
-- [ ] Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
-- [ ] Metastore Database operator
-    - [ ] List databases (~= s3 list buckets)
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
 - [ ] Dedupe Operator
 - [ ] Table Operators
-    - [ ] Delete
+    - [ ] :large_blue_circle: Query (requires metastore and execution engine)
+    - [ ] :large_blue_diamond: Delete
     - [ ] Delete Database
 - [ ] Seperate out database operator?
+- [ ] Metastore Database operator
+    - [ ] List databases (~= s3 list buckets)
 - [ ] Jobs operators (scheduler):
     - [x] Get C: 04/08/2020
     - [ ] List
 - [ ] Scheduler operators:
+    - [ ] :large_blue_diamond: Create
+    - [ ] :large_blue_diamond: Delete
     - [ ] List
-    - [ ] Delete
+- [ ] :arrow_down: Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
 
 ## Clients
 
@@ -95,13 +99,14 @@ Legend
    - [ ] :arrow_down: Avro schema
    - [ ] :arrow_down: Msgpack pack schema
 
+### Execution Engine
 #### Python
 - [ ] :arrow_up: Basic setup
 #### IPython/Jupyter
 - [ ] :arrow_up: Basic setup
 - [ ] :arrow_up: Papermill integration 
 #### Athena
-- [ ] :arrow_up: Basic setup 
+- [ ] :large_blue_diamond: Basic setup 
 #### Spark
 - [x] Basic setup 
     - [x] Kubernetes Operator Runner C: 4/06/2020
@@ -119,7 +124,7 @@ Legend
 ### Glue
 - [x] Basic set up
 #### Airflow
-- [ ] :arrow_up: Basic setup 
+- [ ] :large_blue_diamond: Basic setup 
 
 ### Storage
 #### Redshift
