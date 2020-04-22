@@ -134,7 +134,7 @@ Legend
 - [ ] Redshift
 - [ ] Elasticsearch
 
-## :arrow_down: Preparing for public
+## :arrow_up: Preparing for public
 - [ ] Remove samtec specific examples from examples/ files.  Use public examples
 
 
