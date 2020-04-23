@@ -27,10 +27,11 @@ elif [ $1 == "1.03" ]
 then
   commands=(
     "mason config examples/configs/"
-    "mason config -s 1"
+    "mason config -s 0"
     "mason register examples/operators/table"
     "mason register examples/operators/job"
     "mason operator"
+    "mason operator table list -p \"database_name:crawler-poc\""
   )
 else
   commands=()

@@ -12,9 +12,11 @@ class GlueClient:
     def __init__(self, config: dict):
         self.aws_role_arn = config.get("aws_role_arn") or ""
         self.aws_region = config.get("aws_region") or ""
+        self.access_key = config.get("access_key") or ""
+        self.secret_key = config.get("secret_key") or ""
 
     def client(self) -> BaseClient:
-        boto3.client('glue', region_name=self.aws_region)
+        return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
 
     def list_tables(self, database_name: str, response: Response):
         try:
