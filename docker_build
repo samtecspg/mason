@@ -1,1 +1,1 @@
-docker image build -t samtecspg/mason:v1.02 .
+docker image build -t samtecspg/mason:v$(cat VERSION) .
