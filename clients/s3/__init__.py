@@ -9,10 +9,11 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from engines.metastore.models.schemas import check_schemas as CheckSchemas
 from util.list import get
 import s3fs #type: ignore
+from os import environ
 
 class S3Client:
     def __init__(self, s3_config: dict):
-        self.region = s3_config.get("region")
+        self.region = s3_config.get("aws_region")
         self.client = s3fs.S3FileSystem(client_kwargs={'region_name': self.region})
 
     def parse_responses(self, s3_response: dict):

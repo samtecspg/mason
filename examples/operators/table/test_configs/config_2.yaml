@@ -3,7 +3,9 @@ execution_engine: spark
 clients:
   s3:
     configuration:
-      region: us-east-1
+      aws_region: "{{AWS_REGION}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
   spark:
     configuration:
       runner:

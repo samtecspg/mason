@@ -24,8 +24,8 @@ class Operator:
     def find_configurations(self, configs: List[Config], response: Response) -> Tuple[List[Config], Response]:
         configurations: List[Config] = []
         for config in configs:
-            vc = self.validate_configuration(config, Response())
-            if not vc.errored():
+            response = self.validate_configuration(config, Response())
+            if not response.errored():
                 configurations.append(config)
         if len(configurations) == 0:
             response.add_error(f"No matching configuration for operator {self.cmd} {self.subcommand}.  Check operator.yml for supported configurations.")

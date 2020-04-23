@@ -4,7 +4,6 @@ from clients.s3 import S3Client
 from engines.metastore.models.credentials.aws import AWSCredentials
 from urllib.parse import urlparse
 from typing import Tuple, List
-import os
 
 from engines.metastore.models.schemas import MetastoreSchema
 from util.logger import logger
@@ -13,7 +12,7 @@ from util.logger import logger
 class S3MetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
-        self.region = config.get("region")
+        self.region = config.get("aws_region")
         self.access_key = config.get("access_key")
         self.secret_key = config.get("secret_key")
         self.client = S3Client(self.get_config())

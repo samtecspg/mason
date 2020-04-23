@@ -1,3 +1,4 @@
+from engines import Engine, safe_interpolate_environment
 from util.environment import MasonEnvironment
 from engines.execution import ExecutionEngine
 from engines.metastore import MetastoreEngine
@@ -6,6 +7,7 @@ from engines.scheduler import SchedulerEngine
 from test.support import testing_base as base
 from util.yaml import parse_yaml
 from definitions import from_root
+from os import environ
 
 class TestExecutionEngine:
     def before(self, config: str):
@@ -91,6 +93,29 @@ class TestSchedulerEngine:
         me = self.before("/test/support/configs/test_partial_config.yaml")
         assert(me.client_name == "")
         assert(type(me.client).__name__ == "EmptySchedulerClient")
+
+class TestEnvironmentInterpolation:
+    def test_interpolation(self):
+        # valid interpolation
+        environ["AWS_REGION"] = "test"
+        test_config = {"test": "{{AWS_REGION}}"}
+        expect = {"test": "test"}
+        d = safe_interpolate_environment(test_config)
+        assert(d == expect)
+
+        # unpermitted
+        environ["SENSITIVE"] = "test"
+        test_config = {"test": "{{SENSITIVE}}"}
+        d = safe_interpolate_environment(test_config)
+        assert(d == test_config)
+
+
+
+
+
+
+
+
 
 
 

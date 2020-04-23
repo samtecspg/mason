@@ -6,8 +6,6 @@ from parameters import Parameters
 from clients.response import Response
 from api import operator_api as OperatorApi
 from engines.metastore.models.credentials import MetastoreCredentials
-from util.logger import logger
-
 
 def api(*args, **kwargs): return OperatorApi.get("table", "merge", *args, **kwargs)
 
