@@ -23,6 +23,15 @@ then
     "mason operator table get -p \"database_name:spg-mason-demo,table_name:part_data_json\""
     "mason operator table merge -p \"input_path:spg-mason-demo/part_data_json/,output_path:spg-mason-demo/part_data_json_merged/\""
   )
+elif [ $1 == "1.03" ]
+then
+  commands=(
+    "mason config examples/configs/"
+    "mason config -s 1"
+    "mason register examples/operators/table"
+    "mason register examples/operators/job"
+    "mason operator"
+  )
 else
   commands=()
 fi
@@ -31,7 +40,7 @@ fi
 for i in "${commands[@]}"
 do
   echo "Press [Enter] to continue demo:"
-  read -p "$i"
+  read -p ">> $i"
   eval "$i"
 done
 
