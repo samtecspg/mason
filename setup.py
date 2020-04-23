@@ -7,7 +7,7 @@ long_description = 'Mason Data Operators Framework'
 
 setup(
     name='mason',
-    version='1.0.0',
+    version='1.03',
     author='Kyle Prifogle',
     author_email='kyle.prifogle@samtec.com',
     url='',

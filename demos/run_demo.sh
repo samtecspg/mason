@@ -27,7 +27,7 @@ elif [ $1 == "1.03" ]
 then
   commands=(
     "mason config examples/configs/"
-    "mason config -s 0"
+    "mason config -s 1"
     "mason register examples/operators/table"
     "mason register examples/operators/job"
     "mason operator"
