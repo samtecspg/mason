@@ -12,7 +12,7 @@ class SparkClient(ExecutionClient):
         self.config = SparkConfig(spark_config)
 
     def client(self):
-        self.get_runner(self.runner_type)
+        return self.get_runner(self.runner_type)
 
     def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response):
         self.client().run(self.config, job_name, metastore_credentials, params, response)
