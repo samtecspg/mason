@@ -35,9 +35,19 @@ class Config:
         }
 
         if valid:
-            logger.debug(f"Valid Configuration: {self.engines}")
+            logger.debug(f"Valid Configuration")
         else:
-            logger.error(f"\nInvalid config schema: {config}\n")
+            logger.error(f"\nInvalid config schema\n")
+
+    def sanitize(self, d: dict):
+        REDACTED_KEYS = ["access_key", "secret_key", "aws_role_arn"]
+        def redact_value(key: str, value: str):
+            if key in REDACTED_KEYS:
+                return "REDACTED"
+            else:
+                return value
+
+        return {key: redact_value(key, value) for (key, value) in d.items()}
 
     def extended_info(self, config_id: int, current: bool = False):
         ei = []
@@ -48,7 +58,7 @@ class Config:
                     "",
                     "metastore",
                     self.metastore.client_name,
-                    self.metastore.config_doc,
+                    self.sanitize(self.metastore.config_doc),
                 ]
             )
 
@@ -58,7 +68,7 @@ class Config:
                     "",
                     "scheduler",
                     self.scheduler.client_name,
-                    self.scheduler.config_doc,
+                    self.sanitize(self.scheduler.config_doc),
                 ]
             )
 
@@ -68,7 +78,7 @@ class Config:
                     "",
                     "storage",
                     self.storage.client_name,
-                    self.storage.config_doc,
+                    self.sanitize(self.storage.config_doc),
                 ]
             )
 
@@ -78,7 +88,7 @@ class Config:
                     "",
                     "execution",
                     self.execution.client_name,
-                    self.execution.config_doc,
+                    self.sanitize(self.execution.config_doc),
                 ]
             )
 
