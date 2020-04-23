@@ -54,36 +54,13 @@ class TestCLI:
         assert clean_string(expects) == clean_string(result.output)
 
     def test_config_1(self):
+      import dotenv
+      dotenv.load_dotenv()
       runner = CliRunner()
       result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_1.yaml'), '-l', 'info'])
-      expect1 = """
-        +-------------------------------+
-        | Creating MASON_HOME at .tmp/  |
-        +-------------------------------+
-        +-------------------------------------------------------+
-        | Creating OPERATOR_HOME at .tmp/registered_operators/  |
-        +-------------------------------------------------------+
-        +-----------------------------------------------+
-        | Creating CONFIG_HOME at .tmp/configurations/  |
-        +-----------------------------------------------+
-        
-        Set log level to info
-
-        Valid Configuration. Saving config """ + from_root("/examples/operators/table/test_configs/config_1.yaml") + """ to .tmp/configurations/
-
-        Setting current config to 0
-        +-----------------+
-        | Configurations  |
-        +-----------------+
-        Config ID    Engine     Client    Configuration
-        -----------  ---------  --------  --------------------------------------------------------------------------------------------------------------------------
-        *  0         metastore  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
-                     scheduler  glue      {'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue', 'region': 'us-east-1'}
-                     storage    s3        {'region': 'us-east-1'}
-
-        * = Current Configuration      
-      """
-      assert clean_string(expect1) == clean_string(result1.output)
+      result2 = runner.invoke(register, [from_root('/examples/operators/table/'), '-l', 'info'])
+      result3 = runner.invoke(operator, ["table", "list", "-p", "database_name:crawler-poc"])
+      print_result(result3)
 
     def test_set_current_config(self):
         runner = CliRunner()
