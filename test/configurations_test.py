@@ -3,7 +3,6 @@ from util.environment import MasonEnvironment
 from definitions import from_root
 from util.yaml import parse_yaml
 from configurations import Config
-from test.support.testing_base import get_mocks
 from util.logger import logger
 
 def empty_config():
@@ -22,7 +21,6 @@ class TestConfiguration:
         env = MasonEnvironment(config_home=config_home)
         config_doc = parse_yaml(env.config_home)
         conf = Config(env, config_doc)
-        get_mocks(conf)
         return conf
 
 

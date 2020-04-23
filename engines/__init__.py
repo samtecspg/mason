@@ -20,7 +20,7 @@ def interpolate_value(value: Union[str, dict]):
             key = v.replace("{{", "").replace("}}", "")
             with open(from_root('/.env.example')) as env_example:
                 lines = env_example.readlines()
-                values = list(map(lambda l: l.rstrip("=\n"), lines))
+                values = list(map(lambda l: l.split("=")[0], lines))
                 if key in values:
                     interpolated = environ.get(key)
 
@@ -61,12 +61,6 @@ class Engine():
             else:
                 self.valid = True
 
-    def set_underlying_client(self, client):
-        self.client.client.client = client
-
-    def underlying_client(self):
-        return self.client.client.client
-
     def to_dict(self):
         return {
             "client_name": self.client_name,
@@ -75,8 +69,10 @@ class Engine():
 
 class EmptyEngine(Engine):
     def __init__(self):
-        self.client = EmptyClient()
         self.client_name = None
+
+    def client(self):
+        EmptyClient()
 
     def set_underlying_client(self, client):
         pass
