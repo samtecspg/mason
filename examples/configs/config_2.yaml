@@ -2,9 +2,10 @@ metastore_engine: s3
 execution_engine: spark
 clients:
   s3:
-    region: {{AWS_REGION}}
-    access_key: {{AWS_ACCESS_KEY_ID}}
-    secret_key: {{AWS_SECRET_ACCESS_KEY}}
+    configuration:
+      aws_region: "{{AWS_REGION}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
   spark:
     configuration:
       runner:

@@ -11,6 +11,16 @@ def safe_interpolate_environment(config_doc: dict):
     return {k: interpolate_value(v) for k, v in config_doc.items()}
 
 def interpolate_value(value: Union[str, dict]):
+
+    SAFE_KEYS = [
+        'AWS_ACCESS_KEY_ID',
+        'AWS_SECRET_ACCESS_KEY',
+        'AWS_REGION',
+        'MASON_HOME',
+        'KUBECONFIG',
+        'GLUE_ROLE_ARN'
+    ]
+
     r = re.compile(r'^\{\{[A-Z0-9_]+\}\}$')
     interpolated: Optional[str] = None
     if not value.__class__.__name__ == "dict": #TODO: deal with nested configuration structures
@@ -18,11 +28,8 @@ def interpolate_value(value: Union[str, dict]):
         v:str = value # type: ignore
         if r.match(v):
             key = v.replace("{{", "").replace("}}", "")
-            with open(from_root('/.env.example')) as env_example:
-                lines = env_example.readlines()
-                values = list(map(lambda l: l.split("=")[0], lines))
-                if key in values:
-                    interpolated = environ.get(key)
+            if key in SAFE_KEYS:
+                interpolated = environ.get(key)
 
     return interpolated or value
 
