@@ -10,9 +10,9 @@ from configurations import Config
 from operators.operator import Operator
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
+import pytest #type: ignore
 
 import os
-
 
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
@@ -128,6 +128,7 @@ def test_merge():
     os.environ["AWS_ACCESS_KEY_ID"] = "test"
     run_tests("table", "merge", True, tests)
 
+@pytest.mark.skip(reason="WIP")
 def test_query():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):

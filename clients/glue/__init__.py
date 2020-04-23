@@ -1,6 +1,8 @@
 from typing import Tuple
 
 import boto3 # type: ignore
+from botocore.client import BaseClient # type: ignore
+
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
@@ -8,12 +10,15 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, S
 class GlueClient:
 
     def __init__(self, config: dict):
-        self.client = boto3.client('glue', region_name=config.get("aws_region"))
         self.aws_role_arn = config.get("aws_role_arn") or ""
+        self.aws_region = config.get("aws_region") or ""
+
+    def client(self) -> BaseClient:
+        boto3.client('glue', region_name=self.aws_region)
 
     def list_tables(self, database_name: str, response: Response):
         try:
-            result = self.client.get_tables(DatabaseName=database_name)
+            result = self.client().get_tables(DatabaseName=database_name)
         except ClientError as e:
             result = e.response
         response.add_response(result)
@@ -96,7 +101,7 @@ class GlueClient:
     def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[MetastoreSchema, Response]:
 
         try:
-            result = self.client.get_table(DatabaseName=database_name, Name=table_name)
+            result = self.client().get_table(DatabaseName=database_name, Name=table_name)
         except ClientError as e:
             result = e.response
 
@@ -118,7 +123,7 @@ class GlueClient:
 
     def refresh_glue_table(self, crawler_name: str):
         try:
-            result = self.client.start_crawler(Name=crawler_name)
+            result = self.client().start_crawler(Name=crawler_name)
         except ClientError as e:
             result = e.response
         return result
@@ -134,7 +139,7 @@ class GlueClient:
         }
 
         try:
-            result = self.client.create_crawler(
+            result = self.client().create_crawler(
                 DatabaseName=database,
                 Name=name,
                 Role=role,
