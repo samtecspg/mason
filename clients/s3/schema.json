@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "S3Configuration",
   "properties": {
-    "region": {
+    "aws_region": {
       "type": "string"
     },
     "access_key": {
@@ -12,6 +12,6 @@
       "type": "string"
     }
   },
-  "required": ["region"],
+  "required": ["aws_region", "access_key", "secret_key"],
   "additionalProperties": false
 }

@@ -1,0 +1,7 @@
+metastore_engine: glue
+execution_engine: athena
+clients:
+  glue:
+    configuration: {}
+  athena:
+    configuration: {}

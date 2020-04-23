@@ -1,16 +1,37 @@
 
 from util.logger import logger
 from clients import EmptyClient
-from typing import Optional
+from typing import Optional, Union
 from util.json_schema import validate_schema
 from definitions import from_root
-from os import path
+from os import path, environ
+import re
+
+def safe_interpolate_environment(config_doc: dict):
+    return {k: interpolate_value(v) for k, v in config_doc.items()}
+
+def interpolate_value(value: Union[str, dict]):
+    r = re.compile(r'^\{\{[A-Z0-9_]+\}\}$')
+    interpolated: Optional[str] = None
+    if not value.__class__.__name__ == "dict": #TODO: deal with nested configuration structures
+        # TODO: Fix type
+        v:str = value # type: ignore
+        if r.match(v):
+            key = v.replace("{{", "").replace("}}", "")
+            with open(from_root('/.env.example')) as env_example:
+                lines = env_example.readlines()
+                values = list(map(lambda l: l.rstrip("=\n"), lines))
+                if key in values:
+                    interpolated = environ.get(key)
+
+    return interpolated or value
 
 class Engine():
 
     def __init__(self, engine_type: str, config: Optional[dict]):
         self.client_name = (config or {}).get(f"{engine_type}_engine") or ""
-        self.config_doc = (config or {}).get("clients", {}).get(self.client_name, {}).get("configuration", {})
+        conf_doc = (config or {}).get("clients", {}).get(self.client_name, {}).get("configuration", {})
+        self.config_doc = safe_interpolate_environment(conf_doc)
         self.valid = False
 
         schema_path = from_root(f"/clients/{self.client_name}/schema.json")

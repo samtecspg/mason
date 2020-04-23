@@ -73,6 +73,7 @@ def test_post():
         response, status = table_infer_api(env, config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
         assert((response, status) == expects.post(False))
 
+    os.environ["GLUE_ROLE_ARN"] = "TestRole"
     run_tests("table", "infer", True,  tests)
 
 
@@ -101,8 +102,6 @@ def test_merge():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # unsupported merge schema
-        os.environ["AWS_SECRET_ACCESS_KEY"]="test"
-        os.environ["AWS_ACCESS_KEY_ID"]="test"
         params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
         unsupported = op.run(env, config, params, Response())
         info = ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created', 'Running job merge']
@@ -125,5 +124,17 @@ def test_merge():
 
         assert(valid.with_status() == expect)
 
-
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "test"
+    os.environ["AWS_ACCESS_KEY_ID"] = "test"
     run_tests("table", "merge", True, tests)
+
+def test_query():
+
+    def tests(env: MasonEnvironment, config: Config, op: Operator):
+        os.environ["AWS_SECRET_ACCESS_KEY"]="test"
+        os.environ["AWS_ACCESS_KEY_ID"]="test"
+        query = "SELECT * from TEST"
+
+        params = Parameters(parameters=f"query_string:{query}")
+
+    run_tests("table", "query", True, tests)

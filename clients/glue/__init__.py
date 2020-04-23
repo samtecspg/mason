@@ -8,8 +8,8 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, S
 class GlueClient:
 
     def __init__(self, config: dict):
-        self.client = boto3.client('glue', region_name=config.get("region"))
-        self.aws_role_arn = config.get("aws_role_arn", "")
+        self.client = boto3.client('glue', region_name=config.get("aws_region"))
+        self.aws_role_arn = config.get("aws_role_arn") or ""
 
     def list_tables(self, database_name: str, response: Response):
         try:

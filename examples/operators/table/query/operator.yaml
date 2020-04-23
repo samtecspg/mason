@@ -1,0 +1,10 @@
+type: "operator"
+namespace: "table"
+command: "query"
+description:  "Query metastore tables"
+parameters:
+  required:
+    - query_string
+supported_configurations:
+  - metastore: "glue"
+    execution: "athena"

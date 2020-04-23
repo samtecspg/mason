@@ -48,7 +48,7 @@ class TestConfiguration:
              'metastore': {'client_name': '', 'configuration': {}},
              'scheduler': {'client_name': '', 'configuration': {}},
              'storage': {'client_name': 's3',
-             'configuration': {'region': 'us-west-2'}}
+             'configuration': {'aws_region': 'us-west-2', "secret_key": "test", "access_key": "test"}}
        }
         assert(conf.engines == expects)
 

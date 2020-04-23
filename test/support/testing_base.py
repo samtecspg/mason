@@ -59,7 +59,6 @@ def get_env(operator_home: str = "/examples/operators", config_home = "/examples
     return MasonEnvironment(operator_home=from_root(operator_home), config_home=from_root(config_home), operator_module=operator_module)
 
 def get_configs(env: MasonEnvironment):
-    # env.config_schema = from_root("/test/support/schemas/config.json")
     return get_all(env)
 
 def get_mocks(config: Config):
