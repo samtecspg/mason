@@ -4,12 +4,12 @@ scheduler_engine: glue
 clients:
   glue:
     configuration:
-      region: {{AWS_REGION}}
-      aws_role_arn: {{GLUE_ROLE_ARN}}
-      access_key: {{AWS_ACCESS_KEY_ID}}
-      secret_key: {{AWS_SECRET_ACCESS_KEY}}
+      aws_region: "{{AWS_REGION}}"
+      aws_role_arn: "{{GLUE_ROLE_ARN}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
   s3:
     configuration:
-      region: {{AWS_REGION}}
-      access_key: {{AWS_ACCESS_KEY_ID}}
-      secret_key: {{AWS_SECRET_ACCESS_KEY}}
+      aws_region: "{{AWS_REGION}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
