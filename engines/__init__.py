@@ -30,6 +30,8 @@ def interpolate_value(value: Union[str, dict]):
             key = v.replace("{{", "").replace("}}", "")
             if key in SAFE_KEYS:
                 interpolated = environ.get(key)
+            else:
+                interpolated = ""
 
     return interpolated or value
 
@@ -43,14 +45,17 @@ class Engine():
 
         schema_path = from_root(f"/clients/{self.client_name}/schema.json")
 
-        if len(self.config_doc) == 0 :
-            if not self.client_name == "":
-                logger.error()
-                logger.error(f"No {self.client_name} client configuration for specified {engine_type}_engine")
-                self.config_doc = {}
-                self.client_name = "invalid"
-            else:
-                self.valid = True
+        # if len(self.config_doc) == 0 :
+        #     if not self.client_name == "":
+        #         logger.error()
+        #         logger.error(f"No {self.client_name} client configuration for specified {engine_type}_engine")
+        #         self.config_doc = {}
+        #         self.client_name = "invalid"
+        #     else:
+        #         self.valid = True
+        # else:
+        if self.client_name == "":
+            self.valid = True
         else:
             if path.exists(schema_path):
                 valid = validate_schema(self.config_doc, schema_path)

@@ -21,16 +21,6 @@ class Operator:
     def required_parameters(self):
         return self.parameters.get("required", [])
 
-    def find_configurations(self, configs: List[Config], response: Response) -> Tuple[List[Config], Response]:
-        configurations: List[Config] = []
-        for config in configs:
-            response = self.validate_configuration(config, Response())
-            if not response.errored():
-                configurations.append(config)
-        if len(configurations) == 0:
-            response.add_error(f"No matching configuration for operator {self.cmd} {self.subcommand}.  Check operator.yml for supported configurations.")
-        return configurations, response
-
     def run(self, env: MasonEnvironment, config: Config, parameters: Parameters, response: Response) -> Response:
 
         self.validate(config, parameters, response)

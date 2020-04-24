@@ -10,10 +10,10 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, S
 class GlueClient:
 
     def __init__(self, config: dict):
-        self.aws_role_arn = config.get("aws_role_arn") or ""
-        self.aws_region = config.get("aws_region") or ""
-        self.access_key = config.get("access_key") or ""
-        self.secret_key = config.get("secret_key") or ""
+        self.aws_role_arn = config.get("aws_role_arn")
+        self.aws_region = config.get("aws_region")
+        self.access_key = config.get("access_key")
+        self.secret_key = config.get("secret_key")
 
     def client(self) -> BaseClient:
         return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
@@ -30,7 +30,7 @@ class GlueClient:
             response.add_error(f"Database {database_name} not found")
             response.set_status(404)
         elif 200 <= status < 300:
-            data = self.parse_table_list_data(result)
+            data = {'Tables': self.parse_table_list_data(result)}
             response.add_data(data)
             response.set_status(status)
         else:
@@ -43,7 +43,7 @@ class GlueClient:
         create_crawler_response = self.create_glue_crawler(
             database=database_name,
             name=schedule_name,
-            role=self.aws_role_arn,
+            role=self.aws_role_arn or "",
             path=path
         )
 

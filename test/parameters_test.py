@@ -15,7 +15,8 @@ class TestInit:
             "param_test-value=with.equals:value-test_value=with.equals": {"param_test-value=with.equals": "value-test_value=with.equals"},
             "param1:value,param2:value": {"param1": "value", "param2": "value"},
             "param1:value,param1:value2": {"param1": "value2"},
-            "testwith\,inthemiddle:result,param2:andanother\:inthemiddle": {'inthemiddle': 'result', 'param2': 'andanother'}
+            "testwith\,inthemiddle:result,param2:andanother\:inthemiddle": {'inthemiddle': 'result', 'param2': 'andanother\\'},
+            "test with space: on both sides": {'test with space': ' on both sides'}
         }
 
         for param_string, result in good_tests.items():

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "AthenaConfiguration",
+  "properties": {
+    "access_key": {
+      "type": "string"
+    },
+    "secret_key": {
+      "type": "string"
+    }
+  },
+  "required": ["access_key", "secret_key"]
+}
