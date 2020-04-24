@@ -3,6 +3,7 @@ from clients.spark.runner import SparkRunner
 from clients.spark.config import SparkConfig
 from clients.response import Response
 from definitions import from_root
+from engines.execution.models.jobs import Job
 from util.sys_call import run_sys_call
 from hiyapyco import load as hload # type: ignore
 from typing import List
@@ -59,7 +60,7 @@ def merge_config(config: SparkConfig, job_name: str, metastore_credentials: Meta
 
 class KubernetesOperator(SparkRunner):
 
-    def run(self, config: SparkConfig, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response):
+    def run(self, config: SparkConfig, job_name: str, metastore_credentials: MetastoreCredentials, params: dict) -> Job:
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
 
@@ -72,15 +73,32 @@ class KubernetesOperator(SparkRunner):
 
             command = ["kubectl", "apply", "-f", yaml_file.name]
 
+            logs = []
             message = f"Executing Spark Kubernetes Operator. job_id:  {job_id}"
-            response.add_info(message)
+            logs.append(message)
 
-            response = run_sys_call(command, response)
+            stdout, stderr = run_sys_call(command)
+            logs = []
+            errors = []
+            if len(stdout) > 0:
+                logs.append(stdout)
+            if len(stderr) > 0:
+                errors.append(stderr)
 
-            return response
+            job = Job(job_id, logs, errors)
 
-    def get(self, job_id: str, response: Response):
+            return job
+
+    def get(self, job_id: str) -> Job:
         command = ["kubectl", "logs", job_id + "-driver"]
-        response = run_sys_call(command, response)
-        return response
+        stdout, stderr = run_sys_call(command)
+        logs = []
+        errors = []
+        if len(stdout) > 0:
+            logs.append(stdout)
+        if len(stderr) > 0:
+            errors.append(stderr)
+
+        job = Job(job_id, logs, errors)
+        return job
 

@@ -5,6 +5,7 @@ description:  "Query metastore tables"
 parameters:
   required:
     - query_string
+    - database_name
 supported_configurations:
   - metastore: "glue"
     execution: "athena"

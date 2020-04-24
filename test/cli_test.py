@@ -4,9 +4,10 @@ from cli import config, operator, register
 from definitions import from_root
 import os
 import pytest #type: ignore
+import dotenv #type: ignore
 import shutil
 from test.support.testing_base import clean_string
-from util.logger import logger
+
 
 
 def print_result(result):
@@ -54,7 +55,6 @@ class TestCLI:
         assert clean_string(expects) == clean_string(result.output)
 
     def test_config_1(self):
-      import dotenv
       dotenv.load_dotenv()
       runner = CliRunner()
       result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_1.yaml'), '-l', 'info'])

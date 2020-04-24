@@ -9,7 +9,7 @@ import re
 class Parameters:
 
     def parse_string(self, param_string: str) -> dict:
-        pattern = r"([=a-zA-Z0-9\-:_./]+:[=a-zA-Z0-9\-:_./]+)"
+        pattern = r"([^,^:]+:[^,^:]+)"
         pattern_guide = "<param1>:<value1>,<param2>:<value2>"
         matches = re.findall(pattern, param_string)
 

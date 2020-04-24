@@ -10,7 +10,7 @@ class Response:
         self.configs = []
         self.current_config = None
         self.status_code: int = 200
-        self.data: dict = {}
+        self.data: List[dict] = []
 
     def errored(self):
         return not (len(self.errors) == 0)
@@ -48,8 +48,7 @@ class Response:
         self.status_code = status
 
     def add_data(self, data: dict):
-        self.data = data
-
+        self.data.append(data)
 
     def formatted(self):
         returns = {}
@@ -63,8 +62,9 @@ class Response:
         if self.current_config:
             returns['Current Config'] = self.current_config.engines
 
-        if len(self.data) > 0:
-            returns['Data'] = self.data  # type: ignore
+        d = [i for i in self.data if len(i) > 0]
+        if len(d) > 0:
+            returns['Data'] = d  # type: ignore
 
         if logger.log_level.debug():
             returns['_client_responses'] = self.responses # type: ignore

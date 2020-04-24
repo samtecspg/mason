@@ -71,7 +71,7 @@ class S3Client:
         split = database_name.split("/", 1)
         try:
             result = self.client().s3.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
-            response.add_data(result.get("CommonPrefixes", {}))
+            response.add_data({"Prefixes": result.get("CommonPrefixes", {})})
         except ClientError as e:
             result = e.response
             error = result.get("Error", {})

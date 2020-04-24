@@ -110,10 +110,13 @@ def get_all(env: MasonEnvironment) -> List[Config]:
     for subdir, dirs, files in walk(env.config_home):
         for file in files:
             if '.yaml' in file:
-                yaml_config_doc: dict = parse_yaml(env.config_home + file) or {}
-                configs.append(Config(env, yaml_config_doc))
+                configs.append(get_config(env, file))
 
     return configs
+
+def get_config(env: MasonEnvironment, file: str):
+    yaml_config_doc: dict = parse_yaml(env.config_home + file) or {}
+    return Config(env, yaml_config_doc)
 
 
 def tabulate_configs(configs: List[Config], env: MasonEnvironment, log_level: str = "info") -> Optional[Config]:

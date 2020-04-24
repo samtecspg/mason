@@ -12,10 +12,10 @@ from engines.metastore.models.schemas import MetastoreSchema
 class GlueMetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
-        self.aws_region = config.get("aws_region") or ""
-        self.aws_role_arn = config.get("aws_role_arn") or ""
-        self.access_key = config.get("access_key") or ""
-        self.secret_key = config.get("secret_key") or ""
+        self.aws_region = config.get("aws_region")
+        self.aws_role_arn = config.get("aws_role_arn")
+        self.access_key = config.get("access_key")
+        self.secret_key = config.get("secret_key")
         self.client = GlueClient(self.get_config())
 
     def list_tables(self, database_name: str, response: Response) -> Response:
