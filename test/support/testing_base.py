@@ -14,6 +14,12 @@ from dotenv import load_dotenv # type: ignore
 
 load_dotenv('.env.example')
 
+MOCKS = {
+    "glue": "glue",
+    "s3": "s3",
+    "spark": "kubernetes"
+}
+
 def clean_uuid(s: str):
     return uuid_regex().sub('', s)
 
@@ -32,13 +38,30 @@ def mock(client: str):
     return MagicMock(return_value=Mocks.get_client(client))
 
 
+def get_mock(client_name: str, mockable_name: str, callable):
+    with patch(f"clients.{client_name}.{client_name.capitalize()}Client.client", mock(mockable_name)):
+        callable
+
+def get_mocks(callable):
+    if len(MOCKS) > 0:
+        key = list(MOCKS.keys())[0]
+        value = MOCKS.pop(key)
+        get_mock(key, value, get_client_mocks(MOCKS, callable))
+    else:
+        callable
+
+def get_client_mocks(mocks: dict, callable):
+    if len(mocks) > 0:
+        key = list(mocks.keys())[0]
+        value = mocks.pop(key)
+        get_mock(key, value, get_client_mocks(mocks, callable))
+    else:
+       callable
+
 def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable):
     logger.set_level(log_level)
     if do_mock:
-        with patch('clients.glue.GlueClient.client', mock("glue")):
-            with patch('clients.s3.S3Client.client', mock("s3")):
-                with patch('clients.spark.SparkClient.client', mock("kubernetes")):
-                    execute_tests(cmd,sub, configs, callable)
+        get_mocks(execute_tests(cmd, sub, configs, callable))
     else:
         execute_tests(cmd,sub, configs, callable)
 

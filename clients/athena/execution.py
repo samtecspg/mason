@@ -9,10 +9,12 @@ class AthenaExecutionClient(ExecutionClient):
         self.client = AthenaClient(config)
 
     def run_job(self, job_type: str, metastore_credentials: MetastoreCredentials, parameters: dict, response: Response) -> Response:
-        response = self.client.run_job(job_type, metastore_credentials, parameters, response)
+        response, job = self.client.run_job(job_type, metastore_credentials, parameters, response)
+        response = job.add_data(response)
         return response
 
     def get_job(self, job_id: str, response: Response) -> Response:
-        response = self.client.get_job(job_id, response)
+        response, job = self.client.get_job(job_id, response)
+        response = job.add_data(response)
         return response
 
