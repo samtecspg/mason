@@ -38,7 +38,3 @@ class Job:
             response.add_data({"Results": self.results})
         return response
 
-    def add_preview(self, response: Response) -> Response:
-        if self.preview:
-            response.add_data({"Preview": self.preview})
-        return response

@@ -1,0 +1,11 @@
+type: "operator"
+namespace: "table"
+command: "delete"
+description:  "Delete metastore tables"
+parameters:
+  required:
+    - table_name
+    - database_name
+supported_configurations:
+  - metastore: "glue"
+    execution: "athena"

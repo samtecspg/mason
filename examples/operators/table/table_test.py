@@ -11,7 +11,7 @@ from configurations import Config
 from operators.operator import Operator
 from test.support.testing_base import run_tests, clean_uuid
 from util.environment import MasonEnvironment
-from dotenv import load_dotenv
+from dotenv import load_dotenv #type: ignore
 
 import os
 
@@ -75,7 +75,7 @@ def test_post():
         assert((response, status) == expects.post(False))
 
     os.environ["GLUE_ROLE_ARN"] = "TestRole"
-    run_tests("table", "infer", True, "trace",["config_1"],  tests)
+    run_tests("table", "infer", True, "fatal",["config_1"],  tests)
 
 
 

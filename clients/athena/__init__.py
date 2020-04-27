@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 from botocore.exceptions import ClientError # type: ignore
 
@@ -25,7 +25,7 @@ class AthenaClient:
         message = athena_response.get('Error', {}).get('Message')
         return error, status, message
 
-    def get_job(self, job_id: str, response: Response) -> Tuple[Job, Response]:
+    def get_job(self, job_id: str, response: Response) -> Tuple[Response, Job]:
         try:
             athena_response = self.client().get_query_results(
                 QueryExecutionId=job_id,
@@ -46,7 +46,7 @@ class AthenaClient:
             job = Job(job_id, results=[results])
         return response, job
 
-    def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response) -> Tuple[Response, Job]:
+    def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response) -> Tuple[Response, Optional[Job]]:
         response.add_info(f"Running job {job_name}")
         try:
             request_token = str(uuid4())
