@@ -23,6 +23,11 @@ class MetastoreClient(Client):
         raise NotImplementedError("Client not implemented")
         return emptySchema(), response
 
+    # @abstractmethod
+    # def delete_table(self, database_name: str, table_name: str, response: Response) -> Tuple[str, str]:
+    #     raise NotImplementedError("Client not implemented")
+    #     return ("", "")
+
     @abstractmethod
     def credentials(self) -> MetastoreCredentials:
         raise NotImplementedError("Client not implemented")
@@ -37,6 +42,7 @@ class MetastoreClient(Client):
     def parse_path(self, path: str) -> Tuple[str, str]:
         raise NotImplementedError("Client not implemented")
         return ("", "")
+
 
 
 class EmptyMetastoreClient(MetastoreClient):

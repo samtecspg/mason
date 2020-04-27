@@ -4,7 +4,7 @@ from parameters import Parameters
 from clients.response import Response
 from api import operator_api as OperatorApi
 
-def api(*args, **kwargs): return OperatorApi.get("table", "merge", *args, **kwargs)
+def api(*args, **kwargs): return OperatorApi.get("table", "query", *args, **kwargs)
 
 def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
     query_string = parameters.safe_get("query_string")

@@ -6,7 +6,7 @@ from parameters import Parameters
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv #type: ignore
 
 def test_get():
 

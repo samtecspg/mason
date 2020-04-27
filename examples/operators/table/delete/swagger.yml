@@ -1,15 +1,15 @@
 paths:
-  /table/query:
+  /table/delete:
     post:
-      operationId: "registered_operators.table.query.api"
+      operationId: "registered_operators.table.delete.api"
       tags:
         - "Table"
-      summary: "Trigger an execution engine job to query the metastore table"
-      description: "Query metastore data"
+      summary: "Delete metastore table"
+      description: "Delete metastore table"
       consumes:
         - application/json
       parameters:
-        - name: query_string
+        - name: table_name
           in: query
           required: true
           type: string
@@ -25,6 +25,6 @@ paths:
           default: "info"
       responses:
         200:
-          description: "Successful Query"
+          description: "Successful Delete"
           schema:
             type: "string"
