@@ -22,6 +22,13 @@ class SparkClient:
     def get_job(self, job_id: str, response: Response):
         job = self.client().get(job_id)
         response = job.add_data(response)
+        not_found = False
+
+        for e in job.errors or []:
+            if "not found" in e:
+                not_found = True
+        if not_found:
+            response.set_status(400)
 
         return response
 

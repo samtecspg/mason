@@ -1,27 +1,25 @@
-from test.support import mocks as Mocks
+import contextlib
+
+from test.support.mocks import get_patches
 from util.logger import logger
-from util.environment import MasonEnvironment
-from configurations import get_all, get_config
-from operators import operators as Operators
-from operators.operator import Operator
-from typing import Optional, List
+from configurations import get_all
 from definitions import from_root
-from clients.response import Response
 import re
 from util.uuid import uuid_regex
-from unittest.mock import patch, MagicMock
 from dotenv import load_dotenv # type: ignore
+
+from typing import List, Optional
+
+from clients.response import Response
+from configurations import get_config
+from operators.operator import Operator
+from operators import operators as Operators
+from util.environment import MasonEnvironment
 
 load_dotenv('.env.example')
 
-MOCKS = {
-    "glue": "glue",
-    "s3": "s3",
-    "spark": "kubernetes"
-}
-
-def clean_uuid(s: str):
-    return uuid_regex().sub('', s)
+def clean_uuid(s: str, subst: str = ''):
+    return uuid_regex().sub(subst, s)
 
 def ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -32,42 +30,20 @@ def clean_string(s1: str):
     f1 = e.sub('', ansi_escape(s1))
     return f1
 
-
-def mock(client: str):
-    logger.debug(f"Mocking {client} client")
-    return MagicMock(return_value=Mocks.get_client(client))
-
-
-def get_mock(client_name: str, mockable_name: str, callable):
-    with patch(f"clients.{client_name}.{client_name.capitalize()}Client.client", mock(mockable_name)):
-        callable
-
-def get_mocks(callable):
-    if len(MOCKS) > 0:
-        key = list(MOCKS.keys())[0]
-        value = MOCKS.pop(key)
-        get_mock(key, value, get_client_mocks(MOCKS, callable))
-    else:
-        callable
-
-def get_client_mocks(mocks: dict, callable):
-    if len(mocks) > 0:
-        key = list(mocks.keys())[0]
-        value = mocks.pop(key)
-        get_mock(key, value, get_client_mocks(mocks, callable))
-    else:
-       callable
-
-def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable):
+def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
     logger.set_level(log_level)
-    if do_mock:
-        get_mocks(execute_tests(cmd, sub, configs, callable))
-    else:
-        execute_tests(cmd,sub, configs, callable)
-
-def execute_tests(cmd: str, sub: str, configs: List[str], callable):
-    set_log_level()
     env = get_env()
+    if do_mock:
+        patches = get_patches()
+        with contextlib.ExitStack() as stack:
+            for p in patches:
+                stack.enter_context(p)
+            run_test(env, cmd, sub, configs, callable)
+    else:
+        run_test(env, cmd, sub, configs, callable)
+
+
+def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], callable):
     response = Response()
     op: Optional[Operator] = Operators.get_operator(env, cmd, sub)
 

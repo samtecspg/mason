@@ -24,7 +24,6 @@ class Job:
 
     def add_errors(self, response: Response) -> Response:
         if self.errors:
-            response.set_status(500)
             for e in self.errors:
                 response.add_error(e)
         return response
