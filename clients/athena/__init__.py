@@ -65,8 +65,9 @@ class AthenaClient:
         response.add_response(athena_response)
         error, status, message = self.parse_response(athena_response)
 
+        job = None
         if error == "AccessDeniedException":
-            response.set_status(status)
+            response.set_status(403)
             response.add_error("Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena")
         elif not ((error or "") == ""):
             response.set_status(status)

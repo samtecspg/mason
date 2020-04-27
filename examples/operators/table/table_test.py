@@ -9,7 +9,7 @@ from examples.operators.table.test.expects import table as expects # type: ignor
 from parameters import Parameters
 from configurations import Config
 from operators.operator import Operator
-from test.support.testing_base import run_tests
+from test.support.testing_base import run_tests, clean_uuid
 from util.environment import MasonEnvironment
 from dotenv import load_dotenv
 
@@ -144,11 +144,21 @@ def test_merge():
 def test_query():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
-        query = "SELECT * from catalog_poc_data limit 5"
-
-        params = Parameters(parameters=f"query_string:{query},database_name:crawler-poc")
+        # valid query
+        query = "SELECT * from good_table limit 5"
+        params = Parameters(parameters=f"query_string:{query},database_name:good_database")
         result = op.run(env, config, params, Response())
-        print(result.formatted())
+        expect = {'Errors': [], 'Info': ['Running Query "SELECT * from good_table limit 5"', 'Running job query', 'Running job id=test'], 'Warnings': []}
+        assert(result.with_status() == (expect, 200))
+
+        # bad permissions
+        query = "SELECT * from good_table limit 5"
+        params = Parameters(parameters=f"query_string:{query},database_name:access_denied")
+        result = op.run(env, config, params, Response())
+        expect = {'Errors': ['Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena'], 'Info': ['Running Query "SELECT * from good_table limit 5"', 'Running job query'], 'Warnings': []}
+
+        assert(result.with_status() == (expect, 403))
+
 
     load_dotenv()
-    run_tests("table", "query", False, "trace", ["config_3"], tests)
+    run_tests("table", "query", True, "fatal", ["config_3"], tests)
