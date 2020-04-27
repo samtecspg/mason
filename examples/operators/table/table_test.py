@@ -11,7 +11,7 @@ from configurations import Config
 from operators.operator import Operator
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
-import pytest #type: ignore
+from dotenv import load_dotenv
 
 import os
 
@@ -144,10 +144,11 @@ def test_merge():
 def test_query():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
-        query = "SELECT * from BAD_TABLE limit 5"
+        query = "SELECT * from catalog_poc_data limit 5"
 
         params = Parameters(parameters=f"query_string:{query},database_name:crawler-poc")
         result = op.run(env, config, params, Response())
         print(result.formatted())
 
-    run_tests("table", "query", False, "trace", ["config_1", "config_2"], tests)
+    load_dotenv()
+    run_tests("table", "query", False, "trace", ["config_3"], tests)

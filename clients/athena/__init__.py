@@ -25,7 +25,7 @@ class AthenaClient:
         message = athena_response.get('Error', {}).get('Message')
         return error, status, message
 
-    def get_job(self, job_id: str, response: Response):
+    def get_job(self, job_id: str, response: Response) -> Tuple[Job, Response]:
         try:
             athena_response = self.client().get_query_results(
                 QueryExecutionId=job_id,
@@ -39,22 +39,17 @@ class AthenaClient:
 
         if not ((error or "") == ""):
             response.set_status(status)
-            response.add_error(message)
+            job = Job(job_id, errors=[message])
         else:
             response.set_status(status)
-        return response
+            results = athena_response.get("ResultSet")
+            job = Job(job_id, results=[results])
+        return response, job
 
-    def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response):
+    def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response) -> Tuple[Response, Job]:
         response.add_info(f"Running job {job_name}")
         try:
             request_token = str(uuid4())
-            # ResultConfiguration={
-            #     'OutputLocation': 'string',
-            #     'EncryptionConfiguration': {
-            #         'EncryptionOption': 'SSE_S3' | 'SSE_KMS' | 'CSE_KMS',
-            #         'KmsKey': 'string'
-            #     }
-            # },
             athena_response = self.client().start_query_execution(
                 QueryString=params["query_string"],
                 ClientRequestToken=request_token,
@@ -83,5 +78,5 @@ class AthenaClient:
                 job = Job(id)
                 response = job.running(response)
 
-        return response
+        return response, job
 
