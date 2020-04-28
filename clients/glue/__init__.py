@@ -39,6 +39,19 @@ class GlueClient:
 
         return response
 
+
+    def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
+        try:
+            glue_response = self.client().delete_table(
+                DatabaseName=database_name,
+                Name=table_name
+            )
+
+        except ClientError as e:
+            glue_response = e.response
+
+        return response
+
     def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response):
         create_crawler_response = self.create_glue_crawler(
             database=database_name,
@@ -122,6 +135,7 @@ class GlueClient:
             response.set_status(status)
 
         return schema, response
+
 
     def refresh_glue_table(self, crawler_name: str):
         try:

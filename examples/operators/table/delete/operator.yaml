@@ -8,4 +8,3 @@ parameters:
     - database_name
 supported_configurations:
   - metastore: "glue"
-    execution: "athena"

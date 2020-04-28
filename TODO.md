@@ -50,6 +50,7 @@ Legend
 - [X] :arrow_up: Consolidate response.add_  actions and logger._ actions into one command C: 04/13/2020
 - [x] Interpolate environment variables into config and have that affect config validation: C: 04/23/2020
 - [x] Clean up mock implementations: C: 04/23/2020
+- [ ] Consolidate all AWS response error parsing methods.
 
 ## Test Cases
 

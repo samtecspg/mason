@@ -161,7 +161,7 @@ class TestCLI:
         result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
         result25 = runner.invoke(register, [from_root('/examples/operators/job/')])
         result4 = runner.invoke(config, ["-s", "1"])
-        result5 = runner.invoke(operator, ["table", "get", "-l", "error", "-p", "database_name:spg-mason-demo,table_name:part_data_csv/"])
+        result5 = runner.invoke(operator, ["table", "get", "-l", "error", "-p", "database_name:spg-mason-demo,table_name:conflicting-parquet/"])
         print_result(result5)
 
 
