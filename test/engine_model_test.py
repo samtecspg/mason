@@ -150,7 +150,7 @@ class TestParquetSchema:
         assert(len(s) == 2)
 
         schemas, data, response = find_conflicts([schema1, schema3], Response())
-        assert(data['SchemaConflicts']['NonOverlappingColumns'] == ['(test_name_2,test_type_2)', '(test_name_3,test_type_3)'])
+        assert(data['SchemaConflicts']['NonOverlappingColumns'] == [{'name': 'test_name_2', 'type': 'test_type_2'}, {'name': 'test_name_3', 'type': 'test_type_3'}])
 
     def test_snappy_parquet_schema_support(self):
         logger.set_level("info")
