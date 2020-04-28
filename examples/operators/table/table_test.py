@@ -1,3 +1,5 @@
+import pytest #type: ignore
+
 from definitions import from_root
 from examples.operators.table.get import api as table_get_api
 from examples.operators.table.list import api as table_list_api
@@ -162,3 +164,17 @@ def test_query():
 
     load_dotenv()
     run_tests("table", "query", True, "fatal", ["config_3"], tests)
+
+@pytest.mark.skip(reason="Unfinished")
+def test_delete():
+
+    def tests(env: MasonEnvironment, config: Config, op: Operator):
+        # valid delete
+        params = Parameters(parameters=f"table_name:good_table,database_name:good_database")
+        result = op.run(env, config, params, Response())
+        expect: dict = {}
+        assert(result.with_status() == (expect, 200))
+
+
+    load_dotenv()
+    run_tests("table", "delete", False, "fatal", ["config_1"], tests)

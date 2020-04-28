@@ -18,6 +18,10 @@ class GlueMetastoreClient(MetastoreClient):
         self.secret_key = config.get("secret_key")
         self.client = GlueClient(self.get_config())
 
+    def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
+        response = self.client.delete_table(database_name, table_name, response)
+        return response
+
     def list_tables(self, database_name: str, response: Response) -> Response:
         response = self.client.list_tables(database_name, response)
         return response
@@ -25,6 +29,8 @@ class GlueMetastoreClient(MetastoreClient):
     def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
         schema, response = self.client.get_table(database_name, table_name, response)
         return [schema], response
+
+
 
     def get_config(self):
         return {

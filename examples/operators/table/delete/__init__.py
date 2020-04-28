@@ -10,7 +10,7 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     database_name: str = parameters.safe_get("database_name")
     table_name: str = parameters.safe_get("table_name")
 
-    schema, response = config.metastore.client.delete_table(database_name, table_name, response)
+    response = config.metastore.client.delete_table(database_name, table_name, response)
 
     return response
 

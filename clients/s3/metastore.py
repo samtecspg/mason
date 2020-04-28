@@ -24,6 +24,10 @@ class S3MetastoreClient(MetastoreClient):
     def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
         return self.client.get_table(database_name, table_name, response, options)
 
+    def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
+        return ("", "")
+
     def credentials(self):
         return AWSCredentials(self.access_key, self.secret_key)
 

@@ -31,7 +31,7 @@ then
     "mason register examples/operators/table"
     "mason register examples/operators/job"
     "mason operator"
-    "mason operator table list -p \"database_name:crawler-poc\""
+    "mason operator table get -p \"database_name:spg-mason-demo,table_name:conflicting-parquet\""
   )
 else
   commands=()
