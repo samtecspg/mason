@@ -165,7 +165,7 @@ def test_query():
     load_dotenv()
     run_tests("table", "query", True, "fatal", ["config_3"], tests)
 
-@pytest.mark.skip(reason="Unfinished")
+# @pytest.mark.skip(reason="Unfinished")
 def test_delete():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):

@@ -52,7 +52,7 @@ def find_conflicts(schemas: List[MetastoreSchema], response: Response) -> Tuple[
                 'SchemaConflicts': {
                     'CountDistinctSchemas': len(unique_schema_dicts),
                     'DistinctSchemas': unique_schema_dicts,
-                    'NonOverlappingColumns': list(map(lambda s: "(" + s.name + "," + s.type + ")", diff.columns))
+                    'NonOverlappingColumns': list(map(lambda s: {'name': s.name, 'type': s.type}, diff.columns))
                 }
             }
 
