@@ -56,6 +56,17 @@ class GlueMock:
         else:
             raise Exception(f"Unmocked glue api call")
 
+    def delete_crawler(self, *args, **kwargs):
+        if kwargs["Name"] == "good_schedule":
+            return {'ResponseMetadata': {'RequestId': 'test_id', 'HTTPStatusCode': 200}}
+        elif kwargs["Name"] == "bad_schedule":
+            return {'Error': {'Message': 'Crawler entry with name bad_schedule does not exist', 'Code': 'EntityNotFoundException'}, 'ResponseMetadata': {'HTTPStatusCode': 400}}
+        else:
+            raise Exception(f"Unmocked glue api call")
+
+
+
+
 
 
 

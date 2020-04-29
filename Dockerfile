@@ -22,6 +22,7 @@ ENV KUBECONFIG /app/.kube/config
 RUN mason config examples/configs/
 RUN mason register examples/operators/table/
 RUN mason register examples/operators/job/
+RUN mason register examples/operators/schedule/
 
 RUN ./scripts/install_kubectl.sh
 

@@ -19,7 +19,6 @@ import os
 
 load_dotenv()
 
-
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # Database Exists
