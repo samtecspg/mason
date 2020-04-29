@@ -1,5 +1,4 @@
 
-import boto3 # type: ignore
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 from typing import Optional, List, Tuple
@@ -9,11 +8,14 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from engines.metastore.models.schemas import check_schemas as CheckSchemas
 from util.list import get
 import s3fs #type: ignore
+from s3fs import S3FileSystem #type: ignore
 
 class S3Client:
     def __init__(self, s3_config: dict):
-        self.region = s3_config.get("region")
-        self.client = s3fs.S3FileSystem(client_kwargs={'region_name': self.region})
+        self.region = s3_config.get("aws_region")
+
+    def client(self) -> S3FileSystem:
+        return s3fs.S3FileSystem(client_kwargs={'region_name': self.region})
 
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
@@ -47,13 +49,13 @@ class S3Client:
     def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
         logger.info(f"Fetching keys in {database_name} {table_name}")
 
-        keys = self.client.find(database_name + "/" + (table_name or ""))
+        keys = self.client().find(database_name + "/" + (table_name or ""))
 
         schema_list: List[MetastoreSchema] = []
         if len(keys) > 0:
             for key in keys:
                 logger.debug(f"Key {key}")
-                k = self.client.open(key)
+                k = self.client().open(key)
                 response, schema = schemas.from_file(k, response, options)
                 if schema:
                     schema_list.append(schema)
@@ -68,8 +70,8 @@ class S3Client:
     def list_tables(self, database_name: str, response: Response):
         split = database_name.split("/", 1)
         try:
-            result = self.client.s3.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
-            response.add_data(result.get("CommonPrefixes", {}))
+            result = self.client().s3.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
+            response.add_data({"Prefixes": result.get("CommonPrefixes", {})})
         except ClientError as e:
             result = e.response
             error = result.get("Error", {})

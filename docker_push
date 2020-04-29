@@ -1,1 +1,1 @@
-docker push samtecspg/mason:v1.02
+docker push samtecspg/mason:v$(cat VERSION)

@@ -16,7 +16,11 @@ class SchedulerClient(Client):
     def trigger_schedule(self, schedule_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
         return response
-        # return self.config.scheduler.trigger_schedule(schedule_name, response)
+
+    @abstractmethod
+    def delete_schedule(self, schedule_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client method not implemented")
+        return response
 
     # TODO: Remove
     @abstractmethod
@@ -26,6 +30,10 @@ class SchedulerClient(Client):
 
 
 class EmptySchedulerClient(SchedulerClient):
+
+    def delete_schedule(self, schedule_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client method not implemented")
+        return response
 
     def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")

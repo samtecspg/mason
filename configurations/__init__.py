@@ -35,9 +35,19 @@ class Config:
         }
 
         if valid:
-            logger.debug(f"Valid Configuration: {self.engines}")
+            logger.debug(f"Valid Configuration")
         else:
-            logger.error(f"\nInvalid config schema: {config}\n")
+            logger.error(f"\nInvalid config schema\n")
+
+    def sanitize(self, d: dict):
+        REDACTED_KEYS = ["access_key", "secret_key", "aws_role_arn"]
+        def redact_value(key: str, value: str):
+            if key in REDACTED_KEYS:
+                return "REDACTED"
+            else:
+                return value
+
+        return {key: redact_value(key, value) for (key, value) in d.items()}
 
     def extended_info(self, config_id: int, current: bool = False):
         ei = []
@@ -48,7 +58,7 @@ class Config:
                     "",
                     "metastore",
                     self.metastore.client_name,
-                    self.metastore.config_doc,
+                    self.sanitize(self.metastore.config_doc),
                 ]
             )
 
@@ -58,7 +68,7 @@ class Config:
                     "",
                     "scheduler",
                     self.scheduler.client_name,
-                    self.scheduler.config_doc,
+                    self.sanitize(self.scheduler.config_doc),
                 ]
             )
 
@@ -68,7 +78,7 @@ class Config:
                     "",
                     "storage",
                     self.storage.client_name,
-                    self.storage.config_doc,
+                    self.sanitize(self.storage.config_doc),
                 ]
             )
 
@@ -78,7 +88,7 @@ class Config:
                     "",
                     "execution",
                     self.execution.client_name,
-                    self.execution.config_doc,
+                    self.sanitize(self.execution.config_doc),
                 ]
             )
 
@@ -100,10 +110,13 @@ def get_all(env: MasonEnvironment) -> List[Config]:
     for subdir, dirs, files in walk(env.config_home):
         for file in files:
             if '.yaml' in file:
-                yaml_config_doc: dict = parse_yaml(env.config_home + file) or {}
-                configs.append(Config(env, yaml_config_doc))
+                configs.append(get_config(env, file))
 
     return configs
+
+def get_config(env: MasonEnvironment, file: str):
+    yaml_config_doc: dict = parse_yaml(env.config_home + file) or {}
+    return Config(env, yaml_config_doc)
 
 
 def tabulate_configs(configs: List[Config], env: MasonEnvironment, log_level: str = "info") -> Optional[Config]:

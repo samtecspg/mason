@@ -1,6 +1,5 @@
 
-from abc import abstractmethod
-from typing import Sequence
+from typing import Sequence, Set, Dict
 
 
 class SchemaElement:
@@ -19,15 +18,20 @@ class MetastoreSchema:
 
     def __init__(self, columns: Sequence[SchemaElement], type: str):
         self.type = type
-        self.columns = columns
+        self.columns: Sequence[SchemaElement] = columns
 
     def __hash__(self):
         return 0
 
     def __eq__(self, other):
-        # types are equal and there are no items outside of the intersection of their children
-        symm_diff = set(self.columns).symmetric_difference(set(other.columns))
-        return self.type == other.type and (len(symm_diff) == 0)
+        diff = self.diff(other)
+        return (len(diff) == 0)
+
+    def diff(self, other: 'MetastoreSchema') -> Set[SchemaElement]:
+        if not self.type == other.type:
+            return set(self.columns)
+        else:
+            return set(self.columns).symmetric_difference(set(other.columns))
 
     def to_dict(self):
         return {

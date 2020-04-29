@@ -2,13 +2,19 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "GlueConfiguration",
   "properties": {
-    "region": {
+    "aws_region": {
       "type": "string"
     },
     "aws_role_arn": {
       "type": "string"
+    },
+    "access_key": {
+      "type": "string"
+    },
+    "secret_key": {
+      "type": "string"
     }
   },
   "additionalProperties": false,
-  "required": ["region", "aws_role_arn"]
+  "required": ["aws_region"]
 }

@@ -10,7 +10,7 @@ import operators.operators as Operators
 from util.environment import MasonEnvironment, initialize_environment
 from configurations import get_current_config
 from configurations.actions import run_configuration_actions
-from dotenv import load_dotenv
+from dotenv import load_dotenv #type: ignore
 
 load_dotenv()
 

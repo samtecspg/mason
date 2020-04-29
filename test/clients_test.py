@@ -92,7 +92,7 @@ class TestS3:
 
     def test_parse_path(self):
         env = MasonEnvironment()
-        conf = Config(env, {"metastore_engine": "s3", "clients": {"s3": {"configuration": {"region": "test"}}}})
+        conf = Config(env, {"metastore_engine": "s3", "clients": {"s3": {"configuration": {"aws_region": "test", "secret_key": "test", "access_key": "test"}}}})
         assert(conf.metastore.client.__class__.__name__ == "S3MetastoreClient")
         client = conf.metastore.client
         parsed = client.parse_path("test_bucket/test_path/test_file.csv")

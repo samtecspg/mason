@@ -1,0 +1,26 @@
+paths:
+  /schedule/delete:
+    post:
+      operationId: "registered_operators.schedule.delete.api"
+      tags:
+        - "Schedule"
+      summary: "Delete schedule"
+      description: "Delete schedule"
+      consumes:
+        - application/json
+      parameters:
+        - name: schedule_name
+          in: query
+          required: true
+          type: string
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          required: false
+          type: string
+          default: "info"
+      responses:
+        200:
+          description: "Successful Delete"
+          schema:
+            type: "string"

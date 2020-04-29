@@ -1,6 +1,8 @@
 from typing import Tuple
 
 import boto3 # type: ignore
+from botocore.client import BaseClient # type: ignore
+
 from clients.response import Response
 from botocore.errorfactory import ClientError # type: ignore
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
@@ -8,12 +10,17 @@ from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, S
 class GlueClient:
 
     def __init__(self, config: dict):
-        self.client = boto3.client('glue', region_name=config.get("region"))
-        self.aws_role_arn = config.get("aws_role_arn", "")
+        self.aws_role_arn = config.get("aws_role_arn")
+        self.aws_region = config.get("aws_region")
+        self.access_key = config.get("access_key")
+        self.secret_key = config.get("secret_key")
+
+    def client(self) -> BaseClient:
+        return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
 
     def list_tables(self, database_name: str, response: Response):
         try:
-            result = self.client.get_tables(DatabaseName=database_name)
+            result = self.client().get_tables(DatabaseName=database_name)
         except ClientError as e:
             result = e.response
         response.add_response(result)
@@ -23,7 +30,7 @@ class GlueClient:
             response.add_error(f"Database {database_name} not found")
             response.set_status(404)
         elif 200 <= status < 300:
-            data = self.parse_table_list_data(result)
+            data = {'Tables': self.parse_table_list_data(result)}
             response.add_data(data)
             response.set_status(status)
         else:
@@ -32,11 +39,34 @@ class GlueClient:
 
         return response
 
+
+    def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
+        try:
+            glue_response = self.client().delete_table(
+                DatabaseName=database_name,
+                Name=table_name
+            )
+
+        except ClientError as e:
+            glue_response = e.response
+
+        error, status, message = self.parse_response(glue_response)
+        response.add_response(glue_response)
+
+        if not error == "":
+            response.set_status(status)
+            response.add_error(message)
+
+        else:
+            response.add_info(f"Table {table_name} successfully deleted.")
+
+        return response
+
     def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response):
         create_crawler_response = self.create_glue_crawler(
             database=database_name,
             name=schedule_name,
-            role=self.aws_role_arn,
+            role=self.aws_role_arn or "",
             path=path
         )
 
@@ -55,6 +85,27 @@ class GlueClient:
         else:
             response.add_error(message)
             response.set_status(status)
+
+        return response
+
+    def delete_schedule(self, schedule_name: str, response: Response) -> Response:
+        try:
+            glue_response = self.client().delete_crawler(
+                Name=schedule_name
+            )
+
+        except ClientError as e:
+            glue_response = e.response
+
+        error, status, message = self.parse_response(glue_response)
+        response.add_response(glue_response)
+
+        if not error == "":
+            response.set_status(status)
+            response.add_error(message)
+
+        else:
+            response.add_info(f"Schedule {schedule_name} successfully deleted.")
 
         return response
 
@@ -96,7 +147,7 @@ class GlueClient:
     def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[MetastoreSchema, Response]:
 
         try:
-            result = self.client.get_table(DatabaseName=database_name, Name=table_name)
+            result = self.client().get_table(DatabaseName=database_name, Name=table_name)
         except ClientError as e:
             result = e.response
 
@@ -116,9 +167,10 @@ class GlueClient:
 
         return schema, response
 
+
     def refresh_glue_table(self, crawler_name: str):
         try:
-            result = self.client.start_crawler(Name=crawler_name)
+            result = self.client().start_crawler(Name=crawler_name)
         except ClientError as e:
             result = e.response
         return result
@@ -134,7 +186,7 @@ class GlueClient:
         }
 
         try:
-            result = self.client.create_crawler(
+            result = self.client().create_crawler(
                 DatabaseName=database,
                 Name=name,
                 Role=role,

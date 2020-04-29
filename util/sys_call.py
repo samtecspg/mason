@@ -4,21 +4,14 @@ import subprocess
 
 from clients.response import Response
 
-def run_sys_call(command: List[str], response: Response):
+def run_sys_call(command: List[str]):
     sys_call = SysCall(command)
     sys_call.run()
     stdout = (sys_call.stdout or b"").decode("utf-8").replace("\n", '')
     stderr = (sys_call.stderr or b"").decode("utf-8").replace("\n", '')
 
-    if len(stdout) > 0:
-        response.add_info({"Logs": "".join(stdout[-100:])})
-        response.add_response({"STDOUT": stdout})
-    if len(stderr) > 0:
-        response.add_error(stderr)
-        response.add_response({"STDERR": stdout})
-        response.set_status(500)
 
-    return response
+    return stdout, stderr
 
 class SysCall(threading.Thread):
     def __init__(self, command: List[str]):
