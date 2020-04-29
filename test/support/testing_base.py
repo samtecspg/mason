@@ -1,25 +1,25 @@
+import contextlib
 
+from test.support.mocks import get_patches
 from util.logger import logger
-from util.environment import MasonEnvironment
 from configurations import get_all
-from operators import operators as Operators
-from operators.operator import Operator
-from typing import Optional
 from definitions import from_root
-from test.support.mocks.clients.glue import GlueMock
-from test.support.mocks.clients.s3 import S3Mock
-from test.support.mocks.clients.kubernetes import KubernetesMock
-from configurations import Config
-from engines import Engine
-from clients.response import Response
 import re
 from util.uuid import uuid_regex
+from dotenv import load_dotenv # type: ignore
 
-LOG_LEVEL = "fatal"
-# LOG_LEVEL = "trace"
+from typing import List, Optional
 
-def clean_uuid(s: str):
-    return uuid_regex().sub('', s)
+from clients.response import Response
+from configurations import get_config
+from operators.operator import Operator
+from operators import operators as Operators
+from util.environment import MasonEnvironment
+
+load_dotenv('.env.example')
+
+def clean_uuid(s: str, subst: str = ''):
+    return uuid_regex().sub(subst, s)
 
 def ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
@@ -30,61 +30,42 @@ def clean_string(s1: str):
     f1 = e.sub('', ansi_escape(s1))
     return f1
 
-def run_tests(cmd: str, sub: str, mock: bool, callable):
-    set_log_level()
+def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
+    logger.set_level(log_level)
     env = get_env()
+    if do_mock:
+        patches = get_patches()
+        with contextlib.ExitStack() as stack:
+            for p in patches:
+                stack.enter_context(p)
+            run_test(env, cmd, sub, configs, callable)
+    else:
+        run_test(env, cmd, sub, configs, callable)
+
+
+def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], callable):
     response = Response()
-    configs = get_configs(env)
     op: Optional[Operator] = Operators.get_operator(env, cmd, sub)
 
     if op:
         operator: Operator = op
-        configs,response = op.find_configurations(configs, response)
-        if configs:
-            for config in configs:
-                if mock:
-                    get_mocks(config)
-                callable(env, config, operator)
-        else:
-            raise Exception(f"No matching configuration found for operator {op.cmd}, {op.subcommand}")
+        for config in configs:
+            conf = get_config(env, config + ".yaml")
+            if conf and conf.valid:
+                callable(env, conf, operator)
+            else:
+                raise Exception(f"No matching valid configuration found for operator {op.cmd}, {op.subcommand}")
 
     else:
         raise Exception(f"Operator not found {cmd} {sub}")
 
 
 def set_log_level(level: str = None):
-    logger.set_level(level or LOG_LEVEL, False)
+    logger.set_level(level or "fatal", False)
 
 def get_env(operator_home: str = "/examples/operators", config_home = "/examples/operators/table/test_configs/", operator_module: str = "examples.operators"):
     return MasonEnvironment(operator_home=from_root(operator_home), config_home=from_root(config_home), operator_module=operator_module)
 
 def get_configs(env: MasonEnvironment):
-    # env.config_schema = from_root("/test/support/schemas/config.json")
     return get_all(env)
-
-def get_mocks(config: Config):
-    get_mock(config.metastore)
-    get_mock(config.scheduler)
-    get_mock(config.execution)
-    get_mock(config.storage)
-
-def get_mock(engine: Engine):
-    client_name = engine.client_name
-    if client_name:
-        if client_name == "glue":
-            logger.info("Mocking Glue Client")
-            engine.set_underlying_client(GlueMock())
-        elif client_name == "s3":
-            logger.info("Mocking S3 Client")
-            engine.set_underlying_client(S3Mock())
-        elif client_name == "spark":
-            if (engine.underlying_client().__class__.__name__ == "KubernetesOperator"):
-                logger.info("Mocking Spark Kubernetes Operator")
-                engine.set_underlying_client(KubernetesMock())
-            else:
-                raise Exception("Unmocked Spark Runner Client")
-        elif client_name == "invalid":
-            pass
-        else:
-            raise Exception(f"Unmocked Client Implementation: {client_name}")
 

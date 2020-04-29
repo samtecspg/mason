@@ -1,0 +1,84 @@
+Set log level to info
+
++--------------------+
+| Parsed Parameters  |
++--------------------+
+{'query_string': 'SELECT * from "conflicting_parquet" limit 5', 'database_name': 'spg-mason-demo'}
+
+
++-------------------------+
+| Parameters Validation:  |
++-------------------------+
+Validated: ['query_string', 'database_name']
+
+Running Query "SELECT * from "conflicting_parquet" limit 5"
+Running job query
+Running job id=3efd2e91-24b8-4213-a8c9-11673c154881
++--------------------+
+| Operator Response  |
++--------------------+
+{
+ "Errors": [],
+ "Info": [
+  "Running Query \"SELECT * from \"conflicting_parquet\" limit 5\"",
+  "Running job query",
+  "Running job id=3efd2e91-24b8-4213-a8c9-11673c154881"
+ ],
+ "Warnings": []
+}
+Set log level to info
+
++--------------------+
+| Parsed Parameters  |
++--------------------+
+{'query_string': 'SELECT * from "conflicting_parquet" limit 5', 'database_name': 'spg-mason-demo'}
+
+
++-------------------------+
+| Parameters Validation:  |
++-------------------------+
+Validated: ['query_string', 'database_name']
+
+Running Query "SELECT * from "conflicting_parquet" limit 5"
+Running job query
+Running job id=7aa55908-8c5b-4b39-8a59-e4cc1c7707ca
++--------------------+
+| Operator Response  |
++--------------------+
+{
+ "Errors": [],
+ "Info": [
+  "Running Query \"SELECT * from \"conflicting_parquet\" limit 5\"",
+  "Running job query",
+  "Running job id=7aa55908-8c5b-4b39-8a59-e4cc1c7707ca"
+ ],
+ "Warnings": []
+}
+Set log level to info
+
++--------------------+
+| Parsed Parameters  |
++--------------------+
+{'query_string': 'SELECT * from "file_1_parquet" limit 5', 'database_name': 'spg-mason-demo'}
+
+
++-------------------------+
+| Parameters Validation:  |
++-------------------------+
+Validated: ['query_string', 'database_name']
+
+Running Query "SELECT * from "file_1_parquet" limit 5"
+Running job query
+Running job id=393ca715-7629-4d15-9444-452ba53e50e5
++--------------------+
+| Operator Response  |
++--------------------+
+{
+ "Errors": [],
+ "Info": [
+  "Running Query \"SELECT * from \"file_1_parquet\" limit 5\"",
+  "Running job query",
+  "Running job id=393ca715-7629-4d15-9444-452ba53e50e5"
+ ],
+ "Warnings": []
+}

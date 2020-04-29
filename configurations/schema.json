@@ -12,7 +12,8 @@
     "execution_engine": {
       "type": "string",
       "enum": [
-        "spark"
+        "spark",
+        "athena"
       ]
     },
     "storage_engine": {

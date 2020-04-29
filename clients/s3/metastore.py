@@ -4,7 +4,6 @@ from clients.s3 import S3Client
 from engines.metastore.models.credentials.aws import AWSCredentials
 from urllib.parse import urlparse
 from typing import Tuple, List
-import os
 
 from engines.metastore.models.schemas import MetastoreSchema
 from util.logger import logger
@@ -13,7 +12,7 @@ from util.logger import logger
 class S3MetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
-        self.region = config.get("region")
+        self.region = config.get("aws_region")
         self.access_key = config.get("access_key")
         self.secret_key = config.get("secret_key")
         self.client = S3Client(self.get_config())
@@ -24,6 +23,10 @@ class S3MetastoreClient(MetastoreClient):
 
     def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
         return self.client.get_table(database_name, table_name, response, options)
+
+    def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client not implemented")
+        return ("", "")
 
     def credentials(self):
         return AWSCredentials(self.access_key, self.secret_key)

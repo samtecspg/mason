@@ -2,4 +2,6 @@ storage_engine: s3
 clients:
   s3:
     configuration:
-      region: "us-west-2"
+      aws_region: "us-west-2"
+      secret_key: "test"
+      access_key: "test"
