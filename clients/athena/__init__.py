@@ -13,11 +13,12 @@ from engines.metastore.models.credentials import MetastoreCredentials
 class AthenaClient:
 
     def __init__(self, config: dict):
+        self.aws_region = config.get("aws_region")
         self.access_key = config.get("access_key") or ""
         self.secret_key = config.get("secret_key") or ""
 
     def client(self):
-        return boto3.client('athena', aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
+        return boto3.client('athena', region_name=self.aws_region, aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
 
     def parse_execution_response(self, athena_response: dict) -> Tuple[str, str, int, str, str]:
         reason = athena_response.get("QueryExecution", {}).get("Status", {}).get("StateChangeReason")

@@ -17,7 +17,7 @@ from dotenv import load_dotenv #type: ignore
 
 import os
 
-load_dotenv()
+load_dotenv('.env.example')
 
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
