@@ -46,6 +46,17 @@ class GlueMock:
         else:
             raise Exception(f"Unmocked glue api call made Targets={Targets}")
 
+    def delete_table(self, *args, **kwargs):
+        if kwargs["DatabaseName"] == "good_database" and kwargs["Name"] == "good_table":
+            return {'ResponseMetadata': {'RequestId': 'test_id', 'HTTPStatusCode': 200}}
+        elif kwargs["DatabaseName"] == "bad_database":
+            return {'Error': {'Message': 'Database bad_database not found.', 'Code': 'EntityNotFoundException'}, 'ResponseMetadata': {'HTTPStatusCode': 400}}
+        elif kwargs["DatabaseName"] == "good_database" and kwargs["Name"] == "bad_table":
+            return {'Error': {'Message': 'Table bad_table not found.', 'Code': 'EntityNotFoundException'}, 'ResponseMetadata': {'HTTPStatusCode': 400}}
+        else:
+            raise Exception(f"Unmocked glue api call")
+
+
 
 
 

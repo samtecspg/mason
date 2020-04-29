@@ -17,6 +17,9 @@ from dotenv import load_dotenv #type: ignore
 
 import os
 
+load_dotenv()
+
+
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # Database Exists
@@ -162,19 +165,26 @@ def test_query():
         assert(result.with_status() == (expect, 403))
 
 
-    load_dotenv()
     run_tests("table", "query", True, "fatal", ["config_3"], tests)
 
-# @pytest.mark.skip(reason="Unfinished")
 def test_delete():
+
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # valid delete
         params = Parameters(parameters=f"table_name:good_table,database_name:good_database")
-        result = op.run(env, config, params, Response())
-        expect: dict = {}
-        assert(result.with_status() == (expect, 200))
+        good = op.run(env, config, params, Response())
+        assert(good.with_status() == ({'Errors': [], 'Info': [], 'Warnings': []}, 200))
+
+        # database DNE
+        params = Parameters(parameters=f"table_name:bad_table,database_name:bad_database")
+        bad = op.run(env, config, params, Response())
+        assert(bad.with_status() == ({'Errors': ['Database bad_database not found.'], 'Info': [], 'Warnings': []}, 400))
+
+        # table DNE
+        params = Parameters(parameters=f"table_name:bad_table,database_name:good_database")
+        bad = op.run(env, config, params, Response())
+        assert(bad.with_status() == ({'Errors': ['Table bad_table not found.'], 'Info': [], 'Warnings': []}, 400))
 
 
-    load_dotenv()
-    run_tests("table", "delete", False, "fatal", ["config_1"], tests)
+    run_tests("table", "delete", True, "fatal", ["config_1"], tests)

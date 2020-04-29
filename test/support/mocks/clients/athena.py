@@ -10,23 +10,26 @@ class AthenaMock:
         else:
             raise Exception(f"Unmocked athena api call made")
 
+    def get_query_execution(*args, **kwargs):
+        if kwargs["QueryExecutionId"] == "good_job_id":
+            return {'QueryExecution': {'QueryExecutionId': 'good_job_id', 'Query': 'SELECT * from "test_table" limit 5', 'QueryExecutionContext': {'Database': 'spg-mason-demo'}, 'Status': {'State': 'SUCCEEDED'}}, 'ResponseMetadata': {'RequestId': '02a2b4f3-2132-40ba-a537-4df8e2c19e0f', 'HTTPStatusCode': 200}}
+        elif kwargs["QueryExecutionId"] == "bad_job_id":
+            return {'Error': {'Message': 'QueryExecution bad_job_id was not found', 'Code': 'InvalidRequestException'}, 'ResponseMetadata': {'RequestId': 'request_id', 'HTTPStatusCode': 400, 'HTTPHeaders': {}}}
+        else:
+            raise Exception(f"Unmocked athena api call made")
 
     def get_query_results(*args, **kwargs):
         if kwargs["QueryExecutionId"] == "good_job_id":
             return {
-                'UpdateCount': 0,
-                'ResultSet':
-                    {'Rows': [{'Data': [{'VarCharValue': 'index'}]}],
-                     'ResultSetMetadata':
-                         {'ColumnInfo': [ {'CatalogName': 'hive', 'SchemaName': '', 'TableName': '', 'Name': 'index', 'Label': 'index', 'Type': 'bigint', 'Precision': 19, 'Scale': 0, 'Nullable': 'UNKNOWN', 'CaseSensitive': False}]}
-                     },
-                'ResponseMetadata': {'RequestId': 'test-id', 'HTTPStatusCode': 200}
+                'UpdateCount': 0, 'ResultSet': {'Rows': [{'Data': [{'VarCharValue': 'widget'}]}], 'ResultSetMetadata': {
+                    'ColumnInfo': [
+                        {'CatalogName': 'hive', 'SchemaName': '', 'TableName': '', 'Name': 'widget', 'Label': 'widget', 'Type': 'varchar', 'Precision': 2147483647, 'Scale': 0, 'Nullable': 'UNKNOWN', 'CaseSensitive': True},
+                    ]
+                }},
+                'ResponseMetadata': {'RequestId': 'good_job_id', 'HTTPStatusCode': 200}
             }
         elif kwargs["QueryExecutionId"] == "bad_job_id":
-            return {'Error': {'Code': 'InvalidRequestException',
-                        'Message': 'QueryExecution bad_job_id was not found'},
-                        'ResponseMetadata': {'HTTPHeaders': {'connection': 'keep-alive'}, 'HTTPStatusCode': 400, 'RequestId': 'test-id',
-                                   'RetryAttempts': 0}}
+            return {'Error': {'Code': 'InvalidRequestException', 'Message': 'QueryExecution bad_job_id was not found'}, 'ResponseMetadata': {'HTTPHeaders': {'connection': 'keep-alive'}, 'HTTPStatusCode': 400, 'RequestId': 'test-id', 'RetryAttempts': 0}}
         else:
             raise Exception(f"Unmocked athena api call made")
 
