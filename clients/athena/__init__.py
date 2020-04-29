@@ -19,6 +19,15 @@ class AthenaClient:
     def client(self):
         return boto3.client('athena', aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
 
+    def parse_execution_response(self, athena_response: dict) -> Tuple[str, str, int, str, str]:
+        reason = athena_response.get("QueryExecution", {}).get("Status", {}).get("StateChangeReason")
+        state = athena_response.get("QueryExecution", {}).get("Status", {}).get("State", "")
+        status = athena_response.get('ResponseMetadata', {}).get('HTTPStatusCode')
+        error = athena_response.get('Error', {}).get('Code', '')
+        message = athena_response.get('Error', {}).get('Message')
+
+        return reason, state, status, error, message
+
     def parse_response(self, athena_response: dict):
         error = athena_response.get('Error', {}).get('Code', '')
         status = athena_response.get('ResponseMetadata', {}).get('HTTPStatusCode')
@@ -27,23 +36,45 @@ class AthenaClient:
 
     def get_job(self, job_id: str, response: Response) -> Tuple[Response, Job]:
         try:
-            athena_response = self.client().get_query_results(
+            athena_response = self.client().get_query_execution(
                 QueryExecutionId=job_id,
-                MaxResults=10
             )
         except ClientError as e:
             athena_response = e.response
 
-        response.add_response(athena_response)
-        error, status, message = self.parse_response(athena_response)
 
-        if not ((error or "") == ""):
-            response.set_status(status)
-            job = Job(job_id, errors=[message])
+        reason, state, status, error, message = self.parse_execution_response(athena_response)
+        response.add_response(athena_response)
+        response.set_status(status)
+        if reason:
+            response.add_info(reason)
+
+        if status == 200:
+            try:
+                athena_response_2 = self.client().get_query_results(
+                    QueryExecutionId=job_id,
+                    MaxResults=10
+                )
+            except ClientError as e:
+                athena_response_2 = e.response
+
+            response.add_response(athena_response_2)
+
+            error, status, message = self.parse_response(athena_response_2)
+
+            if not ((error or "") == ""):
+                response.set_status(status)
+                job = Job(job_id, errors=[message])
+            else:
+                response.set_status(status)
+                results = athena_response_2.get("ResultSet")
+                if results:
+                    job = Job(job_id, results=[results])
+                else:
+                    job = Job(job_id)
+
         else:
-            response.set_status(status)
-            results = athena_response.get("ResultSet")
-            job = Job(job_id, results=[results])
+            job = Job(job_id, errors=[message])
         return response, job
 
     def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response) -> Tuple[Response, Optional[Job]]:

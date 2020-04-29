@@ -50,6 +50,14 @@ class GlueClient:
         except ClientError as e:
             glue_response = e.response
 
+        error, status, message = self.parse_response(glue_response)
+        response.add_response(glue_response)
+
+        if not error == "":
+            response.set_status(status)
+            response.add_error(message)
+
+
         return response
 
     def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response):
