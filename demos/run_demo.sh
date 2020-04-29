@@ -29,6 +29,7 @@ then
     "mason config examples/configs/"
     "mason register examples/operators/table"
     "mason register examples/operators/job"
+    "mason register examples/operators/schedule"
     "mason operator"
     "mason config -s 1"
     "mason operator table get -p \"database_name:spg-mason-demo,table_name:conflicting-parquet\""
@@ -40,7 +41,8 @@ then
     "export JOB_ID=\"\$(cat query.txt | grep \"job id\" | tail -n 1 | cut -d= -f2 | sed -e 's/\"$//')\""
     "echo \$JOB_ID"
     "mason operator job get -p \"job_id:\$JOB_ID\""
-    "mason operator table delete -p \"database_name:spg-mason-demo,table_name:conflicting-parquet\""
+    "mason operator table delete -p \"database_name:spg-mason-demo,table_name:conflicting_parquet\""
+    "mason operator schedule delete -p \"schedule_name:mason-demo-crawler\""
     "mason operator table infer -p \"database_name:spg-mason-demo,schedule_name:mason-demo-crawler-2,storage_path:spg-mason-demo/conflicting-parquet/file_1.parquet\""
     "echo \"wait a bit for table to be created by glue\""
     "mason operator table query -p \"database_name:spg-mason-demo,query_string:SELECT * from \\\"file_1_parquet\\\" limit 5\" >> query.txt"
@@ -50,6 +52,7 @@ then
     "echo \"Wait a bit for job to run\""
     "mason operator job get -p \"job_id:\$JOB_ID\""
     "mason operator table delete -p \"database_name:spg-mason-demo,table_name:file_1_parquet\""
+    "mason operator schedule delete -p \"schedule_name:mason-demo-crawler-2\""
   )
 else
   commands=()

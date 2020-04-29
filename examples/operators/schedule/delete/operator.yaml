@@ -1,0 +1,9 @@
+type: "operator"
+namespace: "schedule"
+command: "delete"
+description:  "Delete schedule"
+parameters:
+  required:
+    - schedule_name
+supported_configurations:
+  - scheduler: "glue"

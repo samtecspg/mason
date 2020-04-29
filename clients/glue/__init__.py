@@ -88,6 +88,27 @@ class GlueClient:
 
         return response
 
+    def delete_schedule(self, schedule_name: str, response: Response) -> Response:
+        try:
+            glue_response = self.client().delete_crawler(
+                Name=schedule_name
+            )
+
+        except ClientError as e:
+            glue_response = e.response
+
+        error, status, message = self.parse_response(glue_response)
+        response.add_response(glue_response)
+
+        if not error == "":
+            response.set_status(status)
+            response.add_error(message)
+
+        else:
+            response.add_info(f"Schedule {schedule_name} successfully deleted.")
+
+        return response
+
     def trigger_schedule(self, schedule_name: str, response: Response):
         refresh_glue_table_response = self.refresh_glue_table(schedule_name)
         error, status, message = self.parse_response(refresh_glue_table_response)
