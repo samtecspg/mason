@@ -66,7 +66,7 @@ Legend
 ## Operators
 - [ ] Infer operator
     - [x] Glue Support: C: long time ago
-    - [ ] :large_blue_circle: Athena Support
+    - [ ] :large_blue_diamond: Athena Support
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
@@ -82,8 +82,8 @@ Legend
     - [x] Get C: 04/08/2020
     - [ ] List
 - [ ] Scheduler operators:
-    - [ ] :large_blue_diamond: Delete
-    - [ ]  Create
+    - [x] Delete C: 04/29/2020
+    - [ ] Create
     - [ ] List
 - [ ] :arrow_down: Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
 
