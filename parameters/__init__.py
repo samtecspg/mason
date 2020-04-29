@@ -16,11 +16,14 @@ class Parameters:
         if len(matches) > 0:
             return dict(list([tuple(x.split(":")) for x in matches])) # type: ignore
         else:
-            logger.error(f"Warning:  Parameter string does not conform to needed pattern: {pattern_guide}")
+            logger.warning(f"Warning:  Parameter string does not conform to needed pattern: {pattern_guide}")
             return {}
 
     def __init__(self, parameters: Optional[str] = None, parameter_path: Optional[str] = None):
+        #  Parsed parameters are all parameters validly parsed
         self.parsed_parameters: dict = {}
+
+        #  Validated parameters are parsed parameters which were also required by the operator
         self.validated_parameters: dict = {}
 
         if parameters:
