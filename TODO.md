@@ -64,13 +64,16 @@ Legend
 - [ ]  Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Operators
+- [ ] Infer operator
+    - [x] Glue Support: C: long time ago
+    - [ ] :large_blue_circle: Athena Support
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
 - [ ] Dedupe Operator
 - [ ] Table Operators
-    - [ ] :large_blue_circle: Query (requires metastore and execution engine)
-    - [ ] :large_blue_diamond: Delete
+    - [x] Query (requires metastore and execution engine) C:04/28/2020
+    - [x] Delete. C: 04/29/2020
     - [ ] Delete Database
 - [ ] Seperate out database operator?
 - [ ] Metastore Database operator
@@ -79,8 +82,8 @@ Legend
     - [x] Get C: 04/08/2020
     - [ ] List
 - [ ] Scheduler operators:
-    - [ ] :large_blue_diamond: Create
     - [ ] :large_blue_diamond: Delete
+    - [ ]  Create
     - [ ] List
 - [ ] :arrow_down: Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
 
@@ -109,7 +112,7 @@ Legend
 - [ ] :arrow_up: Basic setup
 - [ ] :arrow_up: Papermill integration 
 #### Athena
-- [ ] :large_blue_diamond: Basic setup 
+- [x] Basic setup C: 04/26/2020
 #### Spark
 - [x] Basic setup 
     - [x] Kubernetes Operator Runner C: 4/06/2020
@@ -127,7 +130,7 @@ Legend
 ### Glue
 - [x] Basic set up
 #### Airflow
-- [ ] :large_blue_diamond: Basic setup 
+- [ ] Basic setup 
 
 ### Storage
 #### Redshift

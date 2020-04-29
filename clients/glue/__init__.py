@@ -57,6 +57,8 @@ class GlueClient:
             response.set_status(status)
             response.add_error(message)
 
+        else:
+            response.add_info(f"Table {table_name} successfully deleted.")
 
         return response
 
