@@ -49,27 +49,3 @@ class Parameters:
     def unsafe_get(self, attribute: str) -> Optional[str]:
         return self.parsed_parameters.get(attribute, None)
 
-    # def validate(self, op: Operator, response: Response = None):
-    #     response = response or Response()
-    #     required_params = set(op.required_parameters())
-    #     provided_params = set(self.parsed_parameters.keys())
-    #     diff = required_params.difference(provided_params)
-    #     intersection = required_params.intersection(provided_params)
-    #     self.add_valid(list(intersection))
-    #
-    #     logger.info()
-    #     validated = list(self.validated_parameters.keys())
-    #     missing = list(diff)
-    #
-    #     banner(f"Parameters Validation:")
-    #     if len(validated) > 0:
-    #         logger.info(f"Validated: {validated}")
-    #     if len(missing) > 0:
-    #         logger.info(f"Missing: {missing}")
-    #     logger.info()
-    #
-    #     if len(diff) > 0:
-    #         dp = ", ".join(list(diff))
-    #         response.add_error(f"Missing required parameters: {dp}")
-    #         response.set_status(400)
-    #     return response

@@ -174,7 +174,7 @@ def test_delete():
         # valid delete
         params = Parameters(parameters=f"table_name:good_table,database_name:good_database")
         good = op.run(env, config, params, Response())
-        assert(good.with_status() == ({'Errors': [], 'Info': [], 'Warnings': []}, 200))
+        assert(good.with_status() == ({'Errors': [], 'Info': ['Table good_table successfully deleted.'], 'Warnings': []}, 200))
 
         # database DNE
         params = Parameters(parameters=f"table_name:bad_table,database_name:bad_database")
