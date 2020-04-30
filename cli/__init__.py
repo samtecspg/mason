@@ -1,5 +1,4 @@
 import click
-import shutil
 import os
 from os import path
 from typing import Optional
@@ -50,7 +49,7 @@ def register(operator_file: str, log_level: Optional[str] = None):
     """
     Registers mason operator using [OPERATOR_FILE].
 
-    See examples/operators/table/ for examples of operators.
+    See examples/operators/ for examples of operators.
 
     Valid operators will contain an operator.yaml file which defines the compatible clients and parmeters for the operator.
     """
@@ -58,20 +57,16 @@ def register(operator_file: str, log_level: Optional[str] = None):
     env = MasonEnvironment()
     if path.exists(env.config_home):
         logger.set_level(log_level)
+        operators, errors = Operators.validate_operators(operator_file, True)
 
-        validation = Operators.validate_operators(operator_file, True)
-        if len(validation[1]) == 0:
-
-            basename = path.basename(operator_file.rstrip("/"))
-            pathname = env.operator_home + f"{basename}/"
-
-            if not path.exists(pathname):
-                logger.info(f"Registering operators at {operator_file} to {pathname}")
-                shutil.copytree(operator_file, pathname)
-            else:
-                logger.error(f"Operator \"{basename}\" already exists at {pathname}")
+        if len(operators) > 0:
+            for operator in operators:
+                operator.register_to(env.operator_home)
         else:
-            logger.error(f"Invalid operator configurations found: {validation[1]}")
+            if len(errors) > 0:
+                for error in errors:
+                    logger.error(f"Invalid operator configurations found: {error}")
+
 
     else:
         logger.error("Configuration not found.  Run \"mason config\" first")

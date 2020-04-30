@@ -70,14 +70,14 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, cmd: Opti
         print_json(response.formatted())
         return response
 
-def from_config(config: dict):
+def from_config(config: dict, source_path: Optional[str] = None):
     namespace = config.get("namespace")
     command = config.get("command")
     description = config.get("description", "")
     parameters = config.get("parameters", {})
     supported_configurations = config.get("supported_configurations", [])
     if namespace and command:
-        return Operator(namespace, command, description, parameters, supported_configurations)
+        return Operator(namespace, command, description, parameters, supported_configurations, source_path)
     else:
         None
 
@@ -94,7 +94,7 @@ def validate_operators(operator_file: str, print_validation: bool = False):
                     if validate_schema(config, schema):
                         if print_validation:
                             logger.info(f"Valid Operator Definition {file_path}")
-                        operator = from_config(config)
+                        operator = from_config(config, file_path)
                         if operator:
                             operators.append(operator)
                     else:
@@ -132,12 +132,13 @@ def get_operator(env: MasonEnvironment, cmd: Optional[str], subcmd: Optional[str
 def tabulate_operators(env: MasonEnvironment, cmd: Optional[str] = None):
     ops = list_operators(env)
     array = []
-    for k in ops:
-        for item in ops[k]:
-            command = item.subcommand
-            description = item.description
-            parameters = item.parameters
-            array.append([k, command, description, parameters])
+    if cmd:
+        for item in ops[cmd]:
+            array.append([cmd, item.subcommand, item.description, item.parameters])
+    else:
+        for k in ops:
+            for item in ops[k]:
+                array.append([k, item.subcommand, item.description, item.parameters])
 
     cmd_value = (cmd or "Operator")
     logger.info()

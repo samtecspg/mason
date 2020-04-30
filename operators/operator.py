@@ -1,3 +1,5 @@
+import shutil
+
 from configurations import Config
 from clients.response import Response
 from typing import Dict, Optional, List, Tuple
@@ -7,16 +9,19 @@ from util.logger import logger
 from util.printer import banner
 from importlib import import_module
 from util.environment import MasonEnvironment
+from os import path, makedirs
 
 
 class Operator:
 
-    def __init__(self, cmd: str, subcommand: str, description: str, parameters: dict, supported_engine_sets: List[Dict[str, str]]):
+    def __init__(self, cmd: str, subcommand: str, description: str, parameters: dict, supported_engine_sets: List[Dict[str, str]], source_path: Optional[str] = None):
         self.cmd = cmd
         self.subcommand = subcommand
         self.description = description
         self.parameters: dict = parameters
         self.supported_configurations: List[SupportedEngineSet] = from_array(supported_engine_sets)
+        if source_path:
+            self.source_path = source_path
 
     def required_parameters(self):
         return self.parameters.get("required", [])
@@ -72,6 +77,19 @@ class Operator:
         if not test:
             response.add_error("Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
         return response
+
+    def register_to(self, operator_home: str):
+        if self.source_path:
+            dir = path.dirname(self.source_path)
+            tree_path = ("/").join([operator_home.rstrip("/"), self.cmd, self.subcommand + "/"])
+            if not path.exists(tree_path):
+                shutil.copytree(dir, tree_path)
+            else:
+                logger.error("Operator definition already exists")
+        else:
+            logger.error("Source path not found for operator, run validate_operators to populate")
+
+
 
     def to_dict(self):
         return {

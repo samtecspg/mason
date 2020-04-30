@@ -1,7 +1,38 @@
+import shutil
 
+from definitions import from_root
 from operators import operators as Operators
 from test.support import testing_base as base
 from clients.response import Response
+from util.logger import logger
+import os
+
+
+class TestRegisterOperator:
+
+    def test_register_to(self):
+        base.set_log_level("fatal")
+        mason_home = from_root("/.tmp/")
+        operator_home = from_root("/.tmp/operators/")
+        if os.path.exists(mason_home):
+            shutil.rmtree(mason_home)
+
+        env = base.get_env("/.tmp/operators/")
+
+        operators, errors = Operators.validate_operators(from_root("/test/support/operators"), True)
+        for operator in operators:
+            operator.register_to(env.operator_home)
+
+        op = Operators.list_operators(env)
+
+        result = {k: list(map(lambda v: v.subcommand, v)) for (k, v) in op.items()}
+
+        expect = {'namespace2': ['operator3'], 'namespace1': ['operator1', 'operator2']}
+
+        assert(result == expect)
+
+        if os.path.exists(mason_home):
+            shutil.rmtree(mason_home)
 
 class TestGetOperator:
 
