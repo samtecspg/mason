@@ -31,7 +31,7 @@ class Parameters:
         elif parameter_path:
             parsed_parameters = parse_yaml(parameter_path) or {}
         else:
-            logger.warning("Neither parameter string nor parameter path provided.")
+            logger.debug("Neither parameter string nor parameter path provided.")
             parsed_parameters = {}
 
         self.parsed_parameters = dedupe(parsed_parameters)

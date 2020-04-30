@@ -1,13 +1,24 @@
 # Mason - Data Operator Framework ![Mason Logo](images/MasonLogo.png) 
 
-Mason is the connecting tissue for your data projects.  You can think of Data Operators as a "data aware" analogue to the concept of an airflow operator, or a data analogue to the react.js concept of a "component".  In reality it specifies Data Operators which interact with 4 configuration abstractions called "Engines":
+What is Mason?
+1.  Its a data aware analogue of airflow operators
+2.  Its like react components but for data pipelines
+3.  Its an open source answer to Glue
+4.  It gives you self contained composable declarative functional data operators
+5.  Its a crazy idea!
+
+Mason is all of these and more s/crazy/useful/g. In short Mason is the connecting tissue for your data projects.  
+
+Out of the box Mason defines 4 main abstractions called "Engines" which it gives you a systematic means of brokering the relationship between the engines and various clients which serve in roles as a particular engine.  
+
+The four main engines mason ships with by default are Metastore Engines, Execution Engines, Scheduler Engines, and Storage Engines which can be described as follows:
 
 ![Operator Engines](images/OperatorConfigs.png)
 
-1.   Storage Engines - Any activity that involves serial (row level) access and storage of data.  Some example storage clients would be S3 or HDFS.
-2.   Metastore Engines - Any activity that involves accessing metadata of datasets such as partitioning or schema information but not the data itself.  Some example metastore clients would be Glue, or Hive.
-3.   Execution Engines - Any activity that involves programatic serial or SQL analytical computation on data.  Example exeuction engines would be spark, presto, or athena.
-4.   Scheduler Engines -  Anything that involves scheduling frequency of data jobs.  Example scheduler clients would be airflow, or aws data pipelines
+1.   Metastore Engines - Defines concepts like databases and tables, and allows interacting with dataset metadata such as partitioning or schema information.  Some example metastore clients would be Glue, or Hive.
+2.   Execution Engines - Defines a means to "compute" or derive additional datasets on source data in metastore tables.   This includes programatic serial or SQL analytical computation on data.  Example exeuction engines would be spark, presto, or athena.
+3.   Scheduler Engines -  Anything that involves scheduling frequency of data jobs and job DAGS.  Example scheduler clients would be airflow, DigDag or Azkaban.
+4.   Storage Engines - Any activity that involves serial (row level) access and storage of data.  Some example storage clients would be S3 or HDFS.
 
 Mason is heavily inspired by language agnostic configuration driven tools like kubernetes, helm, and terraform.   Mason aims to help to make existing higher level open source big data tools _easier_ to coordinate with one another and make them easier to interact with for individuals of various expertise across organizations.  Mason does not attempt to make provisioning and standing up such services referenced in its configurations easier and thus is meant to be used in conjunction with tools
 like kubernetes and helm.
@@ -17,7 +28,7 @@ Mason's mission is to provide ways to build composable self contained functional
 ## Quickstart
 ### Docker
 
-If you are implementing aws clients remember to update `.env` file to include AWS credentials:
+If you are implementing aws clients remember to update `.env` file to include AWS credentials
 ```.env
 AWS_ACCESS_KEY_ID=<KEY_ID>
 AWS_SECRET_ACCESS_KEY=<SECRET_KEY>
@@ -40,7 +51,7 @@ docker-compose up
 
 Swagger ui for registered operators can then be found at: `http://localhost:5000/api/ui/`  
 
-You can access additional mason commands by shelling into the running docker container and running them via:
+You can access additional mason commands by shelling into the running docker container and running them via docker_attach script:
 
 ```
 ./docker_attach
@@ -80,60 +91,101 @@ Mason leverages `mypy` heavily for ensuring that function signatures and types a
 ### Basic Mason Commands
 
 To configure mason run `mason config`.  Configurations are validated for basic structure using json_schema.  See `configurations/schema.json`:
-```
-mason config examples/config/config_example.yaml
->>
-Creating MASON_HOME at ~/.mason/
-Creating OPERATOR_HOME at ~/.mason/operators/
 
-Using config examples/config/config_example.yaml.  Saving to ~/.mason/config.yaml
-+-------------------------------------------------+
-| Reading configuration at ~/.mason/config.yaml:  |
-+-------------------------------------------------+
-{
- "metastore_config": "{'client': 'glue', 'configuration': {'region': 'us-east-1', 'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue'}}",
- "storage_config": "{'client': 's3', 'configuration': {'region': 'us-east-1'}}",
- "scheduler_config": "{'client': 'glue', 'configuration': {'region': 'us-east-1', 'aws_role_arn': 'arn:aws:iam::062325279035:role/service-role/AWSGlueServiceRole-anduin-data-glue'}}",
- "execution_config": "{}"
-}
+```
+>> mason config examples/configs/
++---------------------------------------------+
+| Creating MASON_HOME at /Users/kyle/.mason/  |
++---------------------------------------------+
++---------------------------------------------------------------------+
+| Creating OPERATOR_HOME at /Users/kyle/.mason/registered_operators/  |
++---------------------------------------------------------------------+
++-------------------------------------------------------------+
+| Creating CONFIG_HOME at /Users/kyle/.mason/configurations/  |
++-------------------------------------------------------------+
+
+Valid Configuration. Saving config examples/configs/config_1.yaml to /Users/kyle/.mason/configurations/
+Valid Configuration. Saving config examples/configs/config_2.yaml to /Users/kyle/.mason/configurations/
+
+Setting current config to 0
++-----------------+
+| Configurations  |
++-----------------+
+Config ID    Engine     Client    Configuration
+-----------  ---------  --------  -----------------------------------------------------------------------------------------------------------
+*  0         metastore  glue      {'aws_region': 'us-east-1', 'aws_role_arn': 'REDACTED', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
+             scheduler  glue      {'aws_region': 'us-east-1', 'aws_role_arn': 'REDACTED', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
+             storage    s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
+             execution  athena    {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
+.  1         metastore  s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
+             execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
+
+* = Current Configuration
 ```
 
 You will begin without any operators registered by default:
 ```
-mason operator
->>
+>> mason operator
 No Operators Registered.  Register operators by running "mason register"
 
 ```
   You can register some example operators.  Operators are validated for basic structure using json_schema.  See `/operators/schema.json` for the schema description.
+  
 ```
-mason register examples/operators/table
->>
+>> mason register examples/operators/
+Valid Operator Definition examples/operators/schedule/delete/operator.yaml
+Valid Operator Definition examples/operators/table/delete/operator.yaml
+Valid Operator Definition examples/operators/table/merge/operator.yaml
 Valid Operator Definition examples/operators/table/refresh/operator.yaml
 Valid Operator Definition examples/operators/table/get/operator.yaml
 Valid Operator Definition examples/operators/table/list/operator.yaml
 Valid Operator Definition examples/operators/table/infer/operator.yaml
-Registering operator(s) at examples/operators/table to ~/.mason/operators/table/
+Valid Operator Definition examples/operators/table/query/operator.yaml
+Valid Operator Definition examples/operators/job/get/operator.yaml
+Registering operators at examples/operators/ to /Users/kyle/.mason/registered_operators/operators/
 ```
+
 Listing Operators:
+
 ```
+>> mason operator
 mason operator
->>
-+--------------------------------------------------+
-| Available Operator Methods: ~/.mason/operators/  |
-+--------------------------------------------------+
+
++-----------------------------------------------------------------------+
+| Available Operator Methods: /Users/kyle/.mason/registered_operators/  |
++-----------------------------------------------------------------------+
 
 namespace    command    description                                                                               parameters
------------  ---------  ----------------------------------------------------------------------------------------  ----------------------------------------------------------------
+-----------  ---------  ----------------------------------------------------------------------------------------  ---------------------------------------------------------------------------------------------------------------
+schedule     delete     Delete schedule                                                                           {'required': ['schedule_name']}
+table        delete     Delete metastore tables                                                                   {'required': ['table_name', 'database_name']}
+table        merge      Merge metastore tables                                                                    {'required': ['output_path', 'input_path'], 'optional': ['extract_paths', 'repartition_keys', 'parse_headers']}
 table        refresh    Refresh metastore tables                                                                  {'required': ['database_name', 'table_name']}
 table        get        Get metastore table contents                                                              {'required': ['database_name', 'table_name']}
 table        list       Get metastore tables                                                                      {'required': ['database_name']}
 table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']}
+table        query      Query metastore tables                                                                    {'required': ['query_string', 'database_name']}
+job          get        Get Execution Job Status                                                                  {'required': ['job_id']}
+```
+
+Listing Operators for a particular namespace:
 
 ```
-Listing Operators for a particular namespace:
-```
 mason operator table
+
++--------------------------------------------------------------------+
+| Available table Methods: /Users/kyle/.mason/registered_operators/  |
++--------------------------------------------------------------------+
+
+namespace    command    description                                                                               parameters
+-----------  ---------  ----------------------------------------------------------------------------------------  ---------------------------------------------------------------------------------------------------------------
+table        delete     Delete metastore tables                                                                   {'required': ['table_name', 'database_name']}
+table        merge      Merge metastore tables                                                                    {'required': ['output_path', 'input_path'], 'optional': ['extract_paths', 'repartition_keys', 'parse_headers']}
+table        refresh    Refresh metastore tables                                                                  {'required': ['database_name', 'table_name']}
+table        get        Get metastore table contents                                                              {'required': ['database_name', 'table_name']}
+table        list       Get metastore tables                                                                      {'required': ['database_name']}
+table        infer      Registers a schedule for infering the table then does a one time trigger of the refresh.  {'required': ['database_name', 'storage_path', 'schedule_name']}
+table        query      Query metastore tables                                                                    {'required': ['query_string', 'database_name']}
 ```
 
 Running operator with parameters argument:
