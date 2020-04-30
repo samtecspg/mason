@@ -25,7 +25,7 @@ class TestRegisterOperator:
 
         op = Operators.list_operators(env)
 
-        result = {k: list(map(lambda v: v.subcommand, v)) for (k, v) in op.items()}
+        result = {k: sorted(list(map(lambda v: v.subcommand, v))) for (k, v) in op.items()}
 
         expect = {'namespace2': ['operator3'], 'namespace1': ['operator1', 'operator2']}
 
