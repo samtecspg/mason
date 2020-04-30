@@ -1,7 +1,7 @@
 # Mason - Data Operator Framework ![Mason Logo](images/MasonLogo.png) 
 
 What is Mason?
-1.  Its a data aware analogue to airflow operators
+1.  Its creates a data aware analogue to airflow operators
 2.  Its like react components but for data pipelines
 3.  Its an open source answer to Glue
 4.  It gives you self contained composable declarative functional data operators
@@ -325,6 +325,27 @@ Table (coming soon)
 ## Operators 
 
 Here are some example operators that are included with mason along with a diagram:
+
+
+```table merge```
+
+![table-merge](images/table-merge.png)
+
+
+```table query```
+
+![table-query](images/table-query.png)
+
+
+For more operators see `examples/operators`.  Here are some diagrams of upcoming planned operators:
+
+```table dedupe```
+
+![table-dedupe](images/DedupeOperator.png)
+
+```table summarize```
+
+![table-summarize](images/SummarizeOperator.png)
 
 
 In other words Engines define the valid operations which can be performed via the various clients and operators implement one or more of those operations.  In reality operators actually define sentences like the above in a complete description of work for multiple engines, i.e. one operator can implement several such statements.
