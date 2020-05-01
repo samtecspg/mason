@@ -2,7 +2,7 @@
 #!/bin/bash
 set -e
 
-echo "Requirements:  docker, .env file with AWS credentials.  Run docker_build in parent directory.  Run script from demos root."
+echo "Requirements:  docker, .env file with AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, GLUE_ROLE_ARN with full glue permission.  Run docker_build in parent directory.  Run script from demos root."
 echo "Press [Enter] to continue demo:"
 read -p "$*"
 
