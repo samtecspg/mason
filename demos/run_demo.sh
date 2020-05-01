@@ -27,9 +27,7 @@ elif [ $1 == "1.03" ]
 then
   commands=(
     "mason config examples/configs/"
-    "mason register examples/operators/table"
-    "mason register examples/operators/job"
-    "mason register examples/operators/schedule"
+    "mason register examples/operators/"
     "mason operator"
     "mason config -s 0"
     "mason operator table get -p \"database_name:spg-mason-demo,table_name:conflicting-parquet\""
@@ -51,6 +49,18 @@ then
     "mason operator job get -p \"job_id:\$JOB_ID\""
     "echo \"Wait a bit for job to run\""
     "mason operator job get -p \"job_id:\$JOB_ID\""
+    "mason operator table delete -p \"database_name:spg-mason-demo,table_name:file_1_parquet\""
+    "mason operator schedule delete -p \"schedule_name:mason-demo-crawler-2\""
+  )
+elif [ $1 == "1.03a" ]
+then
+  commands=(
+    "mason config examples/configs/"
+    "mason register examples/operators/"
+    "mason operator"
+    "mason config -s 1"
+    "mason operator table delete -p \"database_name:spg-mason-demo,table_name:conflicting_parquet\""
+    "mason operator schedule delete -p \"schedule_name:mason-demo-crawler\""
     "mason operator table delete -p \"database_name:spg-mason-demo,table_name:file_1_parquet\""
     "mason operator schedule delete -p \"schedule_name:mason-demo-crawler-2\""
   )
