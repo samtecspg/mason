@@ -354,14 +354,14 @@ In other words Engines define the valid operations which can be performed via th
 Look in `examples/operators/` for example operator definitions.  The general anatomy of an operator (currently) consists of three parts:
 
 (1).  An `operator.yaml` definition file which defines the operator namespace and command name as well as required configurations.  
-(2).  An __init__.py which defines the work to be done by the operator.  
+(2).  An `__init__.py` which defines the work to be done by the operator.  
 (3).  If you wish for the operator to also be exposed in the mason api (and not just by `mason operator` command) a `swagger.yml` which defines the component of the API expressed by the operator.  This gets mixed into the main swagger definition for mason before running the api server.
-    (a). Also a line like this in the __init__.py:
+    (a). Also a line like this in the `__init__.py`:
 ```
 def api(*args, **kwargs): return OperatorApi.get("<NAMESPACE>", "COMMAND", *args, **kwargs)
 ```
 
-By convention operator.yaml files and its __init__.py are colocated in a directory for the <COMMAND> name under the namespace directory:
+By convention operator.yaml files and its `__init__.py` are colocated in a directory for the <COMMAND> name under the namespace directory:
 ```
 <NAMESPACE>
 |
@@ -429,7 +429,7 @@ would only accept an operator with both `metastore: s3` and `execution:spark` si
 
 ### Composing Operators
 
-Currently operators are just composed in the old fashioned way by creating a new operator that composes other engine definitions in its __init__.py definition.  Composing operators natively is an upcoming feature.  A good example of where this will first be implemented is with scheduler engines as any operator can technically be scheduled (within reason).  In the mean time defining a new "scheduled" variant of an operator with an additional required scheduler compoenent is the best means to achieve a scheduled operator.
+Currently operators are just composed in the old fashioned way by creating a new operator that composes other engine definitions in its `__init__.py` definition.  Composing operators natively is an upcoming feature.  A good example of where this will first be implemented is with scheduler engines as any operator can technically be scheduled (within reason).  In the mean time defining a new "scheduled" variant of an operator with an additional required scheduler compoenent is the best means to achieve a scheduled operator.
 
 ## Clients
 
@@ -440,7 +440,7 @@ Clients are being added they include a number of prioprietary technologies such 
 Clients have 3 necessary parts:
 
 (1) A schema.json located in `clients/<CLIENT_NAME>/`  
-(2) An __init__.py which contains a Client definition which defines all possible actions to be made by a client on behalf of mason
+(2) An `__init__.py` which contains a Client definition which defines all possible actions to be made by a client on behalf of mason
 (3) For each engine type "role" of a particular client an accompanying engine definition file.  For example if you intend to use Glue as both a metastore (accessing Glue Data Catalog) as well as a Scheduler (creating Glue crawlers) then you would have an accompanying `metastore.py` as well as `scheduler.py`
 
 Every metastore client implementation has a set of "canonical" actions which are defined to be the set of things an engine type can do.  See `clients/engines/`.  If you extend an engine to include a new action type you will need to add accompanying abstract methods to these classes which will be enforced by mypy.   If a particular client will not currently support an action then an accompying empty action which raises NotImplemented will need to be added.  Mason is built around a "white list" approach to support for clients and engines so this is encouraged.  However new actions (especially ones that have very bespoke applications to one client), should be added infrequently.
