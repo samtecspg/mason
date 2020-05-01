@@ -116,6 +116,19 @@ class TestTextSchema:
             assert(list(map(lambda c: c.name,schema.columns)) == ["type","price"])
             assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
 
+    def test_csv_equality(self):
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/sample_data/csv_sample.csv')) as f:
+            response, schema1 = from_file(f, Response(), {"read_headers": True})
+
+        with fs.open(from_root('/test/sample_data/csv_sample_2.csv')) as f:
+            response, schema2 = from_file(f, Response(), {"read_headers": True})
+
+        schema, data, response = find_conflicts([schema1, schema2], response)
+        expect = {'CountDistinctSchemas': 2, 'DistinctSchemas': [{'SchemaType': 'text', 'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}]},{'SchemaType': 'text', 'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}, {'Name': 'availabile', 'Type': 'boolean'}, {'Name': 'date', 'Type': 'date'}]}], 'NonOverlappingColumns': [{'name': 'availabile', 'type': 'boolean'}, {'name': 'date', 'type': 'date'}]}
+        assert(data['SchemaConflicts'] == expect)
+
+
     def test_csv_no_header(self):
         fs = LocalFileSystem()
         with fs.open(from_root('/test/sample_data/csv_no_header.csv')) as f:
