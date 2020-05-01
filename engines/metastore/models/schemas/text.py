@@ -14,6 +14,15 @@ class TextElement(SchemaElement):
         self.type = type
         super().__init__(name, type)
 
+    def __eq__(self, other):
+        if other:
+            return (self.name == other.name and self.type == other.type)
+        else:
+            False
+
+    def __hash__(self):
+        return 0
+
 class TextSchema(MetastoreSchema):
 
     def __init__(self, columns: Sequence[TextElement], type: str):
