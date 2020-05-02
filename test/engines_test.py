@@ -5,6 +5,7 @@ from engines.metastore import MetastoreEngine
 from engines.storage import StorageEngine
 from engines.scheduler import SchedulerEngine
 from test.support import testing_base as base
+from util.logger import logger
 from util.yaml import parse_yaml
 from definitions import from_root
 from os import environ
@@ -96,6 +97,7 @@ class TestSchedulerEngine:
 
 class TestEnvironmentInterpolation:
     def test_interpolation(self):
+        logger.set_level("fatal")
         # valid interpolation
         environ["AWS_REGION"] = "test"
         test_config = {"test": "{{AWS_REGION}}"}
@@ -107,7 +109,7 @@ class TestEnvironmentInterpolation:
         environ["SENSITIVE"] = "test"
         test_config = {"test": "{{SENSITIVE}}"}
         d = safe_interpolate_environment(test_config)
-        assert(d == test_config)
+        assert(d == {"test": None})
 
 
 

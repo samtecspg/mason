@@ -10,7 +10,7 @@ import re
 def safe_interpolate_environment(config_doc: dict):
     return {k: interpolate_value(v) for k, v in config_doc.items()}
 
-def interpolate_value(value: Union[str, dict]):
+def interpolate_value(value: Union[str, dict]) -> Optional[Union[str, dict]]:
 
     SAFE_KEYS = [
         'AWS_ACCESS_KEY_ID',
@@ -22,18 +22,27 @@ def interpolate_value(value: Union[str, dict]):
     ]
 
     r = re.compile(r'^\{\{[A-Z0-9_]+\}\}$')
-    interpolated: Optional[str] = None
-    if not value.__class__.__name__ == "dict": #TODO: deal with nested configuration structures
+    interpolated: Optional[Union[str, dict]]
+    if not value.__class__.__name__ == "dict":  # TODO: deal with nested configuration structures
         # TODO: Fix type
-        v:str = value # type: ignore
+        v: str = value  # type: ignore
         if r.match(v):
             key = v.replace("{{", "").replace("}}", "")
             if key in SAFE_KEYS:
                 interpolated = environ.get(key)
+                if interpolated is None:
+                    logger.error(
+                        f"Undefined environment interpolation for key {{{key}}}.  Check that {key} is defined in your .env")
             else:
-                interpolated = ""
+                logger.error(f"Unpermitted Interpolation for key {{{key}}}.  Must be one of {','.join(SAFE_KEYS)}")
+                interpolated = None
+        else:
+            interpolated = v
+    else:
+        interpolated = value
 
-    return interpolated or value
+    return interpolated
+
 
 class Engine():
 
@@ -45,15 +54,6 @@ class Engine():
 
         schema_path = from_root(f"/clients/{self.client_name}/schema.json")
 
-        # if len(self.config_doc) == 0 :
-        #     if not self.client_name == "":
-        #         logger.error()
-        #         logger.error(f"No {self.client_name} client configuration for specified {engine_type}_engine")
-        #         self.config_doc = {}
-        #         self.client_name = "invalid"
-        #     else:
-        #         self.valid = True
-        # else:
         if self.client_name == "":
             self.valid = True
         else:
