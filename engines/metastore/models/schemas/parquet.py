@@ -1,10 +1,10 @@
 
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
-from fastparquet import ParquetFile #type: ignore
-from fastparquet.schema import SchemaHelper #type: ignore
+from fastparquet import ParquetFile
+from fastparquet.schema import SchemaHelper
 from util.list import get, flatten
 from typing import Optional, List
-from fsspec.spec import AbstractBufferedFile #type: ignore
+from fsspec.spec import AbstractBufferedFile
 from typing import Union
 
 class ParquetElement(SchemaElement):

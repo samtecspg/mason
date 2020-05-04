@@ -7,8 +7,8 @@ from engines.metastore.models import schemas
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
 from engines.metastore.models.schemas import check_schemas as CheckSchemas
 from util.list import get
-import s3fs #type: ignore
-from s3fs import S3FileSystem #type: ignore
+import s3fs
+from s3fs import S3FileSystem
 
 class S3Client:
     def __init__(self, s3_config: dict):

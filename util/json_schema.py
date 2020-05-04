@@ -1,5 +1,5 @@
 
-from jsonschema import validate # type: ignore
+from jsonschema import validate
 from jsonschema.exceptions import SchemaError, ValidationError # type: ignore
 from util.json import parse_json
 from util.logger import logger

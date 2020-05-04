@@ -1,4 +1,4 @@
-import pytest #type: ignore
+import pytest
 
 from definitions import from_root
 from examples.operators.table.get import api as table_get_api
@@ -13,7 +13,7 @@ from configurations import Config
 from operators.operator import Operator
 from test.support.testing_base import run_tests, clean_uuid
 from util.environment import MasonEnvironment
-from dotenv import load_dotenv #type: ignore
+from dotenv import load_dotenv
 
 import os
 
