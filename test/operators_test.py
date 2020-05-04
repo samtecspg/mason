@@ -2,6 +2,7 @@ import shutil
 
 from definitions import from_root
 from operators import operators as Operators
+from operators.operator import Operator, emptyOperator
 from test.support import testing_base as base
 from clients.response import Response
 from util.logger import logger
@@ -39,7 +40,7 @@ class TestGetOperator:
     def test_command_exists(self):
         base.set_log_level("trace")
         env = base.get_env("/test/support/operators/")
-        op = Operators.get_operator(env, "namespace1", "operator1")
+        op = (Operators.get_operator(env, "namespace1", "operator1") or emptyOperator())
         expects = {'cmd':'namespace1','description':'Test Operator','parameters':{'required':['test_param']},'subcommand':'operator1','supported_configurations':[{'execution':None,'metastore':'test_client','scheduler':None,'storage':None}]}
         assert(op.to_dict()==expects)
 
@@ -61,7 +62,7 @@ class TestListOperators:
     def test_namespace_exists(self):
         base.set_log_level("fatal")
         env = base.get_env("/test/support/operators/")
-        l = Operators.list_operators(env, "namespace1").get("namespace1")
+        l = Operators.list_operators(env, "namespace1").get("namespace1") or []
         dicts = list(map(lambda x: x.to_dict(), l))
         expects = [{'cmd': 'namespace1',
           'description': 'Test Operator',
@@ -95,7 +96,7 @@ class TestListOperators:
         base.set_log_level("fatal")
         env = base.get_env("/test/support/operators/")
         config = base.get_configs(env)[0]
-        op = Operators.get_operator(env, "namespace1", "operator2")
+        op = Operators.get_operator(env, "namespace1", "operator2") or emptyOperator()
         response = op.validate_configuration(config, response)
         expects = {'Errors': ['Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.'], 'Info': [], 'Warnings': []}
         assert(response.formatted() == expects)

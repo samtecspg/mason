@@ -1,11 +1,11 @@
 from typing import Sequence, Tuple, Optional, Union, List
 
-from tabulator import FormatError # type: ignore
+from tabulator import FormatError
 
 from clients.response import Response
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement, emptySchema
 
-from tableschema import Table # type: ignore
+from tableschema import Table
 
 class TextElement(SchemaElement):
 

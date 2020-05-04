@@ -1,5 +1,5 @@
 
-# from flask import session # type: ignore
+# from flask import session
 from util.logger import logger
 from util.environment import MasonEnvironment
 from util.exception import message

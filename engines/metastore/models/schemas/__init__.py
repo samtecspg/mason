@@ -10,7 +10,7 @@ from engines.metastore.models.schemas import parquet as ParquetSchema
 from engines.metastore.models.schemas import json as JsonSchema
 from engines.metastore.models.schemas import text as TextSchema
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
-from fsspec.spec import AbstractBufferedFile  # type: ignore
+from fsspec.spec import AbstractBufferedFile
 
 def header_length(file: AbstractBufferedFile):
     head = []

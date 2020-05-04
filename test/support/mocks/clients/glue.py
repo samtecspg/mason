@@ -1,5 +1,5 @@
 import datetime
-from botocore.exceptions import ClientError # type: ignore
+from botocore.exceptions import ClientError
 from dateutil.tz import tzlocal
 
 class GlueMock:

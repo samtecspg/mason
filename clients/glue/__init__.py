@@ -1,11 +1,12 @@
 from typing import Tuple
 
-import boto3 # type: ignore
-from botocore.client import BaseClient # type: ignore
+import boto3
+from botocore.client import BaseClient
 
 from clients.response import Response
-from botocore.errorfactory import ClientError # type: ignore
+from botocore.errorfactory import ClientError
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
+
 
 class GlueClient:
 

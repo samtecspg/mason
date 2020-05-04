@@ -6,7 +6,7 @@ from configurations import get_all
 from definitions import from_root
 import re
 from util.uuid import uuid_regex
-from dotenv import load_dotenv # type: ignore
+from dotenv import load_dotenv
 
 from typing import List, Optional
 

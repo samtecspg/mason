@@ -5,7 +5,7 @@ from engines.metastore.models.credentials import MetastoreCredentials
 from configurations import Config
 from test.support.testing_base import clean_uuid, clean_string
 from util.environment import MasonEnvironment
-from hiyapyco import dump as hdump # type: ignore
+from hiyapyco import dump as hdump
 from clients.spark import SparkConfig
 
 
