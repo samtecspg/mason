@@ -1,5 +1,5 @@
 
-from typing import List, Set, Tuple, Optional
+from typing import List, Set, Tuple, Optional, Type, TypeVar
 
 from clients.response import Response
 from engines.metastore.models.schemas.json import merge_schemas
@@ -15,7 +15,8 @@ def diff_schemas(schema1: MetastoreSchema, schema2: MetastoreSchema) -> Metastor
     return MetastoreSchema(list(column_diff), schema1.type)
 
 
-def find_conflicts(schemas: List[MetastoreSchema], response: Response) -> Tuple[List[MetastoreSchema], dict, Response]:
+M = TypeVar('M', bound=MetastoreSchema)
+def find_conflicts(schemas: List[M], response: Response) -> Tuple[List[M], dict, Response]:
 
     working_schemas = schemas
     def get_name(s: MetastoreSchema) -> Optional[str]:
