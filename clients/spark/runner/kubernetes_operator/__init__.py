@@ -5,7 +5,7 @@ from clients.response import Response
 from definitions import from_root
 from engines.execution.models.jobs import Job
 from util.sys_call import run_sys_call
-from hiyapyco import load as hload # type: ignore
+from hiyapyco import load as hload
 from typing import List
 import yaml
 from engines.metastore.models.credentials import MetastoreCredentials

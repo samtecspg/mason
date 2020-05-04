@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 import threading
 import subprocess
 
@@ -15,8 +15,8 @@ def run_sys_call(command: List[str]):
 
 class SysCall(threading.Thread):
     def __init__(self, command: List[str]):
-        self.stdout = None
-        self.stderr = None
+        self.stdout: Optional[bytes] = None
+        self.stderr: Optional[bytes] = None
         self.command = command
         threading.Thread.__init__(self)
 

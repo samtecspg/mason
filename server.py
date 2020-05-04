@@ -1,5 +1,5 @@
-import connexion # type: ignore
-import markdown # type: ignore
+import connexion
+import markdown
 import operators.operators as Operator
 from util.printer import banner
 from util.environment import MasonEnvironment

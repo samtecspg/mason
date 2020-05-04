@@ -1,6 +1,6 @@
 
 from clients.response import Response
-from botocore.errorfactory import ClientError # type: ignore
+from botocore.errorfactory import ClientError
 from typing import Optional, List, Tuple
 from util.logger import logger
 from engines.metastore.models import schemas

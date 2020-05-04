@@ -1,11 +1,11 @@
 from typing import Tuple, Optional
 
-from botocore.exceptions import ClientError # type: ignore
+from botocore.exceptions import ClientError
 
 from engines.execution.models.jobs import Job
 from util.uuid import uuid4
 
-import boto3 # type: ignore
+import boto3
 from clients.response import Response
 
 from engines.metastore.models.credentials import MetastoreCredentials

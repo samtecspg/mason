@@ -99,3 +99,6 @@ class Operator:
             'parameters': self.parameters,
             'supported_configurations': list(map(lambda x: x.all, self.supported_configurations))
         }
+
+def emptyOperator():
+    Operator("", "", "", {}, [])

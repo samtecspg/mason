@@ -1,6 +1,6 @@
 
-from botocore.errorfactory import ClientError # type: ignore
-from fsspec.implementations.local import LocalFileSystem # type: ignore
+from botocore.errorfactory import ClientError
+from fsspec.implementations.local import LocalFileSystem
 
 from definitions import from_root
 

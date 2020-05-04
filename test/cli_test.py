@@ -177,6 +177,7 @@ class TestCLI:
         print_result(result3)
         result4 = runner.invoke(config, ["-s", "1"])
         print_result(result4)
+        job_id=""
         result5 = runner.invoke(operator, ["job", "get", "-l", "trace", "-p", f"job_id:{job_id}"], catch_exceptions=False)
         print_result(result5)
 

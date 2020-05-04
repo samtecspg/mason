@@ -6,7 +6,7 @@ from engines.metastore.models.schemas import from_file
 from engines.metastore.models.schemas.check_schemas import find_conflicts
 from engines.metastore.models.schemas.json import from_file as json_from_file, JsonSchema
 from engines.metastore.models.schemas.parquet import ParquetSchema, ParquetElement
-from fsspec.implementations.local import LocalFileSystem # type: ignore
+from fsspec.implementations.local import LocalFileSystem
 
 from util.logger import logger
 
@@ -19,7 +19,7 @@ class TestUnsupportedSchema:
             response, schema = from_file(f, Response())
             expect = {'Errors': [], 'Info': [], 'Warnings': [f"File type not supported for file {from_root('/test/sample_data/unsupported_file_type.usf')}"]}
             assert(response.formatted() == expect)
-            assert(schema.__class__.__name__ == "MetastoreSchema")
+            assert(schema.__class__.__name__ == "EmptyMetastoreSchema")
 
 class TestJSONSchema:
 
@@ -39,7 +39,7 @@ class TestJSONSchema:
         fs = LocalFileSystem()
         with fs.open(from_root('/test/sample_data/bad_json.json')) as f:
             response, schema = from_file(f, Response())
-            assert(schema.__class__.__name__ == "MetastoreSchema")
+            assert(schema.__class__.__name__ == "EmptyMetastoreSchema")
             expect = {'Errors': [], 'Info': [], 'Warnings': [f"File type not supported for file {from_root('/test/sample_data/bad_json.json')}"]}
             assert(response.formatted() == expect)
 
@@ -63,7 +63,7 @@ class TestJSONSchema:
 
     def test_file_dne(self):
         response, schema = json_from_file('test/sample_data/dne.json', Response())
-        assert(schema.__class__.__name__ == "MetastoreSchema")
+        assert(schema.__class__.__name__ == "EmptyMetastoreSchema")
         expect = {'Errors': ['File not found test/sample_data/dne.json'], 'Info': [], 'Warnings': []}
         assert (response.formatted() == expect)
 
