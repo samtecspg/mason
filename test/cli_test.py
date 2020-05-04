@@ -3,8 +3,8 @@ from click.testing import CliRunner
 from cli import config, operator, register
 from definitions import from_root
 import os
-import pytest #type: ignore
-import dotenv #type: ignore
+import pytest
+import dotenv
 import shutil
 from test.support.testing_base import clean_string
 

@@ -1,13 +1,13 @@
 from typing import List, Tuple
 
-from fsspec.spec import AbstractBufferedFile #type: ignore
+from fsspec.spec import AbstractBufferedFile
 
 from clients.response import Response
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, emptySchema
-from genson import SchemaBuilder #type: ignore
+from genson import SchemaBuilder
 import json
-import fsspec #type: ignore
-import jsonlines #type: ignore
+import fsspec
+import jsonlines
 import os
 
 def from_file(file: str, response: Response):

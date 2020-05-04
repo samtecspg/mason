@@ -1,7 +1,7 @@
 from typing import Union
 
-import magic #type: ignore
-from s3fs import S3File #type: ignore
+import magic
+from s3fs import S3File
 
 from clients.response import Response
 from engines.metastore.models.schemas.metastore_schema import emptySchema

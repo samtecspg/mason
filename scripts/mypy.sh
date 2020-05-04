@@ -2,4 +2,4 @@
 set -e
 
 pip3 install mypy
-mypy .
+mypy . --config-file=mypy.ini
