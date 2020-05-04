@@ -33,7 +33,7 @@ class ParquetElement(SchemaElement):
 
 class ParquetSchema(MetastoreSchema):
 
-    def __init__(self, columns: List[SchemaElement], schema_helper: Optional[SchemaHelper] = None):
+    def __init__(self, columns: List[ParquetElement], schema_helper: Optional[SchemaHelper] = None):
         self._schema = schema_helper
         self.columns = columns
         self.type = 'parquet'
@@ -46,7 +46,7 @@ def schema_from_text(schema: SchemaHelper):
     text = schema.text
     split = text.split("\n")
     split.pop(0)
-    column_elements: List[SchemaElement] = flatten(list(map(lambda line: element_from_text(line), split)))
+    column_elements: List[ParquetElement] = flatten(list(map(lambda line: element_from_text(line), split)))
     return ParquetSchema(column_elements, schema)
 
 def element_from_text(line: str) -> Optional[ParquetElement]:

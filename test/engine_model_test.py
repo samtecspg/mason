@@ -1,8 +1,10 @@
+from typing import List
+
 from clients.response import Response
 from definitions import from_root
 from engines.metastore.models.schemas import from_file
 from engines.metastore.models.schemas.check_schemas import find_conflicts
-from engines.metastore.models.schemas.json import from_file as json_from_file
+from engines.metastore.models.schemas.json import from_file as json_from_file, JsonSchema
 from engines.metastore.models.schemas.parquet import ParquetSchema, ParquetElement
 from fsspec.implementations.local import LocalFileSystem # type: ignore
 
@@ -68,12 +70,15 @@ class TestJSONSchema:
     def test_check_schemas(self):
         fs = LocalFileSystem()
         with fs.open(from_root('/test/sample_data/complex_json.json')) as f:
+            schema1: JsonSchema
             response, schema1 = from_file(f, Response())
 
         with fs.open(from_root('/test/sample_data/complex_json_2.json')) as f:
+            schema2: JsonSchema
             response, schema2 = from_file(f, Response())
 
         with fs.open(from_root('/test/sample_data/json_simple.json')) as f:
+            schema3: JsonSchema
             response, schema3 = from_file(f, Response())
 
         with fs.open(from_root('/test/sample_data/unsupported_file_type.usf')) as f:
@@ -88,6 +93,7 @@ class TestJSONSchema:
         with fs.open(from_root('/test/sample_data/json_lines2.jsonl')) as f:
             response, schema7 = from_file(f, Response())
 
+        schema: List[JsonSchema]
         schema, data, response = find_conflicts([schema1, schema2], response)
         expect = {'$schema': 'http://json-schema.org/schema#','properties': {'data': {'items': {'properties': {'field1': {'type': 'string'},'field2': {'type': ['integer','string']},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'properties': {'some_other_stuff': {'type': 'string'}},'required': ['some_other_stuff'],'type': 'object'},'field6': {'type': 'string'}},'type': 'object'},'type': 'array'}},'required': ['data'],'type': 'object'}
         assert(schema[0].schema == expect)
