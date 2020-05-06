@@ -10,14 +10,34 @@ All of these statements are try in varying degrees. In short Mason is the connec
 
 Out of the box Mason defines 4 main abstractions called "Engines" which it gives you a systematic means of brokering the relationship between the engines and various clients which serve in roles as a particular engine.  
 
+Once configured mason gives you a declarative ability to perform simple statements like:
+
+```
+mason operator table get -p "database_name:test-db,table_name:test-table"
+```
+
+or
+
+```
+mason operator job get -p "job_id:test_job_id"
+```
+
+or
+
+```
+mason operator table infer -p "storage_path:test-path,database_name:test-database,table_name:test-table"
+```
+
+and for the operators to perform sensible actions regardless of your configured metastore engine, or execution engine whether its local file systems, or s3 or athena or spark.
+
 The four main engines mason ships with by default are Metastore Engines, Execution Engines, Scheduler Engines, and Storage Engines which can be described as follows:
 
 ![Operator Engines](images/OperatorConfigs.png)
 
-1.   Metastore Engines - Defines concepts like databases and tables, and allows interacting with dataset metadata such as partitioning or schema information.  Some example metastore clients would be Glue, or Hive.
-2.   Execution Engines - Defines a means to "compute" or derive additional datasets on source data in metastore tables.   This includes programatic serial or SQL analytical computation on data.  Example exeuction engines would be spark, presto, or athena.
-3.   Scheduler Engines -  Anything that involves scheduling frequency of data jobs and job DAGS.  Example scheduler clients would be airflow, DigDag or Azkaban.
-4.   Storage Engines - Any activity that involves serial (row level) access and storage of data.  Some example storage clients would be S3 or HDFS.
+1.   Metastore - Defines concepts like databases and tables, and allows interacting with dataset metadata such as partitioning or schema information.  Some example metastore clients would be Glue, or Hive.
+2.   Execution - Defines a means to "compute" or derive additional datasets on source data in metastore tables.   This includes programatic serial or SQL analytical computation on data.  Example exeuction engines would be spark, presto, or athena.
+3.   Scheduler -  Anything that involves scheduling frequency of data jobs and job DAGS.  Example scheduler clients would be airflow, DigDag or Azkaban.
+4.   Storage - Any activity that involves serial (row level) access and storage of data.  Some example storage clients would be S3 or HDFS.
 
 Mason is heavily inspired by language agnostic configuration driven tools like kubernetes, helm, and terraform.   Mason aims to help to make existing higher level open source big data tools _easier_ to coordinate with one another and make them easier to interact with for individuals of various expertise across organizations.  Mason does not attempt to make provisioning and standing up such services referenced in its configurations easier and thus is meant to be used in conjunction with tools
 like kubernetes and helm.
