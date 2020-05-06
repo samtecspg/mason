@@ -1,0 +1,8 @@
+type: "workflow"
+namespace: "table"
+command: "infer"
+description:  "One step workfow for table infer operator"
+  dag:
+    - type: "operator"
+      namespace: "table"
+      command: "infer"

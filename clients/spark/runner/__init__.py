@@ -1,7 +1,6 @@
 
 from abc import abstractmethod
 from clients.spark.config import SparkConfig
-from clients.response import Response
 from engines.execution.models.jobs import Job
 from engines.metastore.models.credentials import MetastoreCredentials
 

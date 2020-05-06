@@ -1,6 +1,6 @@
 
 from click.testing import CliRunner
-from cli import config, operator, register
+from cli import config, operator, register, workflow
 from definitions import from_root
 import os
 import pytest
@@ -16,8 +16,8 @@ def print_result(result):
     print(result.exception)
 
 
-@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
-class TestCLI:
+# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+class TestPlayground:
 
     @pytest.fixture(autouse=True)
     def run_around_tests(self):
@@ -169,16 +169,12 @@ class TestCLI:
         runner = CliRunner()
         result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
         print_result(result1)
-        result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
+        result2 = runner.invoke(register, [from_root('/examples/operators/')])
         print_result(result2)
-        result25 = runner.invoke(register, [from_root('/examples/operators/job/')])
-        print_result(result25)
-        result3 = runner.invoke(operator, [])
+        result3 = runner.invoke(config, ["-s", "1"])
         print_result(result3)
-        result4 = runner.invoke(config, ["-s", "1"])
+        result4 = runner.invoke(workflow, ["register", from_root("/examples/workflows/"), "-l", "trace"])
         print_result(result4)
-        job_id=""
-        result5 = runner.invoke(operator, ["job", "get", "-l", "trace", "-p", f"job_id:{job_id}"], catch_exceptions=False)
-        print_result(result5)
+
 
 

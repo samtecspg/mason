@@ -287,6 +287,8 @@ mason run
 
 ## Advanced Usage
 
+![uml-diagram](images/uml-diagram.png)
+
 Mason's main function is to broker the relationship between 3 main objects:
 1. Clients -  Technologies which can be used in various capacities as engines
 2. Engines -  The 4 main types of data engines by default (storage, execution, metastore and scheduler) which comprise of the various ways by which a client can be utilized.

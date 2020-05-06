@@ -6,6 +6,7 @@ from typing import Optional
 from parameters import Parameters
 from util.logger import logger
 import operators.operators as Operators
+import workflows as Workflows
 from util.environment import MasonEnvironment, initialize_environment
 from configurations import get_current_config
 from configurations.actions import run_configuration_actions
@@ -94,6 +95,39 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
         Operators.run(env, config, params, cmd, subcmd)
     else:
         logger.info("Configuration not found.  Run \"mason config\" first")
+
+@main.command("workflow", short_help="Registers, lists and executes mason workflows")
+@click.argument("cmd", required=False)
+@click.argument("subcmd", required=False)
+@click.option("-l", "--log_level", help="Log level for mason")
+def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level: Optional[str] = None):
+    """
+    Running without cmd or subcmd will list out all mason workflows currently registered.
+    Running without subcmd will list out all mason workflows under the cmd namespace.
+    Running with both cmd and subcmd will execute the workflow or print out missing required parameters.
+    Running with -r registers workflow from specified <workflow_file>, workflow_file must contain a valid workflow.yaml
+    """
+    env = MasonEnvironment()
+
+    if path.exists(env.config_home):
+        if cmd == "register":
+            logger.set_level(log_level)
+            register_file = subcmd
+            workflows, errors = Workflows.validate_workflows(register_file, True)
+
+            if len(workflows) > 0:
+                for workflow in workflows:
+                    workflow.register_to(env.workflow_home)
+            else:
+                if len(errors) > 0:
+                    for error in errors:
+                        logger.error(f"Invalid workflow configurations found: {error}")
+        else:
+            Workflows.run(env, config, cmd, subcmd)
+
+    else:
+        logger.error("Configuration not found.  Run \"mason config\" first")
+
 
 @main.command("run", short_help="Runs mason flask server on port 5000")
 def run():
