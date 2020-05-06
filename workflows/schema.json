@@ -8,7 +8,7 @@
     },
     "namespace": { "type": "string" },
     "command": { "type": "string" },
-    "description": { "type": "string" },
+    "description": { "type": "string" }
   },
   "required": ["type", "namespace", "command", "description"]
 }

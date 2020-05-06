@@ -86,7 +86,7 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
     Running with both cmd and subcmd will execute the operator or print out missing required parameters.
     """
     env = MasonEnvironment()
-    config = get_current_config(env, "debug")  # return first config for now
+    config = get_current_config(env, "debug")
 
     logger.set_level(log_level or "info")
 
@@ -108,13 +108,16 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level:
     Running with -r registers workflow from specified <workflow_file>, workflow_file must contain a valid workflow.yaml
     """
     env = MasonEnvironment()
+    config = get_current_config(env, "debug")
 
-    if path.exists(env.config_home):
+    if config:
         if cmd == "register":
             logger.set_level(log_level)
             register_file = subcmd
-            workflows, errors = Workflows.validate_workflows(register_file, True)
-
+            if register_file:
+                workflows, errors = Workflows.validate_workflows(register_file, True)
+            else:
+                logger.error("No file path provided to register operator")
             if len(workflows) > 0:
                 for workflow in workflows:
                     workflow.register_to(env.workflow_home)

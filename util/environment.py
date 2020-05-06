@@ -19,7 +19,7 @@ class MasonEnvironment:
         self.operator_home: str = operator_home or (self.mason_home + "registered_operators/")
         self.workflow_home: str = workflow_home or (self.mason_home + "registered_workflows/")
         self.operator_module = operator_module or "registered_operators"
-        self.operator_module = workflow_module or "registered_workflows"
+        self.workflow_module = workflow_module or "registered_workflows"
         self.config_schema = from_root("/configurations/schema.json")
 
 def get_mason_home() -> str:
