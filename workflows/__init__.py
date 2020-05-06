@@ -4,7 +4,6 @@ from importlib import import_module
 from util.yaml import parse_yaml
 from typing import Optional
 from configurations import Config
-from parameters import Parameters
 from clients.response import Response
 from util.printer import banner
 from sys import path
@@ -12,8 +11,6 @@ from util.json_schema import validate_schema
 from typing import List
 from util.logger import logger
 from util.json import print_json
-import yaml
-from operators.operator import Operator
 from definitions import from_root
 from typing import Dict
 from util.environment import MasonEnvironment
@@ -25,7 +22,7 @@ def import_all(env: MasonEnvironment, config: Config):
     workflows = list_workflows(env)
     for namespace, ops in workflows.items():
         for op in ops:
-            cmd = op.subcommand
+            cmd = op.command
             import_module(f"{env.workflow_module}.{namespace}.{cmd}")
 
 def run(env: MasonEnvironment, config: Config, cmd: Optional[str] = None, subcmd: Optional[str] = None):
@@ -41,14 +38,14 @@ def run(env: MasonEnvironment, config: Config, cmd: Optional[str] = None, subcmd
         wf: Optional[Workflow] = get_workflow(env, cmd, subcmd)
 
         if wf:
-            response = workflow.run(env, config, response)
+            response = wf.run(env, config, response)
         else:
             if not response.errored():
                 response.add_error(f"Workflow {cmd} {subcmd} not found.  Check workflows with 'mason workflow'")
 
         banner("Workflow Response")
         print_json(response.formatted())
-        return response
+    return response
 
 def from_config(config: dict, source_path: Optional[str] = None) -> Optional[Workflow]:
     namespace = config.get("namespace")
@@ -57,7 +54,7 @@ def from_config(config: dict, source_path: Optional[str] = None) -> Optional[Wor
     if namespace and command:
         return Workflow(namespace, command, source_path=source_path)
     else:
-        None
+        return None
 
 def validate_workflows(workflow_file: str, print_validation: bool = False):
     workflows: List[Workflow] = []
@@ -95,10 +92,10 @@ def list_workflows(env: MasonEnvironment, cmd: Optional[str] = None) -> Dict[str
 
     return filtered
 
-def get_workflow(env: MasonEnvironment, cmd: Optional[str], subcmd: Optional[str]) -> Optional[Operator]:
+def get_workflow(env: MasonEnvironment, cmd: Optional[str], subcmd: Optional[str]) -> Optional[Workflow]:
     if cmd and subcmd:
         wfs: List[Workflow] = list_workflows(env, cmd).get(cmd) or []
-        filtered = list(filter(lambda x: x.subcommand == subcmd, wfs))
+        filtered = list(filter(lambda x: x.command == subcmd, wfs))
         if len(filtered) == 0:
             return None
         else:
@@ -111,11 +108,11 @@ def tabulate_workflows(env: MasonEnvironment, cmd: Optional[str] = None):
     array = []
     if cmd:
         for item in ops[cmd]:
-            array.append([cmd, item.subcommand, item.description, item.parameters])
+            array.append([item.namespace, item.command, item.description or ""])
     else:
         for k in ops:
             for item in ops[k]:
-                array.append([k, item.subcommand, item.description, item.parameters])
+                array.append([item.namespace, item.command, item.description or ""])
 
     cmd_value = (cmd or "Workflow")
     logger.info()

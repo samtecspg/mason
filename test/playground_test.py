@@ -175,6 +175,8 @@ class TestPlayground:
         print_result(result3)
         result4 = runner.invoke(workflow, ["register", from_root("/examples/workflows/"), "-l", "trace"])
         print_result(result4)
+        result5 = runner.invoke(workflow)
+        print_result(result5)
 
 
 

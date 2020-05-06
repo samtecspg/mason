@@ -10,14 +10,16 @@ from util.logger import logger
 
 class Workflow:
 
-    def __init__(self, namespace: str, command: str, source_path: Optional[str] = None):
+    def __init__(self, namespace: str, command: str, description: Optional[str] = None, source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
+        self.description = description
+        self.source_path = source_path
 
     def register_to(self, workflow_home: str):
         if self.source_path:
             dir = path.dirname(self.source_path)
-            tree_path = ("/").join([workflow_home.rstrip("/"), self.cmd, self.subcommand + "/"])
+            tree_path = ("/").join([workflow_home.rstrip("/"), self.namespace, self.command + "/"])
             if not path.exists(tree_path):
                 shutil.copytree(dir, tree_path)
             else:
