@@ -5,7 +5,6 @@ from operators import operators as Operators
 from operators.operator import Operator, emptyOperator
 from test.support import testing_base as base
 from clients.response import Response
-from util.logger import logger
 import os
 
 

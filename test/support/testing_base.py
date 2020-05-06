@@ -63,8 +63,8 @@ def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], call
 def set_log_level(level: str = None):
     logger.set_level(level or "fatal", False)
 
-def get_env(operator_home: str = "/examples/operators", config_home = "/examples/operators/table/test_configs/", operator_module: str = "examples.operators"):
-    return MasonEnvironment(operator_home=from_root(operator_home), config_home=from_root(config_home), operator_module=operator_module)
+def get_env(operator_home: str = "/examples/operators", config_home = "/examples/operators/table/test_configs/", operator_module: str = "examples.operators", workflow_home: str = "/examples/workflows", workflow_module="examples.workflows"):
+    return MasonEnvironment(operator_home=from_root(operator_home), config_home=from_root(config_home), operator_module=operator_module, workflow_home=workflow_home, workflow_module=workflow_module)
 
 def get_configs(env: MasonEnvironment):
     return get_all(env)

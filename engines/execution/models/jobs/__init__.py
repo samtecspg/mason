@@ -2,7 +2,6 @@ from typing import List, Optional, Dict
 
 from clients.response import Response
 
-
 class Job:
 
     def __init__(self, id: str, logs: Optional[List[str]]=None, errors: Optional[List[str]]=None, results: Optional[List[Dict]]=None):

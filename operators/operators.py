@@ -26,7 +26,6 @@ def import_all(env: MasonEnvironment, config: Config):
             cmd = op.subcommand
             import_module(f"{env.operator_module}.{namespace}.{cmd}")
 
-
 def update_yaml(env: MasonEnvironment, base_swagger: str):
     swagger_file = "api/swagger.yml"
     parsed_swagger = parse_yaml(base_swagger) or {}

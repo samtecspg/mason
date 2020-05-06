@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MasonWorkflowSchema",
+  "properties": {
+    "type": {
+      "type": "string" ,
+      "enum": ["workflow"]
+    },
+    "namespace": { "type": "string" },
+    "command": { "type": "string" },
+    "description": { "type": "string" },
+  },
+  "required": ["type", "namespace", "command", "description"]
+}
+

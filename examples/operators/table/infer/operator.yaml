@@ -1,13 +1,19 @@
 type: "operator"
 namespace: "table"
 command: "infer"
-description:  "Registers a schedule for infering the table then does a one time trigger of the refresh."
+description:  "Reads from <storage_path> for <storage_engine>, infers schema using <execution_engine> and emits statements to create <metastore_engine> <database_name>"
 parameters:
   required:
     - "database_name"
     - "storage_path"
     - "schedule_name"
+  optional:
+    - "schedule_name"
+    - "schedule_frequency"
 supported_configurations:
   - metastore: "glue"
     scheduler: "glue"
     storage: "s3"
+  - metastore: "athena"
+    storage: "s3"
+    execution: "spark"
