@@ -11,13 +11,12 @@ from examples.operators.table.test.expects import table as expects # type: ignor
 from parameters import Parameters
 from configurations import Config
 from operators.operator import Operator
-from test.support.testing_base import run_tests, clean_uuid
+from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
 from dotenv import load_dotenv
-
 import os
 
-load_dotenv('.env.example')
+load_dotenv(from_root("/.env.example"))
 
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):

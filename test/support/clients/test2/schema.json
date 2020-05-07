@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "TestClient",
+  "properties": {
+    "test_param_3": {
+      "type": "string"
+    },
+    "test_param_4": {
+      "type": "string"
+    }
+  },
+  "required": ["test_param_3", "test_param_4"]
+}

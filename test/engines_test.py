@@ -36,7 +36,7 @@ class TestExecutionEngine:
 
 class TestMetastoreEngine:
     def before(self, config: str):
-        base.set_log_level("error")
+        base.set_log_level("fatal")
         config_home = from_root(config)
         env = MasonEnvironment(config_home=config_home)
         yaml_config_doc = parse_yaml(env.config_home)
@@ -52,7 +52,6 @@ class TestMetastoreEngine:
         me = self.before("/test/support/configs/test_partial_config.yaml")
         assert(me.client_name == "")
         assert(type(me.client).__name__ == "EmptyMetastoreClient")
-
 
 
 class TestStorageEngine:

@@ -1,6 +1,6 @@
 import connexion
 import markdown
-import operators.operators as Operator
+import operators as Operator
 from util.printer import banner
 from util.environment import MasonEnvironment
 from configurations import get_all

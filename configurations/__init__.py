@@ -19,7 +19,8 @@ from clients.response import Response
 class Config:
 
     def __init__(self, env: MasonEnvironment, config: dict):
-        valid = validate_schema(config, env.config_schema)
+        validation = validate_schema(config, env.config_schema)
+        valid = (validation == True)
 
         self.metastore = MetastoreEngine(config, valid)
         self.scheduler = SchedulerEngine(config, valid)

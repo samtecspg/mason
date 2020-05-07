@@ -1,12 +1,11 @@
 import shutil
 
 from definitions import from_root
-from operators import operators as Operators
+import operators as Operators
 from operators.operator import Operator, emptyOperator
 from test.support import testing_base as base
 from clients.response import Response
 import os
-
 
 class TestRegisterOperator:
 
@@ -25,7 +24,7 @@ class TestRegisterOperator:
 
         op = Operators.list_operators(env)
 
-        result = {k: sorted(list(map(lambda v: v.subcommand, v))) for (k, v) in op.items()}
+        result = {k: sorted(list(map(lambda v: v.command, v))) for (k, v) in op.items()}
 
         expect = {'namespace2': ['operator3'], 'namespace1': ['operator1', 'operator2']}
 

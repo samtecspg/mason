@@ -1,13 +1,13 @@
 import shutil
 from os import path
-from typing import Optional, List
+from typing import Optional, List, Union, Tuple
 
 from clients.response import Response
 from configurations import Config
 from operators.operator import Operator
-from parameters import Parameters
 from util.environment import MasonEnvironment
 from util.logger import logger
+from workflows.dags import validate_dag, Dag
 
 
 class Workflow:
@@ -19,8 +19,23 @@ class Workflow:
         self.dag = validate_dag(dag)
         self.source_path = source_path
 
-    def validate_dag(self, dag: List[dict]) -> List[DagStep]:
+    def validate(self, operators: List[Operator]) -> Union[bool, str]:
+        validation: Union[bool, str] = True
+        dag = self.dag
+        if dag:
+            validation = self.validate_operators(dag, operators)
+        else:
+            validation = "Workflow invalid due to invalid DAG definition"
+        return validation
 
+    def validate_operators(self, dag: Dag, operators: List[Operator]) -> Union[bool, str]:
+        validation: Union[bool, str] = True
+        operator_signatures: List[Tuple[str, str]] = list(map(lambda o: (o.namespace, o.command), operators))
+        for step in dag.steps:
+            if not (step.namespace,step.command) in operator_signatures:
+                validation = f"Unsupported DAG step: Operator {step.namespace} {step.command} not found"
+                break
+        return validation
 
     def register_to(self, workflow_home: str):
         if self.source_path:
@@ -32,12 +47,6 @@ class Workflow:
                 logger.error("Workflow definition already exists")
         else:
             logger.error("Source path not found for operator, run validate_operators to populate")
-
-
-    def operators_supported(self, operators: List[Operator]):
-
-
-
 
     def run(self, env: MasonEnvironment, config: Config, response: Response) -> Response:
         response.add_info("Running Workflow")
