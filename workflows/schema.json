@@ -8,8 +8,19 @@
     },
     "namespace": { "type": "string" },
     "command": { "type": "string" },
-    "description": { "type": "string" }
+    "description": { "type": "string" },
+    "dag": {
+      "type":  "array",
+      "items": {
+        "type":  "object",
+        "properties": {
+           "type": {"type":  "string"},
+           "namespace": {"type": "string"},
+           "command": {"type":  "string"}
+        }
+      }
+    }
   },
-  "required": ["type", "namespace", "command", "description"]
+  "required": ["type", "namespace", "command", "description", "dag"]
 }
 

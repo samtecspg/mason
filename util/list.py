@@ -1,5 +1,5 @@
 
-from typing import List, Any, Optional
+from typing import List, Any, Optional, TypeVar
 
 
 def get(l: List[Any], i: int) -> Optional[Any]:
@@ -11,7 +11,8 @@ def flatten(l: List[Optional[Any]]) -> List[Any]:
 def flatten_string(l: List[str]) -> List[str]:
     return [string for string in l if string != ""]
 
-def flatten_array(l: List[List[str]]) -> List[str]:
+T = TypeVar("T")
+def flatten_array(l: List[List[T]]) -> List[T]:
     values = []
     for value in l:
         for subvalue in value:

@@ -1,20 +1,26 @@
 import shutil
 from os import path
-from typing import Optional
+from typing import Optional, List
 
 from clients.response import Response
 from configurations import Config
+from operators.operator import Operator
 from parameters import Parameters
 from util.environment import MasonEnvironment
 from util.logger import logger
 
+
 class Workflow:
 
-    def __init__(self, namespace: str, command: str, description: Optional[str] = None, source_path: Optional[str] = None):
+    def __init__(self, namespace: str, command: str, dag: List[dict], description: Optional[str] = None, source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
         self.description = description
+        self.dag = validate_dag(dag)
         self.source_path = source_path
+
+    def validate_dag(self, dag: List[dict]) -> List[DagStep]:
+
 
     def register_to(self, workflow_home: str):
         if self.source_path:
@@ -23,21 +29,17 @@ class Workflow:
             if not path.exists(tree_path):
                 shutil.copytree(dir, tree_path)
             else:
-                logger.error("Operator definition already exists")
+                logger.error("Workflow definition already exists")
         else:
             logger.error("Source path not found for operator, run validate_operators to populate")
 
 
+    def operators_supported(self, operators: List[Operator]):
+
+
+
+
     def run(self, env: MasonEnvironment, config: Config, response: Response) -> Response:
-
-        # self.validate(config, parameters, response)
-
-        # if not response.errored():
-        #     try:
-        #         mod = import_module(f'{env.operator_module}.{self.cmd}.{self.subcommand}')
-        #         response = mod.run(env, config, parameters, response)  # type: ignore
-        #     except ModuleNotFoundError as e:
-        #         response.add_error(f"Module Not Found: {e}")
         response.add_info("Running Workflow")
 
         return response

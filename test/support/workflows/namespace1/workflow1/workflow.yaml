@@ -1,0 +1,8 @@
+type: "workflow"
+namespace: "namespace1"
+command: "workflow1"
+description: "Test Workflow"
+dag:
+  - type: "operator"
+    namespace: "namespace1"
+    command: "operator1"

@@ -1,6 +1,10 @@
 import os
 from tabulate import tabulate
 from importlib import import_module
+
+from operators.operator import Operator
+from operators.operators import list_operators
+from util.list import flatten_array
 from util.yaml import parse_yaml
 from typing import Optional
 from configurations import Config
@@ -51,13 +55,16 @@ def from_config(config: dict, source_path: Optional[str] = None) -> Optional[Wor
     namespace = config.get("namespace")
     command = config.get("command")
     description = config.get("description")
+    dag = config.get("dag")
+
     if namespace and command:
-        return Workflow(namespace, command, source_path=source_path)
+        return Workflow(namespace, command, description, dag, source_path=source_path)
     else:
         return None
 
-def validate_workflows(workflow_file: str, print_validation: bool = False):
+def validate_workflows(workflow_file: str, env: MasonEnvironment, print_validation: bool = False):
     workflows: List[Workflow] = []
+    operators: List[Operator] = flatten_array(list(list_operators(env).values()))
     errors: List[dict] = []
     for r, d, f in os.walk(workflow_file):
         for file in f:
@@ -67,11 +74,14 @@ def validate_workflows(workflow_file: str, print_validation: bool = False):
                     config = parse_yaml(file_path)
                     schema = from_root("/workflows/schema.json")
                     if validate_schema(config, schema):
-                        if print_validation:
-                            logger.info(f"Valid Workflow Definition {file_path}")
-                        workflow = from_config(config, file_path)
-                        if workflow:
-                            workflows.append(workflow)
+                        if workflow.operators_supported(operators):
+                            if print_validation:
+                                logger.info(f"Valid Workflow Definition {file_path}")
+                            workflow = from_config(config, file_path)
+                            if workflow:
+                                workflows.append(workflow)
+                        else:
+                            logger.error("Workflow specifies operators which are not registered")
                     else:
                         logger.error(f"Invalid Workflow Definition: {file_path}")
 
@@ -84,9 +94,9 @@ def list_workflows(env: MasonEnvironment, cmd: Optional[str] = None) -> Dict[str
     grouped: Dict[str, List[Workflow]] = {}
 
     for workflow in workflows:
-        wfs = grouped.get(workflow.command) or []
+        wfs = grouped.get(workflow.namespace) or []
         wfs.append(workflow)
-        grouped[workflow.command] = wfs
+        grouped[workflow.namespace] = wfs
 
     filtered = {k: v for k, v in grouped.items() if (k == cmd) or (cmd == None)}
 
