@@ -13,10 +13,10 @@ from typing import List, Optional
 from clients.response import Response
 from configurations import get_config
 from operators.operator import Operator
-from operators import operators as Operators
+import operators as Operators
 from util.environment import MasonEnvironment
 
-load_dotenv('.env.example')
+load_dotenv(from_root('/.env.example'))
 
 def clean_uuid(s: str, subst: str = ''):
     return uuid_regex().sub(subst, s)
@@ -54,11 +54,10 @@ def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], call
             if conf and conf.valid:
                 callable(env, conf, operator)
             else:
-                raise Exception(f"No matching valid configuration found for operator {op.cmd}, {op.subcommand}")
+                raise Exception(f"No matching valid configuration found for operator {op.namespace}, {op.command}")
 
     else:
         raise Exception(f"Operator not found {cmd} {sub}")
-
 
 def set_log_level(level: str = None):
     logger.set_level(level or "fatal", False)
@@ -68,4 +67,3 @@ def get_env(operator_home: str = "/examples/operators", config_home = "/examples
 
 def get_configs(env: MasonEnvironment):
     return get_all(env)
-

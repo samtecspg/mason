@@ -2,7 +2,7 @@ from parameters import Parameters
 from configurations import Config, get_current_config
 from util.environment import MasonEnvironment
 from typing import Optional
-from operators import operators as Operators
+import operators as Operators
 from typing import List
 import urllib.parse
 from util.logger import logger

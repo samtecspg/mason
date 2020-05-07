@@ -5,7 +5,7 @@ from typing import Optional
 
 from parameters import Parameters
 from util.logger import logger
-import operators.operators as Operators
+import operators as Operators
 import workflows as Workflows
 from util.environment import MasonEnvironment, initialize_environment
 from configurations import get_current_config
@@ -115,16 +115,12 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level:
             logger.set_level(log_level)
             register_file = subcmd
             if register_file:
-                workflows, errors = Workflows.validate_workflows(register_file, env, True)
+                workflows = Workflows.validate_workflows(register_file, env)
             else:
                 logger.error("No file path provided to register operator")
             if len(workflows) > 0:
                 for workflow in workflows:
                     workflow.register_to(env.workflow_home)
-            else:
-                if len(errors) > 0:
-                    for error in errors:
-                        logger.error(f"Invalid workflow configurations found: {error}")
         else:
             Workflows.run(env, config, cmd, subcmd)
 

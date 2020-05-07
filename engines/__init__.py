@@ -1,10 +1,11 @@
+from dotenv import load_dotenv
 
 from util.logger import logger
 from clients import EmptyClient
 from typing import Optional, Union
 from util.json_schema import validate_schema
 from definitions import from_root
-from os import path, environ
+from os import environ
 import re
 
 def safe_interpolate_environment(config_doc: dict):
@@ -50,28 +51,21 @@ class Engine():
         self.client_name = (config or {}).get(f"{engine_type}_engine") or ""
         conf_doc = (config or {}).get("clients", {}).get(self.client_name, {}).get("configuration", {})
         self.config_doc = safe_interpolate_environment(conf_doc)
-        self.valid = False
+        self.valid = True
 
-        schema_path = from_root(f"/clients/{self.client_name}/schema.json")
-
-        if self.client_name == "":
-            self.valid = True
+        # TODO:  Improve this
+        if (config or {}).get("testing", False):
+            schema_path = from_root(f"/test/support/clients/{self.client_name}/schema.json")
         else:
-            if path.exists(schema_path):
-                valid = validate_schema(self.config_doc, schema_path)
-            else:
-                logger.warning(f"Specified schema at {schema_path} does not exist")
-                valid = True
+            schema_path = from_root(f"/clients/{self.client_name}/schema.json")
 
-            if not valid:
-                if not self.client_name == "":
-                    logger.error(f"Invalid configuration for client {self.client_name}")
-                    self.client_name = "invalid"
-                    self.config_doc = {}
-                else:
-                    self.valid = True
-            else:
-                self.valid = True
+        if not self.client_name == "":
+            validation = validate_schema(self.config_doc, schema_path)
+            if isinstance(validation, str):
+                logger.warning(validation)
+                logger.error(f"Invalid configuration for client {self.client_name}")
+                self.client_name = "invalid"
+                self.config_doc = {}
 
     def to_dict(self):
         return {

@@ -1,22 +1,20 @@
 from clients.response import Response
 
 from configurations import Config
-from operators.operator import Operator
+from definitions import from_root
+from operators import Operator
 from parameters import Parameters
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
 from dotenv import load_dotenv
-load_dotenv('.env.example')
 
+load_dotenv(from_root('/.env.example'))
 
 def test_get():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # valid job_id
-        job_id="bad"
-        job_id="ab8671a9-0878-434d-82f9-4d8505efe53a"
-        job_id="good_job_id"
-        params = Parameters(parameters=f"job_id:{job_id}")
+        params = Parameters(parameters=f"job_id:good_job_id")
         # TODO: consolidate these
         expect = {
             'spark': {'Data': [{'Logs': ['<LOG_DATA>']}], 'Errors': [], 'Info': [], 'Warnings': []},

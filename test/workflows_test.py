@@ -4,7 +4,7 @@ import shutil
 from definitions import from_root
 from test.support import testing_base as base
 import workflows as Workflows
-import operators.operators as Operators
+import operators as Operators
 
 class TestWorkflows:
 
@@ -22,7 +22,7 @@ class TestWorkflows:
         for operator in operators:
             operator.register_to(env.operator_home)
 
-        workflows, errors = Workflows.validate_workflows(from_root("/test/support/workflows/"), True)
+        workflows = Workflows.validate_workflows(from_root("/test/support/workflows/"), env)
 
         for workflow in workflows:
             workflow.register_to(env.workflow_home)

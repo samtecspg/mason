@@ -14,12 +14,12 @@ from os import path, makedirs
 
 class Operator:
 
-    def __init__(self, cmd: str, subcommand: str, description: str, parameters: dict, supported_engine_sets: List[Dict[str, str]], source_path: Optional[str] = None):
-        self.cmd = cmd
-        self.subcommand = subcommand
+    def __init__(self, namespace: str, command: str, description: str, parameters: dict, supported_configurations: List[Dict[str, str]], source_path: Optional[str] = None):
+        self.namespace = namespace
+        self.command = command
         self.description = description
         self.parameters: dict = parameters
-        self.supported_configurations: List[SupportedEngineSet] = from_array(supported_engine_sets)
+        self.supported_configurations: List[SupportedEngineSet] = from_array(supported_configurations)
         if source_path:
             self.source_path = source_path
 
@@ -32,7 +32,7 @@ class Operator:
 
         if not response.errored():
             try:
-                mod = import_module(f'{env.operator_module}.{self.cmd}.{self.subcommand}')
+                mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
                 response = mod.run(env, config, parameters, response)  # type: ignore
             except ModuleNotFoundError as e:
                 response.add_error(f"Module Not Found: {e}")
@@ -81,7 +81,7 @@ class Operator:
     def register_to(self, operator_home: str):
         if self.source_path:
             dir = path.dirname(self.source_path)
-            tree_path = ("/").join([operator_home.rstrip("/"), self.cmd, self.subcommand + "/"])
+            tree_path = ("/").join([operator_home.rstrip("/"), self.namespace, self.command + "/"])
             if not path.exists(tree_path):
                 shutil.copytree(dir, tree_path)
             else:
@@ -93,8 +93,8 @@ class Operator:
 
     def to_dict(self):
         return {
-            'cmd': self.cmd,
-            'subcommand': self.subcommand,
+            'cmd': self.namespace,
+            'subcommand': self.command,
             'description': self.description,
             'parameters': self.parameters,
             'supported_configurations': list(map(lambda x: x.all, self.supported_configurations))
