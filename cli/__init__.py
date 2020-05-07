@@ -115,7 +115,7 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level:
             logger.set_level(log_level)
             register_file = subcmd
             if register_file:
-                workflows, errors = Workflows.validate_workflows(register_file, True)
+                workflows, errors = Workflows.validate_workflows(register_file, env, True)
             else:
                 logger.error("No file path provided to register operator")
             if len(workflows) > 0:
