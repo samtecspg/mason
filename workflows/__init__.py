@@ -1,35 +1,23 @@
-import os
 from tabulate import tabulate
 from importlib import import_module
 
 from operators.operator import Operator
 from operators import list_operators
 from util.list import flatten_array
-from util.yaml import parse_yaml
-from typing import Optional, Union, Tuple, TypeVar, Type
+from typing import Optional
 from configurations import Config
 from clients.response import Response
 from util.printer import banner
 from sys import path
-from util.json_schema import validate_schema, from_json_schema, parse_schemas
+from util.json_schema import parse_schemas
 from typing import List
 from util.logger import logger
 from util.json import print_json
-from definitions import from_root
 from typing import Dict
 from util.environment import MasonEnvironment
 from workflows.workflow import Workflow
 
-
-def import_all(env: MasonEnvironment, config: Config):
-    path.append(env.mason_home)
-    workflows = list_workflows(env)
-    for namespace, ops in workflows.items():
-        for op in ops:
-            cmd = op.command
-            import_module(f"{env.workflow_module}.{namespace}.{cmd}")
-
-def run(env: MasonEnvironment, config: Config, cmd: Optional[str] = None, subcmd: Optional[str] = None):
+def run(env: MasonEnvironment, config: Config, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False):
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
@@ -42,7 +30,7 @@ def run(env: MasonEnvironment, config: Config, cmd: Optional[str] = None, subcmd
         wf: Optional[Workflow] = get_workflow(env, cmd, subcmd)
 
         if wf:
-            response = wf.run(env, config, response)
+            response = wf.run(env, config, response, deploy)
         else:
             if not response.errored():
                 response.add_error(f"Workflow {cmd} {subcmd} not found.  Check workflows with 'mason workflow'")

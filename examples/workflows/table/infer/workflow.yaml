@@ -2,7 +2,25 @@ type: "workflow"
 namespace: "table"
 command: "infer"
 description: "One step workfow for table infer operator"
-#dag:
-#  - type: "operator"
-#    namespace: "table"
-#    command: "infer"
+dag:
+  - type: "operator"
+    namespace: "table"
+    command: "infer"
+
+
+
+#    parameters:
+#      required:
+#        - "database_name"
+#        - "storage_path"
+#        - "schedule_name"
+#      optional:
+#        - "schedule_name"
+#        - "schedule_frequency"
+#    supported_configurations:
+#      - metastore: "glue"
+#        scheduler: "glue"
+#        storage: "s3"
+#      - metastore: "athena"
+#        storage: "s3"
+#        execution: "spark"

@@ -48,7 +48,11 @@ class Workflow:
         else:
             logger.error("Source path not found for operator, run validate_operators to populate")
 
-    def run(self, env: MasonEnvironment, config: Config, response: Response) -> Response:
-        response.add_info("Running Workflow")
+    def run(self, env: MasonEnvironment, config: Config, response: Response, dry_run: bool = True) -> Response:
+        if dry_run:
+            response.add_info("Not Running Workflow")
+        else:
+            response.add_info("Running Workflow")
 
         return response
+

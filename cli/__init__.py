@@ -100,7 +100,8 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
 @click.argument("cmd", required=False)
 @click.argument("subcmd", required=False)
 @click.option("-l", "--log_level", help="Log level for mason")
-def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level: Optional[str] = None):
+@click.option("-d", "--deploy", help="Deploy specified workflow", is_flag=True)
+def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level: Optional[str] = None, deploy: bool = False):
     """
     Running without cmd or subcmd will list out all mason workflows currently registered.
     Running without subcmd will list out all mason workflows under the cmd namespace.
@@ -109,10 +110,10 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level:
     """
     env = MasonEnvironment()
     config = get_current_config(env, "debug")
+    logger.set_level(log_level)
 
     if config:
         if cmd == "register":
-            logger.set_level(log_level)
             register_file = subcmd
             if register_file:
                 workflows = Workflows.validate_workflows(register_file, env)
@@ -122,7 +123,8 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level:
                 for workflow in workflows:
                     workflow.register_to(env.workflow_home)
         else:
-            Workflows.run(env, config, cmd, subcmd)
+            Workflows.run(env, config, cmd, subcmd, not deploy)
+
 
     else:
         logger.error("Configuration not found.  Run \"mason config\" first")
