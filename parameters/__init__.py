@@ -116,6 +116,6 @@ class ValidatedParameters():
         return len(self.invalid_parameters) > 0
 
     def messages(self) -> str:
-        return (" \n").join(list(map(lambda i: i.reason, self.invalid_parameters)))
+        return (", ").join(list(map(lambda i: i.reason, self.invalid_parameters)))
 
 
