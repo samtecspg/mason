@@ -14,6 +14,8 @@ class InputParameters:
             parameters, invalid = self.parse_string(parameter_string)
         elif parameter_path:
             parameters, invalid = self.parse_path(parameter_path)
+        else:
+            parameters, invalid = ([], [])
 
         self.parameters: List[Parameter] = dedupe(parameters)
         self.invalid: List[InvalidParameter] = invalid
