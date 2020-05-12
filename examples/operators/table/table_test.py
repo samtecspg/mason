@@ -1,5 +1,3 @@
-import pytest
-
 from definitions import from_root
 from examples.operators.table.get import api as table_get_api
 from examples.operators.table.list import api as table_list_api
@@ -8,9 +6,9 @@ from examples.operators.table.infer import api as table_infer_api
 
 from clients.response import Response
 from examples.operators.table.test.expects import table as expects # type: ignore
-from parameters import Parameters
-from configurations import Config
 from operators.operator import Operator
+from parameters import InputParameters
+from configurations.config import ValidConfig
 from test.support.testing_base import run_tests
 from util.environment import MasonEnvironment
 from dotenv import load_dotenv
@@ -19,62 +17,62 @@ import os
 load_dotenv(from_root("/.env.example"))
 
 def test_index():
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # Database Exists
-        params = Parameters(parameters="database_name:crawler-poc")
-        exists = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="database_name:crawler-poc")
+        exists = op.validate(config, params).run(env, Response())
         assert exists.with_status() == expects.index(config.metastore.client_name)
 
         # Database DNE
-        params = Parameters(parameters="database_name:bad-database")
-        dne = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="database_name:bad-database")
+        dne = op.validate(config, params).run(env, Response())
         assert(dne.with_status() == expects.index(config.metastore.client_name, False))
 
         # Api
-        response, status = table_list_api(env, config, database_name="crawler-poc")
+        response, status = table_list_api(env, config, database_name="crawler-poc", log_level="fatal")
         assert((response, status) == expects.index(config.metastore.client_name))
 
     run_tests("table", "list", True, "fatal", ["config_1", "config_2"], tests)
 
 def test_get():
 
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # Database and table Exist
-        params = Parameters(parameters="database_name:crawler-poc,table_name:catalog_poc_data")
-        exists = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="database_name:crawler-poc,table_name:catalog_poc_data")
+        exists = op.validate(config, params).run(env, Response())
         assert(exists.with_status() == expects.get(config.metastore.client_name, 1))
 
         # Database DNE
-        params = Parameters(parameters="database_name:bad-database,table_name:catalog_poc_data")
-        dne = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="database_name:bad-database,table_name:catalog_poc_data")
+        dne = op.validate(config, params).run(env, Response())
         assert(dne.with_status() ==expects.get(config.metastore.client_name, 2))
 
         # Table DNE
-        params = Parameters(parameters="database_name:crawler-poc,table_name:bad-table")
-        dne2 = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="database_name:crawler-poc,table_name:bad-table")
+        dne2 = op.validate(config,params).run(env, Response())
         assert(dne2.with_status() == expects.get(config.metastore.client_name, 3))
 
         # API
-        response, status = table_get_api(env, config, database_name="crawler-poc", table_name="catalog_poc_data")
+        response, status = table_get_api(env, config, database_name="crawler-poc", table_name="catalog_poc_data", log_level="fatal")
         assert((response, status) == expects.get(config.metastore.client_name, 1))
 
     run_tests("table", "get", True, "fatal",["config_1", "config_2"],  tests)
 
 def test_post():
 
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         #  DNE
-        params = Parameters(parameters="database_name:crawler-poc,schedule_name:test_crawler_new,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
-        dne = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="database_name:crawler-poc,schedule_name:test_crawler_new,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
+        dne = op.validate(config, params).run(env, Response())
         assert(dne.with_status() == expects.post(False))
 
         # Exists
-        params = Parameters(parameters="database_name:crawler-poc,schedule_name:test_crawler,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
-        exists = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="database_name:crawler-poc,schedule_name:test_crawler,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
+        exists = op.validate(config, params).run(env, Response())
         assert(exists.with_status() == expects.post(True))
 
         # API
-        response, status = table_infer_api(env, config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
+        response, status = table_infer_api(env, config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/", log_level="fatal")
         assert((response, status) == expects.post(False))
 
     os.environ["GLUE_ROLE_ARN"] = "TestRole"
@@ -84,19 +82,19 @@ def test_post():
 
 def test_refresh():
 
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # valid refresh
-        params = Parameters(parameters="table_name:catalog_poc_data,database_name:crawler-poc")
-        refresh = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="table_name:catalog_poc_data,database_name:crawler-poc")
+        refresh = op.validate(config, params).run(env, Response())
         assert(refresh.with_status() == expects.refresh(False))
 
         # already refreshing
-        params = Parameters(parameters="table_name:catalog_poc_data_refreshing,database_name:crawler-poc")
-        refreshing = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="table_name:catalog_poc_data_refreshing,database_name:crawler-poc")
+        refreshing = op.validate(config, params).run(env, Response())
         assert(refreshing.with_status() == expects.refresh(True))
 
         # API
-        response, status = table_refresh_api(env, config, table_name="catalog_poc_data", database_name="crawler-poc")
+        response, status = table_refresh_api(env, config, table_name="catalog_poc_data", database_name="crawler-poc", log_level="fatal")
         assert((response, status) == expects.refresh(False))
 
     run_tests("table", "refresh", True, "fatal",["config_1"],  tests)
@@ -104,10 +102,10 @@ def test_refresh():
 
 def test_merge():
 
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # unsupported merge schema
-        params = Parameters(parameters="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
-        unsupported = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
+        unsupported = op.validate(config, params).run(env, Response())
         expect = ({'Data': [{'Schema': []}],
           'Errors': ['Unsupported schemas for merge operator: '],
           'Info': [],
@@ -118,13 +116,13 @@ def test_merge():
         assert(unsupported.with_status() == expect)
 
         # invalid merge params
-        params = Parameters(parameters="input_path:test,bad:test")
-        invalid = op.run(env, config, params, Response())
-        assert(invalid.with_status() == ({'Errors': ['Missing required parameters: output_path'], 'Info': [], 'Warnings': []}, 400))
+        params = InputParameters(parameter_string="input_path:test,bad:test")
+        invalid = op.validate(config, params).run(env, Response())
+        assert(invalid.with_status() == ({'Errors': ['Invalid Operator.  Reason:  Invalid parameters. \n Required parameter not specified: output_path'], 'Info': [], 'Warnings': []}, 400))
 
         # valid merge
-        params = Parameters(parameters="input_path:good_input_bucket_2/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
-        valid = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string="input_path:good_input_bucket_2/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
+        valid = op.validate(config, params).run(env, Response())
         expect = ({'Data': [{'Schema': {'Columns': [{'ConvertedType': 'REQUIRED', 'Name': 'test_column_1',
                                            'RepititionType': None,
                                            'Type': 'INT32'},
@@ -146,18 +144,18 @@ def test_merge():
 
 def test_query():
 
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # valid query
         query = "SELECT * from good_table limit 5"
-        params = Parameters(parameters=f"query_string:{query},database_name:good_database")
-        result = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string=f"query_string:{query},database_name:good_database")
+        result = op.validate(config, params).run(env, Response())
         expect = {'Errors': [], 'Info': ['Running Query "SELECT * from good_table limit 5"', 'Running job query', 'Running job id=test'], 'Warnings': []}
         assert(result.with_status() == (expect, 200))
 
         # bad permissions
         query = "SELECT * from good_table limit 5"
-        params = Parameters(parameters=f"query_string:{query},database_name:access_denied")
-        result = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string=f"query_string:{query},database_name:access_denied")
+        result = op.validate(config, params).run(env, Response())
         expect = {'Errors': ['Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena'], 'Info': ['Running Query "SELECT * from good_table limit 5"', 'Running job query'], 'Warnings': []}
 
         assert(result.with_status() == (expect, 403))
@@ -168,20 +166,20 @@ def test_query():
 def test_delete():
 
 
-    def tests(env: MasonEnvironment, config: Config, op: Operator):
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # valid delete
-        params = Parameters(parameters=f"table_name:good_table,database_name:good_database")
-        good = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string=f"table_name:good_table,database_name:good_database")
+        good = op.validate(config, params).run(env, Response())
         assert(good.with_status() == ({'Errors': [], 'Info': ['Table good_table successfully deleted.'], 'Warnings': []}, 200))
 
         # database DNE
-        params = Parameters(parameters=f"table_name:bad_table,database_name:bad_database")
-        bad = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string=f"table_name:bad_table,database_name:bad_database")
+        bad = op.validate(config, params).run(env, Response())
         assert(bad.with_status() == ({'Errors': ['Database bad_database not found.'], 'Info': [], 'Warnings': []}, 400))
 
         # table DNE
-        params = Parameters(parameters=f"table_name:bad_table,database_name:good_database")
-        bad = op.run(env, config, params, Response())
+        params = InputParameters(parameter_string=f"table_name:bad_table,database_name:good_database")
+        bad = op.validate(config, params).run(env, Response())
         assert(bad.with_status() == ({'Errors': ['Table bad_table not found.'], 'Info': [], 'Warnings': []}, 400))
 
 

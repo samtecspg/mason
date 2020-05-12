@@ -2,6 +2,13 @@ type: "workflow"
 namespace: "table"
 command: "infer"
 description: "One step workfow for table infer operator"
+parameters:
+  required:
+    - "database_name"
+    - "storage_path"
+    - "schedule_name"
+    - "schedule_name"
+    - "schedule"
 dag:
   - type: "operator"
     namespace: "table"
@@ -9,14 +16,6 @@ dag:
 
 
 
-#    parameters:
-#      required:
-#        - "database_name"
-#        - "storage_path"
-#        - "schedule_name"
-#      optional:
-#        - "schedule_name"
-#        - "schedule_frequency"
 #    supported_configurations:
 #      - metastore: "glue"
 #        scheduler: "glue"

@@ -1,14 +1,14 @@
-from configurations import Config
+from configurations.valid_config import ValidConfig
 from util.environment import MasonEnvironment
-from parameters import Parameters
+from parameters import ValidatedParameters
 from clients.response import Response
 from api import operator_api as OperatorApi
 
 def api(*args, **kwargs): return OperatorApi.get("table", "query", *args, **kwargs)
 
-def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
-    query_string = parameters.safe_get("query_string")
-    database_name = parameters.safe_get("database_name")
+def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response):
+    query_string = parameters.get_required("query_string")
+    database_name = parameters.get_required("database_name")
     metastore_client = config.metastore.client
 
     # TODO?: Sanitize the query string

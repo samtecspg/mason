@@ -6,8 +6,6 @@ from urllib.parse import urlparse
 from typing import Tuple, List
 
 from engines.metastore.models.schemas import MetastoreSchema
-from util.logger import logger
-
 
 class S3MetastoreClient(MetastoreClient):
 

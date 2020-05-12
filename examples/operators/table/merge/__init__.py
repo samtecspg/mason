@@ -1,15 +1,15 @@
 from typing import Set
 
-from configurations import Config
+from configurations.valid_config import ValidConfig
 from util.environment import MasonEnvironment
-from parameters import Parameters
+from parameters import ValidatedParameters
 from clients.response import Response
 from api import operator_api as OperatorApi
 from engines.metastore.models.credentials import MetastoreCredentials
 
 def api(*args, **kwargs): return OperatorApi.get("table", "merge", *args, **kwargs)
 
-def run(env: MasonEnvironment, config: Config, parameters: Parameters, response: Response):
+def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response):
     SUPPORTED_SCHEMAS = {
         "parquet",
         "text",
@@ -25,9 +25,9 @@ def run(env: MasonEnvironment, config: Config, parameters: Parameters, response:
     if not metastore_credentials.secret_key or not metastore_credentials.access_key:
         response.add_error("Metastore credentials undefined")
     else:
-        input_path = parameters.safe_get("input_path")
-        output_path =parameters.safe_get("output_path")
-        parse_headers = bool(parameters.unsafe_get("parse_headers"))
+        input_path = parameters.get_required("input_path")
+        output_path =parameters.get_required("output_path")
+        parse_headers = bool(parameters.get_optional("parse_headers"))
 
         input_database, input_table = metastore_client.parse_path(input_path)
 

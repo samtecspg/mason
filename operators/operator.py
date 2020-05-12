@@ -1,15 +1,15 @@
 import shutil
+from os import path
 
-from configurations import Config
-from clients.response import Response
-from typing import Dict, Optional, List, Tuple
+from configurations.valid_config import ValidConfig
+from configurations.invalid_config import InvalidConfig
+from typing import Dict, Optional, List, Union
+
+from operators.invalid_operator import InvalidOperator
 from operators.supported_engines import from_array, SupportedEngineSet
-from parameters import Parameters
+from operators.valid_operator import ValidOperator
+from parameters import Parameters, InputParameters, ValidatedParameters
 from util.logger import logger
-from util.printer import banner
-from importlib import import_module
-from util.environment import MasonEnvironment
-from os import path, makedirs
 
 
 class Operator:
@@ -18,65 +18,35 @@ class Operator:
         self.namespace = namespace
         self.command = command
         self.description = description
-        self.parameters: dict = parameters
+        self.parameters: Parameters = Parameters(parameters)
         self.supported_configurations: List[SupportedEngineSet] = from_array(supported_configurations)
         if source_path:
             self.source_path = source_path
 
-    def required_parameters(self):
-        return self.parameters.get("required", [])
 
-    def run(self, env: MasonEnvironment, config: Config, parameters: Parameters, response: Response) -> Response:
+    def validate(self, config: ValidConfig, parameters: InputParameters) -> Union[ValidOperator, InvalidOperator]:
+        validated_params: ValidatedParameters = self.parameters.validate(parameters)
+        validated_config = self.validate_config(config)
 
-        self.validate(config, parameters, response)
+        a: Union[ValidOperator, InvalidOperator]
+        if validated_params.has_invalid():
+            return InvalidOperator(f"Invalid parameters. \n {validated_params.messages()}")
+        elif isinstance(validated_config, InvalidConfig):
+            return InvalidOperator(f"Invalid config: {validated_config.reason}")
+        else:
+            return ValidOperator(self.namespace, self.command,self.supported_configurations,self.description, validated_params, validated_config)
 
-        if not response.errored():
-            try:
-                mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
-                response = mod.run(env, config, parameters, response)  # type: ignore
-            except ModuleNotFoundError as e:
-                response.add_error(f"Module Not Found: {e}")
-
-        return response
-
-    def validate(self, config: Config, parameters: Parameters, response: Response) -> Response:
-        response = self.validate_params(parameters, response)
-        response = self.validate_configuration(config, response)
-        return response
-
-    def validate_params(self, params: Parameters, response: Response):
-        required_params = set(self.required_parameters())
-        provided_params = set(params.parsed_parameters.keys())
-        diff = required_params.difference(provided_params)
-        intersection = required_params.intersection(provided_params)
-        params.add_valid(list(intersection))
-
-        logger.info()
-        validated = list(params.validated_parameters.keys())
-        missing = list(diff)
-
-        banner(f"Parameters Validation:")
-        if len(validated) > 0:
-            logger.info(f"Validated: {validated}")
-        if len(missing) > 0:
-            logger.info(f"Missing: {missing}")
-        logger.info()
-
-        if len(diff) > 0:
-            dp = ", ".join(list(diff))
-            response.add_error(f"Missing required parameters: {dp}")
-            response.set_status(400)
-        return response
-
-    def validate_configuration(self, config: Config, response: Response):
+    def validate_config(self, config: ValidConfig) -> Union[ValidConfig, InvalidConfig]:
         test = False
         for ses in self.supported_configurations:
             test = ses.validate_coverage(config)
             if test:
                 break
-        if not test:
-            response.add_error("Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
-        return response
+
+        if test:
+            return config
+        else:
+            return InvalidConfig(config.config, "Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
 
     def register_to(self, operator_home: str):
         if self.source_path:
@@ -89,16 +59,15 @@ class Operator:
         else:
             logger.error("Source path not found for operator, run validate_operators to populate")
 
-
-
     def to_dict(self):
         return {
-            'cmd': self.namespace,
-            'subcommand': self.command,
+            'namespace': self.namespace,
+            'command': self.command,
             'description': self.description,
-            'parameters': self.parameters,
-            'supported_configurations': list(map(lambda x: x.all, self.supported_configurations))
+            'parameters': self.parameters.to_dict(),
+            'supported_configurations': list(map(lambda s: s.all, self.supported_configurations))
         }
+
 
 def emptyOperator():
     Operator("", "", "", {}, [])

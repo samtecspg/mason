@@ -1,32 +1,35 @@
 import shutil
 
+from configurations.invalid_config import InvalidConfig
 from definitions import from_root
-import operators as Operators
-from operators.operator import Operator, emptyOperator
+from operators import operators as Operators
+from operators import namespaces as Namespaces
+from operators.operator import emptyOperator
 from test.support import testing_base as base
 from clients.response import Response
 import os
+
+from util.list import flatten_array
+
 
 class TestRegisterOperator:
 
     def test_register_to(self):
         base.set_log_level("fatal")
         mason_home = from_root("/.tmp/")
-        operator_home = from_root("/.tmp/operators/")
         if os.path.exists(mason_home):
             shutil.rmtree(mason_home)
 
         env = base.get_env("/.tmp/operators/")
 
-        operators, errors = Operators.validate_operators(from_root("/test/support/operators"), True)
+        operators, errors = Operators.list_operators(from_root("/test/support/operators"))
         for operator in operators:
             operator.register_to(env.operator_home)
 
-        op = Operators.list_operators(env)
+        ns, invalid = Operators.list_namespaces(env)
 
-        result = {k: sorted(list(map(lambda v: v.command, v))) for (k, v) in op.items()}
-
-        expect = {'namespace2': ['operator3'], 'namespace1': ['operator1', 'operator2']}
+        result = list(map(lambda n: n.to_dict_brief(), ns))
+        expect = [{'namespace2': ['operator3']}, {'namespace1': ['operator1', 'operator2']}]
 
         assert(result == expect)
 
@@ -39,7 +42,7 @@ class TestGetOperator:
         base.set_log_level("trace")
         env = base.get_env("/test/support/operators/")
         op = (Operators.get_operator(env, "namespace1", "operator1") or emptyOperator())
-        expects = {'cmd':'namespace1','description':'Test Operator','parameters':{'required':['test_param']},'subcommand':'operator1','supported_configurations':[{'execution':None,'metastore':'test_client','scheduler':None,'storage':None}]}
+        expects = {'command': 'operator1', 'description': 'Test Operator', 'namespace': 'namespace1', 'parameters': {'optional': [], 'required': ['test_param']}, 'supported_configurations': [{'execution': None, 'metastore': 'test_client', 'scheduler': None, 'storage': None}]}
         assert(op.to_dict()==expects)
 
     def test_namespace_dne(self):
@@ -60,33 +63,34 @@ class TestListOperators:
     def test_namespace_exists(self):
         base.set_log_level("fatal")
         env = base.get_env("/test/support/operators/")
-        l = Operators.list_operators(env, "namespace1").get("namespace1") or []
-        dicts = list(map(lambda x: x.to_dict(), l))
-        expects = [{'cmd': 'namespace1',
+        l = Operators.list_namespaces(env, "namespace1")[0]
+        dicts = flatten_array(list(map(lambda x: x.to_dict(), l)))
+        expects = [{'namespace': 'namespace1',
           'description': 'Test Operator',
-          'parameters': {'required': ['test_param']},
-          'subcommand': 'operator1',
+          'parameters': {'required': ['test_param'], 'optional': []},
+          'command': 'operator1',
           'supported_configurations': [{'execution': None,
                                         'metastore': 'test_client',
                                         'scheduler': None,
                                         'storage': None}]},
-         {'cmd': 'namespace1',
+         {'namespace': 'namespace1',
           'description': 'Test Operator',
-          'parameters': {'required': ['test_param']},
-          'subcommand': 'operator2',
+          'parameters': {'required': ['test_param'], 'optional': []},
+          'command': 'operator2',
           'supported_configurations': [{'execution': None,
                                         'metastore': 'unsupported_client',
                                         'scheduler': None,
                                         'storage': None}]}]
 
-        d = sorted(dicts, key=lambda i: i['subcommand'])
-        e = sorted(expects, key=lambda e:e['subcommand'])
+        d = sorted(dicts, key=lambda i: i['command'])
+        e = sorted(expects, key=lambda e: e['command'])
         assert(d == e)
 
     def test_namespace_dne(self):
         base.set_log_level("fatal")
         env = base.get_env("/test/support/operators/")
-        l = Operators.list_operators(env, "namespace_dne").get("namespace_dne")
+        l = Namespaces.get(Operators.list_namespaces(env, "namespace_dne")[0], "namespace_dne", "cmd")
+
         assert(l == None)
 
     def test_client_not_supported(self):
@@ -95,9 +99,13 @@ class TestListOperators:
         env = base.get_env("/test/support/operators/")
         config = base.get_configs(env)[0]
         op = Operators.get_operator(env, "namespace1", "operator2") or emptyOperator()
-        response = op.validate_configuration(config, response)
-        expects = {'Errors': ['Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.'], 'Info': [], 'Warnings': []}
-        assert(response.formatted() == expects)
+        if op:
+            valid = op.validate_config(config)
+            if isinstance(valid, InvalidConfig):
+                expects = 'Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.'
+                assert(valid.reason == expects)
+            else:
+                raise Exception("BadTest")
 
 class TestValidateOperator:
 

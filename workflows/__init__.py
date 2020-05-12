@@ -1,11 +1,9 @@
 from tabulate import tabulate
-from importlib import import_module
 
+from configurations.valid_config import ValidConfig
+from operators.operators import list_namespaces
 from operators.operator import Operator
-from operators import list_operators
-from util.list import flatten_array
 from typing import Optional
-from configurations import Config
 from clients.response import Response
 from util.printer import banner
 from sys import path
@@ -16,8 +14,10 @@ from util.json import print_json
 from typing import Dict
 from util.environment import MasonEnvironment
 from workflows.workflow import Workflow
+from operators import namespaces as Namespaces
 
-def run(env: MasonEnvironment, config: Config, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False):
+
+def run(env: MasonEnvironment, config: ValidConfig, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False):
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
@@ -41,7 +41,8 @@ def run(env: MasonEnvironment, config: Config, cmd: Optional[str] = None, subcmd
 
 
 def validate_workflows(workflow_file: str, env: MasonEnvironment) -> List[Workflow]:
-    operators: List[Operator] = flatten_array(list(list_operators(env).values()))
+    namespaces, invalid = list_namespaces(env)
+    operators: List[Operator] = Namespaces.get_all(namespaces)
     workflows, errors = parse_schemas(workflow_file, "workflow", Workflow)
     valid_workflows: List[Workflow] = []
 

@@ -1,8 +1,9 @@
 import contextlib
 
+from configurations.valid_config import ValidConfig
 from test.support.mocks import get_patches
 from util.logger import logger
-from configurations import get_all
+from configurations.configurations import get_all
 from definitions import from_root
 import re
 from util.uuid import uuid_regex
@@ -11,9 +12,9 @@ from dotenv import load_dotenv
 from typing import List, Optional
 
 from clients.response import Response
-from configurations import get_config
+from configurations.configurations import get_config
 from operators.operator import Operator
-import operators as Operators
+from operators import operators as Operators
 from util.environment import MasonEnvironment
 
 load_dotenv(from_root('/.env.example'))
@@ -51,10 +52,10 @@ def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], call
         operator: Operator = op
         for config in configs:
             conf = get_config(env, config + ".yaml")
-            if conf and conf.valid:
+            if isinstance(conf, ValidConfig):
                 callable(env, conf, operator)
             else:
-                raise Exception(f"No matching valid configuration found for operator {op.namespace}, {op.command}")
+                raise Exception(f"No matching valid configuration found for operator {op.namespace}, {op.command}. Reason {conf.reason}")
 
     else:
         raise Exception(f"Operator not found {cmd} {sub}")

@@ -6,6 +6,7 @@ from engines.metastore.models.credentials import MetastoreCredentials
 class SparkExecutionClient(ExecutionClient):
 
     def __init__(self, config: dict):
+        self.config = config
         self.client = SparkClient(config)
 
     def run_job(self, job_type: str, metastore_credentials: MetastoreCredentials, parameters: dict, response: Response) -> Response:

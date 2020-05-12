@@ -1,9 +1,7 @@
-
 from clients.response import Response
 from clients.spark.runner.kubernetes_operator import KubernetesOperator
 from clients.spark.config import SparkConfig
 from clients.spark.runner import EmptySparkRunner
-from engines.execution.models.jobs import Job
 from engines.metastore.models.credentials import MetastoreCredentials
 
 class SparkClient:

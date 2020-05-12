@@ -3,7 +3,7 @@ from os import path
 from typing import Optional, List, Union, Tuple
 
 from clients.response import Response
-from configurations import Config
+from configurations.valid_config import ValidConfig
 from operators.operator import Operator
 from util.environment import MasonEnvironment
 from util.logger import logger
@@ -12,11 +12,12 @@ from workflows.dags import validate_dag, Dag
 
 class Workflow:
 
-    def __init__(self, namespace: str, command: str, dag: List[dict], description: Optional[str] = None, source_path: Optional[str] = None):
+    def __init__(self, namespace: str, command: str, dag: List[dict], description: Optional[str] = None, parameters: Optional[dict] = None, source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
         self.description = description
         self.dag = validate_dag(dag)
+        # self.parameters = validate_parameters(parameters)
         self.source_path = source_path
 
     def validate(self, operators: List[Operator]) -> Union[bool, str]:
@@ -48,7 +49,7 @@ class Workflow:
         else:
             logger.error("Source path not found for operator, run validate_operators to populate")
 
-    def run(self, env: MasonEnvironment, config: Config, response: Response, dry_run: bool = True) -> Response:
+    def run(self, env: MasonEnvironment, config: ValidConfig, response: Response, dry_run: bool = True) -> Response:
         if dry_run:
             response.add_info("Not Running Workflow")
         else:

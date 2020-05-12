@@ -2,9 +2,10 @@ import os
 import shutil
 
 from definitions import from_root
+from parameters import InputParameters
 from test.support import testing_base as base
 import workflows as Workflows
-import operators as Operators
+from operators import operators as Operators
 
 class TestWorkflows:
 
@@ -17,7 +18,7 @@ class TestWorkflows:
             shutil.rmtree(mason_home)
 
         env = base.get_env(workflow_home="/test/.tmp/workflows/", operator_home="/test/.tmp/operators/", config_home="/test/.tmp/configs/")
-        operators, errors = Operators.validate_operators(from_root("/test/support/operators/"), True)
+        operators, errors = Operators.list_operators(from_root("/test/support/operators/"))
 
         for operator in operators:
             operator.register_to(env.operator_home)

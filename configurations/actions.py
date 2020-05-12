@@ -3,10 +3,10 @@ from typing import Optional
 from clients.response import Response
 from util.logger import logger
 from os import path, walk
-from configurations import set_current_config, tabulate_configs, get_all
+from configurations.configurations import set_current_config, tabulate_configs, get_all, ValidConfig
 from util.yaml import parse_yaml
 import shutil
-from configurations import Config
+from configurations.config import Config
 
 def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=None, set_current: Optional[str]=None,  log_level: Optional[str]=None) -> Response:
     response = Response()
@@ -32,14 +32,19 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
         for c in sorted(configs):
             # TODO: Interactive configuration
             parsed = parse_yaml(c)
-            config = Config(env, parsed)
+            config = Config(parsed).validate(env)
 
-            if config.valid:
+            if isinstance(config, ValidConfig):
                 response.add_info(f"Valid Configuration. Saving config {c} to {env.config_home}")
                 shutil.copyfile(c, env.config_home + path.basename(c))
+            else:
+                response.add_error(f"Invalid Configuration.  Reason: {config.reason}")
+
         logger.info()
+
         if len(configs) > 0:
             set_current_config(env, 0, response)
+
     elif set_current:
         set_current_config(env, int(set_current), response)
     else:
