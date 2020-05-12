@@ -152,6 +152,7 @@ class TestPlayground:
         result1 = runner.invoke(config, [from_root('/examples/operators/table/test_configs/config_1.yaml'), '-l', 'info'])
         result2 = runner.invoke(register, [from_root('/examples/operators/table/')])
         result3 = runner.invoke(operator, ["table", "list", "-p", "database_name:crawler-poc", "-l", "trace"])
+        print_result(result3)
         result4 = runner.invoke(operator, ["table", "get", "-p", "database_name:crawler-poc,table_name:catalog_poc_data", "-l", "trace"])
         result5 = runner.invoke(operator, ["table", "refresh", "-p", "database_name:crawler-poc,table_name:catalog_poc_data", "-l", "trace"])
 

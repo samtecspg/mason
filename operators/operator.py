@@ -30,7 +30,7 @@ class Operator:
 
         a: Union[ValidOperator, InvalidOperator]
         if validated_params.has_invalid():
-            return InvalidOperator(f"Invalid parameters. \n {validated_params.messages()}")
+            return InvalidOperator(f"Invalid parameters.  {validated_params.messages()}")
         elif isinstance(validated_config, InvalidConfig):
             return InvalidOperator(f"Invalid config: {validated_config.reason}")
         else:
@@ -53,9 +53,10 @@ class Operator:
             dir = path.dirname(self.source_path)
             tree_path = ("/").join([operator_home.rstrip("/"), self.namespace, self.command + "/"])
             if not path.exists(tree_path):
+                logger.info(f"Valid operator definition.  Rgistering {dir} to {tree_path}")
                 shutil.copytree(dir, tree_path)
             else:
-                logger.error("Operator definition already exists")
+                logger.error(f"Operator definition already exists {self.namespace}:{self.command}")
         else:
             logger.error("Source path not found for operator, run validate_operators to populate")
 

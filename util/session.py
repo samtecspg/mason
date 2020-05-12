@@ -18,8 +18,8 @@ def get_session_config(env: MasonEnvironment) -> int:
     try:
         with open(env.config_home + CURRENT_CONFIG_FILE, 'r') as f:
             config_id = int(f.read())
-    except Exception as e:
-        logger.error(message(e))
+    except FileNotFoundError as e:
+        logger.error("Current Mason config not set.  Run \"mason config -s\" to set current config.")
         config_id = 0
 
     return config_id

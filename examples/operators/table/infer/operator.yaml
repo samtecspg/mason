@@ -1,7 +1,7 @@
 type: "operator"
 namespace: "table"
 command: "infer"
-description:  "Reads from <storage_path> for <storage_engine>, infers schema using <execution_engine> and emits statements to create <metastore_engine> <database_name>"
+description:  "Infers schema for metastore tables"
 parameters:
   required:
     - "database_name"

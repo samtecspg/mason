@@ -1,4 +1,6 @@
 import os
+import sys
+
 from tabulate import tabulate
 from importlib import import_module
 
@@ -52,6 +54,8 @@ def update_yaml(env: MasonEnvironment, base_swagger: str):
 
 
 def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
+    sys.path.append(env.mason_home)
+
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
@@ -113,7 +117,7 @@ def tabulate_operators(env: MasonEnvironment, namespaces: List[Namespace], cmd: 
     ops = Namespaces.get_all(namespaces)
 
     for op in ops:
-        array.append([op.namespace, op.command, op.description, op.parameters])
+        array.append([op.namespace, op.command, op.description, op.parameters.to_dict()])
 
     if len(array) > 0:
         cmd_value = cmd or "Operator"
