@@ -34,6 +34,11 @@ class TestInit:
         for bad in bad_tests:
             assert(InputParameters(bad).parameters == [])
 
+    def test_no_parameters(self):
+        params = InputParameters()
+
+
+
 class TestValidation:
     def test_parameter_validation(self):
 
