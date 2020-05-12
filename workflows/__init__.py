@@ -50,7 +50,7 @@ def validate_workflows(workflow_file: str, env: MasonEnvironment) -> List[Workfl
 
         validation = workflow.validate(operators)
         if isinstance(validation, bool) and validation == True:
-            logger.info(f"Valid Workflow Definition")
+            logger.info(f"Valid Workflow Definition {workflow_file}")
             valid_workflows.append(workflow)
         else:
             error = f"Invalid Workflow Definition {workflow.source_path}.  Reason:  {validation}"
@@ -108,6 +108,6 @@ def tabulate_workflows(env: MasonEnvironment, cmd: Optional[str] = None):
         if cmd:
             logger.error(f"Operator \"{cmd_value}\" not found.  List workflows but running \"mason workflow\"")
         else:
-            logger.error("No Workflows Registered.  Register worfklows by running \"mason workflow -r\"")
+            logger.error("No Workflows Registered.  Register worfklows by running \"mason workflow register\"")
 
 

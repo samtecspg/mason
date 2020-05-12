@@ -106,7 +106,7 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, log_level:
     Running without cmd or subcmd will list out all mason workflows currently registered.
     Running without subcmd will list out all mason workflows under the cmd namespace.
     Running with both cmd and subcmd will execute the workflow or print out missing required parameters.
-    Running with -r registers workflow from specified <workflow_file>, workflow_file must contain a valid workflow.yaml
+    Running with 'register' registers workflow from specified <workflow_file>, workflow_file must contain a valid workflow.yaml
     """
     env = MasonEnvironment()
     config = get_current_config(env, "debug")

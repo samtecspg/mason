@@ -1,4 +1,5 @@
 include operators/schema.json
 include configurations/schema.json
 include clients/*/schema.json
+include workflows/schema.json
 include clients/spark/runner/kubernetes_operator/base_config.yaml

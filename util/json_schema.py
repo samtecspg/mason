@@ -69,6 +69,7 @@ def parse_schemas(directory: str, type: str, cls: Type[T]) -> Tuple[List[T], Lis
 
 def validate_schema(d: Optional[dict], schema_file: str) -> Union[ValidSchemaDict, InvalidSchemaDict]:
     di = d or {}
+    schema = {}
     if not di == {}:
         try:
             schema = parse_json(schema_file)
