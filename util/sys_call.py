@@ -2,8 +2,6 @@ from typing import List, Optional
 import threading
 import subprocess
 
-from clients.response import Response
-
 def run_sys_call(command: List[str]):
     sys_call = SysCall(command)
     sys_call.run()

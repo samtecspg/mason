@@ -1,10 +1,7 @@
 from dotenv import load_dotenv
 
 from util.logger import logger
-from clients import EmptyClient
 from typing import Optional, Union
-from util.json_schema import validate_schema
-from definitions import from_root
 from os import environ
 import re
 
@@ -45,43 +42,3 @@ def interpolate_value(value: Union[str, dict]) -> Optional[Union[str, dict]]:
     return interpolated
 
 
-class Engine():
-
-    def __init__(self, engine_type: str, config: Optional[dict]):
-        self.client_name = (config or {}).get(f"{engine_type}_engine") or ""
-        conf_doc = (config or {}).get("clients", {}).get(self.client_name, {}).get("configuration", {})
-        self.config_doc = safe_interpolate_environment(conf_doc)
-        self.valid = True
-
-        # TODO:  Improve this
-        if (config or {}).get("testing", False):
-            schema_path = from_root(f"/test/support/clients/{self.client_name}/schema.json")
-        else:
-            schema_path = from_root(f"/clients/{self.client_name}/schema.json")
-
-        if not self.client_name == "":
-            validation = validate_schema(self.config_doc, schema_path)
-            if isinstance(validation, str):
-                logger.warning(validation)
-                logger.error(f"Invalid configuration for client {self.client_name}")
-                self.client_name = "invalid"
-                self.config_doc = {}
-
-    def to_dict(self):
-        return {
-            "client_name": self.client_name,
-            "configuration": self.config_doc
-        }
-
-class EmptyEngine(Engine):
-    def __init__(self):
-        self.client_name = None
-
-    def client(self):
-        EmptyClient()
-
-    def set_underlying_client(self, client):
-        pass
-
-    def to_dict(self):
-        return {}

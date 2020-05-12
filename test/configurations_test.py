@@ -2,8 +2,7 @@ from test.support import testing_base as base
 from util.environment import MasonEnvironment
 from definitions import from_root
 from util.yaml import parse_yaml
-from configurations import Config
-from util.logger import logger
+from configurations.config import Config
 
 def empty_config():
     return {
@@ -20,12 +19,12 @@ class TestConfiguration:
         config_home = from_root(config)
         env = MasonEnvironment(config_home=config_home)
         config_doc = parse_yaml(env.config_home)
-        conf = Config(env, config_doc)
+        conf = Config(config_doc).validate(env)
         return conf, env
 
 
     def test_configuration_path_dne(self):
-        conf, env = self.before("path_dne")
+        conf, env = self.before("/path_dne")
         assert(conf.engines == empty_config())
 
     def test_configuration_invalid_yaml(self):
@@ -45,8 +44,7 @@ class TestConfiguration:
         expects = {'execution': {'client_name': '', 'configuration': {}},
              'metastore': {'client_name': '', 'configuration': {}},
              'scheduler': {'client_name': '', 'configuration': {}},
-             'storage': {'client_name': 's3',
-             'configuration': {'aws_region': 'us-west-2', "secret_key": "test", "access_key": "test"}}
+             'storage': {'client_name': 's3', 'configuration': {'aws_region': 'us-west-2', "secret_key": "test", "access_key": "test"}}
        }
         assert(conf.engines == expects)
         extended_info = [['*  0', 'storage', 's3', {'aws_region': 'us-west-2', 'secret_key': 'REDACTED', 'access_key': 'REDACTED'}]]
@@ -65,19 +63,16 @@ class TestConfiguration:
 
     def test_invalid_spark_config(self):
         conf, env = self.before("/test/support/configs/invalid_spark_config.yaml")
-        expects = {'execution': {'client_name': 'invalid', 'configuration': {}},
-         'metastore': {'client_name': '', 'configuration': {}},
-         'scheduler': {'client_name': '', 'configuration': {}},
-         'storage': {'client_name': '', 'configuration': {}}}
-        assert(conf.engines == expects)
+
+        assert(conf.__class__.__name__ == "InvalidConfig")
+        assert("'runner' is a required property" in conf.reason)
+
 
     def test_invalid_spark_config_2(self):
         conf, env = self.before("/test/support/configs/invalid_spark_config_2.yaml")
-        expects = {'execution': {'client_name': 'invalid', 'configuration': {}},
-                   'metastore': {'client_name': '', 'configuration': {}},
-                   'scheduler': {'client_name': '', 'configuration': {}},
-                   'storage': {'client_name': '', 'configuration': {}}}
-        assert(conf.engines == expects)
+        assert(conf.__class__.__name__ == "InvalidConfig")
+        assert("Additional properties are not allowed ('bad_attribute' was unexpected)." in conf.reason)
+
 
 
 

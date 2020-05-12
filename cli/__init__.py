@@ -3,12 +3,12 @@ import os
 from os import path
 from typing import Optional
 
-from parameters import Parameters
+from parameters import InputParameters
 from util.logger import logger
-import operators as Operators
+from operators import operators as Operators
 import workflows as Workflows
 from util.environment import MasonEnvironment, initialize_environment
-from configurations import get_current_config
+from configurations.configurations import get_current_config
 from configurations.actions import run_configuration_actions
 from dotenv import load_dotenv
 
@@ -58,7 +58,7 @@ def register(operator_file: str, log_level: Optional[str] = None):
     env = MasonEnvironment()
     if path.exists(env.config_home):
         logger.set_level(log_level)
-        operators, errors = Operators.validate_operators(operator_file, True)
+        operators, errors = Operators.list_operators(operator_file)
 
         if len(operators) > 0:
             for operator in operators:
@@ -91,7 +91,7 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
     logger.set_level(log_level or "info")
 
     if config:
-        params = Parameters(parameters, param_file)
+        params = InputParameters(parameters, param_file)
         Operators.run(env, config, params, cmd, subcmd)
     else:
         logger.info("Configuration not found.  Run \"mason config\" first")

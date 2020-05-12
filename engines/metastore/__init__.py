@@ -1,24 +1,24 @@
-
+from clients.engines.valid_client import ValidClient
 from clients.glue.metastore import GlueMetastoreClient
 from clients.s3.metastore import S3MetastoreClient
-from clients.engines.metastore import EmptyMetastoreClient
-from engines import Engine
+from engines.engine import Engine
+from clients.engines.invalid_client import InvalidClient
 
 class MetastoreEngine(Engine):
 
-    def __init__(self, config: dict, valid: bool = True):
+    def __init__(self, config: dict):
         super().__init__("metastore", config)
-        if valid and self.valid:
-            self.client = self.get_client(self.client_name, self.config_doc)
-        else:
-            self.client = EmptyMetastoreClient()
+        self.client = self.get_client()
 
-    def get_client(self, client_name: str, config_doc: dict):
-        if client_name == "glue":
-            return GlueMetastoreClient(config_doc)
-        elif client_name == "s3":
-            return S3MetastoreClient(config_doc)
+    def get_client(self):
+        client = self.validate()
+        if isinstance(client, ValidClient):
+            if self.client_name == "glue":
+                return GlueMetastoreClient(client.config)
+            elif self.client_name == "s3":
+                return S3MetastoreClient(client.config)
+            else:
+                return InvalidClient(f"Client type not supported: {client.client_name}")
         else:
-            return EmptyMetastoreClient()
-
+            return client
 

@@ -1,14 +1,13 @@
 
+from engines.metastore.models.credentials import MetastoreCredentials
 from clients.spark.runner import SparkRunner
 from clients.spark.config import SparkConfig
-from clients.response import Response
 from definitions import from_root
 from engines.execution.models.jobs import Job
 from util.sys_call import run_sys_call
 from hiyapyco import load as hload
 from typing import List
 import yaml
-from engines.metastore.models.credentials import MetastoreCredentials
 import tempfile
 
 import hiyapyco
@@ -24,7 +23,7 @@ def merge_config(config: SparkConfig, job_name: str, metastore_credentials: Meta
     base_config_file = from_root("/clients/spark/runner/kubernetes_operator/base_config.yaml")
 
     parameters["job"] = job_name
-    
+
     if metastore_credentials.type == "aws":
         parameters["access_key"] = metastore_credentials.access_key
         parameters["secret_key"] = metastore_credentials.secret_key

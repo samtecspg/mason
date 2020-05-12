@@ -1,17 +1,18 @@
-from parameters import Parameters
-from configurations import Config, get_current_config
+from parameters import InputParameters
+from configurations.configurations import get_current_config
+from configurations.valid_config import ValidConfig
 from util.environment import MasonEnvironment
 from typing import Optional
-import operators as Operators
+from operators import operators as Operators
 from typing import List
 import urllib.parse
 from util.logger import logger
 from clients.response import Response
 
-def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[Config] = None, *args, **kwargs) :
+def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[ValidConfig] = None, *args, **kwargs) :
 
     env: MasonEnvironment = environment or MasonEnvironment()
-    config: Optional[Config] = configuration or get_current_config(env)
+    config: Optional[ValidConfig] = configuration or get_current_config(env)
 
     if config:
         param_list: List[str] = []
@@ -20,9 +21,10 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
             param_list.append(f"{k}:{unq}")
 
         parameters = ",".join(param_list)
-        params = Parameters(parameters)
+        params = InputParameters(parameters)
 
         logger.set_level(params.unsafe_get("log_level"))
+
         response = Operators.run(env, config, params, namespace, command)
     else:
         response = Response()

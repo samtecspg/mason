@@ -1,21 +1,24 @@
 from clients.athena.execution import AthenaExecutionClient
-from engines import Engine
+from clients.engines.invalid_client import InvalidClient
+from clients.engines.valid_client import ValidClient
+from engines.engine import Engine
 from clients.spark.execution import SparkExecutionClient
-from clients.engines.execution import EmptyExecutionClient
 
 class ExecutionEngine(Engine):
 
-    def __init__(self, config: dict, valid: bool = True):
+    def __init__(self, config: dict):
         super().__init__("execution", config)
-        if valid and self.valid:
-            self.client = self.get_client(self.client_name, self.config_doc)
-        else:
-            self.client = EmptyExecutionClient()
+        self.client = self.get_client()
 
-    def get_client(self, client_name: str, config_doc: dict):
-        if client_name == "spark":
-            return SparkExecutionClient(config_doc)
-        elif client_name == "athena":
-            return AthenaExecutionClient(config_doc)
+    def get_client(self):
+        client = self.validate()
+        if isinstance(client, ValidClient):
+            if client.client_name == "spark":
+                return SparkExecutionClient(client.config)
+            elif client.client_name == "athena":
+                return AthenaExecutionClient(client.config)
+            else:
+                return InvalidClient(f"Client type not supported {client.client_name}")
         else:
-            return EmptyExecutionClient()
+            return client
+

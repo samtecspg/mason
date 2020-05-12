@@ -1,19 +1,21 @@
-
+from clients.engines.invalid_client import InvalidClient
+from clients.engines.valid_client import ValidClient
 from clients.glue.scheduler import GlueSchedulerClient
-from clients.engines.scheduler import EmptySchedulerClient
-from engines import Engine
+from engines.engine import Engine
 
 class SchedulerEngine(Engine):
 
-    def __init__(self, config: dict, valid: bool = True):
+    def __init__(self, config: dict):
         super().__init__("scheduler", config)
-        if valid and self.valid:
-            self.client = self.get_client(self.client_name, self.config_doc)
-        else:
-            self.client = EmptySchedulerClient()
+        self.client = self.get_client()
 
-    def get_client(self, client_name: str, config_doc: dict):
-        if client_name == "glue":
-            return GlueSchedulerClient(config_doc)
+    def get_client(self):
+        client = self.validate()
+        if isinstance(client, ValidClient):
+            if client.client_name == "glue":
+                return GlueSchedulerClient(client.config)
+            else:
+                return InvalidClient(f"Client type not supported: {client.client_name}")
         else:
-            return EmptySchedulerClient()
+            return client
+

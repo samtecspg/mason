@@ -1,13 +1,11 @@
 from clients.spark.runner.kubernetes_operator import merge_config
-
+from configurations.valid_config import ValidConfig
 from engines.metastore.models.credentials import MetastoreCredentials
-
-from configurations import Config
+from configurations.config import Config
 from test.support.testing_base import clean_uuid, clean_string
 from util.environment import MasonEnvironment
 from hiyapyco import dump as hdump
 from clients.spark import SparkConfig
-
 
 class TestSpark:
 
@@ -92,10 +90,11 @@ class TestS3:
 
     def test_parse_path(self):
         env = MasonEnvironment()
-        conf = Config(env, {"metastore_engine": "s3", "clients": {"s3": {"configuration": {"aws_region": "test", "secret_key": "test", "access_key": "test"}}}})
-        assert(conf.metastore.client.__class__.__name__ == "S3MetastoreClient")
-        client = conf.metastore.client
-        parsed = client.parse_path("test_bucket/test_path/test_file.csv")
-        assert(parsed[0] == "test_bucket")
-        assert(parsed[1] == "test_path/test_file.csv")
+        conf = Config({"metastore_engine": "s3", "clients": {"s3": {"configuration": {"aws_region": "test", "secret_key": "test", "access_key": "test"}}}}).validate(env)
+        if isinstance(conf, ValidConfig):
+            assert(conf.metastore.client.__class__.__name__ == "S3MetastoreClient")
+            client = conf.metastore.client
+            parsed = client.parse_path("test_bucket/test_path/test_file.csv")
+            assert(parsed[0] == "test_bucket")
+            assert(parsed[1] == "test_path/test_file.csv")
 
