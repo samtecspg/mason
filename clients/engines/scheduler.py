@@ -2,10 +2,18 @@ from clients.response import Response
 from clients import Client
 from abc import abstractmethod
 
+from engines.scheduler.models.dags import ValidDag
+
+
 class SchedulerClient(Client):
 
     ###  IMPORTANT:   This ensures that implemented specific metastore client implementations conform to the needed template when 'mypy .' is run
     ###  which will return Cannot instantiate abstract class 'GlueSchedulerClient' with abstract attribute 'register_schedule' (for example)
+
+    @abstractmethod
+    def register_dag(self, schedule_name: str, dag: ValidDag, response: Response) -> Response:
+        raise NotImplementedError("Client method not implemented")
+        return response
 
     @abstractmethod
     def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response) -> Response:

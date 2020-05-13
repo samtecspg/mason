@@ -1,23 +1,23 @@
 from tabulate import tabulate
 
 from configurations.valid_config import ValidConfig
-from operators.operators import list_namespaces
-from operators.operator import Operator
-from typing import Optional
+from typing import Optional, Union, Tuple
 from clients.response import Response
+from parameters import InputParameters
+from util.list import split_type, get
 from util.printer import banner
 from sys import path
 from util.json_schema import parse_schemas
 from typing import List
 from util.logger import logger
 from util.json import print_json
-from typing import Dict
 from util.environment import MasonEnvironment
+from workflows.invalid_workflow import InvalidWorkflow
+from workflows.valid_workflow import ValidWorkflow
 from workflows.workflow import Workflow
-from operators import namespaces as Namespaces
 
 
-def run(env: MasonEnvironment, config: ValidConfig, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False):
+def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False):
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
@@ -30,7 +30,11 @@ def run(env: MasonEnvironment, config: ValidConfig, cmd: Optional[str] = None, s
         wf: Optional[Workflow] = get_workflow(env, cmd, subcmd)
 
         if wf:
-            response = wf.run(env, config, response, deploy)
+            validated = wf.validate(env, config, parameters)
+            if isinstance(validated, ValidWorkflow):
+                response = validated.run(env, response, deploy, run)
+            else:
+                response.add_error(f"Invalid Workflow: {validated.reason}")
         else:
             if not response.errored():
                 response.add_error(f"Workflow {cmd} {subcmd} not found.  Check workflows with 'mason workflow'")
@@ -40,63 +44,39 @@ def run(env: MasonEnvironment, config: ValidConfig, cmd: Optional[str] = None, s
     return response
 
 
-def validate_workflows(workflow_file: str, env: MasonEnvironment) -> List[Workflow]:
-    namespaces, invalid = list_namespaces(env)
-    operators: List[Operator] = Namespaces.get_all(namespaces)
+def parse_workflows(workflow_file: str) -> Tuple[List[Workflow], List[InvalidWorkflow]]:
     workflows, errors = parse_schemas(workflow_file, "workflow", Workflow)
-    valid_workflows: List[Workflow] = []
 
-    for workflow in workflows:
+    validated: List[Union[Workflow, InvalidWorkflow]] = list(map(lambda w: w.validate_config(), workflows))
+    workflows, invalid = split_type(validated)
+    schema_errors = list(map(lambda e: InvalidWorkflow("Invalid Workflow Schema: " + e), errors))
+    invalid_workflows = schema_errors + invalid
 
-        validation = workflow.validate(operators)
-        if isinstance(validation, bool) and validation == True:
-            logger.info(f"Valid Workflow Definition {workflow_file}")
-            valid_workflows.append(workflow)
-        else:
-            error = f"Invalid Workflow Definition {workflow.source_path}.  Reason:  {validation}"
-            errors.append(error)
+    return workflows, invalid_workflows
 
-    for error in errors:
-        logger.error(error)
+def register_workflows(workflow_file: str, env: MasonEnvironment):
+    valid_workflows, invalid_workflows = parse_workflows(workflow_file, env)
 
-    return valid_workflows
+    for i in invalid_workflows:
+        logger.error(f"Invalid Workflow Schema Definition {i.reason}")
 
+    for w in valid_workflows:
+        logger.info(f"Valid Workflow Definition: {workflow_file}")
+        w.register_to(env.workflow_home)
 
-def list_workflows(env: MasonEnvironment, cmd: Optional[str] = None) -> Dict[str, List[Workflow]]:
-    path = env.workflow_home
-    workflows = validate_workflows(path, env)
-    grouped: Dict[str, List[Workflow]] = {}
+def list_workflows(env: MasonEnvironment, namespace: Optional[str] = None) -> List[Workflow]:
+    valid, invalid = parse_workflows(env.workflow_home)
+    return [v for v in valid if (v.namespace == namespace or namespace == None)]
 
-    for workflow in workflows:
-        wfs = grouped.get(workflow.namespace) or []
-        wfs.append(workflow)
-        grouped[workflow.namespace] = wfs
-
-    filtered = {k: v for k, v in grouped.items() if (k == cmd) or (cmd == None)}
-
-    return filtered
-
-def get_workflow(env: MasonEnvironment, cmd: Optional[str], subcmd: Optional[str]) -> Optional[Workflow]:
-    if cmd and subcmd:
-        wfs: List[Workflow] = list_workflows(env, cmd).get(cmd) or []
-        filtered = list(filter(lambda x: x.command == subcmd, wfs))
-        if len(filtered) == 0:
-            return None
-        else:
-            return filtered[0]
-    else:
-        return None
+def get_workflow(env: MasonEnvironment, namespace: Optional[str], command: Optional[str]) -> Optional[Workflow]:
+    workflows = list_workflows(env, namespace)
+    return get([w for w in workflows if (w.command == command)], 0)
 
 def tabulate_workflows(env: MasonEnvironment, cmd: Optional[str] = None):
-    ops = list_workflows(env)
+    workflows = list_workflows(env, cmd)
     array = []
-    if cmd:
-        for item in ops[cmd]:
-            array.append([item.namespace, item.command, item.description or ""])
-    else:
-        for k in ops:
-            for item in ops[k]:
-                array.append([item.namespace, item.command, item.description or ""])
+    for w in workflows:
+        array.append([w.namespace, w.command, w.description or ""])
 
     cmd_value = (cmd or "Workflow")
     logger.info()
@@ -106,7 +86,7 @@ def tabulate_workflows(env: MasonEnvironment, cmd: Optional[str] = None):
         logger.info(tabulate(array, headers=["namespace", "command", "description"]))
     else:
         if cmd:
-            logger.error(f"Operator \"{cmd_value}\" not found.  List workflows but running \"mason workflow\"")
+            logger.error(f"Workflow \"{cmd_value}\" not found.  List workflows but running \"mason workflow\"")
         else:
             logger.error("No Workflows Registered.  Register worfklows by running \"mason workflow register\"")
 
