@@ -3,6 +3,8 @@ from importlib import import_module
 from os import path
 from typing import List, Optional
 
+from engines.execution.models.jobs import Job
+
 from clients.response import Response
 from configurations.valid_config import ValidConfig
 from operators.supported_engines import SupportedEngineSet
@@ -29,6 +31,16 @@ class ValidOperator:
             response.add_error(f"Module Not Found: {e}")
 
         return response
+
+
+    def job(self, env: MasonEnvironment, response: Response) -> Job:
+        try:
+            mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
+            job: Job = mod.job(env, self.config, self.parameters, response)  # type: ignore
+        except ModuleNotFoundError as e:
+            response.add_error(f"Module Not Found: {e}")
+
+        return job
 
 
     def to_dict(self):

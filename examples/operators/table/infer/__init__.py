@@ -6,15 +6,19 @@ from clients.response import Response
 from api import operator_api as OperatorApi
 from util.environment import MasonEnvironment
 
-
-def run_new(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response):
+def job(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response) -> InferJob:
     database_name: str = parameters.get_required("database_name")
     storage_path: str = parameters.get_required("storage_path")
-    
-    job = InferJob(database_name, storage_path)
 
+    job = InferJob(database_name, storage_path)
+    return job
 
 def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response):
+    job(env, config, parameters, response).run(response)
+
+    return response
+
+def run_old(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response):
 
     database_name: str = parameters.get_required("database_name")
     storage_path: str = parameters.get_required("storage_path")
