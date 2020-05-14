@@ -4,14 +4,13 @@ from operators import operators as Operators
 import workflows as Workflows
 from util.printer import banner
 from util.environment import MasonEnvironment
-from configurations.configurations import get_all
+from configurations.configurations import get_all, get_current_config
 from util.logger import logger
 
 try:
     banner("Importing all registered_operator modules for API")
     env = MasonEnvironment()
-    logger.set_level("trace")
-    config = get_all(env)[0] # return first config by default
+    config = get_current_config(env)
 
     Operators.import_all(env)
     Workflows.import_all(env)

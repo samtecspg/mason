@@ -23,7 +23,7 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
             i += 1
             sp = c.source_path
             if sp:
-                response.add_info(f"Valid Configuration. Saving config {c} and {c.source_path} to {env.config_home}")
+                response.add_info(f"Valid Configuration. Saving config {c.id} at {c.source_path} to {env.config_home}")
                 shutil.copyfile(sp, env.config_home + path.basename(sp))
             else:
                 response.add_error("Config source path not found.   Run get_all with config file specified")
