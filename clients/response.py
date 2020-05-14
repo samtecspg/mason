@@ -35,7 +35,7 @@ class Response:
             logger.debug(f"Response {str(response)}")
         self.responses.append(response)
 
-    def add_config(self, i: int, config: dict):
+    def add_config(self, i: str, config: dict):
         config["id"] = i
         self.configs.append(config)
 

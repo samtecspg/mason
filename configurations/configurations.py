@@ -3,49 +3,56 @@ from configurations.invalid_config import InvalidConfig
 from configurations.valid_config import ValidConfig
 from util.printer import banner
 
-from util.yaml import parse_yaml
+from util.yaml import parse_yaml_invalid
 from util.session import set_session_config, get_session_config
 
 from util.logger import logger
-from util.list import get
 from util.environment import MasonEnvironment
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict, Tuple
 from os import walk
 from tabulate import tabulate
 from clients.response import Response
 
-def get_all(env: MasonEnvironment) -> List[ValidConfig]:
-    logger.debug(f"Reading configurations at {env.config_home}")
+def get_all(env: MasonEnvironment, config_file: Optional[str] = None) -> Tuple[Dict[str, ValidConfig], List[InvalidConfig]]:
+    dir = config_file or env.config_home
+    logger.debug(f"Reading configurations at {dir}")
 
-    configs: List[ValidConfig] = []
-    for subdir, dirs, files in walk(env.config_home):
+    configs: Dict[str, ValidConfig] = {}
+    invalid: List[InvalidConfig] = []
+
+    for subdir, dirs, files in walk(dir):
         for file in files:
             if '.yaml' in file:
-                config = get_config(env, file)
+                config = get_config(env, subdir + file)
                 if isinstance(config, ValidConfig):
-                    configs.append(config)
+                    if not configs.get(config.id):
+                        configs[config.id] = config
+                    else:
+                        invalid.append(InvalidConfig(config.config, f"Duplicate configuration id {config.id}.  Skipping..."))
                 else:
-                    logger.error(f"Invalid configuration at {file}. Reason: {config.reason}")
+                     invalid.append(config)
 
-    return configs
+    return configs, invalid
 
 def get_config(env: MasonEnvironment, file: str) -> Union[ValidConfig, InvalidConfig]:
-    yaml_config_doc: dict = parse_yaml(env.config_home + file) or {}
-    return Config(yaml_config_doc).validate(env)
+    yaml_config_doc = parse_yaml_invalid(file)
+    if isinstance(yaml_config_doc, dict):
+        return Config(yaml_config_doc).validate(env, file)
+    else:
+        return InvalidConfig({}, yaml_config_doc)
 
-def tabulate_configs(configs: List[ValidConfig], env: MasonEnvironment, log_level: str = "info") -> Optional[ValidConfig]:
+def tabulate_configs(configs: Dict[str, ValidConfig], env: MasonEnvironment, log_level: str = "info") -> Optional[ValidConfig]:
     config_id = get_session_config(env)
-    current_config = None
 
     extended_info: List[List[Union[str, dict, int]]] = []
-    for i, c in enumerate(configs):
-        if i == config_id:
+    for id, c in configs.items():
+        if config_id and id == config_id:
             current = True
             current_config = c
         else:
             current = False
 
-        for ei in c.extended_info(i, current):
+        for ei in c.extended_info(id, current):
             extended_info.append(ei)
 
     banner("Configurations", log_level)
@@ -55,25 +62,37 @@ def tabulate_configs(configs: List[ValidConfig], env: MasonEnvironment, log_leve
 
     return current_config
 
-def set_current_config(env: MasonEnvironment, config_id: int, response: Response):
-    configs = get_all(env)
-    config: Optional[ValidConfig] = get(configs, config_id)
+
+def set_current_config(env: MasonEnvironment, config: ValidConfig, configs: Dict[str, ValidConfig], response: Response):
+    response.add_info(f"Setting current config to {config.id}")
+    set_session_config(env, config.id)
+    tabulate_configs(configs, env)
+
+def set_current_config_id(env: MasonEnvironment, config_id: str, response: Response):
+    configs, invalid = get_all(env)
+    config: Optional[ValidConfig] = configs.get(config_id)
     if config:
-        response.add_info(f"Setting current config to {config_id}")
-        set_session_config(env, config_id)
-        tabulate_configs(configs, env)
+        set_current_config(env, config, configs, response)
     else:
         response.add_error(f"Config {config_id} not found")
 
+
 def get_current_config(env: MasonEnvironment, log_level: str = "info") -> Optional[ValidConfig]:
     config_id = get_session_config(env)
-    configs = get_all(env)
-    config: Optional[ValidConfig] = get(configs, config_id)
-    if config:
-        banner(f"Current Configuration {config_id}", log_level)
-        tabulate_configs(configs, env, log_level)
-        return config
+    configs, invalid = get_all(env)
+    if config_id:
+        config: Optional[ValidConfig] = configs.get(config_id)
+        if config:
+            banner(f"Current Configuration {config_id}", log_level)
+            tabulate_configs(configs, env, log_level)
+            return config
+        else:
+            return None
     else:
         return None
+
+def get_config_by_id(env: MasonEnvironment,  config_id: str) -> Optional[ValidConfig]:
+    configs, invalid = get_all(env)
+    return configs.get(config_id)
 
 

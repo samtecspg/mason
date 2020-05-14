@@ -1,10 +1,12 @@
+from importlib import import_module
+
 from tabulate import tabulate
 
 from configurations.valid_config import ValidConfig
 from typing import Optional, Union, Tuple
 from clients.response import Response
-from parameters import InputParameters
-from util.list import split_type, get
+from parameters import WorkflowParameters
+from util.list import get
 from util.printer import banner
 from sys import path
 from util.json_schema import parse_schemas
@@ -12,12 +14,21 @@ from typing import List
 from util.logger import logger
 from util.json import print_json
 from util.environment import MasonEnvironment
+from util.swagger import update_yaml_file
 from workflows.invalid_workflow import InvalidWorkflow
 from workflows.valid_workflow import ValidWorkflow
 from workflows.workflow import Workflow
 
+def import_all(env: MasonEnvironment):
+    path.append(env.mason_home)
+    workflows = list_workflows(env)
+    for workflow in workflows:
+        import_module(f"{env.workflow_module}.{workflow.namespace}.{workflow.command}")
 
-def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False):
+def update_yaml(env: MasonEnvironment, base_swagger: str):
+    update_yaml_file(base_swagger, env.workflow_home)
+
+def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
@@ -32,12 +43,11 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters,
         if wf:
             validated = wf.validate(env, config, parameters)
             if isinstance(validated, ValidWorkflow):
-                response = validated.run(env, response, deploy, run)
+                response = validated.run(env, response, deploy, run, schedule_name)
             else:
                 response.add_error(f"Invalid Workflow: {validated.reason}")
         else:
-            if not response.errored():
-                response.add_error(f"Workflow {cmd} {subcmd} not found.  Check workflows with 'mason workflow'")
+            response.add_error(f"Workflow {cmd} {subcmd} not found.  Check workflows with 'mason workflow'")
 
         banner("Workflow Response")
         print_json(response.formatted())
@@ -46,16 +56,13 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters,
 
 def parse_workflows(workflow_file: str) -> Tuple[List[Workflow], List[InvalidWorkflow]]:
     workflows, errors = parse_schemas(workflow_file, "workflow", Workflow)
-
-    validated: List[Union[Workflow, InvalidWorkflow]] = list(map(lambda w: w.validate_config(), workflows))
-    workflows, invalid = split_type(validated)
     schema_errors = list(map(lambda e: InvalidWorkflow("Invalid Workflow Schema: " + e), errors))
-    invalid_workflows = schema_errors + invalid
+    invalid_workflows = schema_errors
 
     return workflows, invalid_workflows
 
 def register_workflows(workflow_file: str, env: MasonEnvironment):
-    valid_workflows, invalid_workflows = parse_workflows(workflow_file, env)
+    valid_workflows, invalid_workflows = parse_workflows(workflow_file)
 
     for i in invalid_workflows:
         logger.error(f"Invalid Workflow Schema Definition {i.reason}")

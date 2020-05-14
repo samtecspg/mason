@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "MasonConfiguration",
   "properties": {
+    "id": { "type": ["string", "integer"]},
     "metastore_engine": {
       "type": "string",
       "enum": [
@@ -28,6 +29,7 @@
         "glue"
       ]
     }
-  }
+  },
+  "required": [ "id" ]
 }
 

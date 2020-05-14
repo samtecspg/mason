@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "WorkflowParameterSchema",
+  "type": "object",
+  "patternProperties": {
+    "^.*": {
+      "type": "object",
+      "properties": {
+        "config_id": { "type": ["string","integer"] },
+        "parameters": {
+          "type": "object",
+          "patternProperties": { "^.*": { "type": "string" }},
+          "additionalProperties": false
+        }
+      },
+      "required": ["config_id", "parameters"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

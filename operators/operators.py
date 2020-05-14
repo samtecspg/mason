@@ -9,7 +9,7 @@ from operators.namespaces.namespace import Namespace
 from operators import namespaces as Namespaces
 
 from operators.valid_operator import ValidOperator
-from util.yaml import parse_yaml
+from util.swagger import update_yaml_file
 from typing import Optional, Union, Tuple
 from configurations.valid_config import ValidConfig
 from parameters import InputParameters
@@ -20,7 +20,6 @@ from util.json_schema import parse_schemas
 from typing import List
 from util.logger import logger
 from util.json import print_json
-import yaml
 from operators.operator import Operator
 from util.environment import MasonEnvironment
 
@@ -33,25 +32,7 @@ def import_all(env: MasonEnvironment):
             import_module(f"{env.operator_module}.{namespace}.{cmd}")
 
 def update_yaml(env: MasonEnvironment, base_swagger: str):
-    swagger_file = "api/swagger.yml"
-    parsed_swagger = parse_yaml(base_swagger) or {}
-    paths: dict = parsed_swagger["paths"]
-
-    for r, d, f in os.walk(env.operator_home):
-        for file in f:
-            if '.yml' in file or '.yaml' in file:
-                file_path = os.path.join(r, file)
-                if file == "swagger.yml" or file == "swagger.yaml":
-                    file_parsed = parse_yaml(file_path) or {}
-
-                    parsed_paths = file_parsed.get('paths') or {}
-                    if len(parsed_paths) > 0:
-                        paths.update(parsed_paths)
-
-    parsed_swagger['paths'] = paths
-    with open(swagger_file, 'w+') as file: # type: ignore
-        yaml.dump(parsed_swagger, file) # type: ignore
-
+    update_yaml_file(base_swagger, env.operator_home)
 
 def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
     sys.path.append(env.mason_home)

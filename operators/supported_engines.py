@@ -23,7 +23,7 @@ class SupportedEngineSet:
     def validate_coverage(self, config: ValidConfig):
         test = True
         for engine_type, supported_engine in self.all.items():
-            config_engine_client = config.engines.get(engine_type, {}).get('client_name', "")
+            config_engine_client: str = config.engines.get(engine_type, {}).get('client_name', "")
             if supported_engine:
                 test = (supported_engine == config_engine_client)
             if not test:

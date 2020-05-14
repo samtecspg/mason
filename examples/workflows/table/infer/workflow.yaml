@@ -1,15 +1,12 @@
 type: "workflow"
 namespace: "table"
 command: "infer"
+name: "table_infer"
 description: "One step workfow for table infer operator"
-parameters:
-  required:
-    - "database_name"
-    - "storage_path"
-    - "schedule_name"
-    - "schedule"
 dag:
-    id: "step_1"
-    type: "operator"
-    namespace: "table"
-    command: "infer"
+    - id: "step_1"
+      type: "operator"
+      namespace: "table"
+      command: "infer"
+supported_schedulers:
+  - "glue"

@@ -1,0 +1,6 @@
+step_1:
+  config_id: 1
+  parameters:
+    test_param_1: test_value
+    test_param_2: test_value_2
+

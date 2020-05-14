@@ -1,3 +1,4 @@
+id: 5
 metastore_engine: test
 clients:
   test:

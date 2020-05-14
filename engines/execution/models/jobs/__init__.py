@@ -37,3 +37,8 @@ class Job:
             response.add_data({"Results": self.results})
         return response
 
+
+class InvalidJob:
+
+    def __init__(self, reason: str):
+        self.reason = reason

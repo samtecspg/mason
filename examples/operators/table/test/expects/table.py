@@ -46,9 +46,18 @@ def get(client_type: str, switch: int):
 
 def post(exists = True):
     if exists:
-        return ({'Errors': [], 'Info': ['Refreshing Table Crawler: test_crawler'], 'Warnings': ['Table crawler test_crawler already exists. Skipping '  'creation.']},201)
+        info = ['Registering workflow dag test_crawler with glue.',
+         'Registered schedule test_crawler',
+         'Triggering schedule: test_crawler',
+         'Refreshing Table Crawler: test_crawler']
+        return ({'Errors': [], 'Info': info, 'Warnings': ['Table crawler test_crawler already exists. Skipping '  'creation.']},201)
     else:
-        return ({'Warnings': [], 'Errors': [],'Info': ['Created table crawler test_crawler_new.', 'Refreshing Table Crawler: test_crawler_new']}, 201)
+        info = ['Registering workflow dag test_crawler_new with glue.',
+                'Created table crawler test_crawler_new.',
+                'Registered schedule test_crawler_new',
+                'Triggering schedule: test_crawler_new',
+                'Refreshing Table Crawler: test_crawler_new']
+        return ({'Warnings': [], 'Errors': [],'Info': info}, 201)
 
 def refresh(refreshing = True):
     data = [{'CreatedAt': datetime.datetime(2020, 2, 26, 12, 57, 31, tzinfo=tzlocal()),                       'CreatedBy': 'arn:aws:sts::062325279035:assumed-role/AWSGlueServiceRole-anduin-data-glue/AWS-Crawler',                       'DatabaseName': 'crawler-poc', 'Name': 'catalog_poc_data', 'Schema': {            'Columns': [{'Name': 'index', 'Type': 'bigint'}, {'Name': 'break1maxqty', 'Type': 'double'},                        {'Name': 'break1minqty', 'Type': 'double'}, {'Name': 'break1price', 'Type': 'double'},                        {'Name': 'break2maxqty', 'Type': 'double'}, {'Name': 'break2minqty', 'Type': 'double'},                        {'Name': 'break2price', 'Type': 'double'}, {'Name': 'break3maxqty', 'Type': 'double'},                        {'Name': 'break3minqty', 'Type': 'double'}, {'Name': 'break3price', 'Type': 'double'},                        {'Name': 'break4maxqty', 'Type': 'double'}, {'Name': 'break4minqty', 'Type': 'double'},                        {'Name': 'break4price', 'Type': 'double'}, {'Name': 'break5maxqty', 'Type': 'double'},                        {'Name': 'break5minqty', 'Type': 'double'}, {'Name': 'break5price', 'Type': 'double'},                        {'Name': 'maxprice', 'Type': 'double'}, {'Name': 'minprice', 'Type': 'double'},                        {'Name': 'packaging', 'Type': 'string'}, {'Name': 'partnumber', 'Type': 'string'},                        {'Name': 'qtyperpackage', 'Type': 'double'}, {'Name': 'source', 'Type': 'string'},                        {'Name': 'stockqty', 'Type': 'double'}, {'Name': 'timestamp', 'Type': 'string'},                        {'Name': 'virtualstockqty', 'Type': 'double'}, {'Name': 'break6maxqty', 'Type': 'double'},                        {'Name': 'break6minqty', 'Type': 'double'}, {'Name': 'break6price', 'Type': 'double'},                        {'Name': 'break7maxqty', 'Type': 'double'}, {'Name': 'break7minqty', 'Type': 'double'},                        {'Name': 'break7price', 'Type': 'double'}, {'Name': 'ts', 'Type': 'string'}],            'SchemaType': 'glue'}}]
