@@ -9,8 +9,6 @@ from util.list import flatten
 
 class Dag:
 
-    #  Dag -> [Dag, InvalidDag] -> [ValidDag, InvalidDag]
-
     def __init__(self, dag_config: List[dict]):
         self.steps = flatten(list(map(lambda step: DagStep(step), dag_config)))
 
