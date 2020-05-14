@@ -16,8 +16,6 @@ from workflows.valid_workflow import ValidWorkflow
 
 class Workflow:
 
-    #  Workflow -> [Workflow, InvalidWorkflow] -> [ValidWorkflow, InvalidWorkflow]
-
     def __init__(self, namespace: str, command: str, name: str, dag: List[dict], supported_schedulers: List[str], schedule: Optional[str] = None, description: Optional[str] = None, source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
