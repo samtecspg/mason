@@ -45,6 +45,8 @@ def tabulate_configs(configs: Dict[str, ValidConfig], env: MasonEnvironment, log
     config_id = get_session_config(env)
 
     extended_info: List[List[Union[str, dict, int]]] = []
+    current_config = None
+
     for id, c in configs.items():
         if config_id and id == config_id:
             current = True

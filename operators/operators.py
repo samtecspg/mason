@@ -1,4 +1,3 @@
-import os
 import sys
 
 from tabulate import tabulate
@@ -29,7 +28,7 @@ def import_all(env: MasonEnvironment):
     for namespace in namespaces:
         for op in namespace.operators:
             cmd = op.command
-            import_module(f"{env.operator_module}.{namespace}.{cmd}")
+            import_module(f"{env.operator_module}.{namespace.namespace}.{cmd}")
 
 def update_yaml(env: MasonEnvironment, base_swagger: str):
     update_yaml_file(base_swagger, env.operator_home)

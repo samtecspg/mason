@@ -6,13 +6,12 @@ from util.uuid import uuid4
 
 from configurations.valid_config import ValidConfig
 from engines.scheduler.models.schedule import Schedule
-from parameters import InputParameters, Parameters, WorkflowParameters
+from parameters import WorkflowParameters
 from util.environment import MasonEnvironment
 from util.logger import logger
 from engines.scheduler.models.dags import Dag, ValidDag
 from workflows.invalid_workflow import InvalidWorkflow
 from workflows.valid_workflow import ValidWorkflow
-
 
 class Workflow:
 

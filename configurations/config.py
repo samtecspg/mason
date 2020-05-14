@@ -37,7 +37,7 @@ class Config:
 
                     return InvalidConfig(self.config, reason)
                 else:
-                    logger.debug("Valid Configuration")
+                    logger.debug(f"Valid Configuration {id}")
                     return ValidConfig(id, self.config, me, ce, se, ee, source_path)
 
             else:
