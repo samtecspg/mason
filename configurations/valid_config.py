@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Dict
 
 from engines.execution import ExecutionEngine
 from engines.metastore import MetastoreEngine
@@ -8,14 +8,16 @@ from engines.storage import StorageEngine
 
 class ValidConfig:
 
-    def __init__(self, config: dict, metastore_engine: MetastoreEngine, scheduler_engine: SchedulerEngine, storage_engine: StorageEngine, execution_engine: ExecutionEngine):
+    def __init__(self, id: str, config: dict, metastore_engine: MetastoreEngine, scheduler_engine: SchedulerEngine, storage_engine: StorageEngine, execution_engine: ExecutionEngine, source_path: Optional[str] = None):
+        self.id = id
         self.config = config
         self.metastore = metastore_engine
         self.scheduler = scheduler_engine
         self.storage = storage_engine
         self.execution = execution_engine
+        self.source_path = source_path
 
-        self.engines = {
+        self.engines: Dict[str, Dict] = {
             'metastore': metastore_engine.to_dict(),
             'scheduler': scheduler_engine.to_dict(),
             'storage': storage_engine.to_dict(),
@@ -34,7 +36,7 @@ class ValidConfig:
 
         return {key: redact_value(key, value) for (key, value) in d.items()}
 
-    def extended_info(self, config_id: int, current: bool = False):
+    def extended_info(self, config_id: str, current: bool = False):
         ei = []
 
         if not self.metastore.client_name == "":

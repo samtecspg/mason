@@ -1,3 +1,4 @@
+id: 2
 metastore_engine: test
 bad_engine: test
 clients:

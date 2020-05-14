@@ -1,8 +1,8 @@
+from typing import Tuple
+
 from clients.response import Response
 from clients import Client
 from abc import abstractmethod
-
-from engines.scheduler.models.dags import ValidDag
 
 
 class SchedulerClient(Client):
@@ -11,7 +11,7 @@ class SchedulerClient(Client):
     ###  which will return Cannot instantiate abstract class 'GlueSchedulerClient' with abstract attribute 'register_schedule' (for example)
 
     @abstractmethod
-    def register_dag(self, schedule_name: str, dag: ValidDag, response: Response) -> Response:
+    def register_dag(self, schedule_name: str, valid_dag, response: Response) -> Tuple[str, Response]:
         raise NotImplementedError("Client method not implemented")
         return response
 

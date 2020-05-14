@@ -9,11 +9,6 @@ paths:
       consumes:
         - application/json
       parameters:
-        - name: schedule_name
-          in: query
-          format: path
-          type: string
-          required: true
         - name: database_name
           in: query
           format: path

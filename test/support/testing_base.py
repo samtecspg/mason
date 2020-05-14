@@ -9,13 +9,16 @@ import re
 from util.uuid import uuid_regex
 from dotenv import load_dotenv
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from clients.response import Response
 from configurations.configurations import get_config
 from operators.operator import Operator
 from operators import operators as Operators
+import workflows as Workflows
+
 from util.environment import MasonEnvironment
+from workflows import Workflow
 
 load_dotenv(from_root('/.env.example'))
 
@@ -34,31 +37,37 @@ def clean_string(s1: str):
 def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
     logger.set_level(log_level)
     env = get_env()
+    workflow = kwargs.get("workflow") or False
     if do_mock:
         patches = get_patches()
         with contextlib.ExitStack() as stack:
             for p in patches:
                 stack.enter_context(p)
-            run_test(env, cmd, sub, configs, callable)
+            run_test(env, cmd, sub, configs, workflow, callable)
     else:
-        run_test(env, cmd, sub, configs, callable)
+        run_test(env, cmd, sub, configs, workflow, callable)
 
 
-def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], callable):
+def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], workflow: bool, callable):
     response = Response()
-    op: Optional[Operator] = Operators.get_operator(env, cmd, sub)
+    op: Union[Optional[Operator], Optional[Workflow]] = None
 
+    if workflow:
+        op = Workflows.get_workflow(env, cmd, sub)
+        types = "Workflow"
+    else:
+        op = Operators.get_operator(env, cmd, sub)
+        types = "Operator"
     if op:
-        operator: Operator = op
         for config in configs:
-            conf = get_config(env, config + ".yaml")
+            conf = get_config(env, from_root("/examples/operators/table/test_configs/") + config + ".yaml")
             if isinstance(conf, ValidConfig):
-                callable(env, conf, operator)
+                callable(env, conf, op)
             else:
-                raise Exception(f"No matching valid configuration found for operator {op.namespace}, {op.command}. Reason {conf.reason}")
+                raise Exception(f"No matching valid configuration found for {op.namespace}, {op.command}. Reason {conf.reason}")
 
     else:
-        raise Exception(f"Operator not found {cmd} {sub}")
+        raise Exception(f"{types} not found {cmd} {sub}")
 
 def set_log_level(level: str = None):
     logger.set_level(level or "fatal", False)
@@ -67,4 +76,5 @@ def get_env(operator_home: str = "/examples/operators", config_home = "/examples
     return MasonEnvironment(operator_home=from_root(operator_home), config_home=from_root(config_home), operator_module=operator_module, workflow_home=from_root(workflow_home), workflow_module=workflow_module)
 
 def get_configs(env: MasonEnvironment):
-    return get_all(env)
+    valid, invalid = get_all(env)
+    return list(valid.values())

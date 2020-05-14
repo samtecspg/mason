@@ -1,9 +1,56 @@
-from typing import Optional, List, Tuple, Union
+from typing import Optional, List, Tuple, Dict, Any
 
+from util.environment import MasonEnvironment
+from util.session import get_session_config
+
+from configurations.configurations import get_current_config
+
+from definitions import from_root
 from parameters.invalid_parameter import InvalidParameter
 from parameters.parameter import Parameter, ValidatedParameter, OptionalParameter
+from util.json_schema import object_from_json_schema
 from util.list import dedupe, get
 import re
+from util.exception import message
+
+from util.yaml import parse_yaml_invalid
+
+class WorkflowParameter:
+    def __init__(self, step: str, config_id: str, parameters: 'InputParameters'):
+        self.config_id = config_id
+        self.step = step
+        self.parameters = parameters
+
+class WorkflowParameters:
+    def __init__(self, parameter_path: Optional[str] = None):
+        if parameter_path:
+            parameters, invalid = self.parse_path(parameter_path or "")
+        else:
+            invalid = [InvalidParameter("No parameter path specified")]
+
+        self.parameters: List[WorkflowParameter] = parameters
+        self.invalid: List[InvalidParameter] = invalid
+
+    def parse_path(self, param_path: str) -> Tuple[List[WorkflowParameter], List[InvalidParameter]]:
+        parsed = parse_yaml_invalid(param_path)
+        valid: List[WorkflowParameter] = []
+        invalid: List[InvalidParameter] = []
+        if isinstance(parsed, dict):
+            validated = object_from_json_schema(parsed, from_root("/parameters/workflow_schema.json"), dict)
+            if isinstance(validated, dict):  #can now be confident it is matches schema definition
+                for key, value in validated.items():
+                    config_id: str = str(value["config_id"])
+                    parameters: Dict[str,Dict[str, Any]] = value["parameters"]
+                    valid_step, invalid_step = parse_dict(parameters, from_root("/parameters/schema.json"))
+                    ip = InputParameters()
+                    ip.parameters = valid_step
+                    ip.invalid = invalid_step
+                    valid.append(WorkflowParameter(key, config_id, ip))
+            else:
+                invalid.append(InvalidParameter(f"Parameters do not conform to specified schema in parameters/workflow_schema.json.  Must be of form step_id: key:value.  {validated.reason}"))
+
+        return valid, invalid
+
 
 class InputParameters:
     def __init__(self, parameter_string: Optional[str] = None, parameter_path: Optional[str] = None):
@@ -30,8 +77,16 @@ class InputParameters:
         else:
             return None
 
-    def parse_path(self, param_path: str):
-        return []
+    def parse_path(self, param_path: str) -> Tuple[List[Parameter], List[InvalidParameter]]:
+        parsed = parse_yaml_invalid(param_path)
+        valid: List[Parameter] = []
+        invalid: List[InvalidParameter] = []
+        if isinstance(parsed, dict):
+            valid, invalid = parse_dict(parsed, from_root("/parameters/schema.json"))
+        else:
+            invalid.append(InvalidParameter(parsed))
+
+        return valid, invalid
 
     def parse_string(self, param_string: str) -> Tuple[List[Parameter], List[InvalidParameter]]:
         pattern = r"([^,^:]+:[^,^:]+)"
@@ -91,6 +146,25 @@ class Parameters:
             'required': self.required_parameter_keys,
             'optional': self.optional_parameter_keys
         }
+
+def parse_dict(d: dict, schema: str):
+    valid: List[Parameter] = []
+    invalid: List[InvalidParameter] = []
+    validated = object_from_json_schema(d, schema, dict)
+    if isinstance(validated, dict):  # can now be confident it is a one level dict
+        v: Dict[str, Any] = validated
+        for key, value in v.items():
+            try:
+                valid.append(Parameter(key, value))
+            except Exception as e:
+                invalid.append(InvalidParameter(f"Invalid Parameter: {message(e)}"))
+
+    else:
+        invalid.append(InvalidParameter(
+            "Parameters do not conform to specified schema in parameters/schema.json.  Must be of form key:value"))
+
+    return valid, invalid
+
 
 class ValidatedParameters():
 

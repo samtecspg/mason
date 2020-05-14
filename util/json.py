@@ -1,7 +1,6 @@
 
 import datetime
 import json
-from pygments import highlight, lexers, formatters
 from util.logger import logger
 
 def parse_json(file_path: str):

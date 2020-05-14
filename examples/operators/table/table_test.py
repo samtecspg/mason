@@ -2,7 +2,6 @@ from definitions import from_root
 from examples.operators.table.get import api as table_get_api
 from examples.operators.table.list import api as table_list_api
 from examples.operators.table.refresh import api as table_refresh_api
-from examples.operators.table.infer import api as table_infer_api
 
 from clients.response import Response
 from examples.operators.table.test.expects import table as expects # type: ignore
@@ -58,26 +57,6 @@ def test_get():
 
     run_tests("table", "get", True, "fatal",["config_1", "config_2"],  tests)
 
-def test_post():
-
-    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
-        #  DNE
-        params = InputParameters(parameter_string="database_name:crawler-poc,schedule_name:test_crawler_new,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
-        dne = op.validate(config, params).run(env, Response())
-        assert(dne.with_status() == expects.post(False))
-
-        # Exists
-        params = InputParameters(parameter_string="database_name:crawler-poc,schedule_name:test_crawler,storage_path:lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/")
-        exists = op.validate(config, params).run(env, Response())
-        assert(exists.with_status() == expects.post(True))
-
-        # API
-        response, status = table_infer_api(env, config, database_name="crawler-poc", schedule_name="test_crawler_new",storage_path="lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/", log_level="fatal")
-        assert((response, status) == expects.post(False))
-
-    os.environ["GLUE_ROLE_ARN"] = "TestRole"
-    run_tests("table", "infer", True, "fatal",["config_1"],  tests)
-
 
 
 def test_refresh():
@@ -118,7 +97,7 @@ def test_merge():
         # invalid merge params
         params = InputParameters(parameter_string="input_path:test,bad:test")
         invalid = op.validate(config, params).run(env, Response())
-        assert(invalid.with_status() == ({'Errors': ['Invalid Operator.  Reason:  Invalid parameters. \n Required parameter not specified: output_path'], 'Info': [], 'Warnings': []}, 400))
+        assert(invalid.with_status() == ({'Errors': ['Invalid Operator.  Reason:  Invalid parameters.  Required parameter not specified: output_path'], 'Info': [], 'Warnings': []}, 400))
 
         # valid merge
         params = InputParameters(parameter_string="input_path:good_input_bucket_2/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")

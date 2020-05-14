@@ -1,3 +1,4 @@
+id: 1
 metastore_engine: glue
 storage_engine: s3
 scheduler_engine: glue

@@ -1,16 +1,15 @@
 import shutil
 from importlib import import_module
 from os import path
-from typing import List, Optional
+from typing import List, Optional, Union
 
-from engines.execution.models.jobs import Job
+from engines.execution.models.jobs import Job, InvalidJob
 
 from clients.response import Response
 from configurations.valid_config import ValidConfig
 from operators.supported_engines import SupportedEngineSet
 from parameters import ValidatedParameters
 from util.environment import MasonEnvironment
-from util.logger import logger
 
 class ValidOperator:
 
@@ -32,16 +31,12 @@ class ValidOperator:
 
         return response
 
-
-    def job(self, env: MasonEnvironment, response: Response) -> Job:
+    def job(self, env: MasonEnvironment) -> Union[Job, InvalidJob]:
         try:
             mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
-            job: Job = mod.job(env, self.config, self.parameters, response)  # type: ignore
+            return mod.job(env, self.config, self.parameters)  # type: ignore
         except ModuleNotFoundError as e:
-            response.add_error(f"Module Not Found: {e}")
-
-        return job
-
+            return InvalidJob(f"Module Not Found: {e}")
 
     def to_dict(self):
         return {

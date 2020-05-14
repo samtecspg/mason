@@ -1,6 +1,7 @@
 import connexion
 import markdown
 from operators import operators as Operators
+import workflows as Workflows
 from util.printer import banner
 from util.environment import MasonEnvironment
 from configurations.configurations import get_all
@@ -11,11 +12,17 @@ try:
     env = MasonEnvironment()
     logger.set_level("trace")
     config = get_all(env)[0] # return first config by default
+
     Operators.import_all(env)
+    Workflows.import_all(env)
+
     swagger_yml = "api/base_swagger.yml"
 
     banner(f"Regenerating api yaml based on registered_operators to {swagger_yml}")
+
     Operators.update_yaml(env, swagger_yml)
+    Workflows.update_yaml(env, swagger_yml)
+
     app = connexion.App(__name__, specification_dir='api')
 
     # Read the swagger.yml file to configure the endpoints

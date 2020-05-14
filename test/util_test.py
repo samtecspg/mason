@@ -42,5 +42,5 @@ class TestJsonSchema:
         obj = object_from_json_schema({"test": "test", "type": "test"}, BASIC_SCHEMA, TestBad)
         if isinstance(obj, InvalidSchemaDict):
             assert(obj.__class__.__name__ == "InvalidSchemaDict")
-            assert(obj.reason[0:30] == "Objection creation failed for ")
+            assert(obj.reason[0:27] == "Object creation failed for ")
 

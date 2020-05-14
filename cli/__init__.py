@@ -3,7 +3,7 @@ import os
 from os import path
 from typing import Optional
 
-from parameters import InputParameters
+from parameters import InputParameters, WorkflowParameters
 from util.logger import logger
 from operators import operators as Operators
 import workflows as Workflows
@@ -102,9 +102,9 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
 @click.option("-l", "--log_level", help="Log level for mason")
 @click.option("-d", "--deploy", help="Deploy specified workflow", is_flag=True)
 @click.option('-r', '--run', help="Run workflow right now ignoring schedule", is_flag=True)
-@click.option('-p', '--parameters', help="Load parameters from parameters string of the format  <param1>:<value1>,<param2>:<value2>")
 @click.option('-f', '--param_file', help="Parameters from yaml file path")
-def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None, deploy: bool = False, run: bool = False):
+@click.option('-n', '--schedule_name', help="Optional name for schedule.  Only works with -d --deploy")
+def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
     """
     Running without cmd or subcmd will list out all mason workflows currently registered.
     Running without subcmd will list out all mason workflows under the cmd namespace.
@@ -123,8 +123,8 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
             else:
                 logger.error("No file path provided to register operator")
         else:
-            params = InputParameters(parameters, param_file)
-            Workflows.run(env, config, params, cmd, subcmd, deploy, run)
+            params = WorkflowParameters(param_file)
+            Workflows.run(env, config, params, cmd, subcmd, deploy, run, schedule_name)
     else:
         logger.error("Configuration not found.  Run \"mason config\" first")
 

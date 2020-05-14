@@ -1,3 +1,4 @@
+id: 3
 metastore_engine: glue
 execution_engine: athena
 clients:

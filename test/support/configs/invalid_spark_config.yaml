@@ -1,3 +1,4 @@
+id: 0
 execution_engine: spark
 clients:
   spark:

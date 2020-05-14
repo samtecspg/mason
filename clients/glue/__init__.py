@@ -7,7 +7,6 @@ from clients.response import Response
 from botocore.errorfactory import ClientError
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
 
-
 class GlueClient:
 
     def __init__(self, config: dict):

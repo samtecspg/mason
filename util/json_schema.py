@@ -8,7 +8,6 @@ from definitions import from_root
 from util.exception import message
 
 from util.json import parse_json
-import inspect
 
 from util.yaml import parse_yaml
 
@@ -32,7 +31,9 @@ def object_from_json_schema(attr: dict, schema_file: str, cls: Type[T]) -> Union
     ##  TODO:  Remove need for this note ^
 
     schema = validate_schema(attr, schema_file)
-    attr.pop("type")
+    #  TODO: Fix this
+    if "type" in attr:
+        attr.pop("type")
     obj: Optional[T] = None
 
     if isinstance(schema, ValidSchemaDict):
@@ -41,7 +42,7 @@ def object_from_json_schema(attr: dict, schema_file: str, cls: Type[T]) -> Union
             # TODO: Fix this
             return cls(**attr) #type: ignore
         except Exception as e:
-            return InvalidSchemaDict(schema.dict, schema.schema, f"Objection creation failed for {cls.__name__} with attributes {schema.dict}. {message(e)}")
+            return InvalidSchemaDict(schema.dict, schema.schema, f"Object creation failed for {cls.__name__} with attributes {schema.dict}. {message(e)}")
 
     else:
         return schema
@@ -83,3 +84,19 @@ def validate_schema(d: Optional[dict], schema_file: str) -> Union[ValidSchemaDic
             return InvalidSchemaDict(di, schema, f"\nSchema not found: {e.filename}")
     else:
         return ValidSchemaDict(di, {})
+
+
+A = TypeVar("A")
+B = TypeVar("B")
+
+def sequence(l: List[Union[A, B]], type_a: Type[A], type_b: Type[B]) -> Tuple[List[A], List[B]]:
+    l1: List[A] = []
+    l2: List[B] = []
+    for l0 in l:
+        if isinstance(l0, type_a):
+            l1.append(l0)
+        else:
+            assert(isinstance(l0, type_b))
+            l2.append(l0)
+    return l1, l2
+

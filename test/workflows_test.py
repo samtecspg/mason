@@ -6,13 +6,14 @@ from parameters import InputParameters
 from test.support import testing_base as base
 import workflows as Workflows
 from operators import operators as Operators
+from util.logger import logger
+
 
 class TestWorkflows:
 
     def test_end_to_end(self):
-        base.set_log_level("fatal")
+        base.set_log_level("trace")
         mason_home = from_root("/test/.tmp/")
-
 
         if os.path.exists(mason_home):
             shutil.rmtree(mason_home)
@@ -23,14 +24,9 @@ class TestWorkflows:
         for operator in operators:
             operator.register_to(env.operator_home)
 
-        workflows = Workflows.validate_workflows(from_root("/test/support/workflows/"), env)
+        Workflows.register_workflows(from_root("/test/support/workflows/"), env)
 
-        for workflow in workflows:
-            workflow.register_to(env.workflow_home)
-
-        assert(Workflows.list_workflows(env)['namespace1'][0].command == "workflow1")
-        assert(list(Workflows.list_workflows(env, "namespace1").keys())[0] == "namespace1")
-        assert(Workflows.list_workflows(env, "namespace1")["namespace1"][0].command == "workflow1")
+        wf = Workflows.get_workflow(env, "namespace1", "workflow1")
 
         if os.path.exists(mason_home):
             shutil.rmtree(mason_home)

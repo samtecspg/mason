@@ -1,8 +1,8 @@
-
-from parameters import Parameters, InputParameters
+from definitions import from_root
+from parameters import InputParameters, WorkflowParameters
 from operators.operator import Operator
 from test.support import testing_base as base
-from clients.response import Response
+from util.logger import logger
 
 
 class TestInit:
@@ -36,8 +36,26 @@ class TestInit:
 
     def test_no_parameters(self):
         params = InputParameters()
+        assert(params.invalid == [])
+        assert(params.parameters == [])
+
+    def test_from_path(self):
+        params = InputParameters(parameter_path=from_root("/test/support/parameters/good_params.yaml"))
+        assert(list(map(lambda p: p.value, params.parameters)) == ["test_value", "test_value_2"])
+
+    def test_bad_from_path(self):
+        params = InputParameters(parameter_path=from_root("/test/support/parameters/bad_params.yaml"))
+        message = "Parameters do not conform to specified schema in parameters/schema.json.  Must be of form key:value"
+        assert(params.invalid[0].reason == message)
 
 
+    def test_workflow_parameters(self):
+        params = WorkflowParameters(parameter_path=from_root("/test/support/parameters/good_workflow_params.yaml"))
+        assert(list(map(lambda p: p.value, params.parameters[0].parameters.parameters)) == ["test_value", "test_value_2"])
+
+    def test_bad_workflow_parameters(self):
+        params = WorkflowParameters(parameter_path=from_root("/test/support/parameters/bad_workflow_params.yaml"))
+        assert("Parameters do not conform to specified schema in parameters/workflow_schema.json" in params.invalid[0].reason)
 
 class TestValidation:
     def test_parameter_validation(self):
