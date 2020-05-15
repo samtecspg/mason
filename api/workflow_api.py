@@ -4,8 +4,9 @@ from typing import Optional, List
 from clients.response import Response
 from configurations.configurations import get_current_config
 
+from clients.response import Response
 from configurations.valid_config import ValidConfig
-from parameters import InputParameters, WorkflowParameters
+from parameters import WorkflowParameters
 
 from util.environment import MasonEnvironment
 from util.logger import logger
@@ -17,20 +18,16 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
     config: Optional[ValidConfig] = configuration or get_current_config(env)
 
     if config:
-        param_list: List[str] = []
-        for k,v in kwargs.items():
-            unq = urllib.parse.unquote(v)
-            param_list.append(f"{k}:{unq}")
+        parameters = kwargs["parameters"]
+        log_level = kwargs["log_level"]
+        deploy = kwargs["deploy"]
+        run_now = kwargs["run_now"]
+        schedule_name = kwargs["schedule_name"]
 
-        parameters = ",".join(param_list)
-        params = WorkflowParameters(parameters)
+        params = WorkflowParameters(parameter_dict=parameters)
+        logger.set_level(log_level)
 
-        logger.set_level(kwargs.get("log_level"))
-
-        # def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None,
-        #         subcmd: Optional[str] = None, deploy: bool = False, run: bool = False):
-
-        response = Workflows.run(env, config, params, namespace, command)
+        response = Workflows.run(env, config, params, namespace, command, deploy, run_now, schedule_name)
     else:
         response = Response()
         response.add_error("Configuration not found")

@@ -25,9 +25,6 @@ def import_all(env: MasonEnvironment):
     for workflow in workflows:
         import_module(f"{env.workflow_module}.{workflow.namespace}.{workflow.command}")
 
-def update_yaml(env: MasonEnvironment, base_swagger: str):
-    update_yaml_file(base_swagger, env.workflow_home)
-
 def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
     #  TODO: Allow single step commands without subcommands
     response = Response()

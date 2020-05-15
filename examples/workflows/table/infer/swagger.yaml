@@ -1,23 +1,53 @@
 paths:
-  /table/:
-    get:
+  /table/infer:
+    post:
       operationId: "registered_workflows.table.infer.api"
-      requestBody:
-        content:
-          application/json:
-            parameters:
-              type: object
+      tags:
+        - "Workflows"
+      summary: "One step workflow for infering table structure in metastore"
+      description: "One step workflow for inferring table structure in metastore"
+      consumes:
+        - application/json
       parameters:
+        - name: deploy
+          in: query
+          required: false
+          type: boolean
+          default: false
+        - name: run_now
+          in: query
+          required: false
+          default: false
+          type: boolean
+        - name: schedule_name
+          in: query
+          required: false
+          type: string
         - name: log_level
           in: query
           enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
           required: false
           type: string
           default: "info"
-      tags:
-        - "Job"
-      summary: "List out table contents"
-      description: "List out contents of table by name"
+        - name: parameters
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              step_1:
+                type: object
+                properties:
+                  config_id:
+                    type: string
+                  parameters:
+                    type: object
+                    properties:
+                      database_name:
+                        type: string
+                      storage_path:
+                        type: string
       responses:
         200:
-          description: "Successful list"
+          description: "Successful Schedule"
+
