@@ -20,7 +20,6 @@ try:
     banner(f"Regenerating api yaml based on registered_operators to {swagger_yml}")
 
     Operators.update_yaml(env, swagger_yml)
-    Workflows.update_yaml(env, swagger_yml)
 
     app = connexion.App(__name__, specification_dir='api')
 

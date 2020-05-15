@@ -22,21 +22,23 @@ class WorkflowParameter:
         self.parameters = parameters
 
 class WorkflowParameters:
-    def __init__(self, parameter_path: Optional[str] = None):
+    def __init__(self, parameter_path: Optional[str] = None, parameter_dict: Optional[dict] = None):
+        parameters = []
         if parameter_path:
             parameters, invalid = self.parse_path(parameter_path or "")
+        elif parameter_dict:
+            parameters, invalid = self.parse_dict(parameter_dict or {})
         else:
-            invalid = [InvalidParameter("No parameter path specified")]
+            invalid = [InvalidParameter("No parameter path or json specified")]
 
         self.parameters: List[WorkflowParameter] = parameters
         self.invalid: List[InvalidParameter] = invalid
 
-    def parse_path(self, param_path: str) -> Tuple[List[WorkflowParameter], List[InvalidParameter]]:
-        parsed = parse_yaml_invalid(param_path)
+    def parse_dict(self, param_dict: str) -> Tuple[List[WorkflowParameter], List[InvalidParameter]]:
         valid: List[WorkflowParameter] = []
         invalid: List[InvalidParameter] = []
-        if isinstance(parsed, dict):
-            validated = object_from_json_schema(parsed, from_root("/parameters/workflow_schema.json"), dict)
+        if isinstance(param_dict, dict):
+            validated = object_from_json_schema(param_dict, from_root("/parameters/workflow_schema.json"), dict)
             if isinstance(validated, dict):  #can now be confident it is matches schema definition
                 for key, value in validated.items():
                     config_id: str = str(value["config_id"])
@@ -51,6 +53,17 @@ class WorkflowParameters:
 
         return valid, invalid
 
+
+    def parse_path(self, param_path: str) -> Tuple[List[WorkflowParameter], List[InvalidParameter]]:
+        parsed = parse_yaml_invalid(param_path)
+        valid: List[WorkflowParameter] = []
+        invalid: List[InvalidParameter] = []
+        if isinstance(valid, dict):
+            valid, invalid = parse_dict(valid)
+        else:
+            invalid.append(InvalidParameter(f"Invalid parameter yaml: {parsed}"))
+
+        return valid, invalid
 
 class InputParameters:
     def __init__(self, parameter_string: Optional[str] = None, parameter_path: Optional[str] = None):

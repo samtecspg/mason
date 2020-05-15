@@ -31,7 +31,7 @@ def import_all(env: MasonEnvironment):
             import_module(f"{env.operator_module}.{namespace.namespace}.{cmd}")
 
 def update_yaml(env: MasonEnvironment, base_swagger: str):
-    update_yaml_file(base_swagger, env.operator_home)
+    update_yaml_file(base_swagger, [env.operator_home, env.workflow_home])
 
 def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
     sys.path.append(env.mason_home)
