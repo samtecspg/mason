@@ -1,8 +1,7 @@
 from definitions import from_root
-from parameters import InputParameters, WorkflowParameters
+from parameters import InputParameters, WorkflowParameters, ValidatedParameters
 from operators.operator import Operator
 from test.support import testing_base as base
-from util.logger import logger
 
 
 class TestInit:
@@ -61,14 +60,17 @@ class TestValidation:
     def test_parameter_validation(self):
 
         tests = {
-            "param:value": [{"param": "value"}, ["param"], 200],
-            "param:value": [{}, ["other_param"], 400]
+            "param:value": [["param"], [], ["value"], [], ["value"]],
+            "param:value,other_param:stuff": [["other_param"], ["param"], ["stuff"], ["value"], ["value", "stuff"]]
         }
 
         for param_string,results in tests.items():
             input_param = InputParameters(param_string)
-            op = Operator("cmd", "subcmd", "", {"required": results[1]}, [])
+            op = Operator("cmd", "subcmd", "", {"required": results[0], "optional": results[1]}, [])
             validated = op.parameters.validate(input_param)
-            # assert(validated.status_code == results[2])
-            # assert(param.validated_parameters == results[0])
+            assert(isinstance(validated, ValidatedParameters))
+            assert(list(map(lambda v: v.value, validated.validated_parameters)) == results[2])
+            assert(list(map(lambda v: v.value, validated.optional_parameters)) == results[3])
+            assert(list(map(lambda v: v.value, validated.parsed_parameters)) == results[4])
+
 
