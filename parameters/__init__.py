@@ -23,18 +23,18 @@ class WorkflowParameter:
 
 class WorkflowParameters:
     def __init__(self, parameter_path: Optional[str] = None, parameter_dict: Optional[dict] = None):
-        parameters = []
+        parameters: List[WorkflowParameter] = []
         if parameter_path:
             parameters, invalid = self.parse_path(parameter_path or "")
         elif parameter_dict:
-            parameters, invalid = self.parse_dict(parameter_dict or {})
+            parameters, invalid = self.parse_param_dict(parameter_dict or {})
         else:
             invalid = [InvalidParameter("No parameter path or json specified")]
 
         self.parameters: List[WorkflowParameter] = parameters
         self.invalid: List[InvalidParameter] = invalid
 
-    def parse_dict(self, param_dict: str) -> Tuple[List[WorkflowParameter], List[InvalidParameter]]:
+    def parse_param_dict(self, param_dict: dict) -> Tuple[List[WorkflowParameter], List[InvalidParameter]]:
         valid: List[WorkflowParameter] = []
         invalid: List[InvalidParameter] = []
         if isinstance(param_dict, dict):
@@ -58,8 +58,8 @@ class WorkflowParameters:
         parsed = parse_yaml_invalid(param_path)
         valid: List[WorkflowParameter] = []
         invalid: List[InvalidParameter] = []
-        if isinstance(valid, dict):
-            valid, invalid = parse_dict(valid)
+        if isinstance(parsed, dict):
+            valid, invalid = self.parse_param_dict(parsed)
         else:
             invalid.append(InvalidParameter(f"Invalid parameter yaml: {parsed}"))
 

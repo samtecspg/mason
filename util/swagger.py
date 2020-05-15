@@ -22,5 +22,5 @@ def update_yaml_file(base_swagger: str, directories: List[str]):
                             paths.update(parsed_paths)
 
     parsed_swagger['paths'] = paths
-    with open(swagger_file, 'w+') as file:
-        yaml.dump(parsed_swagger, file)
+    with open(swagger_file, 'w+') as file: #type: ignore
+        yaml.dump(parsed_swagger, file) #type: ignore
