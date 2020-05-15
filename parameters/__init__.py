@@ -1,6 +1,7 @@
 from typing import Optional, List, Tuple, Dict, Any
 
 from util.environment import MasonEnvironment
+from util.logger import logger
 from util.session import get_session_config
 
 from configurations.configurations import get_current_config
