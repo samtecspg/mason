@@ -18,14 +18,15 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
     config: Optional[ValidConfig] = configuration or get_current_config(env)
 
     if config:
-        parameters = kwargs["parameters"]
-        log_level = kwargs["log_level"]
-        deploy = kwargs["deploy"]
-        run_now = kwargs["run_now"]
-        schedule_name = kwargs["schedule_name"]
+        parameters: dict = kwargs["parameters"]
+        log_level: str = kwargs.get("log_level", "info")
+        deploy: bool = kwargs.get("deploy", False)
+        run_now: bool = kwargs.get("run_now", False)
+        schedule_name: Optional[str] = kwargs.get("schedule_name")
+
+        logger.set_level(log_level)
 
         params = WorkflowParameters(parameter_dict=parameters)
-        logger.set_level(log_level)
 
         response = Workflows.run(env, config, params, namespace, command, deploy, run_now, schedule_name)
     else:

@@ -5,7 +5,6 @@ from engines.metastore import MetastoreEngine
 from engines.scheduler import SchedulerEngine
 from engines.storage import StorageEngine
 
-
 class ValidConfig:
 
     def __init__(self, id: str, config: dict, metastore_engine: MetastoreEngine, scheduler_engine: SchedulerEngine, storage_engine: StorageEngine, execution_engine: ExecutionEngine, source_path: Optional[str] = None):

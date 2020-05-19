@@ -1,5 +1,10 @@
+import pytest
+
+from clients.aws.s3 import S3Client
+from clients.dask import DaskClient
 from clients.spark.runner.kubernetes_operator import merge_config
 from configurations.valid_config import ValidConfig
+from engines.execution.models.jobs.infer_job import InferJob
 from engines.metastore.models.credentials import MetastoreCredentials
 from configurations.config import Config
 from test.support.testing_base import clean_uuid, clean_string
@@ -85,7 +90,6 @@ class TestSpark:
         assert clean_string(clean_uuid(dumped)) == clean_string(clean_uuid(expects))
 
 
-
 class TestS3:
 
     def test_parse_path(self):
@@ -98,3 +102,24 @@ class TestS3:
             assert(parsed[0] == "test_bucket")
             assert(parsed[1] == "test_path/test_file.csv")
 
+
+@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+
+class TestDask:
+
+    def test_e2e(self):
+        dask_config = {}
+        s3_config = {}
+        database_name = "test_database"
+        path_name = "test_path"
+
+        dask_client = DaskClient(dask_config)
+
+        metastore_client = S3Client(s3_config)
+        storage_client = S3Client(s3_config)
+
+        database = metastore_client.get_database(database_name)
+        path = storage_client.path(path_name)
+
+        job = InferJob(database, path)
+        dask_client.run_job()

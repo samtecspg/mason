@@ -22,6 +22,9 @@ class ValidOperator:
         self.supported_configurations = supported_configurations
         self.source_path = source_path
 
+    def type_name(self):
+        str.capitalize(self.namespace) + str.capitalize(self.command)
+
     def run(self, env: MasonEnvironment, response: Response) -> Response:
         try:
             mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
@@ -31,12 +34,14 @@ class ValidOperator:
 
         return response
 
-    def job(self, env: MasonEnvironment) -> Union[Job, InvalidJob]:
+    def job(self, env: MasonEnvironment, response: Response) -> Job:
         try:
             mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
-            return mod.job(env, self.config, self.parameters)  # type: ignore
+            job = mod.job(env, self.config, self.parameters, response)  # type: ignore
         except ModuleNotFoundError as e:
-            return InvalidJob(f"Module Not Found: {e}")
+            response.add_error(f"Module Not Found: {e}")
+
+        return job
 
     def to_dict(self):
         return {

@@ -16,7 +16,7 @@ def print_result(result):
     print(result.exception)
 
 
-@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestPlayground:
 
     @pytest.fixture(autouse=True)
@@ -180,6 +180,19 @@ class TestPlayground:
         print_result(result5)
         result6 = runner.invoke(workflow, ["table", "infer"])
         print_result(result6)
+
+    def test_config_3_unmocked(self):
+        runner = CliRunner()
+        result1 = runner.invoke(config, [from_root('/examples/configs/'), '-l', 'info'])
+        print_result(result1)
+        result2 = runner.invoke(register, [from_root('/examples/operators/')])
+        print_result(result2)
+        result3 = runner.invoke(workflow, ["register", from_root("/examples/workflows/")])
+        print_result(result3)
+        result4 = runner.invoke(config)
+        print_result(result4)
+
+
 
 
 

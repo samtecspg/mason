@@ -1,3 +1,5 @@
+from typing import List, Dict
+
 from definitions import from_root
 from parameters import InputParameters, WorkflowParameters, ValidatedParameters
 from operators.operator import Operator
@@ -59,12 +61,11 @@ class TestInit:
 class TestValidation:
     def test_parameter_validation(self):
 
-        tests = {
+        tests: Dict[str, List[List[str]]] = {
             "param:value": [["param"], [], ["value"], [], ["value"]],
             "param:value,other_param:stuff": [["other_param"], ["param"], ["stuff"], ["value"], ["value", "stuff"]]
         }
-
-        for param_string,results in tests.items():
+        for param_string, results in tests.items():
             input_param = InputParameters(param_string)
             op = Operator("cmd", "subcmd", "", {"required": results[0], "optional": results[1]}, [])
             validated = op.parameters.validate(input_param)

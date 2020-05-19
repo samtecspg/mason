@@ -31,11 +31,7 @@ class DagStep:
                 if operator:
                     valid = operator.validate(config, operator_params)
                     if isinstance(valid, ValidOperator):
-                        job = valid.job(env)
-                        if isinstance(job, Job):
-                            return ValidDagStep(valid, job)
-                        else:
-                            return InvalidDagStep(f"Invalid Dag step.  Invalid job {job.reason}")
+                        return ValidDagStep(valid)
                     else:
                         return InvalidDagStep(f"Invalid Dag Step: Invalid Operator Definition: {valid.reason}")
                 else:
@@ -47,9 +43,8 @@ class DagStep:
 
 class ValidDagStep:
 
-    def __init__(self, operator: ValidOperator, job: Job):
+    def __init__(self, operator: ValidOperator):
         self.operator = operator
-        self.job = job
 
 class InvalidDagStep:
 

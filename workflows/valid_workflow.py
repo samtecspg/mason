@@ -26,7 +26,7 @@ class ValidWorkflow:
         return response
 
     def dry_run(self, env: MasonEnvironment, response: Response) -> Response:
-        response.add_info(f"Workflow DAG Definition: {self.dag.to_dict()}")
+        response.add_info(f"Valid Workflow DAG Definition: {self.dag.to_dict()}")
         return response
 
     def deploy(self, env: MasonEnvironment, response: Response, run_now: bool, schedule_name: Optional[str] = None) -> Response:

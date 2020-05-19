@@ -3,12 +3,15 @@ from typing import Tuple, Optional
 from botocore.exceptions import ClientError
 
 from engines.execution.models.jobs import Job
+from engines.execution.models.jobs.infer_job import InferJob
+from engines.execution.models.jobs.query_job import QueryJob
 from util.uuid import uuid4
 
 import boto3
 from clients.response import Response
 
-from engines.metastore.models.credentials import MetastoreCredentials
+import awswrangler as wr
+import pandas as pd
 
 class AthenaClient:
 
@@ -78,8 +81,9 @@ class AthenaClient:
             job = Job(job_id, errors=[message])
         return response, job
 
-    def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response) -> Tuple[Response, Optional[Job]]:
-        response.add_info(f"Running job {job_name}")
+    def query(self, job: QueryJob, response: Response) -> Tuple[Response, Job]:
+        params = job.parameters
+        response.add_info(f"Running job {job.type}")
         try:
             request_token = str(uuid4())
             athena_response = self.client().start_query_execution(
@@ -97,10 +101,10 @@ class AthenaClient:
         response.add_response(athena_response)
         error, status, message = self.parse_response(athena_response)
 
-        job = None
         if error == "AccessDeniedException":
             response.set_status(403)
-            response.add_error("Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena")
+            response.add_error(
+                "Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena")
         elif not ((error or "") == ""):
             response.set_status(status)
             response.add_error(message)
@@ -108,8 +112,18 @@ class AthenaClient:
             response.set_status(status)
             id = athena_response.get("QueryExecutionId")
             if id:
-                job = Job(id)
+                job.id = id
                 response = job.running(response)
+        return response, job
 
+    def infer(self, job: Job) -> Tuple[Response, Job]:
+        
+
+
+    def run_job(self, job: Job, response: Response) -> Tuple[Response, Optional[Job]]:
+        if isinstance(job, QueryJob):
+            response, job = self.query(job, response)
+        else:
+            response.add_error(f"Job type {job.type} not supported for Athena client")
         return response, job
 

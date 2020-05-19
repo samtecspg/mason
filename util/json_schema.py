@@ -77,11 +77,11 @@ def validate_schema(d: Optional[dict], schema_file: str) -> Union[ValidSchemaDic
             validate(di, schema)
             return ValidSchemaDict(di, schema)
         except SchemaError as e:
-            return InvalidSchemaDict(di, schema, f"\nSchema error {schema_file}: {e.message}")
+            return InvalidSchemaDict(di, schema, f"Schema error {schema_file}: {e.message}")
         except ValidationError as e:
-            return InvalidSchemaDict(di, schema, f"\nSchema error {schema_file}: {e.message}")
+            return InvalidSchemaDict(di, schema, f"Schema error {schema_file}: {e.message}")
         except FileNotFoundError as e:
-            return InvalidSchemaDict(di, schema, f"\nSchema not found: {e.filename}")
+            return InvalidSchemaDict(di, schema, f"Schema not found: {e.filename}")
     else:
         return ValidSchemaDict(di, {})
 

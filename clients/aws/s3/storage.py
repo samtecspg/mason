@@ -1,5 +1,5 @@
 from clients.engines.storage import StorageClient
-from clients.s3 import S3Client
+from clients.aws.s3 import S3Client
 
 class S3StorageClient(StorageClient):
 

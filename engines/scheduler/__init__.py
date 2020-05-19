@@ -1,6 +1,6 @@
 from clients.engines.invalid_client import InvalidClient
 from clients.engines.valid_client import ValidClient
-from clients.glue.scheduler import GlueSchedulerClient
+from clients.aws.glue.scheduler import GlueSchedulerClient
 from engines.engine import Engine
 
 class SchedulerEngine(Engine):

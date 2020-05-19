@@ -42,7 +42,7 @@ Legend
 - [x] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc C: 03/20/2020
 - [x] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
 - [x] Allow for multiple configurations C: 04/08/2020
-- [ ] Clean up multiple configurations -> add id, don't use enumerate
+- [x] Clean up multiple configurations -> add id, don't use enumerate. C:05/10/2020
 - [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
 - [ ] Establish session for current configuration
 - [ ] Add redis or sqllite for session 
@@ -60,13 +60,18 @@ Legend
 
 
 ## Execution Engine
-- [ ]  Look into using calcite or coral to extend spark operators to presto and hive
-- [ ]  Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
+- [ ] Look into using calcite or coral to extend spark operators to presto and hive
+- [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
+
+## Workflows
+- [ ] Infer Workflow (1-step)
+    - [x] Glue Support C: 05/10/2020
+    - [ ] :large_blue_circle: Athena Support with local scheduler
+    - [ ] :large_blue_circle: Athena Support with airflow scheduler
 
 ## Operators
-- [ ] Infer operator
+- [x] Infer operator
     - [x] Glue Support: C: long time ago
-    - [ ] :large_blue_diamond: Athena Support
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
@@ -83,7 +88,7 @@ Legend
     - [ ] List
 - [ ] Scheduler operators:
     - [x] Delete C: 04/29/2020
-    - [ ] Create
+    - [x] Create
     - [ ] List
 - [ ] :arrow_down: Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
 
@@ -106,8 +111,8 @@ Legend
    - [ ] :arrow_down: Msgpack pack schema
 
 ### Execution Engine
-#### Python
-- [ ] :arrow_up: Basic setup
+#### Local
+- [ ] :arrow_up: Basic setup :large_blue_circle:
 #### IPython/Jupyter
 - [ ] :arrow_up: Basic setup
 - [ ] :arrow_up: Papermill integration 
@@ -129,6 +134,7 @@ Legend
 ### Scheduler
 ### Glue
 - [x] Basic set up
+- [ ] Workflow Implementation
 #### Airflow
 - [ ] Basic setup 
 
