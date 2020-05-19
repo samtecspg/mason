@@ -5,6 +5,7 @@ from abc import abstractmethod
 from engines.metastore.models.credentials import MetastoreCredentials
 from typing import Tuple, List
 
+from engines.metastore.models.database import Database
 from engines.metastore.models.schemas import MetastoreSchema, emptySchema
 
 
@@ -12,6 +13,11 @@ class MetastoreClient(Client):
 
     ###  IMPORTANT:   This ensures that implemented specific metastore client implementations conform to the needed template when 'mypy .' is run
     ###  which will return Cannot instantiate abstract class 'GlueMetastoreClient' with abstract attribute 'get_table' (for example)
+
+    @abstractmethod
+    def get_database(self, database_name: str) -> Database:
+        raise NotImplementedError("Client not implemented")
+        return response
 
     @abstractmethod
     def list_tables(self, database_name: str, response: Response) -> Response:
@@ -29,9 +35,9 @@ class MetastoreClient(Client):
         return ("", "")
 
     @abstractmethod
-    def credentials(self) -> MetastoreCredentials:
+    def credentials(self, response: Response) -> Tuple[MetastoreCredentials, Response]:
         raise NotImplementedError("Client not implemented")
-        return MetastoreCredentials()
+        return MetastoreCredentials(), response
 
     @abstractmethod
     def full_path(self, path: str) -> str:

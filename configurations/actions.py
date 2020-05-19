@@ -1,13 +1,10 @@
 from util.environment import MasonEnvironment
-from typing import Optional, List, Dict
+from typing import Optional
 from clients.response import Response
 from util.logger import logger
-from os import path, walk
-from configurations.configurations import set_current_config, tabulate_configs, get_all, ValidConfig, \
-    set_current_config_id
-from util.yaml import parse_yaml, parse_yaml_invalid
+from os import path
+from configurations.configurations import set_current_config, tabulate_configs, get_all, set_current_config_id
 import shutil
-from configurations.config import Config
 
 def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=None, set_current: Optional[str]=None,  log_level: Optional[str]=None) -> Response:
     response = Response()
@@ -27,6 +24,9 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
                 shutil.copyfile(sp, env.config_home + path.basename(sp))
             else:
                 response.add_error("Config source path not found.   Run get_all with config file specified")
+
+        for inv in invalid:
+            response.add_error(f"Invalid Configuration: {inv.reason}")
 
     elif set_current:
         set_current_config_id(env, str(set_current), response)

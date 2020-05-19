@@ -1,5 +1,10 @@
 import shutil
+from importlib import import_module
 from os import path
+
+from configurations.configurations import get_current_config
+
+from engines.execution.models.jobs import Job, InvalidJob
 
 from configurations.valid_config import ValidConfig
 from configurations.invalid_config import InvalidConfig
@@ -9,6 +14,7 @@ from operators.invalid_operator import InvalidOperator
 from operators.supported_engines import from_array, SupportedEngineSet
 from operators.valid_operator import ValidOperator
 from parameters import Parameters, InputParameters, ValidatedParameters
+from util.environment import MasonEnvironment
 from util.logger import logger
 
 
@@ -53,7 +59,7 @@ class Operator:
             dir = path.dirname(self.source_path)
             tree_path = ("/").join([operator_home.rstrip("/"), self.namespace, self.command + "/"])
             if not path.exists(tree_path):
-                logger.info(f"Valid operator definition.  Rgistering {dir} to {tree_path}")
+                logger.info(f"Valid operator definition.  Registering {dir} to {tree_path}")
                 shutil.copytree(dir, tree_path)
             else:
                 logger.error(f"Operator definition already exists {self.namespace}:{self.command}")

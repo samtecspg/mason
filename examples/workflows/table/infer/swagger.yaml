@@ -1,5 +1,5 @@
 paths:
-  /table/infer:
+  /workflow/table/infer:
     post:
       operationId: "registered_workflows.table.infer.api"
       tags:

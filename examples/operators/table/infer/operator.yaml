@@ -12,4 +12,4 @@ supported_configurations:
     storage: "s3"
   - metastore: "athena"
     storage: "s3"
-    execution: "spark"
+    execution: "dask"

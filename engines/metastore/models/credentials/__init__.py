@@ -1,10 +1,11 @@
 
 class MetastoreCredentials:
     def __init__(self):
-        self.type = ""
-        self.access_key = None
-        self.secret_key = None
+        pass
 
-    def empty(self):
-        ((self.access_key or "") == "") or ((self.secret_key or "") == "")
+    def to_dict(self): return {}
+
+class InvalidCredentials:
+    def __init__(self, reason: str):
+        self.reason = reason
 

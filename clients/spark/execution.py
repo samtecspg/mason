@@ -1,7 +1,8 @@
+from engines.execution.models.jobs import Job
+
 from clients.engines.execution import ExecutionClient
 from clients.spark import SparkClient
 from clients.response import Response
-from engines.metastore.models.credentials import MetastoreCredentials
 
 class SparkExecutionClient(ExecutionClient):
 
@@ -9,8 +10,8 @@ class SparkExecutionClient(ExecutionClient):
         self.config = config
         self.client = SparkClient(config)
 
-    def run_job(self, job_type: str, metastore_credentials: MetastoreCredentials, parameters: dict, response: Response) -> Response:
-        response = self.client.run_job(job_type, metastore_credentials, parameters, response)
+    def run_job(self, job: Job, response: Response) -> Response:
+        response = self.client.run_job(job, response)
         return response
 
     def get_job(self, job_id: str, response: Response) -> Response:

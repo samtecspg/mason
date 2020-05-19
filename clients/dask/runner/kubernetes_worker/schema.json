@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "SparkConfiguration",
+  "properties": {
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "runner": {
+          "type": "object",
+          "properties": {
+            "type": { "type":  "string", "enum": ["kubernetes-operator"] }
+          },
+          "required": ["type"]
+        }
+      },
+      "required": [ "runner" ]
+    }
+  }
+}
+

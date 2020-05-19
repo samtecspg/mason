@@ -74,7 +74,7 @@ def from_config(config: dict, source_path: Optional[str] = None):
     else:
         None
 
-def list_operators(operator_file: str) -> Tuple[List[Operator], List[InvalidOperator]]:
+def list_operators(operator_file: str, env: Optional[MasonEnvironment] = None) -> Tuple[List[Operator], List[InvalidOperator]]:
 
     valid, errors = parse_schemas(operator_file, "operator", Operator)
     invalid = list(map(lambda e: InvalidOperator(e), errors))

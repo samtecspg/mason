@@ -1,7 +1,9 @@
 from clients.engines.invalid_client import InvalidClient
 from clients.engines.valid_client import ValidClient
 from engines.engine import Engine
-from clients.s3.storage import S3StorageClient
+from clients.aws.s3.storage import S3StorageClient
+from engines.storage.models.path import Path
+
 
 class StorageEngine(Engine):
 
@@ -18,4 +20,8 @@ class StorageEngine(Engine):
                 return InvalidClient(f"Client type not supported {client.client_name}")
         else:
             return client
+
+
+
+
 

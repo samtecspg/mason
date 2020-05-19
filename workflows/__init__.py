@@ -40,7 +40,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParamete
         if wf:
             validated = wf.validate(env, config, parameters)
             if isinstance(validated, ValidWorkflow):
-                response = validated.run(env, response, deploy, run, schedule_name)
+                response = validated.run(env, response, not deploy, run, schedule_name)
             else:
                 response.add_error(f"Invalid Workflow: {validated.reason}")
         else:

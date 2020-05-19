@@ -1,19 +1,23 @@
+from clients.aws import AWSClient
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
-from clients.s3 import S3Client
-from engines.metastore.models.credentials.aws import AWSCredentials
+from clients.aws.s3 import S3Client
 from urllib.parse import urlparse
 from typing import Tuple, List
 
+from engines.metastore.models.database import Database
 from engines.metastore.models.schemas import MetastoreSchema
 
-class S3MetastoreClient(MetastoreClient):
+class S3MetastoreClient(MetastoreClient, AWSClient):
 
     def __init__(self, config: dict):
         self.region = config.get("aws_region")
         self.access_key = config.get("access_key")
         self.secret_key = config.get("secret_key")
         self.client = S3Client(self.get_config())
+
+    def get_database(self, database_name: str) -> Database:
+        return Database()
 
     def list_tables(self, database_name: str, response: Response) -> Response:
         response = self.client.list_tables(database_name, response)
@@ -25,9 +29,6 @@ class S3MetastoreClient(MetastoreClient):
     def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
         raise NotImplementedError("Client not implemented")
         return ("", "")
-
-    def credentials(self):
-        return AWSCredentials(self.access_key, self.secret_key)
 
     def full_path(self, path: str) -> str:
         return "s3a://" + path

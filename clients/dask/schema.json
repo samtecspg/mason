@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "DaskConfiguration",
+  "properties": {
+    "runner": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "required": [ "runner" ]
+}
+

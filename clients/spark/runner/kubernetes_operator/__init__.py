@@ -1,3 +1,4 @@
+from engines.metastore.models.credentials.aws import AWSCredentials
 
 from engines.metastore.models.credentials import MetastoreCredentials
 from clients.spark.runner import SparkRunner
@@ -19,14 +20,13 @@ def prep_parameters(params: dict) -> List[str]:
         param_list.append(v)
     return param_list
 
-def merge_config(config: SparkConfig, job_name: str, metastore_credentials: MetastoreCredentials, parameters: dict):
+def merge_config(config: SparkConfig, job: Job):
     base_config_file = from_root("/clients/spark/runner/kubernetes_operator/base_config.yaml")
 
-    parameters["job"] = job_name
+    parameters = job.parameters
+    job_name = job.type
 
-    if metastore_credentials.type == "aws":
-        parameters["access_key"] = metastore_credentials.access_key
-        parameters["secret_key"] = metastore_credentials.secret_key
+    parameters["job"] = job_name
 
     param_list = prep_parameters(parameters)
     merge_document = {
@@ -59,11 +59,11 @@ def merge_config(config: SparkConfig, job_name: str, metastore_credentials: Meta
 
 class KubernetesOperator(SparkRunner):
 
-    def run(self, config: SparkConfig, job_name: str, metastore_credentials: MetastoreCredentials, params: dict) -> Job:
+    def run(self, config: SparkConfig, job: Job) -> Job:
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
 
-        merged_config = merge_config(config, job_name, metastore_credentials, params)
+        merged_config = merge_config(config, job)
         job_id = merged_config["metadata"]["name"]
         conf = dict(merged_config)
 

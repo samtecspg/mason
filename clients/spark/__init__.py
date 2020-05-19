@@ -1,8 +1,9 @@
+from engines.execution.models.jobs import Job
+
 from clients.response import Response
 from clients.spark.runner.kubernetes_operator import KubernetesOperator
 from clients.spark.config import SparkConfig
 from clients.spark.runner import EmptySparkRunner
-from engines.metastore.models.credentials import MetastoreCredentials
 
 class SparkClient:
     def __init__(self, spark_config: dict):
@@ -12,8 +13,8 @@ class SparkClient:
     def client(self):
         return self.get_runner(self.runner_type)
 
-    def run_job(self, job_name: str, metastore_credentials: MetastoreCredentials, params: dict, response: Response):
-        job = self.client().run(self.config, job_name, metastore_credentials, params)
+    def run_job(self, job: Job, response: Response):
+        job = self.client().run(self.config, job)
         response = job.running(response)
         return response
 

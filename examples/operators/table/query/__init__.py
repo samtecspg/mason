@@ -1,4 +1,5 @@
 from configurations.valid_config import ValidConfig
+from engines.execution.models.jobs.query_job import QueryJob
 from util.environment import MasonEnvironment
 from parameters import ValidatedParameters
 from clients.response import Response
@@ -15,14 +16,12 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
     # query = metastore_client.sanitize_query()
     query = query_string
 
-    metastore_credentials = metastore_client.credentials()
+    metastore_credentials, response = metastore_client.credentials(response)
 
-    if metastore_credentials.empty():
-        response.add_error("Metastore credentials empty")
-    else:
+    if not response.errored():
         response.add_info(f"Running Query \"{query}\"")
-        p = { 'query_string': query_string, 'database_name': database_name}
-        response = config.execution.client.run_job("query", metastore_credentials, p, response)
+        job = QueryJob(database_name, query_string, metastore_credentials.to_dict())
+        response = config.execution.client.run_job(job, response)
 
     return response
 

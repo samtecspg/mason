@@ -2,6 +2,8 @@
 from clients.response import Response
 from botocore.errorfactory import ClientError
 from typing import Optional, List, Tuple
+
+from engines.metastore.models.database import Database
 from util.logger import logger
 from engines.metastore.models import schemas
 from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
@@ -16,6 +18,10 @@ class S3Client:
 
     def client(self) -> S3FileSystem:
         return s3fs.S3FileSystem(client_kwargs={'region_name': self.region})
+
+    def get_database(self) -> Database:
+        return Database()
+
 
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
@@ -87,6 +93,9 @@ class S3Client:
 
     def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
         return self.get_results(response, database_name, table_name, options)
+
+    def get_path(self, path: str) -> Path:
+
 
     def path(self, path: str):
         return "s3://" + path

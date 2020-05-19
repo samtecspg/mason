@@ -1,12 +1,15 @@
+from abc import abstractmethod
 from typing import List, Optional, Dict
 
 from clients.response import Response
 
 class Job:
 
-    def __init__(self, id: str, logs: Optional[List[str]]=None, errors: Optional[List[str]]=None, results: Optional[List[Dict]]=None):
-        self.id = id
+    def __init__(self, type: str, parameters: dict, id: Optional[str]=None, logs: Optional[List[str]]=None, errors: Optional[List[str]]=None, results: Optional[List[Dict]]=None):
+        self.type = type
+        self.parameters = parameters
         self.logs = logs
+        self.id = id
         self.errors = errors
         self.results = results
 
@@ -42,3 +45,6 @@ class InvalidJob:
 
     def __init__(self, reason: str):
         self.reason = reason
+
+    def run(self, response: Response):
+        response.add_error(f"Invalid Job. Reason: {response}")
