@@ -2,7 +2,7 @@
 from clients import Client
 from abc import abstractmethod
 
-from engines.storage import Path
+from engines.storage.models.path import Path
 
 
 class StorageClient(Client):

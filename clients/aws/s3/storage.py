@@ -12,6 +12,9 @@ class S3StorageClient(StorageClient):
     def path(self, path: str):
         return self.client.path(path)
 
+    def get_path(self, path: str):
+        return self.client.get_path(path)
+
     def get_config(self):
         return {
             'region': self.region

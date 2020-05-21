@@ -3,7 +3,7 @@ from typing import Sequence, Tuple, Optional, Union, List
 from tabulator import FormatError
 
 from clients.response import Response
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement, emptySchema
+from engines.metastore.models.schemas.schema import Schema, SchemaElement, emptySchema
 
 from tableschema import Table
 
@@ -23,7 +23,7 @@ class TextElement(SchemaElement):
     def __hash__(self):
         return 0
 
-class TextSchema(MetastoreSchema):
+class TextSchema(Schema):
 
     def __init__(self, columns: Sequence[TextElement], type: str):
         self.columns = columns

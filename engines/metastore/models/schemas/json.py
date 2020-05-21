@@ -3,7 +3,7 @@ from typing import List, Tuple
 from fsspec.spec import AbstractBufferedFile
 
 from clients.response import Response
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, emptySchema
+from engines.metastore.models.schemas.schema import Schema, emptySchema
 from genson import SchemaBuilder
 import json
 import fsspec
@@ -32,7 +32,7 @@ def from_file(file: str, response: Response):
             return response, emptySchema()
 
 
-class JsonSchema(MetastoreSchema):
+class JsonSchema(Schema):
 
     def __init__(self, schema: dict, type: str = "json"):
         self.schema = schema
@@ -40,7 +40,7 @@ class JsonSchema(MetastoreSchema):
         self.columns =  [] # TODO:  Treating json data as non tabular for now.   Surface main columns and nested attributes
 
 
-def merge_schemas(schemas: List[JsonSchema], response: Response) -> Tuple[Response, MetastoreSchema]:
+def merge_schemas(schemas: List[JsonSchema], response: Response) -> Tuple[Response, Schema]:
     builder = SchemaBuilder()
     for schema in schemas:
         builder.add_schema(schema.schema)

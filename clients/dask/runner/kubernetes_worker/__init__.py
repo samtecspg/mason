@@ -1,76 +1,47 @@
 from typing import Union
 
-from clients.dask import DaskConfig
-from clients.dask.runner import DaskRunner
-from definitions import from_root
+from util.uuid import uuid4
 
-from engines.execution.models.jobs import Job, InvalidJob
+from clients.dask.runner import DaskRunner
+
+from engines.execution.models.jobs import Job, InvalidJob, ExecutedJob
 from engines.execution.models.jobs.infer_job import InferJob
 
-from dask_kubernetes import KubeCluster
-
 from dask.distributed import Client
-import dask.array as da
-
-def merge_config(config: DaskConfig, job: Job):
-    base_config_file = from_root("/clients/dask/runner/kubernetes_operator/base_config.yaml")
-
-    merge_document = {
-        'metadata' : {
-            'name': config.job_name(job_name)
-        },
-        'spec': {
-            'arguments': param_list,
-            'image': config.docker_image,
-            'mainClass': config.main_class,
-            'mainApplicationFile': config.application_file,
-            'sparkVersion': config.spark_version,
-            'driver': {
-                'cores': config.driver_cores,
-                'memory': str(config.driver_memory_mbs) + 'm',
-                'labels': {'version': config.spark_version}
-            },
-            'executor' : {
-                'cores': config.executor_cores,
-                'instances': config.executors,
-                'memory': str(config.executor_memory_mb) + 'm',
-                'labels': {'version': config.spark_version}
-            }
-        }
-    }
-
-    arguments = yaml.dump(merge_document)
-    conf = hload(base_config_file, arguments, method=hiyapyco.METHOD_MERGE, usedefaultyamlloader=True)
-    return conf
-
+# import dask.array as da
 
 class KubernetesWorker(DaskRunner):
 
-    def run(self, config: DaskConfig, job: Job) -> Union[Job, InvalidJob]:
+    def __init__(self, config: dict):
+        self.scheduler = config.get("scheduler")
 
-        if isinstance(job, InferJob):
-            self.infer(config, job)
+    def run(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
+        if self.scheduler:
+            # Warning: side-effects, client is used by dask implicitly
+            client = Client(self.scheduler, asynchronous=True)
+
+            if isinstance(job, InferJob):
+                return self.infer(job)
+            else:
+                return InvalidJob("Job type not supported for Dask")
         else:
-            InvalidJob("Job type not supported for Dask")
-
-        return job
+            return InvalidJob("Dask Scheduler not defined")
 
 
-    def infer(self, config: DaskConfig, job: InferJob):
-        job.database
-        job.path
+    def infer(self, job: InferJob) -> ExecutedJob:
+        # array = da.ones((1000, 1000, 1000))
+        # result = array.mean().compute()
+        db = job.database
+        path = job.path
 
-        cluster = KubeCluster.from_yaml('worker-spec.yml')
-        cluster.scale(10)  # specify number of workers explicitly
+        logs = []
+        results = []
 
-        cluster.adapt(minimum=1, maximum=100)  # or dynamically scale based on current workload
+        logs.append(f"Infering schema for path {path.path_str} and storing at database {db.name}")
 
-        # Connect Dask to the cluster
-        client = Client(cluster)
+        id = str(uuid4())
+        return ExecutedJob(job.type + "_" + id, results=results, logs=logs)
 
-        # Create a large array and calculate the mean
-        array = da.ones((1000, 1000, 1000))
-        print(array.mean().compute())  # Should print 1.0
 
 
 

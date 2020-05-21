@@ -1,6 +1,6 @@
 
 from typing import Sequence, Set
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
 
 class SchemaElement:
@@ -14,7 +14,7 @@ class SchemaElement:
             "Type": self.type
         }
 
-class MetastoreSchema(object):
+class Schema(object):
 
     __metaclass__ = ABCMeta
 
@@ -29,7 +29,7 @@ class MetastoreSchema(object):
         diff = self.diff(other)
         return (len(diff) == 0)
 
-    def diff(self, other: 'MetastoreSchema') -> Set[SchemaElement]:
+    def diff(self, other: 'Schema') -> Set[SchemaElement]:
         if not self.type == other.type:
             return set(self.columns)
         else:
@@ -42,7 +42,7 @@ class MetastoreSchema(object):
         }
 
 
-class EmptyMetastoreSchema(MetastoreSchema):
+class EmptySchema(Schema):
 
     def __init__(self):
         self.type = ""
@@ -51,5 +51,12 @@ class EmptyMetastoreSchema(MetastoreSchema):
     def to_dict(self):
         return {}
 
+
+class InvalidSchemaElement:
+
+    def __init__(self, reason: str):
+        self.reason = reason
+
+
 def emptySchema():
-    return EmptyMetastoreSchema()
+    return EmptySchema()

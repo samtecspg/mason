@@ -2,11 +2,11 @@ from typing import Optional, Union
 
 from configurations.valid_config import ValidConfig
 from configurations.invalid_config import InvalidConfig
-from engines.execution import ExecutionEngine
+from engines.execution.execution_engine import ExecutionEngine
 from clients.engines.invalid_client import InvalidClient
-from engines.metastore import MetastoreEngine
-from engines.scheduler import SchedulerEngine
-from engines.storage import StorageEngine
+from engines.metastore.metastore_engine import MetastoreEngine
+from engines.scheduler.scheduler_engine import SchedulerEngine
+from engines.storage.storage_engine import StorageEngine
 from util.environment import MasonEnvironment
 from util.json_schema import validate_schema, ValidSchemaDict
 from util.logger import logger

@@ -1,43 +1,32 @@
-from abc import abstractmethod
-from typing import List, Optional, Dict
+from typing import List, Dict
 
 from clients.response import Response
 
 class Job:
 
-    def __init__(self, type: str, parameters: dict, id: Optional[str]=None, logs: Optional[List[str]]=None, errors: Optional[List[str]]=None, results: Optional[List[Dict]]=None):
+    def __init__(self, type: str, parameters: dict):
         self.type = type
         self.parameters = parameters
-        self.logs = logs
+
+
+class ExecutedJob:
+    def __init__(self, id: str, logs: List[str] = [], errors: List[str]=[], results: List[str]=[]):
         self.id = id
+        self.logs = logs
         self.errors = errors
         self.results = results
 
-    def running(self, response: Response) -> Response:
-        response.add_info(f"Running job id={self.id}")
-        self.add_logs(response)
-        return response
+    def to_response(self, response: Response) -> Response:
 
-    def add_data(self, response: Response) -> Response:
-        response = self.add_errors(response)
-        response = self.add_logs(response)
-        response = self.add_results(response)
-        return response
+        for e in self.errors:
+            response.add_error(e)
 
-    def add_errors(self, response: Response) -> Response:
-        if self.errors:
-            for e in self.errors:
-                response.add_error(e)
-        return response
-
-    def add_logs(self, response: Response) -> Response:
-        if self.logs:
+        if len(self.logs) > 0:
             response.add_data({"Logs": self.logs})
-        return response
 
-    def add_results(self, response: Response) -> Response:
-        if self.results:
+        if len(self.results) > 0:
             response.add_data({"Results": self.results})
+
         return response
 
 

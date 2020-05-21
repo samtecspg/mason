@@ -1,9 +1,9 @@
 from typing import Optional, Dict
 
-from engines.execution import ExecutionEngine
-from engines.metastore import MetastoreEngine
-from engines.scheduler import SchedulerEngine
-from engines.storage import StorageEngine
+from engines.execution.execution_engine import ExecutionEngine
+from engines.metastore.metastore_engine import MetastoreEngine
+from engines.scheduler.scheduler_engine import SchedulerEngine
+from engines.storage.storage_engine import StorageEngine
 
 class ValidConfig:
 
