@@ -1,11 +1,17 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 import boto3
-from botocore.client import BaseClient
+from boto3 import Session
+from botocore.client import BaseClient, logger
 
 from clients.response import Response
 from botocore.errorfactory import ClientError
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
+
+from engines.metastore.models.database import Database, InvalidDatabase
+from engines.metastore.models.schemas.schema import Schema, SchemaElement, InvalidSchemaElement
+from engines.metastore.models.table import InvalidTable, Table
+from util.json_schema import sequence
+
 
 class GlueClient:
 
@@ -17,6 +23,33 @@ class GlueClient:
 
     def client(self) -> BaseClient:
         return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
+
+
+    def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
+        try:
+            result = self.client().get_tables(DatabaseName=database_name)
+        except ClientError as e:
+            result = e.response
+
+        error, status, message = self.parse_response(result)
+
+        if error == "EntityNotFoundException":
+            return InvalidDatabase(f"Database {database_name} not found")
+        elif 200 <= status < 300:
+
+            table_list = result.get("TableList")
+            if table_list:
+                valid, invalid = sequence(list(map(lambda x: self.parse_table(x), table_list)), Table, InvalidTable)
+                if len(invalid) > 0:
+                    invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
+                    return InvalidDatabase(f"Invalid Tables in glue response: {invalid_messages}")
+                else:
+                    return Database(database_name, valid)
+            else:
+                return InvalidDatabase("TableList not found in glue response")
+        else:
+            return InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}")
+
 
     def list_tables(self, database_name: str, response: Response):
         try:
@@ -144,7 +177,7 @@ class GlueClient:
 
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[MetastoreSchema, Response]:
+    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[Schema, Response]:
 
         try:
             result = self.client().get_table(DatabaseName=database_name, Name=table_name)
@@ -203,6 +236,42 @@ class GlueClient:
         message = glue_response.get('Error', {}).get('Message')
         return error, status, message
 
+    def parse_table(self, glue_response: dict) -> Union[Table, InvalidTable]:
+        sd = glue_response.get("StorageDescriptor")
+        if sd:
+            columns = sd.get("Columns")
+            if columns:
+                elements = list(map(lambda c: self.schema_from_dict(c), columns))
+                valid, invalid = sequence(elements, SchemaElement, InvalidSchemaElement)
+                if len(invalid) > 0:
+                    invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
+                    InvalidTable(f"Invalid Schema, invalid elements: {invalid_messages}")
+                elif len(valid) == 0:
+                    InvalidTable(f"Invalid Schema, no valid elements.")
+                else:
+                    name = glue_response.get("Name")
+                    if name:
+                        created_at = glue_response.get("CreateTime")
+                        created_by = glue_response.get("CreatedBy")
+                        schema = Schema("glue", valid)
+                        return Table(name, schema, created_at, created_by)
+                    else:
+                        return InvalidTable("No table Name found in glue response")
+
+            else:
+                return InvalidTable("Columns not found in glue response")
+        else:
+            return InvalidTable("StorageDescriptor not found in glue response")
+
+    def schema_from_dict(self, d: dict) -> Union[SchemaElement, InvalidSchemaElement]:
+        name = d.get("Name")
+        type = d.get("Type")
+        if name and type:
+            return SchemaElement(name, type)
+        else:
+            return InvalidSchemaElement("Name or Type for not found in SchemaElement")
+
+
     def parse_table_data(self, glue_response: dict):
         columns_response = glue_response.get("StorageDescriptor", {}).get("Columns")
         if columns_response:
@@ -210,7 +279,7 @@ class GlueClient:
         else:
             columns = []
 
-        schema = MetastoreSchema(columns, "glue")
+        schema = Schema(columns, "glue")
 
         table_parsed = {
             "Name": glue_response.get("Name"),

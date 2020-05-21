@@ -1,6 +1,15 @@
+from typing import List
+
+from engines.metastore.models.table import Table
 
 
-class Database():
+class Database:
 
-    def __init__(self):
-        pass
+    def __init__(self, name: str, tables: List[Table]):
+        self.name = name
+        self.tables = tables
+
+class InvalidDatabase:
+
+    def __init__(self, reason: str):
+        self.reason = reason

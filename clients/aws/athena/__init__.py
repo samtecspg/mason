@@ -1,17 +1,18 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 from botocore.exceptions import ClientError
+from util.exception import message
 
 from engines.execution.models.jobs import Job
-from engines.execution.models.jobs.infer_job import InferJob
 from engines.execution.models.jobs.query_job import QueryJob
+from engines.metastore.models.database import Database, InvalidDatabase
 from util.uuid import uuid4
 
 import boto3
+from boto3 import Session
 from clients.response import Response
 
 import awswrangler as wr
-import pandas as pd
 
 class AthenaClient:
 
@@ -37,6 +38,7 @@ class AthenaClient:
         status = athena_response.get('ResponseMetadata', {}).get('HTTPStatusCode')
         message = athena_response.get('Error', {}).get('Message')
         return error, status, message
+
 
     def get_job(self, job_id: str, response: Response) -> Tuple[Response, Job]:
         try:
@@ -115,9 +117,6 @@ class AthenaClient:
                 job.id = id
                 response = job.running(response)
         return response, job
-
-    def infer(self, job: Job) -> Tuple[Response, Job]:
-        
 
 
     def run_job(self, job: Job, response: Response) -> Tuple[Response, Optional[Job]]:

@@ -3,26 +3,26 @@ from typing import List, Set, Tuple, Optional, Type, TypeVar, Union
 
 from clients.response import Response
 from engines.metastore.models.schemas.json import merge_schemas
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
+from engines.metastore.models.schemas.schema import Schema
 from functools import reduce
 from util.list import get
 
 
-M = TypeVar('M', bound=MetastoreSchema)
+M = TypeVar('M', bound=Schema)
 
 def diff_schemas(schema1: M, schema2: M) -> M:
     column_diff = schema1.diff(schema2)
     #  NOTE: if two schemas differ in type all columns will differ by default
     #  Therefore choosing to take first schema's types arbitrarily
     # TODO: Look into why type isn't working here
-    gen: M = MetastoreSchema(list(column_diff), schema1.type) #type: ignore
+    gen: M = Schema(list(column_diff), schema1.type) #type: ignore
     return gen
 
 
 def find_conflicts(schemas: List[M], response: Response) -> Tuple[List[M], dict, Response]:
 
     working_schemas = schemas
-    def get_name(s: MetastoreSchema) -> Optional[str]:
+    def get_name(s: Schema) -> Optional[str]:
         stype = s.type
         if not stype == "":
             return stype

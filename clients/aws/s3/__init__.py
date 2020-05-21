@@ -1,12 +1,12 @@
-
 from clients.response import Response
 from botocore.errorfactory import ClientError
 from typing import Optional, List, Tuple
 
 from engines.metastore.models.database import Database
+from engines.storage.models.path import Path
 from util.logger import logger
 from engines.metastore.models import schemas
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
+from engines.metastore.models.schemas.schema import Schema
 from engines.metastore.models.schemas import check_schemas as CheckSchemas
 from util.list import get
 import s3fs
@@ -19,8 +19,8 @@ class S3Client:
     def client(self) -> S3FileSystem:
         return s3fs.S3FileSystem(client_kwargs={'region_name': self.region})
 
-    def get_database(self) -> Database:
-        return Database()
+    def get_database(self, name: str) -> Database:
+        return Database(name)
 
 
     def parse_responses(self, s3_response: dict):
@@ -52,12 +52,12 @@ class S3Client:
     def parse_items(self, s3_response: dict):
         return list(map(lambda x: self.parse_item(x), s3_response.get('Contents', [])))
 
-    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
+    def get_results(self, response: Response, database_name: str, table_name: Optional[str] = None, options: dict = {}) -> Tuple[List[Schema], Response]:
         logger.info(f"Fetching keys in {database_name} {table_name}")
 
         keys = self.client().find(database_name + "/" + (table_name or ""))
 
-        schema_list: List[MetastoreSchema] = []
+        schema_list: List[Schema] = []
         if len(keys) > 0:
             for key in keys:
                 logger.debug(f"Key {key}")
@@ -91,10 +91,11 @@ class S3Client:
         response.add_response(result)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
+    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[Schema], Response]:
         return self.get_results(response, database_name, table_name, options)
 
     def get_path(self, path: str) -> Path:
+        return Path(path)
 
 
     def path(self, path: str):

@@ -1,6 +1,5 @@
-from typing import Optional, Union, TypeVar
+from typing import Union
 
-from clients import Client
 from definitions import from_root
 from engines import safe_interpolate_environment
 from clients.engines.invalid_client import InvalidClient

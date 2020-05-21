@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 
 from util.logger import logger
 from typing import Optional, Union

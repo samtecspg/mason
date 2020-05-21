@@ -4,12 +4,12 @@ import magic
 from s3fs import S3File
 
 from clients.response import Response
-from engines.metastore.models.schemas.metastore_schema import emptySchema
+from engines.metastore.models.schemas.schema import emptySchema
 
 from engines.metastore.models.schemas import parquet as ParquetSchema
 from engines.metastore.models.schemas import json as JsonSchema
 from engines.metastore.models.schemas import text as TextSchema
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema
+from engines.metastore.models.schemas.schema import Schema
 from fsspec.spec import AbstractBufferedFile
 
 def header_length(file: AbstractBufferedFile):

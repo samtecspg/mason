@@ -1,5 +1,5 @@
 
-from engines.metastore.models.schemas.metastore_schema import MetastoreSchema, SchemaElement
+from engines.metastore.models.schemas.schema import Schema, SchemaElement
 from fastparquet import ParquetFile
 from fastparquet.schema import SchemaHelper
 from util.list import get, flatten
@@ -31,7 +31,7 @@ class ParquetElement(SchemaElement):
             'RepititionType': self.repitition_type
         }
 
-class ParquetSchema(MetastoreSchema):
+class ParquetSchema(Schema):
 
     def __init__(self, columns: List[ParquetElement], schema_helper: Optional[SchemaHelper] = None):
         self._schema = schema_helper

@@ -2,11 +2,11 @@
 from clients.response import Response
 from clients import Client
 from abc import abstractmethod
-from engines.metastore.models.credentials import MetastoreCredentials
-from typing import Tuple, List
+from engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
+from typing import Tuple, List, Union, Optional
 
-from engines.metastore.models.database import Database
-from engines.metastore.models.schemas import MetastoreSchema, emptySchema
+from engines.metastore.models.database import Database, InvalidDatabase
+from engines.metastore.models.schemas import Schema, emptySchema
 
 
 class MetastoreClient(Client):
@@ -15,7 +15,7 @@ class MetastoreClient(Client):
     ###  which will return Cannot instantiate abstract class 'GlueMetastoreClient' with abstract attribute 'get_table' (for example)
 
     @abstractmethod
-    def get_database(self, database_name: str) -> Database:
+    def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
         raise NotImplementedError("Client not implemented")
         return response
 
@@ -25,7 +25,7 @@ class MetastoreClient(Client):
         return response
 
     @abstractmethod
-    def get_table(self, database_name: str, table_name: str, response: Response, options: dict) -> Tuple[List[MetastoreSchema], Response]:
+    def get_table(self, database_name: str, table_name: str, response: Response, options: dict) -> Tuple[List[Schema], Response]:
         raise NotImplementedError("Client not implemented")
         return emptySchema(), response
 
@@ -35,9 +35,9 @@ class MetastoreClient(Client):
         return ("", "")
 
     @abstractmethod
-    def credentials(self, response: Response) -> Tuple[MetastoreCredentials, Response]:
+    def credentials(self) -> Union[MetastoreCredentials, InvalidCredentials]:
         raise NotImplementedError("Client not implemented")
-        return MetastoreCredentials(), response
+        return None
 
     @abstractmethod
     def full_path(self, path: str) -> str:
@@ -60,7 +60,7 @@ class EmptyMetastoreClient(MetastoreClient):
         raise NotImplementedError("Client not implemented")
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response, options: dict) -> Tuple[List[MetastoreSchema], Response]:
+    def get_table(self, database_name: str, table_name: str, response: Response, options: dict) -> Tuple[List[Schema], Response]:
         raise NotImplementedError("Client not implemented")
         return emptySchema(), response
 

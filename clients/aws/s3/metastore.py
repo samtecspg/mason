@@ -1,4 +1,4 @@
-from clients.aws import AWSClient
+from clients.aws.aws_client import AWSClient
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.aws.s3 import S3Client
@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from typing import Tuple, List
 
 from engines.metastore.models.database import Database
-from engines.metastore.models.schemas import MetastoreSchema
+from engines.metastore.models.schemas import Schema
 
 class S3MetastoreClient(MetastoreClient, AWSClient):
 
@@ -23,7 +23,7 @@ class S3MetastoreClient(MetastoreClient, AWSClient):
         response = self.client.list_tables(database_name, response)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[MetastoreSchema], Response]:
+    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[Schema], Response]:
         return self.client.get_table(database_name, table_name, response, options)
 
     def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
