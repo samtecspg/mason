@@ -1,4 +1,6 @@
-from engines.execution.models.jobs import Job
+from typing import Union
+
+from engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
 from clients.response import Response
 from clients.spark.runner.kubernetes_operator import KubernetesOperator
@@ -13,10 +15,8 @@ class SparkClient:
     def client(self):
         return self.get_runner(self.runner_type)
 
-    def run_job(self, job: Job, response: Response):
-        job = self.client().run(self.config, job)
-        response = job.running(response)
-        return response
+    def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
+        return self.client().run(self.config, job)
 
     def get_job(self, job_id: str, response: Response):
         job = self.client().get(job_id)

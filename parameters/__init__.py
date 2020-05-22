@@ -194,8 +194,8 @@ class ValidatedParameters():
     def get_required(self, attribute: str) -> str:
         return self.get(self.validated_parameters, attribute) or ""
 
-    def get_optional(self, attribute: str) -> str:
-        return self.get(self.optional_parameters, attribute) or ""
+    def get_optional(self, attribute: str) -> Optional[str]:
+        return self.get(self.optional_parameters, attribute)
 
     def get_parsed(self, attribute: str) -> Optional[str]:
         return self.get(self.parsed_parameters, attribute)

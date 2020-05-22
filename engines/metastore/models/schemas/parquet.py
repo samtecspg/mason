@@ -1,5 +1,5 @@
 
-from engines.metastore.models.schemas.schema import Schema, SchemaElement
+from engines.metastore.models.schemas.schema import Schema, SchemaElement, InvalidSchema
 from fastparquet import ParquetFile
 from fastparquet.schema import SchemaHelper
 from util.list import get, flatten
@@ -8,6 +8,15 @@ from fsspec.spec import AbstractBufferedFile
 from typing import Union
 
 class ParquetElement(SchemaElement):
+    PD_TYPE_MAPPING = {
+        "DOUBLE": "float64",
+        "BOOLEAN": "bool",
+        "INT32": "int32",
+        "INT64": "int64",
+        "FLOAT": "float32",
+        "BYTE_ARRAY": "object"
+    }
+
     def __init__(self, name: str, type: str, converted_type: Optional[str], repitition_type: Optional[str]):
         self.converted_type = converted_type
         self.repitition_type = repitition_type
@@ -31,6 +40,12 @@ class ParquetElement(SchemaElement):
             'RepititionType': self.repitition_type
         }
 
+    def to_pd_dict(self) -> dict:
+        return {self.name: self.lookup_pd_type(self.type)}
+
+    def lookup_pd_type(self, type: str) -> str:
+        return self.PD_TYPE_MAPPING.get(type, "object")
+
 class ParquetSchema(Schema):
 
     def __init__(self, columns: List[ParquetElement], schema_helper: Optional[SchemaHelper] = None):
@@ -38,11 +53,14 @@ class ParquetSchema(Schema):
         self.columns = columns
         self.type = 'parquet'
 
-def from_file(file: Union[str, AbstractBufferedFile]):
-    schema: SchemaHelper = ParquetFile(file).schema
-    return schema_from_text(schema)
+def from_file(file: Union[str, AbstractBufferedFile]) -> Union[ParquetSchema, InvalidSchema]:
+    if isinstance(file, AbstractBufferedFile):
+        schema: SchemaHelper = ParquetFile(file).schema
+        return schema_from_text(schema)
+    else:
+        return InvalidSchema(f"Invalid Schema {file}")
 
-def schema_from_text(schema: SchemaHelper):
+def schema_from_text(schema: SchemaHelper) -> ParquetSchema:
     text = schema.text
     split = text.split("\n")
     split.pop(0)

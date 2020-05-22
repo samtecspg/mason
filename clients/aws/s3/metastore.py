@@ -3,9 +3,9 @@ from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.aws.s3 import S3Client
 from urllib.parse import urlparse
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
-from engines.metastore.models.database import Database
+from engines.metastore.models.database import Database, InvalidDatabase
 from engines.metastore.models.schemas import Schema
 
 class S3MetastoreClient(MetastoreClient, AWSClient):
@@ -16,8 +16,8 @@ class S3MetastoreClient(MetastoreClient, AWSClient):
         self.secret_key = config.get("secret_key")
         self.client = S3Client(self.get_config())
 
-    def get_database(self, database_name: str) -> Database:
-        return Database()
+    def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
+        return InvalidDatabase("S3 Client get_database not implemented")
 
     def list_tables(self, database_name: str, response: Response) -> Response:
         response = self.client.list_tables(database_name, response)

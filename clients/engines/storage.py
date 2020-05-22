@@ -1,7 +1,9 @@
+from typing import List, Tuple, Optional
 
 from clients import Client
 from abc import abstractmethod
 
+from engines.metastore.models.table import Table, InvalidTable
 from engines.storage.models.path import Path
 
 
@@ -19,6 +21,11 @@ class StorageClient(Client):
         raise NotImplementedError("Client method not implemented")
         return Path()
 
+    @abstractmethod
+    def infer_table(self, path: str, options: dict = {}) -> Tuple[Optional[Table], List[InvalidTable]]:
+        return InvalidTable("Not implemented")
+
+
 class EmptyStorageClient(StorageClient):
 
     def path(self, path: str) -> str:
@@ -29,4 +36,6 @@ class EmptyStorageClient(StorageClient):
         raise NotImplementedError("Client method not implemented")
         return Path()
 
+    def infer_table(self, path: str, options: dict = {}) -> Tuple[List[Table], List[InvalidTable]]:
+        return InvalidTable("Not implemented")
 

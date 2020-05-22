@@ -1,24 +1,9 @@
-import os
-
-import pytest
-from dotenv import load_dotenv
-
-from clients.aws.athena import AthenaClient
-from clients.aws.glue import GlueClient
-from clients.aws.s3 import S3Client
-from clients.dask import DaskClient
-from clients.response import Response
 
 from clients.spark.runner.kubernetes_operator import merge_config
 from configurations.valid_config import ValidConfig
-from definitions import from_root
-from engines.execution.models.jobs.infer_job import InferJob
-from engines.metastore.models.credentials import MetastoreCredentials
+from engines.execution.models.jobs.merge_job import MergeJob
 from configurations.config import Config
-from engines.metastore.models.database import Database
-from test.support.testing_base import clean_uuid, clean_string
 from util.environment import MasonEnvironment
-from hiyapyco import dump as hdump
 from clients.spark import SparkConfig
 
 class TestSpark:
@@ -38,15 +23,10 @@ class TestSpark:
             'executor_cores': 20
         })
 
-        parameters = {
-            "job": "merge",
-            "test-parameter": "test-value",
-            "test-parameter-2": "test-value-2"
-        }
+        job = MergeJob()
 
-        mc = MetastoreCredentials()
+        merged = merge_config(config, )
 
-        merged = merge_config(config, "test_job", mc, parameters)
         dumped = hdump(merged)
         expects = """
             apiVersion: sparkoperator.k8s.io/v1beta2
@@ -113,28 +93,18 @@ class TestS3:
 
 
 # @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
-class TestDask:
-
-    def test_e2e(self):
-        load_dotenv(from_root("/.env"), override=True)
-        dask_config = {"runner": {"type": "kubernetes_worker", "scheduler": "dask-scheduler:8786"}}
-        s3_config = {}
-        glue_config = {}
-
-        database_name = "crawler_poc"
-        path_name = "test_path"
-
-        dask_client = DaskClient(dask_config)
-        glue_client = GlueClient(glue_config)
-        s3_client = S3Client(s3_config)
-
-        database = glue_client.get_database(database_name)
-        if isinstance(database, Database):
-            path = s3_client.get_path(path_name)
-            job = InferJob(database, path)
-
-            response = dask_client.run_job(job, Response())
-            print(response.formatted())
-        else:
-            print(database.reason)
-
+# class TestAthenaInfer:
+#
+#     def test_e2e(self):
+#         load_dotenv(from_root("/.env"), override=True)
+#         s3_config = {}
+#
+#         athena_client = AthenaClient({"access_key": environ["AWS_ACCESS_KEY_ID"], "secret_key": environ["AWS_SECRET_ACCESS_KEY"], "aws_region": environ["AWS_REGION"]})
+#         s3_client = S3Client(s3_config)
+#
+#         table, invalid = s3_client.infer_table("test_infer_table", "spg-mason-demo/part_data_merged")
+#         database: Union[Database, InvalidDatabase] = athena_client.get_database("crawler-poc")
+#         if table:
+#             ddl = athena_client.generate_table_ddl(table, Path("s3://spg-mason-demo/athena/"))
+#             job = athena_client.execute_ddl(ddl, database)
+#

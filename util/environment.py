@@ -4,7 +4,6 @@ from definitions import from_root
 from os import path
 from util.printer import banner
 from pathlib import Path
-import sys
 
 class MasonEnvironment:
     def __init__(self,

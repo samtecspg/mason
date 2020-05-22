@@ -1,7 +1,9 @@
+from typing import Union
+
 from clients.dask.config import DaskConfig
 from clients.dask.runner import EmptyDaskRunner
 from clients.dask.runner.kubernetes_worker import KubernetesWorker
-from engines.execution.models.jobs import Job, ExecutedJob
+from engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
 from clients.response import Response
 
@@ -14,14 +16,8 @@ class DaskClient:
     def client(self):
         return self.get_runner(self.runner_type, self.runner_config)
 
-    def run_job(self, job: Job, response: Response):
-        job = self.client().run(job)
-        if isinstance(job, ExecutedJob):
-            job.to_response(response)
-        else:
-            response.add_error(job.reason)
-
-        return response
+    def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
+        return self.client().run(job)
 
     def get_job(self, job_id: str, response: Response):
         raise NotImplementedError("Client not implemented")

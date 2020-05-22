@@ -26,7 +26,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
 
         input_path = parameters.get_required("input_path")
         output_path =parameters.get_required("output_path")
-        parse_headers = bool(parameters.get_optional("parse_headers"))
+        parse_headers = bool(parameters.get_optional("parse_headers") or False)
         input_database, input_table = metastore_client.parse_path(input_path)
 
         schemas, response = metastore_client.get_table(input_database, input_table, response, {"read_headers": parse_headers})
