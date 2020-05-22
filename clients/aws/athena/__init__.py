@@ -1,18 +1,19 @@
 from typing import Tuple, Optional, Union
 
 from botocore.exceptions import ClientError
-from util.exception import message
 
-from engines.execution.models.jobs import Job
-from engines.execution.models.jobs.query_job import QueryJob
+from clients.aws.glue import GlueClient
 from engines.metastore.models.database import Database, InvalidDatabase
+from engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
+from engines.metastore.models.table import Table
+from engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
+from engines.execution.models.jobs.query_job import QueryJob
+from engines.storage.models.path import Path
 from util.uuid import uuid4
 
 import boto3
-from boto3 import Session
 from clients.response import Response
-
-import awswrangler as wr
+from pyathena.util import generate_ddl
 
 class AthenaClient:
 
@@ -23,6 +24,11 @@ class AthenaClient:
 
     def client(self):
         return boto3.client('athena', region_name=self.aws_region, aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
+
+    def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
+        # Parlaying over to glue for now
+        glue_client = GlueClient({"access_key": self.access_key, "secret_key": self.secret_key, "region": self.aws_region})
+        return glue_client.get_database(database_name)
 
     def parse_execution_response(self, athena_response: dict) -> Tuple[str, str, int, str, str]:
         reason = athena_response.get("QueryExecution", {}).get("Status", {}).get("StateChangeReason")
@@ -38,7 +44,6 @@ class AthenaClient:
         status = athena_response.get('ResponseMetadata', {}).get('HTTPStatusCode')
         message = athena_response.get('Error', {}).get('Message')
         return error, status, message
-
 
     def get_job(self, job_id: str, response: Response) -> Tuple[Response, Job]:
         try:
@@ -83,16 +88,16 @@ class AthenaClient:
             job = Job(job_id, errors=[message])
         return response, job
 
-    def query(self, job: QueryJob, response: Response) -> Tuple[Response, Job]:
-        params = job.parameters
-        response.add_info(f"Running job {job.type}")
+    def query(self, job: QueryJob) -> Union[ExecutedJob, InvalidJob]:
+        job.add_log(f"Running job {job.type}")
+
         try:
             request_token = str(uuid4())
             athena_response = self.client().start_query_execution(
-                QueryString=params["query_string"],
+                QueryString=job.query_string,
                 ClientRequestToken=request_token,
                 QueryExecutionContext={
-                    'Database': params["database_name"]
+                    'Database': job.database.name
                 },
                 WorkGroup='mason'
             )
@@ -100,29 +105,43 @@ class AthenaClient:
         except ClientError as e:
             athena_response = e.response
 
-        response.add_response(athena_response)
+        job.add_data(athena_response)
+        job.set_id(job.type + "_" + str(uuid4()))
+
         error, status, message = self.parse_response(athena_response)
 
         if error == "AccessDeniedException":
-            response.set_status(403)
-            response.add_error(
-                "Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena")
+            job.response.set_status(403)
+            return job.errored("Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena")
         elif not ((error or "") == ""):
-            response.set_status(status)
-            response.add_error(message)
+            job.response.set_status(status)
+            return job.errored(message)
         else:
-            response.set_status(status)
+            job.response.set_status(status)
             id = athena_response.get("QueryExecutionId")
             if id:
-                job.id = id
-                response = job.running(response)
-        return response, job
+                job.set_id(id)
+                return job.running(f"Running Athena query.  query_id: {id}")
+            else:
+                return job.errored(InvalidJob("Query id not returned from athena"))
 
 
-    def run_job(self, job: Job, response: Response) -> Tuple[Response, Optional[Job]]:
+    def run_job(self, job: Job, response: Response) -> Union[ExecutedJob, InvalidJob]:
         if isinstance(job, QueryJob):
-            response, job = self.query(job, response)
+            return self.query(job, response)
         else:
-            response.add_error(f"Job type {job.type} not supported for Athena client")
-        return response, job
+            return job.errored(f"Job type {job.type} not supported for Athena client")
+
+    def generate_table_ddl(self, table: Table, output_path: Optional[Path]) -> Union[DDLStatement, InvalidDDLStatement]:
+        if output_path:
+            statement = generate_ddl(table.as_df(), table.name, output_path.path_str)
+            return DDLStatement(statement)
+        else:
+            return InvalidDDLStatement("Athena requires output path location to store parquet files")
+
+    def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
+        ddl.statement
+        job = QueryJob(ddl.statement, database)
+        return self.query(job)
+
 

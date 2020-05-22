@@ -1,9 +1,12 @@
 
-from typing import Sequence, Set
+from typing import Sequence, Set, List, Dict
 from abc import ABCMeta
+
+from util.dict import merge
 
 
 class SchemaElement:
+
     def __init__(self, name: str, type: str):
         self.name = name
         self.type = type
@@ -13,6 +16,12 @@ class SchemaElement:
             "Name": self.name,
             "Type": self.type
         }
+
+    def to_pd_dict(self) -> dict:
+        return {self.name: self.lookup_pd_type(self.type)}
+
+    def lookup_pd_type(self, type: str) -> str:
+        return object
 
 class Schema(object):
 
@@ -41,6 +50,8 @@ class Schema(object):
             'Columns': list(map(lambda c: c.to_dict(), self.columns))
         }
 
+    def to_pd_dict(self) -> Dict:
+        return merge(list(map(lambda c: c.to_pd_dict(), self.columns)))
 
 class EmptySchema(Schema):
 
@@ -51,12 +62,35 @@ class EmptySchema(Schema):
     def to_dict(self):
         return {}
 
+class InvalidSchema:
+
+    def __init__(self, reason: str):
+        self.reason = reason
+
 
 class InvalidSchemaElement:
 
     def __init__(self, reason: str):
         self.reason = reason
 
+
+class SchemaConflict:
+
+    def __init__(self, unique_schemas: List[Schema], schema_diff: Schema):
+        self.unique_schemas = unique_schemas
+        self.schema_diff = schema_diff
+
+
+    def to_dict(self):
+        unique_schema_dicts: List[dict] = list(map(lambda s: s.to_dict(), self.unique_schemas))
+
+        return {
+            'SchemaConflicts': {
+                'CountDistinctSchemas': len(unique_schema_dicts),
+                'DistinctSchemas': unique_schema_dicts,
+                'NonOverlappingColumns': list(map(lambda s: {'name': s.name, 'type': s.type}, self.schema_diff.columns))
+            }
+        }
 
 def emptySchema():
     return EmptySchema()

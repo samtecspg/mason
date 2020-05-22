@@ -15,7 +15,10 @@ def flatten_array(l: List[List[T]]) -> List[T]:
     return values
 
 def get(l: List[T], i: int) -> Optional[T]:
-    return l[i] if i < len(l) else None
+    try:
+        return l[i]
+    except IndexError as e:
+        return None
 
 def dedupe(l: List[T]) -> List[T]:
     l.reverse() # generally want to take last

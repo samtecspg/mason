@@ -3,9 +3,14 @@ from typing import Sequence, Tuple, Optional, Union, List
 from tabulator import FormatError
 
 from clients.response import Response
-from engines.metastore.models.schemas.schema import Schema, SchemaElement, emptySchema
+from engines.metastore.models.schemas.schema import Schema, SchemaElement, emptySchema, InvalidSchemaElement, \
+    InvalidSchema
 
 from tableschema import Table
+
+from util.json_schema import sequence
+from util.exception import message
+
 
 class TextElement(SchemaElement):
 
@@ -33,7 +38,7 @@ class TextSchema(Schema):
             self.type = 'text' + "-" + type
 
 
-def from_file(file_name: str, type: str, response: Response, header_length: int, read_headers: Optional[str]) -> Tuple[Response, TextSchema]:
+def from_file(file_name: str, type: str, header_length: int, read_headers: Optional[str]) -> Union[TextSchema, InvalidSchema]:
     headers = read_headers or False
     header_list: Union[List[str], bool]
 
@@ -46,16 +51,28 @@ def from_file(file_name: str, type: str, response: Response, header_length: int,
     try:
         table.infer()
         fields = table.schema.descriptor.get('fields')
-        columns = list(map(lambda f: TextElement(f.get('name'), f.get('type')), fields))
 
-        errors = table.schema.errors
-        for e in errors:
-            response.add_error(str(e) + f" File: {file_name}")
+        def get_element(f: dict) -> Union[TextElement, InvalidSchemaElement]:
+            name = f.get('name')
+            type = f.get('type')
+            if name and type:
+                return TextElement(name, type)
 
-        return response, TextSchema(columns, type)
+        valid, invalid = sequence(list(map(lambda f: get_element(f), fields)), TextElement, InvalidSchemaElement)
+        errors = list(map(lambda e: InvalidSchemaElement(str(e) + f" File: {file_name}"), table.schema.errors))
+
+        all_errors = invalid + errors
+        all_error_messages = " ,".join(list(map(lambda e: e.reason, all_errors)))
+
+        if len(invalid) > 0:
+            return InvalidSchema(f"Table Parse errors: {all_error_messages}")
+        elif len(valid) > 0:
+            return TextSchema(valid, type)
+        else:
+            return InvalidSchema("No valid table elements")
+
     except FormatError as e:
-        response.add_warning(f'File type not supported for file {file_name}')
-        return response, emptySchema()
+            return InvalidSchema(f'File type not supported for file {file_name} {message(e)}')
 
 
 

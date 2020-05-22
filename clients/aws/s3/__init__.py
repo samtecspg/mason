@@ -1,16 +1,18 @@
 from clients.response import Response
 from botocore.errorfactory import ClientError
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 
-from engines.metastore.models.database import Database
+from engines.metastore.models.table import Table, InvalidTable
 from engines.storage.models.path import Path
+from util.json_schema import sequence
 from util.logger import logger
 from engines.metastore.models import schemas
-from engines.metastore.models.schemas.schema import Schema
+from engines.metastore.models.schemas.schema import Schema, InvalidSchema, SchemaConflict
 from engines.metastore.models.schemas import check_schemas as CheckSchemas
 from util.list import get
 import s3fs
 from s3fs import S3FileSystem
+from fsspec.spec import AbstractBufferedFile
 
 class S3Client:
     def __init__(self, s3_config: dict):
@@ -18,10 +20,6 @@ class S3Client:
 
     def client(self) -> S3FileSystem:
         return s3fs.S3FileSystem(client_kwargs={'region_name': self.region})
-
-    def get_database(self, name: str) -> Database:
-        return Database(name)
-
 
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
@@ -62,14 +60,17 @@ class S3Client:
             for key in keys:
                 logger.debug(f"Key {key}")
                 k = self.client().open(key)
-                response, schema = schemas.from_file(k, response, options)
-                if schema:
+                schema = schemas.from_file(k, options)
+                if isinstance(schema, Schema):
                     schema_list.append(schema)
+                else:
+                    response.add_error(schema.reason)
 
-        schema_listing, schema_data, response = CheckSchemas.find_conflicts(list(set(schema_list)), response)
-        response.add_data(schema_data)
+        validated = CheckSchemas.find_conflicts(list(set(schema_list)), response)
 
-        return schema_listing, response
+        if validated:
+            response.add_data(validated.to_dict())
+
 
 
     #  List tables for s3 only lists out folders, not schemas in folders.  You can specify subfolders and it will be split out
@@ -96,6 +97,28 @@ class S3Client:
 
     def get_path(self, path: str) -> Path:
         return Path(path)
+
+    def get_schemas(self, key: str, options: dict) -> Tuple[Schema, InvalidSchema]:
+        opened = self.client().open(key)
+        if isinstance(opened, AbstractBufferedFile):
+            schemas.from_file(k, options)
+
+    def infer_table(self, name: str, path: str, options: dict = {}) -> Tuple[Optional[Table], List[InvalidTable]]:
+        logger.info(f"Fetching keys at {path}")
+        keys = self.client().find(path)
+
+        if len(keys) > 0:
+            valid, invalid = sequence(list(map(lambda key: schemas.from_file(self.client().open(key), options), keys)), Schema, InvalidSchema)
+            validated = CheckSchemas.find_conflicts(list(set(valid)))
+            table = CheckSchemas.get_table(name, validated)
+            invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid))
+            if isinstance(table, Table):
+                return table, invalid_tables
+            else:
+                invalid_tables.append(table)
+                return None, invalid_tables
+        else:
+            return None, [InvalidTable(f"No keys at {path}")]
 
 
     def path(self, path: str):

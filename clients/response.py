@@ -1,4 +1,4 @@
-from typing import List, Union, Dict
+from typing import List, Union, Dict, TypeVar, Type
 from util.logger import logger
 
 class Response:

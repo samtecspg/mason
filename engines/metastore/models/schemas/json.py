@@ -1,16 +1,14 @@
-from typing import List, Tuple
-
-from fsspec.spec import AbstractBufferedFile
+from typing import List, Union
 
 from clients.response import Response
-from engines.metastore.models.schemas.schema import Schema, emptySchema
+from engines.metastore.models.schemas.schema import Schema, InvalidSchema
 from genson import SchemaBuilder
 import json
 import fsspec
 import jsonlines
 import os
 
-def from_file(file: str, response: Response):
+def from_file(file: str):
     # TODO: large json files
     if os.path.splitext(file)[1] == ".jsonl":
         builder = SchemaBuilder()
@@ -18,7 +16,7 @@ def from_file(file: str, response: Response):
             for data in reader.iter(type=dict, skip_invalid=True):
                 builder.add_object(data)
         schema = builder.to_schema()
-        return response, JsonSchema(schema, "jsonl")
+        return JsonSchema(schema, "jsonl")
     else:
         try:
             with fsspec.open(file) as f:
@@ -26,10 +24,9 @@ def from_file(file: str, response: Response):
                 builder = SchemaBuilder()
                 builder.add_object(data)
                 schema = builder.to_schema()
-                return response, JsonSchema(schema)
+                return JsonSchema(schema)
         except FileNotFoundError as e:
-            response.add_error(f"File not found {file}")
-            return response, emptySchema()
+            return InvalidSchema(f"File not found {file}")
 
 
 class JsonSchema(Schema):
@@ -40,12 +37,12 @@ class JsonSchema(Schema):
         self.columns =  [] # TODO:  Treating json data as non tabular for now.   Surface main columns and nested attributes
 
 
-def merge_schemas(schemas: List[JsonSchema], response: Response) -> Tuple[Response, Schema]:
+def merge_json_schemas(schemas: List[JsonSchema], response: Response) -> Union[JsonSchema, InvalidSchema]:
     builder = SchemaBuilder()
     for schema in schemas:
         builder.add_schema(schema.schema)
 
-    return response, JsonSchema(builder.to_schema())
+    JsonSchema(builder.to_schema())
 
 
 

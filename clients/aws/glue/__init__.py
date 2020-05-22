@@ -1,8 +1,7 @@
 from typing import Tuple, Union
 
 import boto3
-from boto3 import Session
-from botocore.client import BaseClient, logger
+from botocore.client import BaseClient
 
 from clients.response import Response
 from botocore.errorfactory import ClientError
@@ -23,7 +22,6 @@ class GlueClient:
 
     def client(self) -> BaseClient:
         return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
-
 
     def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
         try:

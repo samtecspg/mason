@@ -1,4 +1,6 @@
-from engines.execution.models.jobs import Job
+from typing import Union
+
+from engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
 from clients.engines.execution import ExecutionClient
 from clients.spark import SparkClient
@@ -10,8 +12,8 @@ class SparkExecutionClient(ExecutionClient):
         self.config = config
         self.client = SparkClient(config)
 
-    def run_job(self, job: Job, response: Response) -> Response:
-        response = self.client.run_job(job, response)
+    def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
+        response = self.client.run_job(job)
         return response
 
     def get_job(self, job_id: str, response: Response) -> Response:

@@ -1,39 +1,48 @@
-from typing import List, Dict
+from typing import Optional, List
+
+from util.uuid import uuid4
 
 from clients.response import Response
 
 class Job:
 
-    def __init__(self, type: str, parameters: dict):
+    def __init__(self, type: str, parameters: Optional[dict] = {}, response: Optional[Response] = None):
         self.type = type
         self.parameters = parameters
+        self.response = response or Response()
+        self.logs: List[str] = []
+        self.id = None
+
+    def add_log(self, log: str):
+        self.logs.append(log)
+        self.response.add_info(log)
+
+    def add_data(self, data: dict):
+        self.response.add_data(data)
+
+    def errored(self, error: str) -> 'InvalidJob':
+        self.response.add_error(error)
+        return InvalidJob(self, error)
+
+    def running(self, message: Optional[str] = None) -> 'ExecutedJob':
+        if message:
+            self.response.add_info(message)
+        return ExecutedJob(self)
+
+    def set_id(self, id: Optional[str]):
+        self.id = id or str(uuid4())
+
 
 
 class ExecutedJob:
-    def __init__(self, id: str, logs: List[str] = [], errors: List[str]=[], results: List[str]=[]):
-        self.id = id
-        self.logs = logs
-        self.errors = errors
-        self.results = results
-
-    def to_response(self, response: Response) -> Response:
-
-        for e in self.errors:
-            response.add_error(e)
-
-        if len(self.logs) > 0:
-            response.add_data({"Logs": self.logs})
-
-        if len(self.results) > 0:
-            response.add_data({"Results": self.results})
-
-        return response
-
+    def __init__(self, job: Job):
+        self.job = job
 
 class InvalidJob:
 
-    def __init__(self, reason: str):
+    def __init__(self, job: Job, reason: str):
         self.reason = reason
+        self.job = job
 
     def run(self, response: Response):
-        response.add_error(f"Invalid Job. Reason: {response}")
+        response.add_error(f"Invalid Job. Reason: {self.reason}")
