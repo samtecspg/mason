@@ -1,7 +1,5 @@
-import urllib
-from typing import Optional, List
+from typing import Optional
 
-from clients.response import Response
 from configurations.configurations import get_current_config
 
 from clients.response import Response
@@ -18,10 +16,12 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
     config: Optional[ValidConfig] = configuration or get_current_config(env)
 
     if config:
-        parameters: dict = kwargs["parameters"]
         log_level: str = kwargs.get("log_level", "info")
         deploy: bool = kwargs.get("deploy", False)
         run_now: bool = kwargs.get("run_now", False)
+        parameters: dict = kwargs.get("parameters") or {}
+
+
         schedule_name: Optional[str] = kwargs.get("schedule_name")
 
         logger.set_level(log_level)

@@ -49,14 +49,13 @@ class TestInit:
         message = "Parameters do not conform to specified schema in parameters/schema.json.  Must be of form key:value"
         assert(params.invalid[0].reason == message)
 
-
     def test_workflow_parameters(self):
         params = WorkflowParameters(parameter_path=from_root("/test/support/parameters/good_workflow_params.yaml"))
         assert(list(map(lambda p: p.value, params.parameters[0].parameters.parameters)) == ["test_value", "test_value_2"])
 
     def test_bad_workflow_parameters(self):
         params = WorkflowParameters(parameter_path=from_root("/test/support/parameters/bad_workflow_params.yaml"))
-        assert("Parameters do not conform to specified schema in parameters/workflow_schema.json" in params.invalid[0].reason)
+        assert("Invalid parameters: Schema error /Users/kyle/dev/mason/parameters/workflow_schema.json: " in params.invalid[0].reason)
 
 class TestValidation:
     def test_parameter_validation(self):

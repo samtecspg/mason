@@ -19,7 +19,8 @@ class S3Client(AWSClient):
         super().__init__(**s3_config)
 
     def client(self) -> S3FileSystem:
-        return s3fs.S3FileSystem(client_kwargs={'region_name': self.aws_region})
+
+        return s3fs.S3FileSystem(key=self.access_key, secret=self.secret_key, client_kwargs={'region_name': self.aws_region})
 
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
@@ -70,19 +71,22 @@ class S3Client(AWSClient):
         return response
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
-        return self.infer_table(table_name, database_name + "/" + table_name, options)
+        return self.infer_table(database_name + "/" + table_name, table_name, options)
 
     def get_path(self, path: str) -> Path:
         return Path(path)
 
-    def infer_table(self, name: str, path: str, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
+    def get_name(self, path: str):
+        return path.split("/")[-1]
+
+    def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
         logger.info(f"Fetching keys at {path}")
         keys = self.client().find(path)
 
         if len(keys) > 0:
             valid, invalid = sequence(list(map(lambda key: schemas.from_file(self.client().open(key), options), keys)), Schema, InvalidSchema)
             validated = CheckSchemas.find_conflicts(list(set(valid)))
-            table = CheckSchemas.get_table(name, validated)
+            table = CheckSchemas.get_table(name or self.get_name(path), validated)
             invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid))
             if isinstance(table, Table):
                 return table
@@ -94,5 +98,8 @@ class S3Client(AWSClient):
 
 
     def path(self, path: str):
-        return "s3://" + path
+        if not path[0:4] == "s3://":
+            path = "s3://" + path
+
+        return Path(path)
 

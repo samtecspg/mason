@@ -27,7 +27,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
         output_path =config.storage.client.get_path(parameters.get_required("output_path"))
         parse_headers = parameters.get_optional("parse_headers")
 
-        table = config.storage.client.infer_table("input_table", input_path.path_str, {"read_headers": parse_headers})
+        table = config.storage.client.infer_table(input_path.path_str, "input_table", {"read_headers": parse_headers})
 
         if isinstance(table, Table):
             response.add_error("No conflicting schemas found. Merge unecessary")
