@@ -38,5 +38,4 @@ def test_get():
         assert (bad.with_status() == (expect[config.execution.client_name], 400))
 
 
-    # run_tests("job", "get", True, "fatal", ["config_3", "config_4"], tests)
-    run_tests("job", "get", True, "fatal", ["config_4"], tests)
+    run_tests("job", "get", True, "fatal", ["config_3", "config_4"], tests)
