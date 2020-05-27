@@ -4,7 +4,6 @@ from typing import Union
 
 from clients.spark.config import SparkConfig
 from engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
-from engines.metastore.models.credentials import MetastoreCredentials
 
 class SparkRunner:
 

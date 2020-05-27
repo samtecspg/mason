@@ -1,4 +1,4 @@
-from clients.aws.athena.execution import AthenaExecutionClient
+from clients.athena.execution import AthenaExecutionClient
 from clients.engines.invalid_client import InvalidClient
 from clients.engines.valid_client import ValidClient
 from engines.engine import Engine

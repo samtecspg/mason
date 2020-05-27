@@ -1,9 +1,9 @@
 from engines import safe_interpolate_environment
 from util.environment import MasonEnvironment
-from engines.execution import ExecutionEngine
-from engines.metastore import MetastoreEngine
-from engines.storage import StorageEngine
-from engines.scheduler import SchedulerEngine
+from engines.execution.execution_engine import ExecutionEngine
+from engines.metastore.metastore_engine import MetastoreEngine
+from engines.storage.storage_engine import StorageEngine
+from engines.scheduler.scheduler_engine import SchedulerEngine
 from test.support import testing_base as base
 from util.logger import logger
 from util.yaml import parse_yaml

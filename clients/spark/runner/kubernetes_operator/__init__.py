@@ -1,13 +1,8 @@
 from uuid import uuid4
-
-from engines.metastore.models.credentials.aws import AWSCredentials
-
-from engines.metastore.models.credentials import MetastoreCredentials
 from clients.spark.runner import SparkRunner
 from clients.spark.config import SparkConfig
 from definitions import from_root
 from engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
-from util import uuid
 from util.sys_call import run_sys_call
 from hiyapyco import load as hload
 from typing import List, Union
@@ -27,9 +22,9 @@ def merge_config(config: SparkConfig, job: Job):
     base_config_file = from_root("/clients/spark/runner/kubernetes_operator/base_config.yaml")
 
     parameters = job.parameters
-    parameters["job"] = job.id
-
+    parameters["job"] = job.type
     param_list = prep_parameters(parameters)
+
     merge_document = {
         'metadata' : {
             'name': job.id

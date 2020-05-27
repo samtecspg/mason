@@ -4,9 +4,6 @@ from engines.metastore.models.schemas import Schema
 from engines.metastore.models.schemas.schema import SchemaConflict, InvalidSchema
 import pandas as pd
 
-from util.logger import logger
-
-
 class Table:
 
     def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None):
@@ -21,9 +18,22 @@ class Table:
 
         return pd.DataFrame(columns=column_names).astype(pd_dict)
 
+    def to_dict(self):
+        return {
+            "Name": self.name,
+            "CreatedAt": self.created_at or "",
+            "CreatedBy": self.created_by or "",
+            "Schema": self.schema.to_dict()
+        }
+
+
 class InvalidTable:
 
     def __init__(self, reason: str, schema_conflict: Optional[SchemaConflict] = None, invalid_schema: Optional[InvalidSchema] = None):
-        self.reason = reason
         self.schema_conflict =  schema_conflict
         self.invalid_schema = invalid_schema
+        if invalid_schema:
+            self.reason = reason + ":" + invalid_schema.reason
+        else:
+            self.reason = reason
+

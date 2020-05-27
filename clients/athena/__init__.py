@@ -2,7 +2,8 @@ from typing import Tuple, Optional, Union
 
 from botocore.exceptions import ClientError
 
-from clients.aws.glue import GlueClient
+from clients.aws_client import AWSClient
+from clients.glue import GlueClient
 from engines.metastore.models.database import Database, InvalidDatabase
 from engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from engines.metastore.models.table import Table
@@ -15,12 +16,10 @@ import boto3
 from clients.response import Response
 from pyathena.util import generate_ddl
 
-class AthenaClient:
+class AthenaClient(AWSClient):
 
     def __init__(self, config: dict):
-        self.aws_region = config.get("aws_region")
-        self.access_key = config.get("access_key") or ""
-        self.secret_key = config.get("secret_key") or ""
+        super().__init__(**config)
 
     def client(self):
         return boto3.client('athena', region_name=self.aws_region, aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
@@ -89,7 +88,7 @@ class AthenaClient:
         return response, job
 
     def query(self, job: QueryJob) -> Union[ExecutedJob, InvalidJob]:
-        job.add_log(f"Running job {job.type}")
+        job.add_log(f"Running Query \"{job.query_string}\"")
 
         try:
             request_token = str(uuid4())
@@ -105,7 +104,7 @@ class AthenaClient:
         except ClientError as e:
             athena_response = e.response
 
-        job.add_data(athena_response)
+        job.response.add_response(athena_response)
         job.set_id(job.type + "_" + str(uuid4()))
 
         error, status, message = self.parse_response(athena_response)
@@ -126,9 +125,9 @@ class AthenaClient:
                 return job.errored(InvalidJob("Query id not returned from athena"))
 
 
-    def run_job(self, job: Job, response: Response) -> Union[ExecutedJob, InvalidJob]:
+    def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
         if isinstance(job, QueryJob):
-            return self.query(job, response)
+            return self.query(job)
         else:
             return job.errored(f"Job type {job.type} not supported for Athena client")
 

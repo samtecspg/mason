@@ -1,15 +1,8 @@
 id: 2
 metastore_engine: s3
-execution_engine: spark
 clients:
   s3:
     configuration:
       aws_region: "{{AWS_REGION}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  spark:
-    configuration:
-      runner:
-        spark_version: "2.4.5"
-        type: "kubernetes-operator"
-

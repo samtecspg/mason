@@ -3,8 +3,7 @@ import os
 from clients.response import Response
 from configurations.valid_config import ValidConfig
 from definitions import from_root
-from parameters import InputParameters, WorkflowParameters
-from examples.workflows.table.infer import api as table_infer_api
+from parameters import WorkflowParameters
 from test.support.testing_base import run_tests
 
 from util.environment import MasonEnvironment

@@ -1,6 +1,6 @@
 from clients.engines.scheduler import SchedulerClient
 from clients.response import Response
-from clients.aws.glue import GlueClient
+from clients.glue import GlueClient
 
 class GlueSchedulerClient(SchedulerClient):
 

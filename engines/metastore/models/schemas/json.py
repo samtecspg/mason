@@ -1,12 +1,15 @@
 from typing import List, Union
 
-from clients.response import Response
 from engines.metastore.models.schemas.schema import Schema, InvalidSchema
+from util.exception import message
 from genson import SchemaBuilder
 import json
 import fsspec
 import jsonlines
 import os
+
+from util.logger import logger
+
 
 def from_file(file: str):
     # TODO: large json files
@@ -37,12 +40,20 @@ class JsonSchema(Schema):
         self.columns =  [] # TODO:  Treating json data as non tabular for now.   Surface main columns and nested attributes
 
 
-def merge_json_schemas(schemas: List[JsonSchema], response: Response) -> Union[JsonSchema, InvalidSchema]:
-    builder = SchemaBuilder()
-    for schema in schemas:
-        builder.add_schema(schema.schema)
+def merge_json_schemas(schemas: List[JsonSchema]) -> Union[JsonSchema, InvalidSchema]:
+    try:
+        builder = SchemaBuilder()
+        for schema in schemas:
+            builder.add_schema(schema.schema)
+        schema = builder.to_schema()
+        return JsonSchema(schema)
+    except Exception as e:
+        return InvalidSchema(f"Invalid Schema, builder error: {message(e)}")
 
-    JsonSchema(builder.to_schema())
+
+
+
+
 
 
 

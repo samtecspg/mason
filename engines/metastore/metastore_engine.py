@@ -1,6 +1,6 @@
 from clients.engines.valid_client import ValidClient
-from clients.aws.glue.metastore import GlueMetastoreClient
-from clients.aws.s3.metastore import S3MetastoreClient
+from clients.glue.metastore import GlueMetastoreClient
+from clients.s3.metastore import S3MetastoreClient
 from engines.engine import Engine
 from clients.engines.invalid_client import InvalidClient
 
