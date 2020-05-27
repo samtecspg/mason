@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Union
 
 from clients import Client
 from abc import abstractmethod
@@ -9,9 +9,6 @@ from engines.storage.models.path import Path
 
 class StorageClient(Client):
 
-    ###  IMPORTANT:   This ensures that implemented specific metastore client implementations conform to the needed template when 'mypy .' is run
-    ###  which will return Cannot instantiate abstract class 'S3StorageClient' with abstract attribute 'path' (for example)
-
     @abstractmethod
     def path(self, path: str) -> str:
         raise NotImplementedError("Client method not implemented")
@@ -22,20 +19,8 @@ class StorageClient(Client):
         return Path()
 
     @abstractmethod
-    def infer_table(self, path: str, options: dict = {}) -> Tuple[Optional[Table], List[InvalidTable]]:
-        return InvalidTable("Not implemented")
+    def infer_table(self, name: str, path: str, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
+        raise NotImplementedError("test")
+        return InvalidTable("infer_table not implemented")
 
-
-class EmptyStorageClient(StorageClient):
-
-    def path(self, path: str) -> str:
-        raise NotImplementedError("Client method not implemented")
-        return ""
-
-    def get_path(self, path: str) -> Path:
-        raise NotImplementedError("Client method not implemented")
-        return Path()
-
-    def infer_table(self, path: str, options: dict = {}) -> Tuple[List[Table], List[InvalidTable]]:
-        return InvalidTable("Not implemented")
 

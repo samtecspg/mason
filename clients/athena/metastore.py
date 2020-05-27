@@ -1,9 +1,6 @@
+from clients.aws_client import AWSClient
 from engines.execution.models.jobs import ExecutedJob, InvalidJob
-from engines.execution.models.jobs.query_job import QueryJob
-from engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
-
-from clients.aws.athena import AthenaClient
-from clients.aws.aws_client import AWSClient
+from clients.athena import AthenaClient
 
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
@@ -11,10 +8,8 @@ from typing import Tuple, List, Union, Optional
 
 from engines.metastore.models.database import Database, InvalidDatabase
 from engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from engines.metastore.models.schemas import Schema, emptySchema
-from engines.metastore.models.table import Table
+from engines.metastore.models.table import Table, InvalidTable
 from engines.storage.models.path import Path
-
 
 class AthenaMetastoreClient(MetastoreClient, AWSClient):
 
@@ -31,9 +26,8 @@ class AthenaMetastoreClient(MetastoreClient, AWSClient):
         response.add_error("Athena client list_tables not Implemented")
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response, options: dict) -> Tuple[List[Schema], Response]:
-        response.add_error("Athena client get_table not Implemented")
-        return [], response
+    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
+        return InvalidTable("Client get_table not implemented")
 
     def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
         response.add_error("Athena client delete_table not Implemented")
@@ -47,7 +41,7 @@ class AthenaMetastoreClient(MetastoreClient, AWSClient):
         raise NotImplementedError("Athena Client parse_path not implemented")
         return ("", "")
 
-    def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob] :
+    def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
         return self.client.execute_ddl(ddl, database)
 
 

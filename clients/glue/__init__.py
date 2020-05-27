@@ -1,24 +1,24 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional, List, Dict
 
 import boto3
 from botocore.client import BaseClient
 
+from clients.aws_client import AWSClient
 from clients.response import Response
 from botocore.errorfactory import ClientError
 
 from engines.metastore.models.database import Database, InvalidDatabase
 from engines.metastore.models.schemas.schema import Schema, SchemaElement, InvalidSchemaElement
-from engines.metastore.models.table import InvalidTable, Table
+from engines.metastore.models.table import Table, InvalidTable
 from util.json_schema import sequence
+from util.logger import logger
 
 
-class GlueClient:
+class GlueClient(AWSClient):
 
     def __init__(self, config: dict):
-        self.aws_role_arn = config.get("aws_role_arn")
-        self.aws_region = config.get("aws_region")
-        self.access_key = config.get("access_key")
-        self.secret_key = config.get("secret_key")
+        self.aws_role_arn = config.pop("aws_role_arn")
+        super().__init__(**config)
 
     def client(self) -> BaseClient:
         return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
@@ -61,8 +61,13 @@ class GlueClient:
             response.add_error(f"Database {database_name} not found")
             response.set_status(404)
         elif 200 <= status < 300:
-            data = {'Tables': self.parse_table_list_data(result)}
-            response.add_data(data)
+            valid: List[Table]
+            invalid: List[InvalidTable]
+            valid, invalid = self.parse_table_list_data(result)
+            if len(valid) > 0:
+                #  TODO move out
+                data = {'Tables': list(map(lambda v: v.to_dict(), valid))}
+                response.add_data(data)
             response.set_status(status)
         else:
             response.set_status(status)
@@ -161,42 +166,39 @@ class GlueClient:
         return response
 
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response):
-        schema, get_glue_table_response = self.get_table(database_name, table_name, response)
+        table = self.get_table(database_name, table_name)
 
         crawler_name = None
-        if 200 <= get_glue_table_response.status_code < 300:
-            crawler_name = get_glue_table_response.responses[-1].get("Table", {}).get("Parameters", {}).get("UPDATED_BY_CRAWLER")
-
-        if crawler_name:
-            self.trigger_schedule(crawler_name, response)
+        if isinstance(table, Table):
+            created_by = table.created_by
+            if "crawler:" in created_by:
+                crawler_name = created_by.replace("crawler:", "")
+                self.trigger_schedule(crawler_name, response)
+            else:
+                response.add_error(f"Table not created by crawler. created_by: {created_by}")
         else:
-            response.add_error("Could not find crawler for table")
+            response.add_error(f"Could not find table {table_name}")
             response.set_status(404)
 
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response) -> Tuple[Schema, Response]:
+    def get_table(self, database_name: str, table_name: str) -> Union[Table, InvalidTable]:
 
         try:
             result = self.client().get_table(DatabaseName=database_name, Name=table_name)
         except ClientError as e:
             result = e.response
 
-        response.add_response(result)
+        # response.add_response(result)
         error, status, message = self.parse_response(result)
-        data, schema = self.parse_table_data(result.get("Table", {}))
+        table = self.parse_table(result.get("Table", {}))
 
         if error == "EntityNotFoundException":
-            response.add_error(f"Database {database_name} or table {table_name} not found")
-            response.set_status(404)
+            return InvalidTable(f"Database {database_name} or table {table_name} not found")
         elif 200 <= status < 300:
-            response.add_data(data)
-            response.set_status(status)
+            return table
         else:
-            response.add_error(message)
-            response.set_status(status)
-
-        return schema, response
+            return InvalidTable(f"Invalid Table: {message}")
 
 
     def refresh_glue_table(self, crawler_name: str):
@@ -232,10 +234,13 @@ class GlueClient:
         error = glue_response.get('Error', {}).get('Code', '')
         status = glue_response.get('ResponseMetadata', {}).get('HTTPStatusCode')
         message = glue_response.get('Error', {}).get('Message')
+
         return error, status, message
 
     def parse_table(self, glue_response: dict) -> Union[Table, InvalidTable]:
         sd = glue_response.get("StorageDescriptor")
+        crawler_name = glue_response.get("Parameters", {}).get("UPDATED_BY_CRAWLER")
+
         if sd:
             columns = sd.get("Columns")
             if columns:
@@ -243,15 +248,20 @@ class GlueClient:
                 valid, invalid = sequence(elements, SchemaElement, InvalidSchemaElement)
                 if len(invalid) > 0:
                     invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
-                    InvalidTable(f"Invalid Schema, invalid elements: {invalid_messages}")
+                    return InvalidTable(f"Invalid Schema, invalid elements: {invalid_messages}")
                 elif len(valid) == 0:
-                    InvalidTable(f"Invalid Schema, no valid elements.")
+                    return InvalidTable(f"Invalid Schema, no valid elements.")
                 else:
                     name = glue_response.get("Name")
                     if name:
                         created_at = glue_response.get("CreateTime")
-                        created_by = glue_response.get("CreatedBy")
-                        schema = Schema("glue", valid)
+
+                        if crawler_name:
+                            created_by = "crawler:" + crawler_name
+                        else:
+                            created_by = glue_response.get("CreatedBy")
+
+                        schema = Schema(valid, "glue")
                         return Table(name, schema, created_at, created_by)
                     else:
                         return InvalidTable("No table Name found in glue response")
@@ -269,27 +279,15 @@ class GlueClient:
         else:
             return InvalidSchemaElement("Name or Type for not found in SchemaElement")
 
-
-    def parse_table_data(self, glue_response: dict):
-        columns_response = glue_response.get("StorageDescriptor", {}).get("Columns")
-        if columns_response:
-            columns = list(map(lambda c: SchemaElement(c.get("Name"), c.get("Type")), columns_response))
+    def parse_table_list_data(self, glue_response: dict) -> Tuple[List[Table], List[InvalidTable]]:
+        table_list = glue_response.get('TableList')
+        if isinstance(table_list, List):
+            parsed: List[Union[Table, InvalidTable]] = list(map(lambda x: self.parse_table(x), table_list))
+            valid, invalid = sequence(parsed, Table, InvalidTable)
+            return valid, invalid
         else:
-            columns = []
-
-        schema = Schema(columns, "glue")
-
-        table_parsed = {
-            "Name": glue_response.get("Name"),
-            "CreatedAt": glue_response.get("CreateTime"),
-            "CreatedBy": glue_response.get("CreatedBy"),
-            "DatabaseName": glue_response.get("DatabaseName"),
-            "Schema": schema.to_dict(),
-
-        }
-        return table_parsed, schema
-
-    def parse_table_list_data(self, glue_response: dict):
-        return list(map(lambda x: self.parse_table_data(x)[0], glue_response['TableList']))
+            none1: List[Table] = []
+            none2: List[InvalidTable] = [InvalidTable("Bad TableList response from glue.  Expected list[dict]")]
+            return none1, none2
 
 

@@ -80,7 +80,6 @@ class SchemaConflict:
         self.unique_schemas = unique_schemas
         self.schema_diff = schema_diff
 
-
     def to_dict(self):
         unique_schema_dicts: List[dict] = list(map(lambda s: s.to_dict(), self.unique_schemas))
 

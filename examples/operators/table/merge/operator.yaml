@@ -11,5 +11,5 @@ parameters:
     - repartition_keys
     - parse_headers
 supported_configurations:
-  - metastore: "s3"
+  - storage: "s3"
     execution: "spark"

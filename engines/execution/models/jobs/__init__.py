@@ -11,7 +11,7 @@ class Job:
         self.parameters = parameters
         self.response = response or Response()
         self.logs: List[str] = []
-        self.id = None
+        self.set_id()
 
     def add_log(self, log: str):
         self.logs.append(log)
@@ -27,11 +27,12 @@ class Job:
     def running(self, message: Optional[str] = None) -> 'ExecutedJob':
         if message:
             self.response.add_info(message)
+        else:
+            self.response.add_info(f"Running job {self.id}")
         return ExecutedJob(self)
 
-    def set_id(self, id: Optional[str]):
+    def set_id(self, id: Optional[str] = None):
         self.id = id or str(uuid4())
-
 
 
 class ExecutedJob:

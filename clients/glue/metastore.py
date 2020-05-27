@@ -1,14 +1,15 @@
-from clients.aws.aws_client import AWSClient
+from clients.aws_client import AWSClient
 
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
-from clients.aws.glue import GlueClient
-from typing import Tuple, List, Union
+from clients.glue import GlueClient
+from typing import Union, Optional
 
 from engines.metastore.models.database import Database, InvalidDatabase
-from engines.metastore.models.schemas import Schema
+from engines.metastore.models.table import Table, InvalidTable
 
-class GlueMetastoreClient(MetastoreClient, AWSClient):
+
+class GlueMetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
         self.client = GlueClient(config)
@@ -24,16 +25,6 @@ class GlueMetastoreClient(MetastoreClient, AWSClient):
         response = self.client.list_tables(database_name, response)
         return response
 
-    def get_table(self, database_name: str, table_name: str, response: Response, options: dict = {}) -> Tuple[List[Schema], Response]:
-        schema, response = self.client.get_table(database_name, table_name, response)
-        return [schema], response
-
-
-    def full_path(self, path: str) -> str:
-        raise NotImplementedError("Client not implemented")
-        return ""
-
-    def parse_path(self, path: str) -> Tuple[str, str]:
-        raise NotImplementedError("Client not implemented")
-        return ("", "")
+    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None) -> Union[Table, InvalidTable]:
+        return self.client.get_table(database_name, table_name)
 

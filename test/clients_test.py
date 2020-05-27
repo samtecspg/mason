@@ -3,8 +3,11 @@ from clients.spark.runner.kubernetes_operator import merge_config
 from configurations.valid_config import ValidConfig
 from engines.execution.models.jobs.merge_job import MergeJob
 from configurations.config import Config
+from engines.storage.models.path import Path
+from test.support.testing_base import clean_uuid, clean_string
 from util.environment import MasonEnvironment
 from clients.spark import SparkConfig
+from hiyapyco import dump as hdump
 
 class TestSpark:
 
@@ -23,25 +26,28 @@ class TestSpark:
             'executor_cores': 20
         })
 
-        job = MergeJob()
+        job = MergeJob(Path("test-input"), Path("test-output"), "parquet")
+        job.set_id("mason-spark-test_job")
 
-        merged = merge_config(config, )
+        merged = merge_config(config, job)
 
         dumped = hdump(merged)
         expects = """
             apiVersion: sparkoperator.k8s.io/v1beta2
             kind: SparkApplication
             metadata:
-              name: mason-spark-test_job-
+              name: mason-spark-test_job
               namespace: default
             spec:
               arguments:
+              - --input_path
+              - test-input 
+              - --output_path
+              - test-output 
+              - --input_format
+              - parquet
               - --job
-              - test_job
-              - --test-parameter
-              - test-value
-              - --test-parameter-2
-              - test-value-2
+              - merge 
               driver:
                 coreLimit: 1200m
                 cores: 10
@@ -76,7 +82,7 @@ class TestSpark:
                   type: Directory
                 name: test-volume
         """
-        assert clean_string(clean_uuid(dumped)) == clean_string(clean_uuid(expects))
+        assert clean_string(dumped) == clean_string(expects)
 
 
 class TestS3:
@@ -92,19 +98,3 @@ class TestS3:
             assert(parsed[1] == "test_path/test_file.csv")
 
 
-# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
-# class TestAthenaInfer:
-#
-#     def test_e2e(self):
-#         load_dotenv(from_root("/.env"), override=True)
-#         s3_config = {}
-#
-#         athena_client = AthenaClient({"access_key": environ["AWS_ACCESS_KEY_ID"], "secret_key": environ["AWS_SECRET_ACCESS_KEY"], "aws_region": environ["AWS_REGION"]})
-#         s3_client = S3Client(s3_config)
-#
-#         table, invalid = s3_client.infer_table("test_infer_table", "spg-mason-demo/part_data_merged")
-#         database: Union[Database, InvalidDatabase] = athena_client.get_database("crawler-poc")
-#         if table:
-#             ddl = athena_client.generate_table_ddl(table, Path("s3://spg-mason-demo/athena/"))
-#             job = athena_client.execute_ddl(ddl, database)
-#

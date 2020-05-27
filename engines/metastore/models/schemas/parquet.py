@@ -1,3 +1,6 @@
+from io import BufferedReader
+
+from fsspec.implementations.local import LocalFileOpener
 
 from engines.metastore.models.schemas.schema import Schema, SchemaElement, InvalidSchema
 from fastparquet import ParquetFile
@@ -53,8 +56,8 @@ class ParquetSchema(Schema):
         self.columns = columns
         self.type = 'parquet'
 
-def from_file(file: Union[str, AbstractBufferedFile]) -> Union[ParquetSchema, InvalidSchema]:
-    if isinstance(file, AbstractBufferedFile):
+def from_file(file: Union[AbstractBufferedFile, BufferedReader, LocalFileOpener]) -> Union[ParquetSchema, InvalidSchema]:
+    if isinstance(file, AbstractBufferedFile) or isinstance(file, BufferedReader) or isinstance(file, LocalFileOpener):
         schema: SchemaHelper = ParquetFile(file).schema
         return schema_from_text(schema)
     else:
