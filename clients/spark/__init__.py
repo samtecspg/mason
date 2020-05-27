@@ -18,18 +18,10 @@ class SparkClient:
     def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
         return self.client().run(self.config, job)
 
-    def get_job(self, job_id: str, response: Response):
-        job = self.client().get(job_id)
-        response = job.add_data(response)
-        not_found = False
+    def get_job(self, job_id: str, response: Response) -> ExecutedJob:
+        job = self.client().get(job_id, response)
 
-        for e in job.errors or []:
-            if "not found" in e:
-                not_found = True
-        if not_found:
-            response.set_status(400)
-
-        return response
+        return job
 
     def get_runner(self, runner: str):
         if runner == "kubernetes-operator":

@@ -18,7 +18,7 @@ def test_get():
         # TODO: consolidate these
         expect = {
             'spark': {'Data': [{'Logs': ['<LOG_DATA>']}], 'Errors': [], 'Info': [], 'Warnings': []},
-            'athena': {'Data': [{'Results': [{'ResultSetMetadata': {'ColumnInfo': [{'CaseSensitive': True, 'CatalogName': 'hive', 'Label': 'widget','Name': 'widget', 'Nullable': 'UNKNOWN','Precision': 2147483647, 'Scale': 0,'SchemaName': '','TableName': '','Type': 'varchar'}]},'Rows': [{'Data': [{'VarCharValue': 'widget'}]}]}]}],'Errors': [],'Info': [], 'Warnings': []},
+            'athena': {'Data': [{'ResultSetMetadata': {'ColumnInfo': [{'CaseSensitive': True, 'CatalogName': 'hive', 'Label': 'widget','Name': 'widget', 'Nullable': 'UNKNOWN','Precision': 2147483647, 'Scale': 0,'SchemaName': '','TableName': '','Type': 'varchar'}]},'Rows': [{'Data': [{'VarCharValue': 'widget'}]}]}],'Errors': [],'Info': [], 'Warnings': []},
         }
 
         good = op.validate(config, params).run(env, Response())
@@ -38,4 +38,5 @@ def test_get():
         assert (bad.with_status() == (expect[config.execution.client_name], 400))
 
 
-    run_tests("job", "get", True, "fatal", ["config_2", "config_3"], tests)
+    # run_tests("job", "get", True, "fatal", ["config_3", "config_4"], tests)
+    run_tests("job", "get", True, "fatal", ["config_4"], tests)

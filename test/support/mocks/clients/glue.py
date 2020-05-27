@@ -45,7 +45,7 @@ class GlueMock:
         targets = {'S3Targets': [{'Path': 's3://lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/','Exclusions': []}]}
         if DatabaseName == 'crawler-poc' and Name == 'test_crawler' and Role == 'TestRole' and Targets == targets:
             return {'Error': {'Message': '062325279035:test_crawler already exists', 'Code': 'AlreadyExistsException'}, 'ResponseMetadata': {'RequestId': 'f9bc413f-bf72-4bba-98f0-116bf363b1a6', 'HTTPStatusCode': 400,  'HTTPHeaders': {'date': 'Thu, 27 Feb 2020 20:42:35 GMT',  'content-type': 'application/x-amz-json-1.1',  'content-length': '88', 'connection': 'keep-alive',  'x-amzn-requestid': 'f9bc413f-bf72-4bba-98f0-116bf363b1a6'},  'RetryAttempts': 0}}
-        elif DatabaseName == 'crawler-poc'  and Name == 'test_crawler_new' and Role == 'TestRole' and Targets == targets:
+        elif DatabaseName == 'crawler-poc' and Name == 'test_crawler_new' and Role == 'TestRole' and Targets == targets:
             return {'ResponseMetadata': {'RequestId': '40f04642-e3a9-431e-96f0-e24bb9291706', 'HTTPStatusCode': 200,    'HTTPHeaders': {'date': 'Thu, 27 Feb 2020 20:52:39 GMT','content-type': 'application/x-amz-json-1.1', 'content-length': '2','connection': 'keep-alive','x-amzn-requestid': '40f04642-e3a9-431e-96f0-e24bb9291706'},    'RetryAttempts': 0}}
         else:
             raise Exception(f"Unmocked glue api call made Targets={Targets}")

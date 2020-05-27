@@ -1,4 +1,6 @@
 from uuid import uuid4
+
+from clients.response import Response
 from clients.spark.runner import SparkRunner
 from clients.spark.config import SparkConfig
 from definitions import from_root
@@ -81,16 +83,15 @@ class KubernetesOperator(SparkRunner):
                 else:
                     return job.running()
 
-    def get(self, job_id: str) -> Job:
+    def get(self, job_id: str, response: Response) -> ExecutedJob:
+        job = Job("spark", response=response)
         command = ["kubectl", "logs", job_id + "-driver"]
         stdout, stderr = run_sys_call(command)
-        logs = []
-        errors = []
-        if len(stdout) > 0:
-            logs.append(stdout)
-        if len(stderr) > 0:
-            errors.append(stderr)
 
-        job = Job(job_id, logs, errors)
-        return job
+        if len(stdout) > 0:
+            job.response.add_data({'Logs': stdout})
+        if len(stderr) > 0:
+            job.response.add_error(stderr)
+
+        return ExecutedJob(job)
 

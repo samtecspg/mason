@@ -23,7 +23,7 @@ class ValidOperator:
         self.source_path = source_path
 
     def type_name(self):
-        str.capitalize(self.namespace) + str.capitalize(self.command)
+        return str.capitalize(self.namespace) + str.capitalize(self.command)
 
     def run(self, env: MasonEnvironment, response: Response) -> Response:
         try:

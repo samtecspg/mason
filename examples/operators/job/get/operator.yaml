@@ -6,6 +6,5 @@ parameters:
   required:
     - "job_id"
 supported_configurations:
-  - metastore: "s3"
-    execution: "spark"
+  - execution: "spark"
   - execution: "athena"
