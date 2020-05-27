@@ -49,15 +49,18 @@ class S3Mock:
 
 
     def find(self, path: str):
-        if path == "crawler-poc/catalog_poc_data":
+        if not path[0:5] == "s3://":
+            path = "s3://" + path
+
+        if path == "s3://crawler-poc/catalog_poc_data":
             return ["crawler-poc/catalog_poc_data/test1.csv", "crawler-poc/catalog_poc_data/test2.csv"]
-        elif path == "bad-database/catalog_poc_data":
+        elif path == "s3://bad-database/catalog_poc_data":
             return []
-        elif path == "good_input_bucket/good_input_path":
+        elif path == "s3://good_input_bucket/good_input_path":
             return ["test-data/test-path/test1.usf", "test-data/test-path/test2.usf"]
-        elif path == "good_input_bucket_2/good_input_path":
+        elif path == "s3://good_input_bucket_2/good_input_path":
             return ["test-data/test-path/sample.snappy.parquet"]
-        elif path == "crawler-poc/bad-table":
+        elif path == "s3://crawler-poc/bad-table":
             return []
         else:
             raise Exception(f"Unmocked S3 API endpoint: {path}")

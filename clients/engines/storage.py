@@ -19,7 +19,7 @@ class StorageClient(Client):
         return Path()
 
     @abstractmethod
-    def infer_table(self, name: str, path: str, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
+    def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
         raise NotImplementedError("test")
         return InvalidTable("infer_table not implemented")
 

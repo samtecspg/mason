@@ -26,7 +26,7 @@ class AthenaClient(AWSClient):
 
     def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
         # Parlaying over to glue for now
-        glue_client = GlueClient({"access_key": self.access_key, "secret_key": self.secret_key, "region": self.aws_region})
+        glue_client = GlueClient({"access_key": self.access_key, "secret_key": self.secret_key, "aws_region": self.aws_region, "aws_role_arn": ""})
         return glue_client.get_database(database_name)
 
     def parse_execution_response(self, athena_response: dict) -> Tuple[str, str, int, str, str]:
@@ -129,7 +129,7 @@ class AthenaClient(AWSClient):
                 job.set_id(id)
                 return job.running(f"Running Athena query.  query_id: {id}")
             else:
-                return job.errored(InvalidJob("Query id not returned from athena"))
+                return job.errored("Query id not returned from athena")
 
 
     def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:

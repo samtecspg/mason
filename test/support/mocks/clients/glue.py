@@ -34,7 +34,7 @@ class GlueMock:
             raise Exception(f"Unmocked glue api call made to get_table DatabaseName={db_name} Name={table_name}")
 
     def start_crawler(self, Name: str):
-        if (Name == 'test_crawler') | (Name == 'test_crawler_new'):
+        if (Name == 'test_crawler') | (Name == 'test_crawler_new') | (Name[0:11] == "table_infer"):
             return {'ResponseMetadata': {'RequestId': '6d9a47be-a8de-4b0c-9dd5-6fee482bbf82', 'HTTPStatusCode': 200,    'HTTPHeaders': {'date': 'Fri, 28 Feb 2020 17:01:03 GMT','content-type': 'application/x-amz-json-1.1', 'content-length': '2','connection': 'keep-alive','x-amzn-requestid': '6d9a47be-a8de-4b0c-9dd5-6fee482bbf82'},    'RetryAttempts': 0}}
         elif (Name == 'test_crawler_refreshing'):
             return {'Error': {'Message': 'Crawler with name test_crawler has already started',   'Code': 'CrawlerRunningException'},   'ResponseMetadata': {'RequestId': '540d8901-1f0e-405d-9fd0-5b79fde6595b', 'HTTPStatusCode': 400,    'HTTPHeaders': {'date': 'Fri, 28 Feb 2020 17:03:24 GMT','content-type': 'application/x-amz-json-1.1', 'content-length': '99','connection': 'keep-alive','x-amzn-requestid': '540d8901-1f0e-405d-9fd0-5b79fde6595b'},    'RetryAttempts': 0}}
@@ -43,9 +43,9 @@ class GlueMock:
 
     def create_crawler(self, DatabaseName: str, Name: str, Role: str, Targets: dict):
         targets = {'S3Targets': [{'Path': 's3://lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/','Exclusions': []}]}
-        if DatabaseName == 'crawler-poc' and Name == 'test_crawler' and Role == 'TestRole' and Targets == targets:
+        if DatabaseName == 'crawler-poc' and (Name == 'test_crawler' or Name[0:11] == "table_infer") and Role == 'TestRole' and Targets == targets:
             return {'Error': {'Message': '062325279035:test_crawler already exists', 'Code': 'AlreadyExistsException'}, 'ResponseMetadata': {'RequestId': 'f9bc413f-bf72-4bba-98f0-116bf363b1a6', 'HTTPStatusCode': 400,  'HTTPHeaders': {'date': 'Thu, 27 Feb 2020 20:42:35 GMT',  'content-type': 'application/x-amz-json-1.1',  'content-length': '88', 'connection': 'keep-alive',  'x-amzn-requestid': 'f9bc413f-bf72-4bba-98f0-116bf363b1a6'},  'RetryAttempts': 0}}
-        elif DatabaseName == 'crawler-poc' and Name == 'test_crawler_new' and Role == 'TestRole' and Targets == targets:
+        elif DatabaseName == 'crawler-poc' and (Name == 'test_crawler_new' or Name[0:11]) and Role == 'TestRole' and Targets == targets:
             return {'ResponseMetadata': {'RequestId': '40f04642-e3a9-431e-96f0-e24bb9291706', 'HTTPStatusCode': 200,    'HTTPHeaders': {'date': 'Thu, 27 Feb 2020 20:52:39 GMT','content-type': 'application/x-amz-json-1.1', 'content-length': '2','connection': 'keep-alive','x-amzn-requestid': '40f04642-e3a9-431e-96f0-e24bb9291706'},    'RetryAttempts': 0}}
         else:
             raise Exception(f"Unmocked glue api call made Targets={Targets}")

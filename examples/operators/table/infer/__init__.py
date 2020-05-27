@@ -5,6 +5,7 @@ from engines.execution.models.jobs import ExecutedJob
 from engines.metastore.models.database import Database
 from engines.metastore.models.ddl import DDLStatement
 from engines.metastore.models.table import Table, InvalidTable
+from engines.storage.models.path import Path
 from parameters import ValidatedParameters
 from clients.response import Response
 from api import operator_api as OperatorApi
@@ -14,19 +15,19 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
 
     database_name: str = parameters.get_required("database_name")
     storage_path: str = parameters.get_required("storage_path")
-    output_path: Optional[str] = parameters.get_optional("output_path")
+    output_path: Optional[Path] = parameters.get_optional("output_path")
 
     table = config.storage.client.infer_table(storage_path)
 
     if isinstance(table, Table):
         database = config.metastore.client.get_database(database_name)
         if isinstance(database, Database):
-            op = config.storage.client.get_path(output_path)
-            ddl = config.metastore.client.generate_table_ddl(database_name, table, op)
+            op = config.storage.client.path(output_path)
+            ddl = config.metastore.client.generate_table_ddl(table, op)
             if isinstance(ddl, DDLStatement):
                 executed = config.metastore.client.execute_ddl(ddl, database)
                 if isinstance(executed, ExecutedJob):
-                    response = executed.job.running().response
+                    response = executed.job.running().job.response
                 else:
                     response.add_error(f"Job errored: {executed.reason}")
             else:

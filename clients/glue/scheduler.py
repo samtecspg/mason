@@ -1,6 +1,8 @@
 from clients.engines.scheduler import SchedulerClient
 from clients.response import Response
 from clients.glue import GlueClient
+from engines.storage.models.path import Path
+
 
 class GlueSchedulerClient(SchedulerClient):
 
@@ -19,13 +21,13 @@ class GlueSchedulerClient(SchedulerClient):
             db_name = params.get_required("database_name")
 
             storage_path = op.config.storage.client.path(params.get_required("storage_path"))
-            response = self.register_schedule(db_name,storage_path, schedule_name, response)
+            response = self.register_schedule(db_name, storage_path, schedule_name, response)
         else:
             response.add_error("Glue Scheduler only defined for InferJob type which registers a glue crawler")
 
         return schedule_name, response
 
-    def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response) -> Response:
+    def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
         response = self.client.register_schedule(database_name, path, schedule_name, response)
         return response
 

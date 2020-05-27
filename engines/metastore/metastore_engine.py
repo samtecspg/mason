@@ -1,3 +1,4 @@
+from clients.athena.metastore import AthenaMetastoreClient
 from clients.engines.valid_client import ValidClient
 from clients.glue.metastore import GlueMetastoreClient
 from clients.s3.metastore import S3MetastoreClient
@@ -17,6 +18,8 @@ class MetastoreEngine(Engine):
                 return GlueMetastoreClient(client.config)
             elif self.client_name == "s3":
                 return S3MetastoreClient(client.config)
+            elif self.client_name == "athena":
+                return AthenaMetastoreClient(client.config)
             else:
                 return InvalidClient(f"Client type not supported: {client.client_name}")
         else:

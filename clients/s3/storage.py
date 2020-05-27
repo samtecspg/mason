@@ -11,7 +11,7 @@ class S3StorageClient(StorageClient):
     def __init__(self, config: dict):
         self.client = S3Client(config)
 
-    def path(self, path: str):
+    def path(self, path: str) -> Path:
         return self.client.path(path)
 
     def get_path(self, path: Optional[str]) -> Optional[Path]:
@@ -20,8 +20,8 @@ class S3StorageClient(StorageClient):
         else:
             return None
 
-    def infer_table(self, name: str,  path: str, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
-        return self.client.infer_table(name, path, options)
+    def infer_table(self, path: str,  name: Optional[str] = None, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
+        return self.client.infer_table(self.path(path).path_str, name, options)
 
 
 

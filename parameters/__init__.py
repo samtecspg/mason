@@ -1,11 +1,5 @@
 from typing import Optional, List, Tuple, Dict, Any
 
-from util.environment import MasonEnvironment
-from util.logger import logger
-from util.session import get_session_config
-
-from configurations.configurations import get_current_config
-
 from definitions import from_root
 from parameters.invalid_parameter import InvalidParameter
 from parameters.parameter import Parameter, ValidatedParameter, OptionalParameter
@@ -50,7 +44,9 @@ class WorkflowParameters:
                     ip.invalid = invalid_step
                     valid.append(WorkflowParameter(key, config_id, ip))
             else:
-                invalid.append(InvalidParameter(f"Parameters do not conform to specified schema in parameters/workflow_schema.json.  Must be of form step_id: key:value.  {validated.reason}"))
+                invalid.append(InvalidParameter(f"Invalid parameters: {validated.reason}"))
+        else:
+            invalid.append(InvalidParameter(f"Parameters do not conform to specified schema in parameters/workflow_schema.json.  Must be of form step_id: key:value.  {validated.reason}"))
 
         return valid, invalid
 

@@ -10,8 +10,8 @@ from botocore.errorfactory import ClientError
 from engines.metastore.models.database import Database, InvalidDatabase
 from engines.metastore.models.schemas.schema import Schema, SchemaElement, InvalidSchemaElement
 from engines.metastore.models.table import Table, InvalidTable
+from engines.storage.models.path import Path
 from util.json_schema import sequence
-from util.logger import logger
 
 
 class GlueClient(AWSClient):
@@ -98,12 +98,12 @@ class GlueClient(AWSClient):
 
         return response
 
-    def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response):
+    def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response):
         create_crawler_response = self.create_glue_crawler(
             database=database_name,
             name=schedule_name,
             role=self.aws_role_arn or "",
-            path=path
+            path=path.path_str
         )
 
         response.add_response(create_crawler_response)
