@@ -14,8 +14,7 @@ class AthenaExecutionClient(ExecutionClient):
     def run_job(self, job: Job) -> Union[InvalidJob, ExecutedJob]:
         return self.client.run_job(job)
 
-    def get_job(self, job_id: str, response: Response) -> Response:
-        response, job = self.client.get_job(job_id, response)
-        response = job.add_data(response)
-        return response
+    def get_job(self, job_id: str, response: Response) -> Union[InvalidJob, ExecutedJob]:
+        executed = self.client.get_job(job_id, response)
+        return executed.job.response
 

@@ -44,7 +44,10 @@ class AthenaClient(AWSClient):
         message = athena_response.get('Error', {}).get('Message')
         return error, status, message
 
-    def get_job(self, job_id: str, response: Response) -> Tuple[Response, Job]:
+    def get_job(self, job_id: str, response: Response) -> Union[ExecutedJob, InvalidJob]:
+        job = Job("query", response=response)
+        job.set_id(job_id)
+
         try:
             athena_response = self.client().get_query_execution(
                 QueryExecutionId=job_id,
@@ -54,10 +57,12 @@ class AthenaClient(AWSClient):
 
 
         reason, state, status, error, message = self.parse_execution_response(athena_response)
-        response.add_response(athena_response)
-        response.set_status(status)
+
+        job.response.add_response(athena_response)
+        job.response.set_status(status)
+
         if reason:
-            response.add_info(reason)
+            job.response.add_info(reason)
 
         if status == 200:
             try:
@@ -68,24 +73,26 @@ class AthenaClient(AWSClient):
             except ClientError as e:
                 athena_response_2 = e.response
 
-            response.add_response(athena_response_2)
+            job.response.add_response(athena_response_2)
 
             error, status, message = self.parse_response(athena_response_2)
 
+
             if not ((error or "") == ""):
-                response.set_status(status)
-                job = Job(job_id, errors=[message])
+                job.response.set_status(status)
+                return InvalidJob(job, message)
             else:
-                response.set_status(status)
+                job.response.set_status(status)
                 results = athena_response_2.get("ResultSet")
                 if results:
-                    job = Job(job_id, results=[results])
+                    job.response.add_data(results)
+                    return ExecutedJob(job)
                 else:
-                    job = Job(job_id)
+                    return InvalidJob(job, "No job results returned from athena")
 
         else:
-            job = Job(job_id, errors=[message])
-        return response, job
+            job.response.add_error(message)
+            return InvalidJob(job, f"Invalid Job: {message}")
 
     def query(self, job: QueryJob) -> Union[ExecutedJob, InvalidJob]:
         job.add_log(f"Running Query \"{job.query_string}\"")

@@ -11,14 +11,19 @@ class GlueSchedulerClient(SchedulerClient):
         self.secret_key = config.get("secret_key")
         self.client: GlueClient = GlueClient(self.get_config())
 
-    # def register_dag(self, schedule_name: str, valid_dag, response: Response):
-    #     #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator
-    #     if len(valid_dag.valid_steps) == 1 and valid_dag.valid_steps[0].operator.type_name() == "TableInfer":
-    #         response = self.register_schedule(,,, schedule_name, response)
-    #     else:
-    #         response.add_error("Glue Scheduler only defined for InferJob type which registers a glue crawler")
-    #
-    #     return schedule_name, response
+    def register_dag(self, schedule_name: str, valid_dag, response: Response):
+        #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator
+        if len(valid_dag.valid_steps) == 1 and valid_dag.valid_steps[0].operator.type_name() == "TableInfer":
+            op = valid_dag.valid_steps[0].operator
+            params = valid_dag.valid_steps[0].operator.parameters
+            db_name = params.get_required("database_name")
+
+            storage_path = op.config.storage.client.path(params.get_required("storage_path"))
+            response = self.register_schedule(db_name,storage_path, schedule_name, response)
+        else:
+            response.add_error("Glue Scheduler only defined for InferJob type which registers a glue crawler")
+
+        return schedule_name, response
 
     def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response) -> Response:
         response = self.client.register_schedule(database_name, path, schedule_name, response)

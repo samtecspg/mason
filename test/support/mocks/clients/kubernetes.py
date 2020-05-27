@@ -1,7 +1,7 @@
 from typing import Optional
 
 from clients.response import Response
-from engines.execution.models.jobs import Job
+from engines.execution.models.jobs import Job, ExecutedJob
 from engines.metastore.models.credentials import MetastoreCredentials
 
 from clients.spark import SparkConfig
@@ -18,13 +18,18 @@ class KubernetesMock:
         else:
             raise Exception("Mock parameters not implemented for spark kubernetes implementation")
 
-    def get(self, job_id: str) -> Optional[Job]:
+    def get(self, job_id: str, response: Response) -> Response:
+        job = Job("spark", response=response)
+        job.set_id(job_id)
         if job_id == "good_job_id":
-            logs = ['<LOG_DATA>']
-            return Job(job_id, logs)
+            logs = '<LOG_DATA>'
+            job.response.add_data({'Logs': [logs]})
+            return ExecutedJob(job).job.response
         elif job_id == "bad_job_id":
-            errors = ["Error from server (NotFound): pods \"bad_job_id-driver\" not found"]
-            return Job(job_id, errors=errors)
+            error = "Error from server (NotFound): pods \"bad_job_id-driver\" not found"
+            job.response.add_error(error)
+            job.response.set_status(400)
+            return ExecutedJob(job).job.response
         else:
             raise Exception("Mock parameters not implemented for spark kubernetes implementation")
 
