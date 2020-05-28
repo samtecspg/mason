@@ -12,7 +12,7 @@ class Namespace:
         return list(map(lambda o: o.to_dict(), self.operators))
 
     def to_dict_brief(self):
-        return { self.namespace: list(map(lambda o: o.command, self.operators)) }
+        return { self.namespace: sorted(list(map(lambda o: o.command, self.operators))) }
 
 
 

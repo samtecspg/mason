@@ -75,6 +75,8 @@ Legend
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
+- [ ] Table Export operator with S3 support (export csv's of metastore tables)
+- [ ] Table "join" operator (on set of columns)
 - [ ] Dedupe Operator
 - [ ] Table Operators
     - [x] Query (requires metastore and execution engine) C:04/28/2020

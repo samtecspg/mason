@@ -1,6 +1,6 @@
 from typing import List
 
-from engines.metastore.models.schemas.schema import SchemaConflict
+from engines.metastore.models.schemas.schema import SchemaConflict, Schema
 from engines.metastore.models.schemas.text import TextSchema
 
 from clients.response import Response
@@ -21,7 +21,7 @@ class TestUnsupportedSchema:
         with fs.open(from_root('/test/sample_data/unsupported_file_type.usf')) as f:
             schema = from_file(f)
             assert(isinstance(schema, InvalidSchema))
-            assert(schema.reason[0:97] == f"File type not supported for file {from_root('/test/sample_data/unsupported_file_type.usf')}")
+            assert(schema.reason[0:32] == f"File type not supported for file")
 
 class TestJSONSchema:
 
@@ -41,9 +41,10 @@ class TestJSONSchema:
     def test_invalid_json(self):
         fs = LocalFileSystem()
         with fs.open(from_root('/test/sample_data/bad_json.json')) as f:
-            schema = from_file(f, Response())
+            schema = from_file(f, {})
+            assert(isinstance(schema, InvalidSchema))
             message = f"File type not supported for file {from_root('/test/sample_data/bad_json.json')}"
-            assert(schema.reason[0:97] == message)
+            assert(message in schema.reason)
 
 
     def test_complex_json(self):
@@ -105,6 +106,7 @@ class TestJSONSchema:
         assert(schema.schema == expect)
 
         schema = find_conflicts([schema1, schema2, schema3])
+        assert(isinstance(schema, JsonSchema))
         expect = {'$schema': 'http://json-schema.org/schema#', 'properties': {'data': {'items': {'properties': {'field1': {'type': 'string'},'field2': {'type': ['integer','string']},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'properties': {'some_other_stuff': {'type': 'string'}},'required': ['some_other_stuff'],'type': 'object'},'field6': {'type': 'string'}}, 'type': 'object'}, 'type': 'array'},'field': {'type': 'string'},'field2': {'type': 'string'},'field3': {'type': 'string'}}, 'required': [], 'type': 'object'}
         assert(schema.schema == expect)
         schema = find_conflicts([schema1, schema2, schema3,  schema5])
@@ -130,9 +132,11 @@ class TestTextSchema:
         fs = LocalFileSystem()
         with fs.open(from_root('/test/sample_data/csv_sample.csv')) as f:
             schema1 = from_file(f, {"read_headers": True})
+            assert(isinstance(schema1, TextSchema))
 
         with fs.open(from_root('/test/sample_data/csv_sample_2.csv')) as f:
             schema2 = from_file(f, {"read_headers": True})
+            assert(isinstance(schema2, TextSchema))
 
         schema = find_conflicts([schema1, schema2])
         assert(isinstance(schema, SchemaConflict))

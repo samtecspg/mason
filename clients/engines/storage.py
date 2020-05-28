@@ -10,11 +10,7 @@ from engines.storage.models.path import Path
 class StorageClient(Client):
 
     @abstractmethod
-    def path(self, path: str) -> str:
-        raise NotImplementedError("Client method not implemented")
-
-    @abstractmethod
-    def get_path(self, path: str) -> Path:
+    def path(self, path: Optional[str]) -> Optional[Path]:
         raise NotImplementedError("Client method not implemented")
         return Path()
 

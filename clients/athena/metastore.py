@@ -1,3 +1,7 @@
+from engines.metastore.models.credentials import InvalidCredentials
+
+from engines.metastore.models.credentials.aws import AWSCredentials
+
 from clients.aws_client import AWSClient
 from engines.execution.models.jobs import ExecutedJob, InvalidJob
 from clients.athena import AthenaClient
@@ -11,7 +15,7 @@ from engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from engines.metastore.models.table import Table, InvalidTable
 from engines.storage.models.path import Path
 
-class AthenaMetastoreClient(MetastoreClient, AWSClient):
+class AthenaMetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
         self.client = AthenaClient(config)
@@ -40,6 +44,9 @@ class AthenaMetastoreClient(MetastoreClient, AWSClient):
     def parse_path(self, path: str) -> Tuple[str, str]:
         raise NotImplementedError("Athena Client parse_path not implemented")
         return ("", "")
+
+    def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
+        return InvalidCredentials("Client 'credentials' not implemented")
 
     def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
         return self.client.execute_ddl(ddl, database)

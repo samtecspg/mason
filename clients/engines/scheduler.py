@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from engines.storage.models.path import Path
+
 from clients.response import Response
 from clients import Client
 from abc import abstractmethod
@@ -12,7 +14,7 @@ class SchedulerClient(Client):
         return response
 
     @abstractmethod
-    def register_schedule(self, database_name: str, path: str, schedule_name: str, response: Response) -> Response:
+    def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
         return response
 

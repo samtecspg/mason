@@ -3,9 +3,9 @@ from clients.response import Response
 from clients import Client
 from abc import abstractmethod
 
-from engines.execution.models.jobs import ExecutedJob, InvalidJob
+from engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
 from engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
-from typing import Tuple, List, Union, Optional
+from typing import List, Union, Optional, TypeVar
 
 from engines.metastore.models.database import Database, InvalidDatabase
 from engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
@@ -17,7 +17,7 @@ class MetastoreClient(Client):
 
     @abstractmethod
     def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
-        raise InvalidDatabase("Client get_database not implemented")
+        return InvalidDatabase("Client get_database not implemented")
 
     @abstractmethod
     def list_tables(self, database_name: str, response: Response) -> Response:
@@ -35,18 +35,7 @@ class MetastoreClient(Client):
 
     @abstractmethod
     def credentials(self) -> Union[MetastoreCredentials, InvalidCredentials]:
-        raise NotImplementedError("Client not implemented")
-        return None
-
-    @abstractmethod
-    def full_path(self, path: str) -> str:
-        raise NotImplementedError("Client not implemented")
-        return ""
-
-    @abstractmethod
-    def parse_path(self, path: str) -> Tuple[str, str]:
-        raise NotImplementedError("Client not implemented")
-        return ("", "")
+        return InvalidCredentials("Client not implemented")
 
     @abstractmethod
     def generate_table_ddl(self, table: Table, output_path: Optional[Path] = None) -> Union[DDLStatement, InvalidDDLStatement]:
@@ -54,6 +43,6 @@ class MetastoreClient(Client):
 
     @abstractmethod
     def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
-        return ExecutedJob()
+        return ExecutedJob(Job("generic"))
 
 

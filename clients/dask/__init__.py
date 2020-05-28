@@ -19,9 +19,9 @@ class DaskClient:
     def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
         return self.client().run(job)
 
-    def get_job(self, job_id: str, response: Response):
+    def get_job(self, job_id: str, response: Response) -> Union[ExecutedJob, InvalidJob]:
         raise NotImplementedError("Client not implemented")
-        return response
+        return InvalidJob(job=Job("generic", response=response))
 
     def get_runner(self, runner: str, config: dict):
         if runner == "kubernetes_worker":

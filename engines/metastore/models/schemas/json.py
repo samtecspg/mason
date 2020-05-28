@@ -8,8 +8,6 @@ import fsspec
 import jsonlines
 import os
 
-from util.logger import logger
-
 
 def from_file(file: str):
     # TODO: large json files
@@ -40,13 +38,16 @@ class JsonSchema(Schema):
         self.columns =  [] # TODO:  Treating json data as non tabular for now.   Surface main columns and nested attributes
 
 
-def merge_json_schemas(schemas: List[JsonSchema]) -> Union[JsonSchema, InvalidSchema]:
+def merge_json_schemas(schemas: List[Schema]) -> Union[JsonSchema, InvalidSchema]:
     try:
         builder = SchemaBuilder()
         for schema in schemas:
-            builder.add_schema(schema.schema)
-        schema = builder.to_schema()
-        return JsonSchema(schema)
+            if isinstance(schema, JsonSchema):
+                builder.add_schema(schema.schema)
+            else:
+                return InvalidSchema("merge_json_schemas Only supports JsonSchema type")
+        merged = builder.to_schema()
+        return JsonSchema(merged)
     except Exception as e:
         return InvalidSchema(f"Invalid Schema, builder error: {message(e)}")
 

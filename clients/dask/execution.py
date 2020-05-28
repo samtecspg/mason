@@ -15,8 +15,5 @@ class DaskExecutionClient(ExecutionClient):
     def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
         return self.client.run_job(job)
 
-    def get_job(self, job_id: str, response: Response) -> Response:
-        response = self.client.get_job(job_id, response)
-
-        return response
-
+    def get_job(self, job_id: str, response: Response) -> Union[ExecutedJob, InvalidJob]:
+         return self.client.get_job(job_id, response)

@@ -28,8 +28,8 @@ class TestRegisterOperator:
 
         ns, invalid = Operators.list_namespaces(env)
 
-        result = list(map(lambda n: n.to_dict_brief(), ns))
-        expect = [{'namespace2': ['operator3']}, {'namespace1': ['operator1', 'operator2']}]
+        result = sorted(list(map(lambda n: n.to_dict_brief(), ns)), key=lambda s: list(s.keys())[0])
+        expect = [{'namespace1': ['operator1', 'operator2']}, {'namespace2': ['operator3']}]
 
         assert(result == expect)
 

@@ -32,7 +32,7 @@ def test_get():
 
         expect = {
             'spark': {'Errors': ['Error from server (NotFound): pods "bad_job_id-driver" not found'], 'Info': [], 'Warnings': []},
-            'athena': {'Errors': ['QueryExecution bad_job_id was not found'], 'Info': [], 'Warnings': []}
+            'athena': {'Errors': ['QueryExecution bad_job_id was not found', 'Invalid Job: QueryExecution bad_job_id was not found'], 'Info': [], 'Warnings': []}
         }
 
         assert (bad.with_status() == (expect[config.execution.client_name], 400))

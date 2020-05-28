@@ -1,4 +1,9 @@
-from clients.aws_client import AWSClient
+from engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
+from engines.storage.models.path import Path
+from engines.metastore.models.ddl import InvalidDDLStatement, DDLStatement
+from engines.metastore.models.credentials import InvalidCredentials
+from engines.metastore.models.credentials.aws import AWSCredentials
+
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
 from clients.s3 import S3Client
@@ -8,8 +13,7 @@ from typing import Tuple, List, Union, Optional
 from engines.metastore.models.database import Database, InvalidDatabase
 from engines.metastore.models.table import Table, InvalidTable
 
-
-class S3MetastoreClient(MetastoreClient, AWSClient):
+class S3MetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
         self.client = S3Client(config)
@@ -36,4 +40,15 @@ class S3MetastoreClient(MetastoreClient, AWSClient):
         key = parsed.path.lstrip("/")
         bucket = parsed.netloc
         return bucket, key
+
+    def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
+        return InvalidCredentials("Client 'credentials' not implemented")
+
+    def generate_table_ddl(self, table: Table, output_path: Optional[Path] = None) -> Union[DDLStatement, InvalidDDLStatement]:
+        return InvalidDDLStatement("Client not implemented")
+
+    def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
+        return InvalidJob(Job("generic"), "Client 'execute_ddl' not implemented")
+
+
 

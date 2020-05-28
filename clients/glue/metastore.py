@@ -1,4 +1,9 @@
-from clients.aws_client import AWSClient
+from engines.storage.models.path import Path
+
+from engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
+from engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
+from engines.metastore.models.credentials import InvalidCredentials
+from engines.metastore.models.credentials.aws import AWSCredentials
 
 from clients.engines.metastore import MetastoreClient
 from clients.response import Response
@@ -27,4 +32,15 @@ class GlueMetastoreClient(MetastoreClient):
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None) -> Union[Table, InvalidTable]:
         return self.client.get_table(database_name, table_name)
+
+    def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
+        return InvalidCredentials("Client 'credentials' not implemented")
+
+    def generate_table_ddl(self, table: Table, output_path: Optional[Path] = None) -> Union[DDLStatement, InvalidDDLStatement]:
+        return InvalidDDLStatement("Client not implemented")
+
+    def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
+        return InvalidJob(Job("generic"), "Client 'execute_ddl' not implemented")
+
+
 

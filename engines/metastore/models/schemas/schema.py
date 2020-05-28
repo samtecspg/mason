@@ -21,7 +21,7 @@ class SchemaElement:
         return {self.name: self.lookup_pd_type(self.type)}
 
     def lookup_pd_type(self, type: str) -> str:
-        return object
+        return "object"
 
 class Schema(object):
 

@@ -13,7 +13,7 @@ class ExecutionClient(Client):
         return InvalidJob(job, "Client not implemented")
 
     @abstractmethod
-    def get_job(self, job_id: str, response: Response) -> Response:
+    def get_job(self, job_id: str, response: Response) -> Union[InvalidJob, ExecutedJob]:
         raise NotImplementedError("Client not implemented")
         return response
 
