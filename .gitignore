@@ -8,8 +8,8 @@ dist/*
 mason.egg-info/*
 .mypy_cache/
 .mypy_cache/*
-api/swagger.yml
-.env
+mason/api/swagger.yml
+mason/.env
 .DS_Store
 venv/
 venv/**/*
