@@ -40,7 +40,7 @@ class Workflow:
             else:
                 return InvalidWorkflow(f"Invalid DAG definition: {validated_dag.reason}")
         else:
-            return InvalidWorkflow(f"Scheduler {config.scheduler.client_name} not supported by workflow")
+            return InvalidWorkflow(f"Scheduler {config.scheduler.client_name or '(None)'} not supported by workflow")
 
     def register_to(self, workflow_home: str):
         if self.source_path:
