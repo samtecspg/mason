@@ -12,6 +12,7 @@ from typing import List, Union, Optional, Dict, Tuple
 from os import walk
 from tabulate import tabulate
 from clients.response import Response
+import collections
 
 def get_all(env: MasonEnvironment, config_file: Optional[str] = None) -> Tuple[Dict[str, ValidConfig], List[InvalidConfig]]:
     dir = config_file or env.config_home
@@ -32,7 +33,8 @@ def get_all(env: MasonEnvironment, config_file: Optional[str] = None) -> Tuple[D
                 else:
                      invalid.append(config)
 
-    return configs, invalid
+    configs_ordered = collections.OrderedDict(sorted(configs.items()))
+    return configs_ordered, invalid
 
 def get_config(env: MasonEnvironment, file: str) -> Union[ValidConfig, InvalidConfig]:
     yaml_config_doc = parse_yaml_invalid(file)

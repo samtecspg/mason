@@ -1,7 +1,6 @@
 id: 3
 metastore_engine: athena
 storage_engine: s3
-execution_engine: local
 clients:
   s3:
     configuration:
@@ -13,5 +12,3 @@ clients:
       aws_region: "{{AWS_REGION}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  local:
-    threads: 8
