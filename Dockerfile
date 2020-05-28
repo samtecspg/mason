@@ -19,8 +19,9 @@ ENV MASON_HOME /mason/
 ENV KUBECONFIG /app/.kube/config
 
 # Remove if you do not wish to install the example configuration or operators
-RUN mason config examples/configs/
-RUN mason register examples/operators/
+RUN mason config mason/examples/configs/
+RUN mason register mason/examples/operators/
+RUN mason register mason/examples/workflows/
 
 RUN ./scripts/install_kubectl.sh
 
