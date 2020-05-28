@@ -14,8 +14,8 @@ class KubernetesWorker(DaskRunner):
         if self.scheduler:
             # Warning: side-effects, client is used by dask implicitly
             client = Client(self.scheduler, asynchronous=True)
-            return InvalidJob("Job type not supported for Dask")
+            return InvalidJob(job, "Job type not supported for Dask")
         else:
-            return InvalidJob("Dask Scheduler not defined")
+            return InvalidJob(job, "Dask Scheduler not defined")
 
 

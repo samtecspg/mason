@@ -23,7 +23,7 @@ def prep_parameters(params: dict) -> List[str]:
 def merge_config(config: SparkConfig, job: Job):
     base_config_file = from_root("/clients/spark/runner/kubernetes_operator/base_config.yaml")
 
-    parameters = job.parameters
+    parameters = job.parameters or {}
     parameters["job"] = job.type
     param_list = prep_parameters(parameters)
 

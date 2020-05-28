@@ -44,19 +44,19 @@ def test_get():
         exists = op.validate(config, params).run(env, Response())
         assert(exists.with_status() == expects.get(config.metastore.client_name, 1))
 
-        # # Database DNE
-        # params = InputParameters(parameter_string="database_name:bad-database,table_name:catalog_poc_data")
-        # dne = op.validate(config, params).run(env, Response())
-        # assert(dne.with_status() ==expects.get(config.metastore.client_name, 2))
-        #
-        # # Table DNE
-        # params = InputParameters(parameter_string="database_name:crawler-poc,table_name:bad-table")
-        # dne2 = op.validate(config,params).run(env, Response())
-        # assert(dne2.with_status() == expects.get(config.metastore.client_name, 3))
-        #
-        # # API
-        # response, status = table_get_api(env, config, database_name="crawler-poc", table_name="catalog_poc_data", log_level="fatal")
-        # assert((response, status) == expects.get(config.metastore.client_name, 1))
+        # Database DNE
+        params = InputParameters(parameter_string="database_name:bad-database,table_name:catalog_poc_data")
+        dne = op.validate(config, params).run(env, Response())
+        assert(dne.with_status() ==expects.get(config.metastore.client_name, 2))
+
+        # Table DNE
+        params = InputParameters(parameter_string="database_name:crawler-poc,table_name:bad-table")
+        dne2 = op.validate(config,params).run(env, Response())
+        assert(dne2.with_status() == expects.get(config.metastore.client_name, 3))
+
+        # API
+        response, status = table_get_api(env, config, database_name="crawler-poc", table_name="catalog_poc_data", log_level="fatal")
+        assert((response, status) == expects.get(config.metastore.client_name, 1))
 
     run_tests("table", "get", True, "fatal",["config_1", "config_2"],  tests)
 
@@ -90,9 +90,9 @@ def test_merge():
         assert(unsupported.formatted()["Errors"] == ["Multiple Invalid Schemas detected."])
 
         # invalid merge params
-        params = InputParameters(parameter_string="input_path:test,bad:test")
-        invalid = op.validate(config, params).run(env, Response())
-        assert(invalid.with_status() == ({'Errors': ['Invalid Operator.  Reason:  Invalid parameters.  Required parameter not specified: output_path'], 'Info': [], 'Warnings': []}, 400))
+        # params = InputParameters(parameter_string="input_path:test,bad:test")
+        # invalid = op.validate(config, params).run(env, Response())
+        # assert(invalid.with_status() == ({'Errors': ['Invalid Operator.  Reason:  Invalid parameters.  Required parameter not specified: output_path'], 'Info': [], 'Warnings': []}, 400))
 
         # TODO: fix
         # valid merge

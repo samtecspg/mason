@@ -55,7 +55,7 @@ class TestInit:
 
     def test_bad_workflow_parameters(self):
         params = WorkflowParameters(parameter_path=from_root("/test/support/parameters/bad_workflow_params.yaml"))
-        assert("Invalid parameters: Schema error /Users/kyle/dev/mason/parameters/workflow_schema.json: " in params.invalid[0].reason)
+        assert(f"Invalid parameters: Schema error {from_root('/parameters/workflow_schema.json')}: " in params.invalid[0].reason)
 
 class TestValidation:
     def test_parameter_validation(self):

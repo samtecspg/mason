@@ -9,10 +9,10 @@ class SparkRunner:
 
     @abstractmethod
     def run(self, config: SparkConfig, job: Job) -> Union[ExecutedJob, InvalidJob]:
-        return InvalidJob("Runner not implemented")
+        return InvalidJob(job, "Runner not implemented")
 
 class EmptySparkRunner(SparkRunner):
 
     def run(self, config: SparkConfig, job: Job) -> Union[ExecutedJob, InvalidJob]:
-        return InvalidJob("Runner not implemented")
+        return InvalidJob(job, "Runner not implemented")
 

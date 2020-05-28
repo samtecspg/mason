@@ -23,11 +23,11 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
 
     if not response.errored():
 
-        input_path = config.storage.client.get_path(parameters.get_required("input_path"))
-        output_path =config.storage.client.get_path(parameters.get_required("output_path"))
+        input_path = parameters.get_required("input_path")
+        output_path = parameters.get_required("output_path")
         parse_headers = parameters.get_optional("parse_headers")
 
-        table = config.storage.client.infer_table(input_path.path_str, "input_table", {"read_headers": parse_headers})
+        table = config.storage.client.infer_table(input_path, "input_table", {"read_headers": parse_headers})
 
         if isinstance(table, Table):
             response.add_error("No conflicting schemas found. Merge unecessary")
@@ -42,10 +42,10 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
                 schema_types: Set[str] = set(map(lambda schema: schema.type, schemas))
                 if len(schemas) > 0 and schema_types.issubset(SUPPORTED_SCHEMAS):
                     if len(schema_types) == 1:
-                        job = MergeJob(input_path, output_path, next(iter(schema_types)))
+                        job = MergeJob(config.storage.client.path(input_path), config.storage.client.path(output_path), next(iter(schema_types)))
                         executed = config.execution.client.run_job(job, response)
                         if isinstance(executed, ExecutedJob):
-                            response = executed.job.running().response
+                            response = executed.job.running().job.response
                         else:
                             response.add_error(f"Job errored: {executed.reason}")
                     else:

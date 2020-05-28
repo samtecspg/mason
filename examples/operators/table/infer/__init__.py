@@ -5,7 +5,6 @@ from engines.execution.models.jobs import ExecutedJob
 from engines.metastore.models.database import Database
 from engines.metastore.models.ddl import DDLStatement
 from engines.metastore.models.table import Table, InvalidTable
-from engines.storage.models.path import Path
 from parameters import ValidatedParameters
 from clients.response import Response
 from api import operator_api as OperatorApi
@@ -15,7 +14,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
 
     database_name: str = parameters.get_required("database_name")
     storage_path: str = parameters.get_required("storage_path")
-    output_path: Optional[Path] = parameters.get_optional("output_path")
+    output_path: Optional[str] = parameters.get_optional("output_path")
 
     table = config.storage.client.infer_table(storage_path)
 

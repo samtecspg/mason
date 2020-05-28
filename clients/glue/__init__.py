@@ -171,8 +171,9 @@ class GlueClient(AWSClient):
         crawler_name = None
         if isinstance(table, Table):
             created_by = table.created_by
-            if "crawler:" in created_by:
-                crawler_name = created_by.replace("crawler:", "")
+            cb = created_by or ""
+            if "crawler:" in cb:
+                crawler_name = cb.replace("crawler:", "")
                 self.trigger_schedule(crawler_name, response)
             else:
                 response.add_error(f"Table not created by crawler. created_by: {created_by}")

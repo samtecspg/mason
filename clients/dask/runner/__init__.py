@@ -9,11 +9,11 @@ class DaskRunner:
 
     @abstractmethod
     def run(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
-        return InvalidJob("Runner not implemented")
+        return InvalidJob(job, "Runner not implemented")
 
 class EmptyDaskRunner(DaskRunner):
 
     def run(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
-        return InvalidJob("Runner not implemented")
+        return InvalidJob(job, "Runner not implemented")
 
 

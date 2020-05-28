@@ -15,3 +15,4 @@ class AWSClient:
             return AWSCredentials(self.access_key, self.secret_key)
         else:
             return InvalidCredentials("AWS Credentials Undefined.")
+

@@ -57,6 +57,8 @@ def from_file(file_name: str, type: str, header_length: int, read_headers: Optio
             type = f.get('type')
             if name and type:
                 return TextElement(name, type)
+            else:
+                return InvalidSchemaElement(f"Schema name or type not found: {f}")
 
         valid, invalid = sequence(list(map(lambda f: get_element(f), fields)), TextElement, InvalidSchemaElement)
         errors = list(map(lambda e: InvalidSchemaElement(str(e) + f" File: {file_name}"), table.schema.errors))
