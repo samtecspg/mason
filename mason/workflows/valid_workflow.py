@@ -26,7 +26,12 @@ class ValidWorkflow:
         return response
 
     def dry_run(self, env: MasonEnvironment, response: Response) -> Response:
-        response.add_info(f"Valid Workflow DAG Definition: {self.dag.to_dict()}")
+        response.add_info(f"Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag")
+        response.add_info("")
+        response.add_info(f"Valid Workflow DAG Definition:")
+        response.add_info(f"-" * 80)
+        response.add_info(f"{self.dag.display()}")
+        response.add_info("")
         return response
 
     def deploy(self, env: MasonEnvironment, response: Response, run_now: bool, schedule_name: Optional[str] = None) -> Response:

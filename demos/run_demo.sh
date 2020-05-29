@@ -67,9 +67,34 @@ then
 elif [ $1 == "1.04" ]
 then
   commands=(
-    "mason config examples/configs/"
-    "mason register examples/operators/"
-    "mason workflows register examples/workflows/"
+      "mason config mason/examples/configs/ -l trace"
+      "mason workflow"
+      "mason workflow register mason/examples/workflows/"
+      "mason workflow"
+      "mason workflow table infer"
+      "mason workflow table infer -f mason/examples/parameters/bad_file.yaml"
+      "mason workflow table infer -f mason/examples/parameters/workflow_table_infer.yaml"
+      "mason operator"
+      "mason register mason/examples/operators/"
+      "mason workflow table infer -f mason/examples/parameters/workflow_table_infer.yaml"
+      "mason workflow table infer -f mason/examples/parameters/bad_workflow_table_infer.yaml"
+      "mason workflow table infer -f mason/examples/parameters/workflow_table_infer.yaml -d"
+      "mason workflow table infer -f mason/examples/parameters/workflow_table_infer.yaml -d -r"
+      "mason config -s 3"
+      "mason operator table"
+      "mason operator table infer -p database_name:bad_database,storage_path:bogus"
+      "mason operator table infer -p database_name:bad_database,storage_path:spg-mason-demo/part_data_parts -l trace"
+      "mason operator table infer -p database_name:crawler-poc,storage_path:spg-mason-demo/part_data_parts -l trace >> infer.txt"
+      "cat infer.txt"
+      "export JOB_ID=\"\$(cat infer.txt | grep \"job id\" | tail -n 1 | cut -d= -f2 | sed -e 's/\"$//')\""
+      "echo \$JOB_ID"
+      "mason config -s 1"
+      "mason operator job get -p \"job_id:\$JOB_ID\" -l trace"
+      "mason operator table query -p \"database_name:crawler-poc,query_string:SELECT * from \\\"part_data_parts\\\" limit 5\" >> query.txt"
+      "cat query.txt"
+      "export JOB_ID=\"\$(cat query.txt | grep \"job id\" | tail -n 1 | cut -d= -f2 | sed -e 's/\"$//')\""
+      "echo \$JOB_ID"
+      "mason operator job get -p \"job_id:\$JOB_ID\""
   )
 else
   commands=()

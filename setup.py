@@ -15,7 +15,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license='',
-    packages=find_namespace_packages(),
+    packages=find_packages(),
     entry_points={
         'console_scripts': [
             'mason = mason.cli:main'

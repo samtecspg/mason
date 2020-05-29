@@ -37,7 +37,7 @@ class MetastoreClient(Client):
         return InvalidCredentials("Client not implemented")
 
     @abstractmethod
-    def generate_table_ddl(self, table: Table, output_path: Optional[Path] = None) -> Union[DDLStatement, InvalidDDLStatement]:
+    def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
         return InvalidDDLStatement("Client not implemented")
 
     @abstractmethod

@@ -30,7 +30,7 @@ class DagStep:
                 if operator:
                     valid = operator.validate(config, operator_params)
                     if isinstance(valid, ValidOperator):
-                        return ValidDagStep(valid)
+                        return ValidDagStep(self.id, valid)
                     else:
                         return InvalidDagStep(f"Invalid Dag Step: Invalid Operator Definition: {valid.reason}")
                 else:
@@ -38,11 +38,13 @@ class DagStep:
             else:
                 return InvalidDagStep(f"Invalid Dag Step: Config not found with id {wfp.config_id}")
         else:
-            return InvalidDagStep(f"Workflow Parameters for step {self.id} not specified")
+            messages = ", ".join(list(map(lambda p: p.reason, parameters.invalid)))
+            return InvalidDagStep(f"Workflow Parameters for step:{self.id} not specified. Invalid Parameters: {messages}")
 
 class ValidDagStep:
 
-    def __init__(self, operator: ValidOperator):
+    def __init__(self, id: str, operator: ValidOperator):
+        self.id = id
         self.operator = operator
 
 class InvalidDagStep:

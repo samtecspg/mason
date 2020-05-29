@@ -57,21 +57,24 @@ def register(operator_file: str, log_level: Optional[str] = None):
     """
 
     env = MasonEnvironment()
-    if path.exists(env.config_home):
-        logger.set_level(log_level)
-        ops, errors = operators.list_operators(operator_file)
+    if path.exists(operator_file):
+        if path.exists(env.config_home):
+            logger.set_level(log_level)
+            ops, errors = operators.list_operators(operator_file)
 
-        if len(ops) > 0:
-            for operator in ops:
-                operator.register_to(env.operator_home)
+            if len(ops) > 0:
+                for operator in ops:
+                    operator.register_to(env.operator_home)
+            else:
+                if len(errors) > 0:
+                    for error in errors:
+                        logger.error(f"Invalid operator configurations found: {error}")
+
+
         else:
-            if len(errors) > 0:
-                for error in errors:
-                    logger.error(f"Invalid operator configurations found: {error}")
-
-
+            logger.error("Configuration not found.  Run \"mason config\" first")
     else:
-        logger.error("Configuration not found.  Run \"mason config\" first")
+        logger.error(f"File not found {operator_file}")
 
 
 @main.command("operator", short_help="Executes and lists mason operators")
@@ -103,7 +106,7 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
 @click.option("-l", "--log_level", help="Log level for mason")
 @click.option("-d", "--deploy", help="Deploy specified workflow", is_flag=True)
 @click.option('-r', '--run', help="Run workflow right now ignoring schedule", is_flag=True)
-@click.option('-f', '--param_file', help="Parameters from yaml file path")
+@click.option('-f', '--param_file', help="Parameters from yaml file path. For workflows this is the only way to pass parameters")
 @click.option('-n', '--schedule_name', help="Optional name for schedule.  Only works with -d --deploy")
 def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
     """
@@ -113,8 +116,8 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, param_file
     Running with 'register' registers workflow from specified <workflow_file>, workflow_file must contain a valid workflow.yaml
     """
     env = MasonEnvironment()
-    config = get_current_config(env, "debug")
     logger.set_level(log_level)
+    config = get_current_config(env, "debug")
 
     if config:
         if cmd == "register":

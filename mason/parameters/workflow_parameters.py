@@ -53,3 +53,4 @@ class WorkflowParameters:
             invalid.append(InvalidParameter(f"Invalid parameter yaml: {parsed}"))
 
         return valid, invalid
+

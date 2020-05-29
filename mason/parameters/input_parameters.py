@@ -11,7 +11,6 @@ from mason.parameters.parameter import Parameter
 from mason.util.list import dedupe, get
 from mason.util.yaml import parse_yaml_invalid
 
-
 class InputParameters:
     def __init__(self, parameter_string: Optional[str] = None, parameter_path: Optional[str] = None):
         self.parameter_string = parameter_string

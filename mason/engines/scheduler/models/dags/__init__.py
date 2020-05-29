@@ -6,6 +6,8 @@ from mason.util.environment import MasonEnvironment
 from mason.util.json_schema import sequence
 
 from mason.util.list import flatten
+from mason.util.logger import logger
+
 
 class Dag:
 
@@ -20,7 +22,7 @@ class Dag:
 
     def validate_dag(self, valid_steps: List[ValidDagStep], invalid_steps: List[InvalidDagStep]) -> Union['ValidDag', 'InvalidDag']:
         if len(valid_steps) == 0:
-            return InvalidDag("No valid DAG steps", valid_steps, invalid_steps)
+            return InvalidDag("No valid DAG steps. ", valid_steps, invalid_steps)
         else:
             #  TODO: Validate that is indeed a valid dag
             return ValidDag(valid_steps, invalid_steps)
@@ -32,8 +34,13 @@ class ValidDag:
         self.invalid_steps = invalid_steps
 
     def to_dict(self) -> dict:
-        # TODO: Find Sensible way to display dag
         return {}
+
+    def display(self) -> str:
+        #  TODO: Print out full dag diagram with multi-steps
+        vs = self.valid_steps
+        vs0 = vs[0]
+        return f"{vs0.id}>> {vs0.operator.display_name()}"
 
 class InvalidDag:
 

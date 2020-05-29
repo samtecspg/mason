@@ -64,6 +64,7 @@ class AthenaClient(AWSClient):
             job.response.add_info(reason)
 
         if status == 200:
+            job.response.add_info(f"Job Status: {state}")
             try:
                 athena_response_2 = self.client().get_query_results(
                     QueryExecutionId=job_id,
@@ -84,7 +85,9 @@ class AthenaClient(AWSClient):
                 job.response.set_status(status)
                 results = athena_response_2.get("ResultSet")
                 if results:
-                    job.response.add_data(results)
+                    rows = results.get("Rows") or []
+                    if len(rows) > 0:
+                        job.response.add_data(results)
                     return ExecutedJob(job)
                 else:
                     return InvalidJob(job, "No job results returned from athena")
@@ -137,12 +140,9 @@ class AthenaClient(AWSClient):
         else:
             return job.errored(f"Job type {job.type} not supported for Athena client")
 
-    def generate_table_ddl(self, table: Table, output_path: Optional[Path]) -> Union[DDLStatement, InvalidDDLStatement]:
-        if output_path:
-            statement = generate_ddl(table.as_df(), table.name, output_path.path_str)
-            return DDLStatement(statement)
-        else:
-            return InvalidDDLStatement("Athena requires output path location to store parquet files")
+    def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
+        statement = generate_ddl(df=table.as_df(), name=table.name, location=path.path_str, schema=database.name)
+        return DDLStatement(statement)
 
     def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
         ddl.statement

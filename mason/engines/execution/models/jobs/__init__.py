@@ -28,7 +28,7 @@ class Job:
         if message:
             self.response.add_info(message)
         else:
-            self.response.add_info(f"Running job {self.id}")
+            self.response.add_info(f"Running job id={self.id}")
         return ExecutedJob(self)
 
     def set_id(self, id: Optional[str] = None):

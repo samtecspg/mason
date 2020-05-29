@@ -7,6 +7,8 @@ WORKDIR /app
 RUN pip3 install -r requirements.txt
 
 COPY . /app
+RUN rm mason/.env
+RUN cp mason/.env.example mason/.env
 
 RUN chmod +x /app/demos/run_demo.sh
 
@@ -22,6 +24,7 @@ ENV KUBECONFIG /app/.kube/config
 RUN mason config mason/examples/configs/
 RUN mason register mason/examples/operators/
 RUN mason register mason/examples/workflows/
+#RUN rm mason/.env
 
 RUN ./scripts/install_kubectl.sh
 

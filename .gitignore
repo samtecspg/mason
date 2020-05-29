@@ -14,6 +14,8 @@ mason/.env
 venv/
 venv/**/*
 .direnv/
+pip-wheel-metadata/
+pip-wheel-metadata/*
 .direnv/**/*
 .direnv/*
 htmlcov/

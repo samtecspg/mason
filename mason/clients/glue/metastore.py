@@ -34,7 +34,7 @@ class GlueMetastoreClient(MetastoreClient):
     def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
         return InvalidCredentials("Client 'credentials' not implemented")
 
-    def generate_table_ddl(self, table: Table, output_path: Optional[Path] = None) -> Union[DDLStatement, InvalidDDLStatement]:
+    def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
         return InvalidDDLStatement("Client not implemented")
 
     def execute_ddl(self, ddl: DDLStatement, database: Database) -> Union[ExecutedJob, InvalidJob]:
