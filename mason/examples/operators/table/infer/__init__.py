@@ -19,7 +19,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
     table = config.storage.client.infer_table(storage_path, table_name)
 
     if isinstance(table, Table):
-        response.add_info(f"Table inferred: {table.to_dict()}")
+        response.add_info(f"Table inferred: {table.name}")
         database = config.metastore.client.get_database(database_name)
         if isinstance(database, Database):
             path = config.storage.client.path(storage_path)

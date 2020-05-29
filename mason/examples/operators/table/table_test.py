@@ -123,7 +123,7 @@ def test_query():
         query = "SELECT * from good_table limit 5"
         params = InputParameters(parameter_string=f"query_string:{query},database_name:good_database")
         result = op.validate(config, params).run(env, Response())
-        expect = {'Errors': [], 'Info': ['Running Query "SELECT * from good_table limit 5"', 'Running Athena query.  query_id: test', 'Running job test'], 'Warnings': []}
+        expect = {'Errors': [], 'Info': ['Running Query "SELECT * from good_table limit 5"', 'Running Athena query.  query_id: test', 'Running job id=test'], 'Warnings': []}
 
         assert(result.with_status() == (expect, 200))
 
@@ -165,7 +165,7 @@ def test_infer():
         # database DNE
         params = InputParameters(parameter_string=f"database_name:bad-database,storage_path:crawler-poc/catalog_poc_data")
         good = op.validate(config, params).run(env, Response())
-        assert(good.with_status() == ({'Errors': ['Metastore database bad-database not found'], 'Info': [], 'Warnings': []}, 200))
+        assert(good.with_status() == ({'Errors': ['Metastore database bad-database not found'], 'Info': ['Table inferred: catalog_poc_data'], 'Warnings': []}, 200))
 
         # bad path
         params = InputParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/bad-table")
@@ -181,21 +181,14 @@ def test_infer():
         infos = clean(good.formatted()["Info"])
 
         expect = [
-            'RunningQuery"CREATEEXTERNALTABLEIFNOTEXISTS`default`.``(`widget`STRING,`price`DOUBLE,`manufacturer`STRING,`in_stock`BOOLEAN)STOREDASPARQUETLOCATION\'s3://spg-mason-demo/athena/\'"',
-            'RunningAthenaquery.query_id:',
-            'Runningjob'
-        ]
-
-        expect = [
-            'RunningQuery"CREATEEXTERNALTABLEIFNOTEXISTS`default`.`catalog_poc_data`(`test_column_1`INT,`test_column_2`STRING)STOREDASPARQUETLOCATION\'s3://crawler-poc/athena/\'"',
+            'RunningQuery"CREATEEXTERNALTABLEIFNOTEXISTS`crawler-poc`.`catalog_poc_data`(`test_column_1`INT,`test_column_2`STRING)STOREDASPARQUETLOCATION\'s3://crawler-poc/catalog_poc_data\'"',
             'RunningAthenaquery.query_id:test_id',
-            'Runningjobtest_id'
+            'Runningjobid=test_id'
         ]
         assert(infos == expect)
 
         # API
         response, status = table_infer_api(env, config, database_name="crawler-poc", storage_path="crawler-poc/catalog_poc_data", output_path="crawler-poc/athena/", log_level="fatal")
-        # response, status = table_infer_api(env, config, database_name="crawler-poc", storage_path="spg-mason-demo/part_data_merged", output_path="spg-mason-demo/athena/", log_level="fatal")
         assert (clean(response["Errors"]) == [])
         assert (clean(response["Info"]) == expect)
 

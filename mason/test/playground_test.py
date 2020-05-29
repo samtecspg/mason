@@ -18,7 +18,7 @@ def print_result(result):
         print(result.exception)
 
 
-# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestPlayground:
 
     @pytest.fixture(autouse=True)

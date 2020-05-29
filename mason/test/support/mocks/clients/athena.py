@@ -10,7 +10,7 @@ class AthenaMock:
             f1 = e.sub('', s1)
             return f1
 
-        ddl = """CREATE EXTERNAL TABLE IF NOT EXISTS `default`.`catalog_poc_data` (`test_column_1` INT, `test_column_2` STRING) STORED AS PARQUET LOCATION \'s3://crawler-poc/athena/\'"""
+        ddl = """CREATE EXTERNAL TABLE IF NOT EXISTS `crawler-poc`.`catalog_poc_data` (`test_column_1` INT, `test_column_2` STRING) STORED AS PARQUET LOCATION \'s3://crawler-poc/catalog_poc_data\'"""
         if kwargs["QueryExecutionContext"]["Database"] == "access_denied":
             return {'Error': {'Message': 'User: arn:aws:iam::062325279035:user/kops is not authorized to perform: athena:CreateNamedQuery on resource: arn:aws:athena:us-east-1:062325279035:workgroup/mason', 'Code': 'AccessDeniedException'}, 'ResponseMetadata': {'RequestId': '5fb1a7af-8478-46fe-b3d1-1efce725d879', 'HTTPStatusCode': 400, 'HTTPHeaders': {'content-type': 'application/x-amz-json-1.1', 'date': 'Fri, 24 Apr 2020 13:31:08 GMT', 'x-amzn-requestid': '5fb1a7af-8478-46fe-b3d1-1efce725d879', 'content-length': '209', 'connection': 'keep-alive'}, 'RetryAttempts': 0}}
         elif (kwargs["QueryExecutionContext"]["Database"] == "good_database") and (kwargs["QueryString"] == "SELECT * from good_table limit 5") and kwargs["WorkGroup"] == "mason":
