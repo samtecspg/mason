@@ -86,16 +86,5 @@ class TestSpark:
         assert clean_string(dumped) == clean_string(expects)
 
 
-class TestS3:
-
-    def test_parse_path(self):
-        env = MasonEnvironment()
-        conf = Config({"metastore_engine": "s3", "clients": {"s3": {"configuration": {"aws_region": "test", "secret_key": "test", "access_key": "test"}}}}).validate(env)
-        if isinstance(conf, ValidConfig):
-            assert(conf.metastore.client.__class__.__name__ == "S3MetastoreClient")
-            client = conf.metastore.client
-            parsed = client.parse_path("test_bucket/test_path/test_file.csv")
-            assert(parsed[0] == "test_bucket")
-            assert(parsed[1] == "test_path/test_file.csv")
 
 

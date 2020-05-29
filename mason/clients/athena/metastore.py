@@ -17,8 +17,8 @@ class AthenaMetastoreClient(MetastoreClient):
     def __init__(self, config: dict):
         self.client = AthenaClient(config)
 
-    def generate_table_ddl(self, table: Table, output_path: Optional[Path] = None) -> Union[DDLStatement, InvalidDDLStatement]:
-        return self.client.generate_table_ddl(table, output_path)
+    def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
+        return self.client.generate_table_ddl(table, path, database)
 
     def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
         return self.client.get_database(database_name)
@@ -38,9 +38,6 @@ class AthenaMetastoreClient(MetastoreClient):
         raise NotImplementedError("Athena Client full_path not implemented")
         return ""
 
-    def parse_path(self, path: str) -> Tuple[str, str]:
-        raise NotImplementedError("Athena Client parse_path not implemented")
-        return ("", "")
 
     def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
         return InvalidCredentials("Client 'credentials' not implemented")

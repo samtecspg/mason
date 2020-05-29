@@ -76,8 +76,11 @@ class S3Client(AWSClient):
     def get_path(self, path: str) -> Path:
         return Path(path)
 
-    def get_name(self, path: str):
-        return path.split("/")[-1]
+    def get_name(self, name: Optional[str], path: str) -> str:
+        if not name or name == "":
+            return path.rstrip("/").split("/")[-1]
+        else:
+            return name
 
     def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
         logger.info(f"Fetching keys at {path}")
@@ -86,7 +89,7 @@ class S3Client(AWSClient):
         if len(keys) > 0:
             valid, invalid = sequence(list(map(lambda key: schemas.from_file(self.client().open(key), options or {}), keys)), Schema, InvalidSchema)
             validated = CheckSchemas.find_conflicts(list(set(valid)))
-            table = CheckSchemas.get_table(name or self.get_name(path), validated)
+            table = CheckSchemas.get_table(self.get_name(name, path), validated)
             invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid))
             if isinstance(table, Table):
                 return table

@@ -64,7 +64,7 @@ def register_workflows(workflow_file: str, env: MasonEnvironment):
         logger.error(f"Invalid Workflow Schema Definition {i.reason}")
 
     for w in valid_workflows:
-        logger.info(f"Valid Workflow Definition: {workflow_file}")
+        logger.info(f"Valid Workflow Definition: {w.source_path}")
         w.register_to(env.workflow_home)
 
 def list_workflows(env: MasonEnvironment, namespace: Optional[str] = None) -> List[Workflow]:

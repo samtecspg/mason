@@ -22,12 +22,15 @@ class ValidOperator:
     def type_name(self):
         return str.capitalize(self.namespace) + str.capitalize(self.command)
 
+    def display_name(self):
+        return f"{self.namespace}:{self.command}"
+
     def run(self, env: MasonEnvironment, response: Response) -> Response:
-        # try:
-        mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
-        response = mod.run(env, self.config, self.parameters, response)  # type: ignore
-        # except ModuleNotFoundError as e:
-        #     response.add_error(f"Module Not Found: {e}")
+        try:
+            mod = import_module(f'{env.operator_module}.{self.namespace}.{self.command}')
+            response = mod.run(env, self.config, self.parameters, response)  # type: ignore
+        except ModuleNotFoundError as e:
+            response.add_error(f"Module Not Found: {e}")
 
         return response
 
