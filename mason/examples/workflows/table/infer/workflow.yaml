@@ -10,4 +10,3 @@ dag:
       command: "infer"
 supported_schedulers:
   - "glue"
-  - "local"

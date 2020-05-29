@@ -29,8 +29,8 @@ Legend
 - [x] :arrow_up: Clean up rest api implementation C:03/13/2020
 - [x] create "mason run" cli command C: 03/09/2020
 - [ ] Pull rest api responses through to swagger spec (200 status example)
-- [ ] :arrow_up: Advanced Operator Registration Documentation 
-- [ ] :arrow_up: New Client Documentation 
+- [x] :arrow_up: Advanced Operator Registration Documentation 
+- [x] :arrow_up: New Client Documentation 
 - [ ] :arrow_down: New Engine Documentation 
 - [x] :arrow_up: Dockerize mason implementation C: 03/09/2020
 - [x] Build and refine "Engines" first order concept C: 03/06/2020
@@ -58,16 +58,16 @@ Legend
 - [x] Extraneous parameters.  Showing up in "required parameters" error return incorrectly. C: 03/11/2020
 - [x] Better errors around Permission errors C: 03/13/2020
 
-
 ## Execution Engine
 - [ ] Look into using calcite or coral to extend spark operators to presto and hive
 - [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Workflows
-- [ ] Infer Workflow (1-step)
+- [x] Infer Workflow (1-step)
     - [x] Glue Support C: 05/10/2020
-    - [ ] :large_blue_circle: Athena Support with local scheduler
-    - [ ] :large_blue_circle: Athena Support with airflow scheduler
+    - [x] Athena Support with local scheduler (this ended up just being local instantiating of underlying infer operator)
+- [ ] :large_blue_circle: Athena Support with airflow scheduler
+- [ ]  Allow run flag to trigger existing workflow
 
 ## Operators
 - [x] Infer operator
@@ -111,6 +111,9 @@ Legend
    - [x] Json schema
    - [ ] :arrow_down: Avro schema
    - [ ] :arrow_down: Msgpack pack schema
+### Athena
+- [x] DDL Generation
+- [ ] Add partitioning concepts to DDL generation
 
 ### Execution Engine
 #### Local
@@ -130,13 +133,15 @@ Legend
 - [ ] :arrow_up: Basic setup 
 
 ### Dask
-- [ ] Basic Setup
-    - [ ] Kubernetes Runner
+- [x] Basic Setup
+    - [x] Kubernetes Runner
 
 ### Scheduler
 ### Glue
 - [x] Basic set up
-- [ ] Workflow Implementation
+- [x] Workflow Implementation
+- [ ] Multiple step workflow implementation
+- [ ] DAG validation (validate that it is a Directed Acycyclic Dag, not that its valid, thats already done)
 #### Airflow
 - [ ] Basic setup 
 
@@ -144,12 +149,12 @@ Legend
 #### Redshift
 #### Elasticsearch
 #### S3
-- [ ] Move some metastore concepts over here like "paths"
+- [x] Move some metastore concepts over here like "paths"
 - [ ] :arrow_up: Basic Setup 
 - [ ] Redshift
 - [ ] Elasticsearch
 
 ## :arrow_up: Preparing for public
-- [ ] Remove samtec specific examples from examples/ files.  Use public examples
+- [x] Remove samtec specific examples from examples/ files.  Use public examples
 
 

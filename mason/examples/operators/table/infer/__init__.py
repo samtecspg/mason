@@ -1,10 +1,10 @@
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.api import operator_api as OperatorApi
 from mason.engines.execution.models.jobs import ExecutedJob
-from mason.engines.metastore.models.database import Database
+from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement
 from mason.engines.metastore.models.table import InvalidTable, Table
 from mason.parameters.validated_parameters import ValidatedParameters
@@ -20,7 +20,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
 
     if isinstance(table, Table):
         response.add_info(f"Table inferred: {table.name}")
-        database = config.metastore.client.get_database(database_name)
+        database: Union[Database, InvalidDatabase] = config.metastore.client.get_database(database_name)
         if isinstance(database, Database):
             path = config.storage.client.path(storage_path)
             ddl = config.metastore.client.generate_table_ddl(table, path, database)
