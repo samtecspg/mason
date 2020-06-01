@@ -2,10 +2,12 @@ import os
 from typing import List
 
 import yaml
+
+from mason.definitions import from_root
 from mason.util.yaml import parse_yaml
 
 def update_yaml_file(base_swagger: str, directories: List[str]):
-    swagger_file = "api/swagger.yml"
+    swagger_file = from_root("/api/swagger.yml")
     parsed_swagger = parse_yaml(base_swagger) or {}
     paths: dict = parsed_swagger["paths"]
 

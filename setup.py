@@ -3,11 +3,14 @@ from setuptools import setup, find_packages, find_namespace_packages
 with open('requirements.txt') as f:
     requirements = f.readlines()
 
+with open('VERSION') as f:
+    version = f.read()
+
 long_description = 'Mason Data Operators Framework'
 
 setup(
     name='mason',
-    version='1.04',
+    version=version,
     author='Kyle Prifogle',
     author_email='kyle.prifogle@samtec.com',
     url='',

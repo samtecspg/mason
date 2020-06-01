@@ -13,6 +13,6 @@ services:
         environment:
             - MASON_HOME=/mason/
         env_file:
-            - mason/.env
+            - .env
         image: "samtecspg/mason:v1.03"
 

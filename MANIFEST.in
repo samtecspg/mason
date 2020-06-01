@@ -5,3 +5,4 @@ include mason/workflows/schema.json
 include mason/parameters/schema.json
 include mason/parameters/workflow_schema.json
 include mason/clients/spark/runner/kubernetes_operator/base_config.yaml
+include mason/api/base_swagger.yml

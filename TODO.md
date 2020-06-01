@@ -66,10 +66,11 @@ Legend
 - [x] Infer Workflow (1-step)
     - [x] Glue Support C: 05/10/2020
     - [x] Athena Support with local scheduler (this ended up just being local instantiating of underlying infer operator)
-- [ ] :large_blue_circle: Athena Support with airflow scheduler
+- [ ]  Athena Support with airflow scheduler
 - [ ]  Allow run flag to trigger existing workflow
 
 ## Operators
+- [ ] table summary operator
 - [x] Infer operator
     - [x] Glue Support: C: long time ago
 - [x] Schema merge operator C:09/04/2020

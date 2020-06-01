@@ -11,7 +11,7 @@ swagger: '2.0'
 paths:
   /configs:
     get:
-      operationId: "api.config_api.get"
+      operationId: "mason.api.config_api.get"
       parameters:
         - name: log_level
           in: query
@@ -28,7 +28,7 @@ paths:
           description: "Successful list"
   /config:
     post:
-      operationId: "api.config_api.set"
+      operationId: "mason.api.config_api.set"
       parameters:
         - name: set_current
           in: query

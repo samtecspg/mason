@@ -64,7 +64,7 @@ then
     "mason operator table delete -p \"database_name:spg-mason-demo,table_name:file_1_parquet\""
     "mason operator schedule delete -p \"schedule_name:mason-demo-crawler-2\""
   )
-elif [ $1 == "1.04" ]
+elif [ $1 == "1.4.0" ]
 then
   commands=(
       "mason config mason/examples/configs/ -l trace"
