@@ -47,7 +47,7 @@ Mason's mission is to provide ways to build composable self contained functional
 ## Quickstart
 ### Docker
 
-If you are implementing aws clients remember to update `.env` file to include AWS credentials
+If you are implementing aws clients remember to update `.env` file to include AWS credentials located at ~/.mason/.env
 ```.env
 AWS_ACCESS_KEY_ID=<KEY_ID>
 AWS_SECRET_ACCESS_KEY=<SECRET_KEY>

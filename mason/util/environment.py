@@ -1,5 +1,8 @@
 import os
 from typing import Optional
+
+from dotenv import load_dotenv
+
 from mason.definitions import from_root
 from os import path
 from mason.util.printer import banner
@@ -21,6 +24,8 @@ class MasonEnvironment:
         self.operator_module = operator_module or "registered_operators"
         self.workflow_module = workflow_module or "registered_workflows"
         self.config_schema = from_root("/configurations/schema.json")
+
+        load_dotenv(self.mason_home + ".env")
 
 def get_mason_home() -> str:
     try:

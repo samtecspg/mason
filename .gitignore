@@ -9,7 +9,7 @@ mason.egg-info/*
 .mypy_cache/
 .mypy_cache/*
 mason/api/swagger.yml
-mason/.env
+.env
 .DS_Store
 venv/
 venv/**/*

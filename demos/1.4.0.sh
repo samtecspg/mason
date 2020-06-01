@@ -8,4 +8,4 @@ read -p "$*"
 
 cd ..
 
-docker run -it --env-file=mason/.env -v=$HOME/.kube/:/app/.kube/ samtecspg/mason:v1.04 ./demos/run_demo.sh 1.04
+docker run -it --env-file=.env -v=$HOME/.kube/:/app/.kube/ samtecspg/mason:v1.4 ./demos/run_demo.sh 1.4.0

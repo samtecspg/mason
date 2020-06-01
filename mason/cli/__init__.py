@@ -1,11 +1,10 @@
 import click
-import os
 from os import path
 from typing import Optional
-from dotenv import load_dotenv
 
 from mason.parameters.input_parameters import InputParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
+from mason.server import MasonServer
 from mason.util.logger import logger
 from mason.util.environment import MasonEnvironment, initialize_environment
 from mason.configurations.configurations import get_current_config
@@ -13,7 +12,6 @@ from mason.configurations.actions import run_configuration_actions
 from mason.operators import operators
 from mason.workflows import workflows
 
-load_dotenv()
 
 @click.group()
 def main():
@@ -139,7 +137,8 @@ def run():
     Will run mason flask server on port 5000.
     To view the mason swagger ui go to: http://localhost:5000/api/ui/
     """
-    os.system('./scripts/run.sh')
+    MasonServer().run()
+
 
 
 if __name__ == "__main__":

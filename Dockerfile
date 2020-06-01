@@ -7,24 +7,25 @@ WORKDIR /app
 RUN pip3 install -r requirements.txt
 
 COPY . /app
-RUN rm mason/.env
-RUN cp mason/.env.example mason/.env
 
 RUN chmod +x /app/demos/run_demo.sh
-
 RUN pip3 install mypy
-RUN ./scripts/test.sh
-RUN ./scripts/install.sh
 
 RUN mkdir /mason
+
 ENV MASON_HOME /mason/
+RUN cp .env.example ${MASON_HOME}/.env
+RUN rm .env 
+
 ENV KUBECONFIG /app/.kube/config
+
+RUN ./scripts/test.sh
+RUN ./scripts/install.sh
 
 # Remove if you do not wish to install the example configuration or operators
 RUN mason config mason/examples/configs/
 RUN mason register mason/examples/operators/
 RUN mason register mason/examples/workflows/
-#RUN rm mason/.env
 
 RUN ./scripts/install_kubectl.sh
 
