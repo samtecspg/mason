@@ -43,7 +43,7 @@ Legend
 - [x] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
 - [x] Allow for multiple configurations C: 04/08/2020
 - [x] Clean up multiple configurations -> add id, don't use enumerate. C:05/10/2020
-- [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
+- [x] ~~Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)~~: not going to do right now
 - [ ] Establish session for current configuration
 - [ ] Add redis or sqllite for session 
 - [ ] Move operator/configs over to redis
@@ -51,6 +51,7 @@ Legend
 - [x] Interpolate environment variables into config and have that affect config validation: C: 04/23/2020
 - [x] Clean up mock implementations: C: 04/23/2020
 - [ ] Consolidate all AWS response error parsing methods.
+- [ ] Improve performance by moving around imports
 
 ## Test Cases
 
@@ -76,8 +77,8 @@ Legend
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
-- [ ] Table Export operator with S3 support (export csv's of metastore tables)
-- [ ] Table "join" operator (on set of columns)
+- [ ] :large_blue_circle: Table Export operator with S3 support (export csv's of metastore tables)
+- [ ] :large_blue_circle: Table "join" operator (on set of columns)
 - [ ] Dedupe Operator
 - [ ] Table Operators
     - [x] Query (requires metastore and execution engine) C:04/28/2020
@@ -118,7 +119,7 @@ Legend
 
 ### Execution Engine
 #### Local
-- [ ] :arrow_up: Basic setup :large_blue_circle:
+- [ ] :arrow_up: Basic setup
 #### IPython/Jupyter
 - [ ] :arrow_up: Basic setup
 - [ ] :arrow_up: Papermill integration 
@@ -129,20 +130,19 @@ Legend
     - [x] Kubernetes Operator Runner C: 4/06/2020
     - [ ] EMR Runner 
     - [ ] Local Runner
-- [ ] Check that file format is supported
+- [x] Check that file format is supported
 #### Presto
 - [ ] :arrow_up: Basic setup 
-
 ### Dask
 - [x] Basic Setup
     - [x] Kubernetes Runner
 
 ### Scheduler
+- [ ] Multiple step workflow implementation
+- [ ] DAG validation (validate that it is a Directed Acyclic Dag, not that its valid, thats already done)
 ### Glue
 - [x] Basic set up
 - [x] Workflow Implementation
-- [ ] Multiple step workflow implementation
-- [ ] DAG validation (validate that it is a Directed Acycyclic Dag, not that its valid, thats already done)
 #### Airflow
 - [ ] Basic setup 
 
@@ -151,7 +151,7 @@ Legend
 #### Elasticsearch
 #### S3
 - [x] Move some metastore concepts over here like "paths"
-- [ ] :arrow_up: Basic Setup 
+- [x] Basic Setup 
 - [ ] Redshift
 - [ ] Elasticsearch
 
