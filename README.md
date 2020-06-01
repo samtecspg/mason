@@ -114,17 +114,17 @@ To configure mason run `mason config`.  Configurations are validated for basic s
 ```
 >> mason config examples/configs/
 +---------------------------------------------+
-| Creating MASON_HOME at /Users/kyle/.mason/  |
+| Creating MASON_HOME at ~/.mason/  |
 +---------------------------------------------+
 +---------------------------------------------------------------------+
-| Creating OPERATOR_HOME at /Users/kyle/.mason/registered_operators/  |
+| Creating OPERATOR_HOME at ~/.mason/registered_operators/  |
 +---------------------------------------------------------------------+
 +-------------------------------------------------------------+
-| Creating CONFIG_HOME at /Users/kyle/.mason/configurations/  |
+| Creating CONFIG_HOME at ~/.mason/configurations/  |
 +-------------------------------------------------------------+
 
-Valid Configuration. Saving config examples/configs/config_1.yaml to /Users/kyle/.mason/configurations/
-Valid Configuration. Saving config examples/configs/config_2.yaml to /Users/kyle/.mason/configurations/
+Valid Configuration. Saving config examples/configs/config_1.yaml to ~/.mason/configurations/
+Valid Configuration. Saving config examples/configs/config_2.yaml to ~/.mason/configurations/
 
 Setting current config to 0
 +-----------------+
@@ -173,7 +173,7 @@ No Operators Registered.  Register operators by running "mason register"
   You can register some example operators.  Operators are validated for basic structure using json_schema.  See `/operators/schema.json` for the schema description.
   
 ```
->> mason register examples/operators/
+>> mason register mason/examples/operators/
 Valid Operator Definition examples/operators/schedule/delete/operator.yaml
 Valid Operator Definition examples/operators/table/delete/operator.yaml
 Valid Operator Definition examples/operators/table/merge/operator.yaml
@@ -183,7 +183,7 @@ Valid Operator Definition examples/operators/table/list/operator.yaml
 Valid Operator Definition examples/operators/table/infer/operator.yaml
 Valid Operator Definition examples/operators/table/query/operator.yaml
 Valid Operator Definition examples/operators/job/get/operator.yaml
-Registering operators at examples/operators/ to /Users/kyle/.mason/registered_operators/operators/
+Registering operators at examples/operators/ to ~/.mason/registered_operators/operators/
 ```
 
 Listing Operators:
@@ -193,7 +193,7 @@ Listing Operators:
 mason operator
 
 +-----------------------------------------------------------------------+
-| Available Operator Methods: /Users/kyle/.mason/registered_operators/  |
+| Available Operator Methods: ~/.mason/registered_operators/            |
 +-----------------------------------------------------------------------+
 
 namespace    command    description                                                                               parameters
@@ -215,7 +215,7 @@ Listing Operators for a particular namespace:
 >> mason operator table
 
 +--------------------------------------------------------------------+
-| Available table Methods: /Users/kyle/.mason/registered_operators/  |
+| Available table Methods: ~/.mason/registered_operators/            |
 +--------------------------------------------------------------------+
 
 namespace    command    description                                                                               parameters
@@ -299,6 +299,7 @@ Validated: ['table_name', 'database_name']
  ]
 }
 ```
+
 
 Running flask web server for registered operator API endpoints (port 5000):
 ```
@@ -449,9 +450,141 @@ supported_configurations:
 
 would only accept an operator with both `metastore: s3` and `execution:spark` simultaneously defined as such, in this case storage and scheduler do not matter.  
 
-### Composing Operators
+## Workflows 
 
-Currently operators are just composed in the old fashioned way by creating a new operator that composes other engine definitions in its `__init__.py` definition.  Composing operators natively is an upcoming feature.  A good example of where this will first be implemented is with scheduler engines as any operator can technically be scheduled (within reason).  In the mean time defining a new "scheduled" variant of an operator with an additional required scheduler compoenent is the best means to achieve a scheduled operator.
+Workflows are an in progress feature that allows you to compose operators in a DAG (Directed Acyclic Graph) definition and then validate the Dag in conjunction with specific configurations and parameters before passing off to a scheduler engine to execute.  Note that mason does not try to focuse on providing a scheduler itself but instead interfaces with known scheduler engines such as Glue Airflow or DigDag and gives them specificed instructions on how to operate.
+
+Registering workflows:
+
+```
+>> mason workflow register mason/examples/workflows/
+Valid Workflow Definition: Saving mason/examples/workflows/table/infer/workflow.yaml to ~/.mason/registered_workflows/
+```
+
+Listing workflows:
+
+```
+mason workflow
++-----------------------------------------------------------------------+
+| Available Workflow Methods: ~/.mason/registered_workflows/            |
++-----------------------------------------------------------------------+
+
+namespace    command    description
+-----------  ---------  -----------------------------------------
+table        infer      One step workfow for table infer operator
+
+
+```
+
+Doing a dry run for a workflow (dry-run is set to True by default).  Note that workflows unlike operators must be run using parameter.yaml files, there is no short hand syntax for workflow parameters (`-p` flag).  You must use the `-f` flag and provide a parameter yaml file:
+
+```
+>> mason workflow table infer -f mason/examples/parameters/workflow_table_infer.yaml 
+Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag
+
+Valid Workflow DAG Definition:
+--------------------------------------------------------------------------------
+step_1>> table:infer
+
++--------------------+
+| Workflow Response  |
++--------------------+
+{
+ "Errors": [],
+ "Info": [
+  "Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag",
+  "",
+  "Valid Workflow DAG Definition:",
+  "--------------------------------------------------------------------------------",
+  "step_1>> table:infer",
+  ""
+ ],
+ "Warnings": []
+}
+
+```
+
+Deploying a workflow (with `-d` flag):
+
+```
+>> mason workflow table infer -f mason/examples/parameters/workflow_table_infer.yaml -d
+Registering workflow dag table_infer with glue.
+Created table crawler table_infer.
+Registered schedule table_infer
++--------------------+
+| Workflow Response  |
++--------------------+
+{
+ "Errors": [],
+ "Info": [
+  "Registering workflow dag table_infer with glue.",
+  "Created table crawler table_infer.",
+  "Registered schedule table_infer"
+ ],
+ "Warnings": []
+}
+```
+
+Running a workflow now (with `-r` flag):
+
+```
+Registering workflow dag table_infer with glue.
+Created table crawler table_infer.
+Registered schedule table_infer
+Triggering schedule: table_infer
+Refreshing Table Crawler: table_infer
++--------------------+
+| Workflow Response  |
++--------------------+
+{
+ "Errors": [],
+ "Info": [
+  "Registering workflow dag table_infer with glue.",
+  "Created table crawler table_infer.",
+  "Registered schedule table_infer",
+  "Triggering schedule: table_infer",
+  "Refreshing Table Crawler: table_infer"
+ ],
+ "Warnings": []
+}
+```
+
+### Creating Workflows:
+
+Workflows are defined in a similar manner to operators.  Workflows because they are composed of operators do not require a run method in their `__init__.py`, however if you want to expose it as an api endpoint you still need an api method (See `/mason/examples/workflows/table/infer/__init__.py`). 
+
+Workflows require a `workflow.yaml` file with specified values of `dag` for the dag instructions of the workflow and `supported_schedulers` for the scheduler of the workflow.  Here is an example `workflow.yaml` file:
+
+```
+type: "workflow"
+namespace: "table"
+command: "infer"
+name: "table_infer"
+description: "One step workfow for table infer operator"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "table"
+      command: "infer"
+supported_schedulers:
+  - "glue"
+```
+
+Notice that the `dag` attribute is an array with steps that each have an "id".  This "id" is what is referenced by the parameters file when running the workflow.   Here is an example `parameters.yaml file` that you would use when running a workflow:
+
+```
+step_1:
+  config_id: 1
+  parameters:
+    database_name: "test-database"
+    storage_path: "spg-mason-demo/part_data_merged/"
+```
+
+The first value in the parameters.yaml file references the step_1 step id.   Notice that the parameters are the same parameters that would be required for running the table infer operator by itself (`database_name` and `storage_path`).  This is validated when the workflow is deployed or run and is inferred from the associated namespace and command in the original workflow dag definition.
+
+Right now workflows only support composing `operator` types but eventually can compose other workflows.
+
+``NOTE:`` Workflows is a work in progress feature that current only supports simple one step workflows.
 
 ## Clients
 

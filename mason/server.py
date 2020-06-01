@@ -14,7 +14,6 @@ class MasonServer:
             banner("Importing all registered_operator modules for API")
             env = MasonEnvironment()
             operators.import_all(env)
-            workflows.import_all(env)
 
             base_swagger = from_root("/api/base_swagger.yml")
 
