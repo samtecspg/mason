@@ -1,4 +1,8 @@
-include operators/schema.json
-include configurations/schema.json
-include clients/*/schema.json
-include clients/spark/runner/kubernetes_operator/base_config.yaml
+include mason/operators/schema.json
+include mason/configurations/schema.json
+include mason/clients/*/schema.json
+include mason/workflows/schema.json
+include mason/parameters/schema.json
+include mason/parameters/workflow_schema.json
+include mason/clients/spark/runner/kubernetes_operator/base_config.yaml
+include mason/api/base_swagger.yml

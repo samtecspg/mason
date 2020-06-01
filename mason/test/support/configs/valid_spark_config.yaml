@@ -1,0 +1,8 @@
+id: 7
+execution_engine: spark
+clients:
+  spark:
+    configuration:
+      runner:
+        type: "kubernetes-operator"
+        spark_version: "2.4.5"

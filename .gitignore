@@ -8,12 +8,14 @@ dist/*
 mason.egg-info/*
 .mypy_cache/
 .mypy_cache/*
-api/swagger.yml
+mason/api/swagger.yml
 .env
 .DS_Store
 venv/
 venv/**/*
 .direnv/
+pip-wheel-metadata/
+pip-wheel-metadata/*
 .direnv/**/*
 .direnv/*
 htmlcov/

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ComplexSchema",
+  "properties": {
+    "test": {
+      "type": "array",
+      "items": {
+        "type":  "object",
+        "properties": {
+          "test2": {
+            "type": "string"
+          },
+          "test3": {
+            "type": "array",
+            "items": {"type":  "string"}
+          }
+        }
+      }
+    }
+  }
+}
+

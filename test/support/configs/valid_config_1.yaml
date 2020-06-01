@@ -1,7 +1,0 @@
-storage_engine: s3
-clients:
-  s3:
-    configuration:
-      aws_region: "us-west-2"
-      secret_key: "test"
-      access_key: "test"

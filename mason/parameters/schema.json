@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ParameterSchema",
+  "type": "object",
+  "patternProperties": {
+    "^.*": { "type": "string" }
+  },
+  "additionalProperties": false
+}

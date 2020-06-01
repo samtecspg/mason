@@ -1,0 +1,10 @@
+type: "operator"
+namespace: "job"
+command: "get"
+description:  "Get Execution Job Status"
+parameters:
+  required:
+    - "job_id"
+supported_configurations:
+  - execution: "spark"
+  - execution: "athena"

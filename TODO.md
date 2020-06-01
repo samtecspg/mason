@@ -29,8 +29,8 @@ Legend
 - [x] :arrow_up: Clean up rest api implementation C:03/13/2020
 - [x] create "mason run" cli command C: 03/09/2020
 - [ ] Pull rest api responses through to swagger spec (200 status example)
-- [ ] :arrow_up: Advanced Operator Registration Documentation 
-- [ ] :arrow_up: New Client Documentation 
+- [x] :arrow_up: Advanced Operator Registration Documentation 
+- [x] :arrow_up: New Client Documentation 
 - [ ] :arrow_down: New Engine Documentation 
 - [x] :arrow_up: Dockerize mason implementation C: 03/09/2020
 - [x] Build and refine "Engines" first order concept C: 03/06/2020
@@ -42,8 +42,8 @@ Legend
 - [x] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc C: 03/20/2020
 - [x] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
 - [x] Allow for multiple configurations C: 04/08/2020
-- [ ] Clean up multiple configurations -> add id, don't use enumerate
-- [ ] Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)
+- [x] Clean up multiple configurations -> add id, don't use enumerate. C:05/10/2020
+- [x] ~~Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)~~: not going to do right now
 - [ ] Establish session for current configuration
 - [ ] Add redis or sqllite for session 
 - [ ] Move operator/configs over to redis
@@ -51,6 +51,7 @@ Legend
 - [x] Interpolate environment variables into config and have that affect config validation: C: 04/23/2020
 - [x] Clean up mock implementations: C: 04/23/2020
 - [ ] Consolidate all AWS response error parsing methods.
+- [ ] Improve performance by moving around imports
 
 ## Test Cases
 
@@ -58,18 +59,26 @@ Legend
 - [x] Extraneous parameters.  Showing up in "required parameters" error return incorrectly. C: 03/11/2020
 - [x] Better errors around Permission errors C: 03/13/2020
 
-
 ## Execution Engine
-- [ ]  Look into using calcite or coral to extend spark operators to presto and hive
-- [ ]  Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
+- [ ] Look into using calcite or coral to extend spark operators to presto and hive
+- [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
+
+## Workflows
+- [x] Infer Workflow (1-step)
+    - [x] Glue Support C: 05/10/2020
+    - [x] Athena Support with local scheduler (this ended up just being local instantiating of underlying infer operator)
+- [ ]  Athena Support with airflow scheduler
+- [ ]  Allow run flag to trigger existing workflow
 
 ## Operators
-- [ ] Infer operator
+- [ ] table summary operator
+- [x] Infer operator
     - [x] Glue Support: C: long time ago
-    - [ ] :large_blue_diamond: Athena Support
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
+- [ ] :large_blue_circle: Table Export operator with S3 support (export csv's of metastore tables)
+- [ ] :large_blue_circle: Table "join" operator (on set of columns)
 - [ ] Dedupe Operator
 - [ ] Table Operators
     - [x] Query (requires metastore and execution engine) C:04/28/2020
@@ -83,7 +92,7 @@ Legend
     - [ ] List
 - [ ] Scheduler operators:
     - [x] Delete C: 04/29/2020
-    - [ ] Create
+    - [x] Create
     - [ ] List
 - [ ] :arrow_down: Smart cast operator -->  all partitions but 1 have Int, but one has String, cast the string partition
 
@@ -104,9 +113,12 @@ Legend
    - [x] Json schema
    - [ ] :arrow_down: Avro schema
    - [ ] :arrow_down: Msgpack pack schema
+### Athena
+- [x] DDL Generation
+- [ ] Add partitioning concepts to DDL generation
 
 ### Execution Engine
-#### Python
+#### Local
 - [ ] :arrow_up: Basic setup
 #### IPython/Jupyter
 - [ ] :arrow_up: Basic setup
@@ -118,17 +130,19 @@ Legend
     - [x] Kubernetes Operator Runner C: 4/06/2020
     - [ ] EMR Runner 
     - [ ] Local Runner
-- [ ] Check that file format is supported
+- [x] Check that file format is supported
 #### Presto
 - [ ] :arrow_up: Basic setup 
-
 ### Dask
-- [ ] Basic Setup
-    - [ ] Kubernetes Runner
+- [x] Basic Setup
+    - [x] Kubernetes Runner
 
 ### Scheduler
+- [ ] Multiple step workflow implementation
+- [ ] DAG validation (validate that it is a Directed Acyclic Dag, not that its valid, thats already done)
 ### Glue
 - [x] Basic set up
+- [x] Workflow Implementation
 #### Airflow
 - [ ] Basic setup 
 
@@ -136,12 +150,12 @@ Legend
 #### Redshift
 #### Elasticsearch
 #### S3
-- [ ] Move some metastore concepts over here like "paths"
-- [ ] :arrow_up: Basic Setup 
+- [x] Move some metastore concepts over here like "paths"
+- [x] Basic Setup 
 - [ ] Redshift
 - [ ] Elasticsearch
 
 ## :arrow_up: Preparing for public
-- [ ] Remove samtec specific examples from examples/ files.  Use public examples
+- [x] Remove samtec specific examples from examples/ files.  Use public examples
 
 

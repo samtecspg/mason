@@ -1,13 +1,16 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, find_namespace_packages
 
 with open('requirements.txt') as f:
     requirements = f.readlines()
+
+with open('VERSION') as f:
+    version = f.read()
 
 long_description = 'Mason Data Operators Framework'
 
 setup(
     name='mason',
-    version='1.03',
+    version=version,
     author='Kyle Prifogle',
     author_email='kyle.prifogle@samtec.com',
     url='',
@@ -18,7 +21,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'mason = cli:main'
+            'mason = mason.cli:main'
         ]
     },
     install_requires=requirements,

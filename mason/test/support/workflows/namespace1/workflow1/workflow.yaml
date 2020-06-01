@@ -1,0 +1,12 @@
+type: "workflow"
+namespace: "namespace1"
+command: "workflow1"
+name: "test_schedule"
+description: "Test Workflow"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator1"
+supported_schedulers:
+  - "test"
