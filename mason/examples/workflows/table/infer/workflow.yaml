@@ -1,0 +1,12 @@
+type: "workflow"
+namespace: "table"
+command: "infer"
+name: "table_infer"
+description: "One step workfow for table infer operator"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "table"
+      command: "infer"
+supported_schedulers:
+  - "glue"

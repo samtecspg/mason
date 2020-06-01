@@ -1,0 +1,16 @@
+id: 3
+metastore_engine: glue
+execution_engine: athena
+clients:
+  glue:
+    configuration:
+      aws_role_arn: "{{GLUE_ROLE_ARN}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+      aws_region: "{{AWS_REGION}}"
+  athena:
+    configuration:
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+      aws_region: "{{AWS_REGION}}"
+

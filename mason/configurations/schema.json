@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MasonConfiguration",
+  "properties": {
+    "id": { "type": ["string", "integer"]},
+    "metastore_engine": {
+      "type": "string",
+      "enum": [
+        "glue",
+        "s3",
+        "athena"
+      ]
+    },
+    "execution_engine": {
+      "type": "string",
+      "enum": [
+        "spark",
+        "athena"
+      ]
+    },
+    "storage_engine": {
+      "type": "string",
+      "enum": [
+        "s3"
+      ]
+    },
+    "scheduler_engine": {
+      "type": "string",
+      "enum": [
+        "glue"
+      ]
+    }
+  },
+  "required": [ "id" ]
+}
+

@@ -1,0 +1,6 @@
+id: 0
+execution_engine: spark
+clients:
+  spark:
+    configuration:
+      bad-parameter: "bad-parameter-value"

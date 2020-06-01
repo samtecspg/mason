@@ -1,0 +1,16 @@
+type: "operator"
+namespace: "table"
+command: "infer"
+description:  "Infers schema for metastore tables"
+parameters:
+  required:
+    - "database_name"
+    - "storage_path"
+  optional:
+    - "table_name"
+supported_configurations:
+  - metastore: "glue"
+    scheduler: "glue"
+    storage: "s3"
+  - metastore: "athena"
+    storage: "s3"
