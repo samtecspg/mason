@@ -44,7 +44,7 @@ class TestConfiguration:
         expects = {'execution': {'client_name': '', 'configuration': {}},
              'metastore': {'client_name': '', 'configuration': {}},
              'scheduler': {'client_name': '', 'configuration': {}},
-             'storage': {'client_name': 's3', 'configuration': {'aws_region': 'us-west-2', "secret_key": "test", "access_key": "test"}}
+             'storage': {'client_name': 's3', 'configuration': {'aws_region': 'us-west-2', "secret_key": "REDACTED", "access_key": "REDACTED"}}
        }
         assert(conf.engines == expects)
         extended_info = [['*  0', 'storage', 's3', {'aws_region': 'us-west-2', 'secret_key': 'REDACTED', 'access_key': 'REDACTED'}]]

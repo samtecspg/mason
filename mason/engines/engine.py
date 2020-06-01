@@ -2,8 +2,10 @@ from typing import Union
 
 from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.engines.valid_client import ValidClient, EmptyClient
+from mason.configurations import REDACTED_KEYS
 from mason.definitions import from_root
 from mason.engines import safe_interpolate_environment
+from mason.util.dict import sanitize
 from mason.util.json_schema import validate_schema, ValidSchemaDict
 
 class Engine:
@@ -36,6 +38,6 @@ class Engine:
     def to_dict(self):
         return {
             'client_name': self.client_name,
-            'configuration': self.config
+            'configuration': sanitize(self.config, REDACTED_KEYS)
         }
 

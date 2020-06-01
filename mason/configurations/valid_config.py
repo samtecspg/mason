@@ -1,11 +1,15 @@
 from typing import Optional, Dict, List
 
+from mason.configurations import REDACTED_KEYS
 from mason.engines.execution.execution_engine import ExecutionEngine
 from mason.engines.metastore.metastore_engine import MetastoreEngine
 from mason.engines.scheduler.scheduler_engine import SchedulerEngine
 from mason.engines.storage.storage_engine import StorageEngine
+from mason.util.dict import sanitize
+
 
 class ValidConfig:
+
 
     def __init__(self, id: str, config: dict, metastore_engine: MetastoreEngine, scheduler_engine: SchedulerEngine, storage_engine: StorageEngine, execution_engine: ExecutionEngine, source_path: Optional[str] = None):
         self.id = id
@@ -17,23 +21,12 @@ class ValidConfig:
         self.source_path = source_path
 
         self.engines: Dict[str, Dict] = {
-            'metastore': metastore_engine.to_dict(),
-            'scheduler': scheduler_engine.to_dict(),
-            'storage': storage_engine.to_dict(),
-            'execution': execution_engine.to_dict()
+            'metastore': self.metastore.to_dict(),
+            'scheduler': self.scheduler.to_dict(),
+            'storage': self.storage.to_dict(),
+            'execution': self.execution.to_dict()
         }
 
-
-    def sanitize(self, d: dict):
-        REDACTED_KEYS = ["access_key", "secret_key", "aws_role_arn"]
-
-        def redact_value(key: str, value: str):
-            if key in REDACTED_KEYS:
-                return "REDACTED"
-            else:
-                return value
-
-        return {key: redact_value(key, value) for (key, value) in d.items()}
 
     def extended_info(self, config_id: str, current: bool = False):
         ei = []
@@ -44,7 +37,7 @@ class ValidConfig:
                     "",
                     "metastore",
                     self.metastore.client_name,
-                    self.sanitize(self.metastore.config),
+                    sanitize(self.metastore.config, REDACTED_KEYS),
                 ]
             )
 
@@ -54,7 +47,7 @@ class ValidConfig:
                     "",
                     "scheduler",
                     self.scheduler.client_name,
-                    self.sanitize(self.scheduler.config),
+                    sanitize(self.scheduler.config, REDACTED_KEYS),
                 ]
             )
 
@@ -64,7 +57,7 @@ class ValidConfig:
                     "",
                     "storage",
                     self.storage.client_name,
-                    self.sanitize(self.storage.config),
+                    sanitize(self.storage.config, REDACTED_KEYS),
                 ]
             )
 
@@ -74,7 +67,7 @@ class ValidConfig:
                     "",
                     "execution",
                     self.execution.client_name,
-                    self.sanitize(self.execution.config),
+                    sanitize(self.execution.config, REDACTED_KEYS),
                 ]
             )
 

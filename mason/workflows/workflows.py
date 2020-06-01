@@ -64,7 +64,7 @@ def register_workflows(workflow_file: str, env: MasonEnvironment):
         logger.error(f"Invalid Workflow Schema Definition {i.reason}")
 
     for w in valid_workflows:
-        logger.info(f"Valid Workflow Definition: {w.source_path}")
+        logger.info(f"Valid Workflow Definition: Saving {w.source_path} to {env.workflow_home}")
         w.register_to(env.workflow_home)
 
 def list_workflows(env: MasonEnvironment, namespace: Optional[str] = None) -> List[Workflow]:
@@ -84,7 +84,7 @@ def tabulate_workflows(env: MasonEnvironment, cmd: Optional[str] = None):
     cmd_value = (cmd or "Workflow")
     logger.info()
     if len(array) > 0:
-        banner(f"Available {cmd_value} Methods: {env.operator_home}")
+        banner(f"Available {cmd_value} Methods: {env.workflow_home}")
         logger.info()
         logger.info(tabulate(array, headers=["namespace", "command", "description"]))
     else:
