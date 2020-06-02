@@ -2,7 +2,7 @@ from typing import Union
 
 from mason.clients.engines.execution import ExecutionClient
 from mason.clients.response import Response
-from mason.clients.spark import SparkClient
+from mason.clients.spark.spark_client import SparkClient
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
 class SparkExecutionClient(ExecutionClient):

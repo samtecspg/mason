@@ -1,14 +1,11 @@
 
 from hiyapyco import dump as hdump
 
-from mason.clients.spark import SparkConfig
-from mason.clients.spark.runner.kubernetes_operator import merge_config
-from mason.configurations.config import Config
-from mason.configurations.valid_config import ValidConfig
+from mason.clients.spark.spark_client import SparkConfig
+from mason.clients.spark.runner.kubernetes_operator.kubernetes_operator import merge_config
 from mason.engines.execution.models.jobs.merge_job import MergeJob
 from mason.engines.storage.models.path import Path
 from mason.test.support.testing_base import clean_string
-from mason.util.environment import MasonEnvironment
 
 class TestSpark:
 

@@ -1,5 +1,5 @@
 from mason.clients.engines.scheduler import SchedulerClient
-from mason.clients.glue import GlueClient
+from mason.clients.glue.glue_client import GlueClient
 from mason.clients.response import Response
 from mason.engines.storage.models.path import Path
 

@@ -1,6 +1,6 @@
 from typing import Optional, Union, List, Tuple
 
-from mason.clients.athena import AthenaClient
+from mason.clients.athena.athena_client import AthenaClient
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob

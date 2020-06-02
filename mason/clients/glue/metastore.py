@@ -1,7 +1,7 @@
 from typing import Union, Optional
 
 from mason.clients.engines.metastore import MetastoreClient
-from mason.clients.glue import GlueClient
+from mason.clients.glue.glue_client import GlueClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
 from mason.engines.metastore.models.credentials import InvalidCredentials

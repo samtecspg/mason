@@ -1,6 +1,6 @@
 from typing import Union
 
-from mason.clients.athena import AthenaClient
+from mason.clients.athena.athena_client import AthenaClient
 from mason.clients.response import Response
 from mason.clients.engines.execution import ExecutionClient
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
