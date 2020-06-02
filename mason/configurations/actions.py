@@ -4,10 +4,12 @@ import shutil
 
 from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
-from mason.util.logger import logger
-from mason.configurations.configurations import set_current_config, tabulate_configs, get_all, set_current_config_id
 
 def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=None, set_current: Optional[str]=None,  log_level: Optional[str]=None) -> Response:
+    
+    from mason.util.logger import logger
+    from mason.configurations.configurations import set_current_config, tabulate_configs, get_all, set_current_config_id
+    
     response = Response()
     logger.set_level(log_level)
 
