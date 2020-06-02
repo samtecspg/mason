@@ -1,4 +1,4 @@
-from typing import Optional, Dict, List
+from typing import Optional, Dict
 
 from mason.configurations import REDACTED_KEYS
 from mason.engines.execution.execution_engine import ExecutionEngine
@@ -7,9 +7,7 @@ from mason.engines.scheduler.scheduler_engine import SchedulerEngine
 from mason.engines.storage.storage_engine import StorageEngine
 from mason.util.dict import sanitize
 
-
 class ValidConfig:
-
 
     def __init__(self, id: str, config: dict, metastore_engine: MetastoreEngine, scheduler_engine: SchedulerEngine, storage_engine: StorageEngine, execution_engine: ExecutionEngine, source_path: Optional[str] = None):
         self.id = id
