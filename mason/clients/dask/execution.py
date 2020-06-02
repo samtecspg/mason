@@ -1,6 +1,6 @@
 from typing import Union
 
-from mason.clients.dask import DaskClient
+from mason.clients.dask.dask_client import DaskClient
 from mason.clients.engines.execution import ExecutionClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job

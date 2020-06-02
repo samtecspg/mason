@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 
 from mason.clients.engines.storage import StorageClient
-from mason.clients.s3 import S3Client
+from mason.clients.s3.s3_client import S3Client
 from mason.engines.metastore.models.table import Table, InvalidTable
 from mason.engines.storage.models.path import Path
 

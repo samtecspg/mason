@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
 from mason.clients.response import Response
-from mason.clients.spark import SparkConfig
+from mason.clients.spark.spark_client import SparkConfig
 
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials

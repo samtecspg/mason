@@ -3,7 +3,7 @@ from typing import Tuple, List, Union, Optional
 
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.response import Response
-from mason.clients.s3 import S3Client
+from mason.clients.s3.s3_client import S3Client
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
