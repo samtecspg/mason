@@ -1,154 +1,30 @@
 import click
-from os import path
-from typing import Optional
-
-from mason.parameters.input_parameters import InputParameters
-from mason.parameters.workflow_parameters import WorkflowParameters
-from mason.server import MasonServer
-from mason.util.logger import logger
-from mason.util.environment import MasonEnvironment, initialize_environment
-from mason.configurations.configurations import get_current_config, get_config_by_id
-from mason.configurations.actions import run_configuration_actions
-from mason.operators import operators
-from mason.workflows import workflows
+from mason.cli.config import Config
+from mason.cli.operator import Operator
+from mason.cli.register import Register
+from mason.cli.run import Run
+from mason.cli.workflow import Workflow
 
 
 @click.group()
-def main():
+def cli():
     """
     \b
     ___  ___
-    |  \/  |                      
-    | .  . | __ _ ___  ___  _ __  
-    | |\/| |/ _` / __|/ _ \| '_ \ 
+    |  \/  |
+    | .  . | __ _ ___  ___  _ __
+    | |\/| |/ _` / __|/ _ \| '_ \     
     | |  | | (_| \__ \ (_) | | | |
     \_|  |_/\__,_|___/\___/|_| |_|
-    
+
     Mason Data Operator Framework
     """
 
-@main.command("config", short_help="Configures mason clients and engines")
-@click.argument('config_file', required=False)
-@click.option("-l", "--log_level", help="Log level for mason")
-@click.option("-s", "--set_current", help="Set current config to config id")
-def config(config_file: Optional[str] = None, set_current: Optional[str] = None, log_level: Optional[str] = None):
-    """
-    Configures mason according to [CONFIG_FILE].
-
-    [CONFIG_FILE] is a yaml file.  See examples/config/ for reference implementations.
-    """
-
-    env = MasonEnvironment()
-    initialize_environment(env)
-    run_configuration_actions(env, config_file=config_file, set_current=set_current, log_level=log_level)
-
-@click.argument("operator_file")
-@click.option("-l", "--log_level", help="Log level for mason")
-@main.command('register', short_help="Registers mason operator")
-def register(operator_file: str, log_level: Optional[str] = None):
-    """
-    Registers mason operator using [OPERATOR_FILE].
-
-    See examples/operators/ for examples of operators.
-
-    Valid operators will contain an operator.yaml file which defines the compatible clients and parmeters for the operator.
-    """
-
-    env = MasonEnvironment()
-    if path.exists(operator_file):
-        if path.exists(env.config_home):
-            logger.set_level(log_level)
-            ops, errors = operators.list_operators(operator_file)
-
-            if len(ops) > 0:
-                for operator in ops:
-                    operator.register_to(env.operator_home)
-            else:
-                if len(errors) > 0:
-                    for error in errors:
-                        logger.error(f"Invalid operator configurations found: {error}")
-
-
-        else:
-            logger.error("Configuration not found.  Run \"mason config\" first")
-    else:
-        logger.error(f"File not found {operator_file}")
-
-
-@main.command("operator", short_help="Executes and lists mason operators")
-@click.argument("cmd", required=False)
-@click.argument("subcmd", required=False)
-@click.option('-p', '--parameters', help="Load parameters from mason.parameters string of the format  <param1>:<value1>,<param2>:<value2>")
-@click.option('-f', '--param_file', help="Parameters from yaml file path")
-@click.option("-l", "--log_level", help="Log level for mason")
-@click.option("-c", "--config_id", help="Specified config id for operator run")
-def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None, config_id: Optional[str] = None):
-    """
-    Running without cmd or subcmd will list out all mason operators currently registered.
-    Running without subcmd will list out all mason operators under the cmd namespace.
-    Running with both cmd and subcmd will execute the operator or print out missing required parameters.
-    """
-    env = MasonEnvironment()
-    if config_id:
-        config = get_config_by_id(env, config_id)
-    else:
-        config = get_current_config(env, "debug")
-
-    logger.set_level(log_level or "info")
-
-    if config:
-        params = InputParameters(parameters, param_file)
-        operators.run(env, config, params, cmd, subcmd)
-    else:
-        if config_id:
-            logger.info(f"Configuration {config_id} not found.  Run \"mason config\" first")
-        else:
-            logger.info(f"Current configuration not found.  Run \"mason config\" first")
-
-
-@main.command("workflow", short_help="Registers, lists and executes mason workflows")
-@click.argument("cmd", required=False)
-@click.argument("subcmd", required=False)
-@click.option("-l", "--log_level", help="Log level for mason")
-@click.option("-d", "--deploy", help="Deploy specified workflow", is_flag=True)
-@click.option('-r', '--run', help="Run workflow right now ignoring schedule", is_flag=True)
-@click.option('-f', '--param_file', help="Parameters from yaml file path. For workflows this is the only way to pass parameters")
-@click.option('-n', '--schedule_name', help="Optional name for schedule.  Only works with -d --deploy")
-def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
-    """
-    Running without cmd or subcmd will list out all mason workflows currently registered.
-    Running without subcmd will list out all mason workflows under the cmd namespace.
-    Running with both cmd and subcmd will execute the workflow or print out missing required parameters.
-    Running with 'register' registers workflow from specified <workflow_file>, workflow_file must contain a valid workflow.yaml
-    """
-    env = MasonEnvironment()
-    logger.set_level(log_level)
-    config = get_current_config(env, "debug")
-
-    if config:
-        if cmd == "register":
-            register_file = subcmd
-            if register_file:
-                workflows.register_workflows(register_file, env)
-            else:
-                logger.error("No file path provided to register operator")
-        else:
-            params = WorkflowParameters(param_file)
-            workflows.run(env, config, params, cmd, subcmd, deploy, run, schedule_name)
-    else:
-        logger.error("Configuration not found.  Run \"mason config\" first")
-
-
-@main.command("run", short_help="Runs mason flask server on port 5000")
-def run():
-    """
-    Will run mason flask server on port 5000.
-    To view the mason swagger ui go to: http://localhost:5000/api/ui/
-    """
-    MasonServer().run()
-
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == 'cli':
+    cli.add_command(Config.config)
+    cli.add_command(Run.run)
+    cli.add_command(Operator.operator)
+    cli.add_command(Register.register)
+    cli.add_command(Workflow.workflow)
+    cli()
 
