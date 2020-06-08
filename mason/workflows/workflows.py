@@ -18,12 +18,6 @@ from mason.workflows.invalid_workflow import InvalidWorkflow
 from mason.workflows.valid_workflow import ValidWorkflow
 from mason.workflows.workflow import Workflow
 
-def import_all(env: MasonEnvironment):
-    path.append(env.mason_home)
-    workflows = list_workflows(env)
-    for workflow in workflows:
-        import_module(f"{env.workflow_module}.{workflow.namespace}.{workflow.command}")
-
 def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
     #  TODO: Allow single step commands without subcommands
     response = Response()

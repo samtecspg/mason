@@ -23,7 +23,7 @@ def get_all(env: MasonEnvironment, config_file: Optional[str] = None) -> Tuple[D
     for subdir, dirs, files in walk(dir):
         for file in files:
             if '.yaml' in file:
-                config = get_config(env, subdir + file)
+                config = get_config(subdir + file)
                 if isinstance(config, ValidConfig):
                     if not configs.get(config.id):
                         configs[config.id] = config
@@ -35,10 +35,10 @@ def get_all(env: MasonEnvironment, config_file: Optional[str] = None) -> Tuple[D
     configs_ordered = collections.OrderedDict(sorted(configs.items()))
     return configs_ordered, invalid
 
-def get_config(env: MasonEnvironment, file: str) -> Union[ValidConfig, InvalidConfig]:
+def get_config(file: str) -> Union[ValidConfig, InvalidConfig]:
     yaml_config_doc = parse_yaml_invalid(file)
     if isinstance(yaml_config_doc, dict):
-        return Config(yaml_config_doc).validate(env, file)
+        return Config(yaml_config_doc).validate(file)
     else:
         return InvalidConfig({}, yaml_config_doc)
 

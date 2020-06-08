@@ -1,18 +1,18 @@
 from botocore.errorfactory import ClientError
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple
 import s3fs
 from s3fs import S3FileSystem
 
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
-from mason.engines.metastore.models.table import InvalidTable, Table
+from mason.engines.metastore.models.table import InvalidTable, Table, TableNotFound, InvalidTables
 from mason.engines.storage.models.path import Path
-from mason.util.json_schema import sequence
 from mason.util.logger import logger
 from mason.engines.metastore.models.schemas import schemas
 from mason.engines.metastore.models.schemas import check_schemas as CheckSchemas
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
-from mason.util.list import get
+from mason.util.list import get, sequence
+
 
 class S3Client(AWSClient):
     def __init__(self, s3_config: dict):
@@ -70,8 +70,8 @@ class S3Client(AWSClient):
         response.add_response(result)
         return response
 
-    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
-        return self.infer_table(database_name + "/" + table_name, table_name, options)
+    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
+        return self.infer_table(database_name + "/" + table_name, table_name, options, response)
 
     def get_path(self, path: str) -> Path:
         return Path(path)
@@ -82,27 +82,32 @@ class S3Client(AWSClient):
         else:
             return name
 
-    def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None) -> Union[Table, InvalidTable, List[InvalidTable]]:
+    def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None, resp: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         logger.info(f"Fetching keys at {path}")
         keys = self.client().find(path)
+        
+        response: Response = resp or Response()
+        final: Union[Table, InvalidTables]
 
         if len(keys) > 0:
-            valid, invalid = sequence(list(map(lambda key: schemas.from_file(self.client().open(key), options or {}), keys)), Schema, InvalidSchema)
+            valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key), options or {}), keys)), Schema, InvalidSchema)
             validated = CheckSchemas.find_conflicts(list(set(valid)))
             table = CheckSchemas.get_table(self.get_name(name, path), validated)
-            invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid))
+            invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
             if isinstance(table, Table):
-                return table
+                final= table
             else:
                 invalid_tables.append(table)
-                return invalid_tables
+                final = InvalidTables(invalid_tables)
         else:
-            return InvalidTable(f"No keys at {path}")
-
+            response.set_status(404)
+            final = InvalidTables([TableNotFound(f"No keys at {path}")])
+            
+        return final, response
 
     def path(self, path: str):
         if not path[0:4] == "s3://":
             path = "s3://" + path
-
+            
         return Path(path)
 

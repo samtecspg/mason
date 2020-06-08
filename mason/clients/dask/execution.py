@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple, Optional
 
 from mason.clients.dask.dask_client import DaskClient
 from mason.clients.engines.execution import ExecutionClient
@@ -12,8 +12,8 @@ class DaskExecutionClient(ExecutionClient):
         self.config = config
         self.client = DaskClient(config)
 
-    def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
+    def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         return self.client.run_job(job)
 
-    def get_job(self, job_id: str, response: Response) -> Union[ExecutedJob, InvalidJob]:
+    def get_job(self, job_id: str, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
          return self.client.get_job(job_id, response)

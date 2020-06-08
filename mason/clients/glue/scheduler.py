@@ -7,11 +7,7 @@ from mason.engines.storage.models.path import Path
 class GlueSchedulerClient(SchedulerClient):
 
     def __init__(self, config: dict):
-        self.aws_region = config.get("aws_region")
-        self.aws_role_arn = config.get("aws_role_arn")
-        self.access_key = config.get("access_key")
-        self.secret_key = config.get("secret_key")
-        self.client: GlueClient = GlueClient(self.get_config())
+        self.client: GlueClient = GlueClient(config)
 
     def register_dag(self, schedule_name: str, valid_dag, response: Response):
         #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator
@@ -43,12 +39,4 @@ class GlueSchedulerClient(SchedulerClient):
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
         response = self.client.trigger_schedule_for_table(table_name, database_name, response)
         return response
-
-    def get_config(self):
-        return {
-            'aws_region': self.aws_region,
-            'aws_role_arn': self.aws_role_arn,
-            'access_key': self.access_key,
-            'secret_key': self.secret_key
-        }
 

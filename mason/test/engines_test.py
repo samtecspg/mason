@@ -22,7 +22,7 @@ class TestExecutionEngine:
     def test_configuration_exists(self):
         ee = self.before("/test/support/configs/test_config.yaml")
         assert(ee.client_name == "test2")
-        assert(type(ee.client).__name__ == "InvalidClient")
+        assert(type(ee.client).__name__ == "InvalidExecutionClient")
 
     def test_configuration_dne(self):
         ee = self.before("/test/support/configs/test_partial_config.yaml")
@@ -46,7 +46,7 @@ class TestMetastoreEngine:
     def test_configuration_exists(self):
         me = self.before("/test/support/configs/test_config.yaml")
         assert(me.client_name == "test")
-        assert(type(me.client).__name__ == "InvalidClient")
+        assert(type(me.client).__name__ == "InvalidMetastoreClient")
 
     def test_configuration_dne(self):
         me = self.before("/test/support/configs/test_partial_config.yaml")
@@ -66,7 +66,7 @@ class TestStorageEngine:
     def test_configuration_exists(self):
         me = self.before("/test/support/configs/test_config.yaml")
         assert(me.client_name == "test")
-        assert(type(me.client).__name__ == "InvalidClient")
+        assert(type(me.client).__name__ == "InvalidStorageClient")
 
     def test_configuration_dne(self):
         me = self.before("/test/support/configs/test_partial_config_2.yaml")
@@ -87,7 +87,7 @@ class TestSchedulerEngine:
     def test_configuration_exists(self):
         me = self.before("/test/support/configs/test_config.yaml")
         assert(me.client_name == "test2")
-        assert(type(me.client).__name__ == "InvalidClient")
+        assert(type(me.client).__name__ == "InvalidSchedulerClient")
 
     def test_configuration_dne(self):
         me = self.before("/test/support/configs/test_partial_config.yaml")

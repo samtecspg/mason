@@ -14,6 +14,13 @@ class ValidClient:
 class EmptyClient():
     def __init__(self):
         self.client_name = ""
+        self.reason = "Client Empty"
+
+    def __getattr__(self, name):
+        def _missing(*args, **kwargs):
+            raise NotImplementedError("Method not implemented on EmptyClient")
+
+        return _missing
 
     def to_dict(self):
         return {}

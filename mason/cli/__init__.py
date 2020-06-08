@@ -1,9 +1,9 @@
 import click
-from mason.cli.config import Config
-from mason.cli.operator import Operator
-from mason.cli.register import Register
-from mason.cli.run import Run
-from mason.cli.workflow import Workflow
+from mason.cli.config import config
+from mason.cli.operator import operator
+from mason.cli.register import register
+from mason.cli.run import run
+from mason.cli.workflow import workflow
 
 
 @click.group()
@@ -27,4 +27,3 @@ if __name__ == 'cli':
     cli.add_command(Register.register)
     cli.add_command(Workflow.workflow)
     cli()
-

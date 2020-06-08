@@ -12,7 +12,7 @@ CONFIGURED_MOCKS = {
 }
 
 def method_name(client_name: str) -> str:
-    return f"mason.clients.{client_name}.{client_name.capitalize()}Client.client"
+    return f"mason.clients.{client_name}.{client_name}_client.{client_name.capitalize()}Client.client"
 
 def get_patches():
     return list(map(lambda m: patch(method_name(m[0]), get_magic_mock(m[1])), CONFIGURED_MOCKS.items()))

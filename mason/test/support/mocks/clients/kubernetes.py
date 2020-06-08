@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 
 from mason.clients.response import Response
 from mason.clients.spark.spark_client import SparkConfig
@@ -22,20 +22,20 @@ class KubernetesMock:
         else:
             raise Exception("Mock parameters not implemented for spark kubernetes implementation")
 
-    def get(self, job_id: str, response: Response) -> Union[ExecutedJob, InvalidJob]:
-        job = Job("spark", response=response)
+    def get(self, job_id: str, response: Response) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
+        job = Job("spark")
         job.set_id(job_id)
         if job_id == "good_job_id":
             logs = '<LOG_DATA>'
-            job.response.add_data({'Logs': [logs]})
-            return ExecutedJob(job)
+            response.add_data({'Logs': [logs]})
+            return job.running(past=True), response
         elif job_id == "bad_job_id":
             error = "Error from server (NotFound): pods \"bad_job_id-driver\" not found"
-            job.response.add_error(error)
-            job.response.set_status(400)
-            return ExecutedJob(job)
+            response.add_error(error)
+            response.set_status(400)
+            return job.errored(), response
         else:
-            return InvalidJob(job, "Mock parameters not implemented for spark kubernetes implementation")
+            return InvalidJob("Mock parameters not implemented for spark kubernetes implementation"), response
 
 
 

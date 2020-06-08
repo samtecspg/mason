@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple, Optional
 
 from mason.clients.dask.runner.dask_runner import EmptyDaskRunner
 from mason.clients.dask.runner.kubernetes_worker.kubernetes_worker import KubernetesWorker
@@ -13,12 +13,11 @@ class DaskClient:
     def client(self):
         return self.get_runner(self.runner_type, self.runner_config)
 
-    def run_job(self, job: Job) -> Union[ExecutedJob, InvalidJob]:
-        return self.client().run(job)
+    def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
+        return self.client().run(job, response)
 
-    def get_job(self, job_id: str, response: Response) -> Union[ExecutedJob, InvalidJob]:
+    def get_job(self, job_id: str, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         raise NotImplementedError("Client not implemented")
-        return InvalidJob(job=Job("generic", response=response))
 
     def get_runner(self, runner: str, config: dict):
         if runner == "kubernetes_worker":

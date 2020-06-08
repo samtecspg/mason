@@ -1,14 +1,12 @@
 
 import os
 import pytest
-import dotenv
 import shutil
-from click.testing import CliRunner
 
-from mason.cli import config, operator, register, workflow
+from dotenv import load_dotenv
+
 from mason.definitions import from_root
-from mason.server import MasonServer
-from mason.test.support.testing_base import clean_string
+from mason.util.notebook_environment import NotebookEnvironment
 
 
 def print_result(result):
@@ -24,14 +22,19 @@ class TestPlayground:
 
     @pytest.fixture(autouse=True)
     def run_around_tests(self):
-        os.environ["MASON_HOME"] = ".tmp/"
-        yield
-        shutil.rmtree(".tmp/")
-
-    def test_unmocked(self):
         pass
+        # os.environ["MASON_HOME"] = ".tmp/"
+        # yield
+        # shutil.rmtree(".tmp/")
+    
+    def test_unmocked(self):
+        env = NotebookEnvironment() 
+        # response = env.run(namespace="table", command="get", parameters="database_name:spg-mason-demo,table_name:merged_csv", config_id="1")
+        # response.formatted()
+        
 
 
+        
 
 
 

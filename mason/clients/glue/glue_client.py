@@ -1,4 +1,4 @@
-from typing import Tuple, Union, List
+from typing import Tuple, Union, List, Optional
 
 import boto3
 from botocore.client import BaseClient
@@ -8,30 +8,35 @@ from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.schemas.schema import SchemaElement, InvalidSchemaElement, Schema
-from mason.engines.metastore.models.table import Table, InvalidTable
+from mason.engines.metastore.models.table import Table, InvalidTable, InvalidTables, TableNotFound
 from mason.engines.storage.models.path import Path
-from mason.util.json_schema import sequence
+from mason.util.list import sequence
 
 
 class GlueClient(AWSClient):
 
     def __init__(self, config: dict):
-        self.aws_role_arn = config.pop("aws_role_arn")
+        self.aws_role_arn = config.get("aws_role_arn")
         super().__init__(**config)
 
     def client(self) -> BaseClient:
-        return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
+        return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key,
+                            aws_secret_access_key=self.secret_key)
 
-    def get_database(self, database_name: str) -> Union[Database, InvalidDatabase]:
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
+        resp = response or Response()
+
         try:
             result = self.client().get_tables(DatabaseName=database_name)
         except ClientError as e:
             result = e.response
 
         error, status, message = self.parse_response(result)
+        resp.add_response(result)
 
         if error == "EntityNotFoundException":
-            return InvalidDatabase(f"Database {database_name} not found")
+            resp.set_status(404)
+            return InvalidDatabase(f"Database {database_name} not found"), resp
         elif 200 <= status < 300:
 
             table_list = result.get("TableList")
@@ -39,16 +44,16 @@ class GlueClient(AWSClient):
                 valid, invalid = sequence(list(map(lambda x: self.parse_table(x), table_list)), Table, InvalidTable)
                 if len(invalid) > 0:
                     invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
-                    return InvalidDatabase(f"Invalid Tables in glue response: {invalid_messages}")
+                    return InvalidDatabase(f"Invalid Tables in glue response: {invalid_messages}"), resp
                 else:
-                    return Database(database_name, valid)
+                    return Database(database_name, valid), resp
             else:
-                return InvalidDatabase("TableList not found in glue response")
+                return InvalidDatabase("TableList not found in glue response"), resp
         else:
-            return InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}")
+            resp.set_status(status)
+            return InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}"), resp
 
-
-    def list_tables(self, database_name: str, response: Response):
+    def list_tables(self, database_name: str, response: Response) -> Response:
         try:
             result = self.client().get_tables(DatabaseName=database_name)
         except ClientError as e:
@@ -61,7 +66,6 @@ class GlueClient(AWSClient):
             response.set_status(404)
         elif 200 <= status < 300:
             valid: List[Table]
-            invalid: List[InvalidTable]
             valid, invalid = self.parse_table_list_data(result)
             if len(valid) > 0:
                 #  TODO move out
@@ -74,8 +78,9 @@ class GlueClient(AWSClient):
 
         return response
 
-
-    def delete_table(self, database_name: str, table_name: str, response: Response) -> Response:
+    def delete_table(self, database_name: str, table_name: str, resp: Optional[Response] = None) -> Response:
+        response = resp or Response()
+        
         try:
             glue_response = self.client().delete_table(
                 DatabaseName=database_name,
@@ -165,7 +170,7 @@ class GlueClient(AWSClient):
         return response
 
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response):
-        table = self.get_table(database_name, table_name)
+        table, response = self.get_table(database_name, table_name)
 
         crawler_name = None
         if isinstance(table, Table):
@@ -182,24 +187,31 @@ class GlueClient(AWSClient):
 
         return response
 
-    def get_table(self, database_name: str, table_name: str) -> Union[Table, InvalidTable]:
-
+    def get_table(self, database_name: str, table_name: str,  resp: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         try:
             result = self.client().get_table(DatabaseName=database_name, Name=table_name)
         except ClientError as e:
             result = e.response
 
-        # response.add_response(result)
+        response: Response = resp or Response()
+        response.add_response(result)
+
         error, status, message = self.parse_response(result)
         table = self.parse_table(result.get("Table", {}))
 
+        final: Union[Table, InvalidTables]
         if error == "EntityNotFoundException":
-            return InvalidTable(f"Database {database_name} or table {table_name} not found")
+            final = InvalidTables([TableNotFound(f"Database {database_name} or table {table_name} not found")])
         elif 200 <= status < 300:
-            return table
+            if isinstance(table, Table):
+                final = table
+            else:
+                final = InvalidTables([table])
         else:
-            return InvalidTable(f"Invalid Table: {message}")
-
+            final = InvalidTables([InvalidTable(f"Invalid Table: {message}")])
+            response.set_status(status)
+            
+        return final, response
 
     def refresh_glue_table(self, crawler_name: str):
         try:
@@ -289,5 +301,3 @@ class GlueClient(AWSClient):
             none1: List[Table] = []
             none2: List[InvalidTable] = [InvalidTable("Bad TableList response from glue.  Expected list[dict]")]
             return none1, none2
-
-

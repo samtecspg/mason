@@ -1,4 +1,4 @@
 #!/bin/sh
 set -e
 
-pip3 install .
+pip3 install --editable .

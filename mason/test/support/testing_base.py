@@ -52,15 +52,15 @@ def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], work
         op = workflows.get_workflow(env, cmd, sub)
         types = "Workflow"
     else:
-        op = operators.get_operator(env, cmd, sub)
+        op = operators.get_operator(env.operator_home, cmd, sub)
         types = "Operator"
     if op:
         for config in configs:
-            conf = get_config(env, from_root("/examples/operators/table/test_configs/") + config + ".yaml")
+            conf = get_config(from_root("/examples/operators/table/test_configs/") + config + ".yaml")
             if isinstance(conf, ValidConfig):
                 callable(env, conf, op)
             else:
-                raise Exception(f"No matching valid configuration found for {op.namespace}, {op.command}. Reason {conf.reason}")
+                raise Exception(f"No matching valid configuration found for {op.namespace}:{op.command}. Reason: {conf.reason}")
 
     else:
         raise Exception(f"{types} not found {cmd} {sub}")

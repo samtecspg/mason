@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Tuple
 
 from mason.util.logger import logger
 
+#  This class is only intended to 
 class Response:
     def __init__(self):
         self.responses: List[dict] = []
@@ -42,7 +43,7 @@ class Response:
 
     def add_current_config(self, config, log: bool = True):
         if log:
-            logger.debug(f"Set current config to {config}")
+            logger.debug(f"Setting current config to {config.id}")
         self.current_config = config
 
     def set_status(self, status: int):
@@ -72,6 +73,6 @@ class Response:
 
         return returns
 
-    def with_status(self):
+    def with_status(self) -> Tuple[dict, int]:
         return (self.formatted(), self.status_code)
 

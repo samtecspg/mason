@@ -3,7 +3,6 @@ from mason.engines.metastore.models.credentials import MetastoreCredentials
 from mason.engines.metastore.models.database import Database
 from mason.engines.storage.models.path import Path
 
-
 class InferJob(Job):
 
     def __init__(self, database: Database, path: Path, credentials: MetastoreCredentials):
