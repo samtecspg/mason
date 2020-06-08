@@ -4,7 +4,7 @@ from functools import reduce
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
 from mason.engines.metastore.models.schemas.json import merge_json_schemas, JsonSchema
 from mason.engines.metastore.models.schemas.schema import SchemaConflict
-from mason.engines.metastore.models.table import Table, InvalidTable
+from mason.engines.metastore.models.table import Table, InvalidTable, ConflictingTable
 from mason.util.list import get
 
 def diff_schemas(schema1: Schema, schema2: Schema) -> Schema:
@@ -49,7 +49,7 @@ def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema]) -
         if isinstance(schema, InvalidSchema):
             return InvalidTable(f"Invalid Schema: {schema.reason}")
         else:
-            return InvalidTable("Conflicting Schemas", schema)
+            return ConflictingTable(schema, "Conflicting Schemas")
 
 
 

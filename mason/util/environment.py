@@ -1,12 +1,12 @@
 import os
-from typing import Optional
+from typing import Optional, Dict
 
 from dotenv import load_dotenv
 
-from mason.definitions import from_root
 from os import path
 from mason.util.printer import banner
 from pathlib import Path
+
 
 class MasonEnvironment:
     def __init__(self,
@@ -23,15 +23,11 @@ class MasonEnvironment:
         self.workflow_home: str = workflow_home or (self.mason_home + "registered_workflows/")
         self.operator_module = operator_module or "registered_operators"
         self.workflow_module = workflow_module or "registered_workflows"
-        self.config_schema = from_root("/configurations/schema.json")
 
         load_dotenv(self.mason_home + ".env")
 
 def get_mason_home() -> str:
-    try:
-        return os.environ['MASON_HOME']
-    except KeyError:
-        return os.path.join(os.path.expanduser('~'), '.mason/')
+    return os.environ.get('MASON_HOME') or os.path.join(os.path.expanduser('~'), '.mason/')
 
 def initialize_environment(env: MasonEnvironment):
     if not path.exists(env.mason_home):

@@ -1,5 +1,5 @@
 from hiyapyco import load as hload
-from typing import List, Union
+from typing import List, Union, Tuple, Optional
 import yaml
 import tempfile
 import hiyapyco
@@ -56,41 +56,52 @@ def merge_config(config: SparkConfig, job: Job):
 
 class KubernetesOperator(SparkRunner):
 
-    def run(self, config: SparkConfig, job: Job) -> Union[ExecutedJob, InvalidJob]:
+    def run(self, config: SparkConfig, job: Job, resp: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
+        
+        response: Response = resp or Response()
 
         job.set_id(job.type + "_" + str(uuid4()))
         merged_config = merge_config(config, job)
         job_id = merged_config["metadata"]["name"]
         conf = dict(merged_config)
+        
+        final: Union[ExecutedJob, InvalidJob]
 
         with tempfile.NamedTemporaryFile(delete=False, mode='w') as yaml_file:
             yaml_dump = yaml.dump(conf, yaml_file)
 
             command = ["kubectl", "apply", "-f", yaml_file.name]
-            job.add_log(f"Executing Spark Kubernetes Operator. job_id:  {job_id}")
+            response.add_info(f"Executing Spark Kubernetes Operator. job_id:  {job_id}")
             stdout, stderr = run_sys_call(command)
 
             if len(stdout) > 0:
                 job.add_log(stdout)
-                return job.running()
+                final = job.running()
             else:
                 if len(stderr) > 0:
                     job.add_log(stderr)
-                    return job.errored(stderr)
+                    final = job.errored()
                 else:
-                    return job.running()
+                    final =  job.running()
+                    
+        return final, response
 
-    def get(self, job_id: str, response: Response) -> ExecutedJob:
-        job = Job("spark", response=response)
+    def get(self, job_id: str, resp: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
+        response: Response = resp or Response()
+        
         command = ["kubectl", "logs", job_id + "-driver"]
         stdout, stderr = run_sys_call(command)
+        job = Job("get")
+        final: Union[ExecutedJob, InvalidJob]
 
         if len(stdout) > 0:
-            job.response.add_data({'Logs': stdout})
+            job.add_log(stdout)
+            final = job.running(past=True)
         if len(stderr) > 0:
-            job.response.add_error(stderr)
-
-        return ExecutedJob(job)
+            job.add_log(stderr)
+            final = job.errored(f"Kubernetes Error")
+            
+        return final, response
 

@@ -3,10 +3,8 @@ from typing import List, Union
 from mason.engines.scheduler.models.dags.dag_step import DagStep, InvalidDagStep, ValidDagStep
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
-from mason.util.json_schema import sequence
 
-from mason.util.list import flatten
-from mason.util.logger import logger
+from mason.util.list import flatten, sequence
 
 
 class Dag:

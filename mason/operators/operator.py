@@ -12,7 +12,6 @@ from mason.parameters.input_parameters import InputParameters
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.logger import logger
 
-
 class Operator:
 
     def __init__(self, namespace: str, command: str, description: str, parameters: dict, supported_configurations: List[Dict[str, str]], source_path: Optional[str] = None):

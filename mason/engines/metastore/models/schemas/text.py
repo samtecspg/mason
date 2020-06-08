@@ -3,7 +3,7 @@ from tableschema import Table
 from tabulator import FormatError
 
 from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema, InvalidSchemaElement
-from mason.util.json_schema import sequence
+from mason.util.list import sequence
 from mason.util.exception import message
 
 

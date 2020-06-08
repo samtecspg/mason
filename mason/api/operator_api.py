@@ -1,6 +1,7 @@
 from typing import Optional, List
 import urllib.parse
 
+from mason.operators.operator_response import OperatorResponse
 from mason.parameters.input_parameters import InputParameters
 from mason.configurations.configurations import get_current_config, get_config_by_id
 from mason.configurations.valid_config import ValidConfig
@@ -31,11 +32,13 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
 
         logger.set_level(params.unsafe_get("log_level"))
 
-        response = operators.run(env, config, params, namespace, command)
+        operator_response = operators.run(env, config, params, namespace, command)
+        
     else:
         response = Response()
         response.add_error("Configuration not found")
+        operator_response = OperatorResponse(response)
 
     uncollected = gc.collect()
     logger.debug(f"UNCOLLECTED ITEMS {uncollected}")
-    return response.formatted(), response.status_code
+    return operator_response.formatted(), operator_response.status_code()

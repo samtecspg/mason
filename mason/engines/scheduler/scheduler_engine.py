@@ -1,23 +1,27 @@
+from typing import Union
+
 from mason.engines.engine import Engine
+
+from mason.clients.engines.scheduler import InvalidSchedulerClient, SchedulerClient
+from mason.clients.engines.valid_client import ValidClient, EmptyClient
 
 
 class SchedulerEngine(Engine):
 
     def __init__(self, config: dict):
         super().__init__("scheduler", config)
-        self.client = self.get_client()
-
-    def get_client(self):
+        self.client: Union[SchedulerClient, InvalidSchedulerClient, EmptyClient] = self.get_client()
+    
+    def get_client(self) -> Union[SchedulerClient, InvalidSchedulerClient, EmptyClient]:
         client = self.validate()
-        from mason.clients.engines.valid_client import ValidClient
-        
         if isinstance(client, ValidClient):
             if client.client_name == "glue":
                 from mason.clients.glue.scheduler import GlueSchedulerClient
                 return GlueSchedulerClient(client.config)
             else:
-                from mason.clients.engines.invalid_client import InvalidClient
-                return InvalidClient(f"Client type not supported: {client.client_name}")
-        else:
+                return InvalidSchedulerClient(f"Client type not supported: {client.client_name}")
+        elif isinstance(client, EmptyClient):
             return client
+        else:
+            return InvalidSchedulerClient(f"{client.reason}")
 

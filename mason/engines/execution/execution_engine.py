@@ -1,10 +1,14 @@
+from typing import Union
+
+from mason.clients.engines.execution import ExecutionClient, InvalidExecutionClient
+from mason.clients.engines.valid_client import EmptyClient
 from mason.engines.engine import Engine
 
 class ExecutionEngine(Engine):
 
     def __init__(self, config: dict):
         super().__init__("execution", config)
-        self.client = self.get_client()
+        self.client: Union[ExecutionClient, InvalidExecutionClient, EmptyClient] = self.get_client()
 
     def get_client(self):
 
@@ -18,8 +22,9 @@ class ExecutionEngine(Engine):
                 from mason.clients.athena.execution import AthenaExecutionClient
                 return AthenaExecutionClient(client.config)
             else:
-                from mason.clients.engines.invalid_client import InvalidClient
-                return InvalidClient(f"Client type not supported {client.client_name}")
-        else:
+                return InvalidExecutionClient(f"Client type not supported {client.client_name}")
+        elif isinstance(client, EmptyClient):
             return client
+        else:
+            return InvalidExecutionClient(client.reason)
 

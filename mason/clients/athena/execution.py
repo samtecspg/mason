@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple, Optional
 
 from mason.clients.athena.athena_client import AthenaClient
 from mason.clients.response import Response
@@ -11,9 +11,9 @@ class AthenaExecutionClient(ExecutionClient):
     def __init__(self, config: dict):
         self.client = AthenaClient(config)
 
-    def run_job(self, job: Job) -> Union[InvalidJob, ExecutedJob]:
-        return self.client.run_job(job)
+    def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
+        return self.client.run_job(job, response)
 
-    def get_job(self, job_id: str, response: Response) -> Union[InvalidJob, ExecutedJob]:
+    def get_job(self, job_id: str, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         return self.client.get_job(job_id, response)
 

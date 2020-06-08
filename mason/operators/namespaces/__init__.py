@@ -14,6 +14,9 @@ def from_ops(operators: List[Operator]) -> List[Namespace]:
 
     return list(map(lambda s: Namespace(s[0], s[1]), namespaces.items()))
 
+def to_ops(namespaces: List[Namespace]) -> List[Operator]:
+    ops: List[List[Operator]] = list(map(lambda n: n.operators, namespaces))
+    return flatten_array(ops)
 
 def filter(namespaces: List[Namespace], namespace: Optional[str] = None) -> List[Namespace]:
     if namespace:

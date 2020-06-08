@@ -1,7 +1,6 @@
 from mason.engines.execution.models.jobs import Job
 from mason.engines.storage.models.path import Path
 
-
 class MergeJob(Job):
 
     def __init__(self, input_path: Path, output_path: Path, input_format: str):
