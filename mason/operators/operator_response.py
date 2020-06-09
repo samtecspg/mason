@@ -5,9 +5,9 @@ from mason.clients.response import Response
 
 class OperatorResponse:
     
-    def __init__(self, response: Response, objects: Optional[Responsable] = None): 
-        self.objects = objects
-        self.response = self.merge_response(response, objects)
+    def __init__(self, response: Response, object: Optional[Responsable] = None):   #TODO: Generalize object
+        self.object = object
+        self.response = self.merge_response(response, object)
 
     def merge_response(self, response: Response, object: Optional[Responsable]) -> Response:
         if object:

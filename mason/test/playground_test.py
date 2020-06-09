@@ -1,12 +1,14 @@
 
-import os
+
 import pytest
-import shutil
-
-from dotenv import load_dotenv
-
-from mason.definitions import from_root
 from mason.util.notebook_environment import NotebookEnvironment
+
+# import os
+# import shutil
+# 
+# from dotenv import load_dotenv
+# 
+# from mason.definitions import from_root
 
 
 def print_result(result):
@@ -29,8 +31,8 @@ class TestPlayground:
     
     def test_unmocked(self):
         env = NotebookEnvironment() 
-        # response = env.run(namespace="table", command="get", parameters="database_name:spg-mason-demo,table_name:merged_csv", config_id="1")
-        # response.formatted()
+        response = env.run(namespace="table", command="get", parameters="database_name:spg-mason-demo,table_name:merged_csv", config_id="1")
+        response.formatted()
         
 
 
