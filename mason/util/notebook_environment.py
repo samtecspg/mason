@@ -1,5 +1,7 @@
 from typing import Dict, Optional, List
 
+from mason.operators.operator_response import OperatorResponse
+
 from mason.clients.response import Response
 from mason.configurations.configurations import get_all, tabulate_configs
 from mason.configurations.invalid_config import InvalidConfig
@@ -10,10 +12,9 @@ from mason.operators.operator import Operator
 from mason.parameters.input_parameters import InputParameters
 from mason.util.environment import MasonEnvironment
 from mason.operators.operators import get_operator, list_namespaces, tabulate_operators
+from mason.util.logger import logger
 
 # make it so that you can see the full display of configs and operators
-from IPython.core.display import display, HTML
-display(HTML("<style>.container { width:100% !important; }</style>"))
 
 class NotebookEnvironment:
     
@@ -30,8 +31,13 @@ class NotebookEnvironment:
         self.print()
         
     def print(self):
+        self.set_display()
         tabulate_configs(self.configs, self.env)
         tabulate_operators(self.env, self.namespaces)
+        
+    def set_display(self):
+        from IPython.core.display import display, HTML
+        display(HTML("<style>.container { width:100% !important; }</style>"))
 
     def config(self, id: str) -> Optional[ValidConfig]:
         return self.configs.get(id)
@@ -40,7 +46,8 @@ class NotebookEnvironment:
         return get_operator(self.env.operator_home, namespace, command)
         
     # TODO: similar to operators run, DRY up
-    def run(self, namespace: str, command: str, parameters: str, config_id: str) -> Response:
+    def run(self, namespace: str, command: str, parameters: str, config_id: str, log_level: str = "trace", return_response: bool = False):
+        logger.set_level(log_level)
         response = Response()
         operator = self.operator(namespace, command)
         config = self.config(config_id)
@@ -48,9 +55,13 @@ class NotebookEnvironment:
         if operator:
             if config:
                 validated = operator.validate(config, input_parameters)
-                validated.run(self.env, response)
+                operator_response = validated.run(self.env, response)
             else:
-                response.add_error(f"Config {config_id} not found.  Valid config_id's: {', '.join(list(self.configs.keys()))}")
+                operator_response = OperatorResponse(response.add_error(f"Config {config_id} not found.  Valid config_id's: {', '.join(list(self.configs.keys()))}"))
         else:
-            response.add_error(f"Operator {namespace} {command} not found")
-        return response
+            operator_response = response.add_error(f"Operator {namespace} {command} not found")
+            
+        if return_response:
+            return operator_response
+        else:
+            return operator_response.object
