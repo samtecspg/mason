@@ -8,6 +8,7 @@ from mason.util.environment import MasonEnvironment
 from mason.util.logger import logger
 from mason.clients.response import Response
 from mason.operators import operators
+import gc
 
 def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[ValidConfig] = None, *args, **kwargs) :
 
@@ -30,4 +31,6 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
         response = Response()
         response.add_error("Configuration not found")
 
+    uncollected = gc.collect()
+    logger.debug(f"UNCOLLECTED ITEMS {uncollected}")
     return response.formatted(), response.status_code
