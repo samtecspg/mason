@@ -1,3 +1,4 @@
+import gc
 from typing import Optional
 
 from mason.workflows import workflows
@@ -28,5 +29,8 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
     else:
         response = Response()
         response.add_error("Configuration not found")
+
+    uncollected = gc.collect()
+    logger.debug(f"UNCOLLECTED ITEMS {uncollected}")
 
     return response.formatted(), response.status_code
