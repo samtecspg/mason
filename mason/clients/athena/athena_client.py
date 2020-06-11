@@ -46,7 +46,6 @@ class AthenaClient(AWSClient):
     def get_job(self, job_id: str, resp: Optional[Response]) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         job = Job("query")
         job.set_id(job_id)
-        
         response: Response = resp or Response()
 
         try:
@@ -80,10 +79,9 @@ class AthenaClient(AWSClient):
 
             error, status, message = self.parse_response(athena_response_2)
 
-
             if not ((error or "") == ""):
                 response.set_status(status)
-                final =  job.errored(message)
+                final = job.errored(message)
             else:
                 response.set_status(status)
                 results = athena_response_2.get("ResultSet")
@@ -93,16 +91,14 @@ class AthenaClient(AWSClient):
                         response.add_data(results)
                     final = job.running(past=True) 
                 else:
-                    final =  job.errored("No job results returned from athena")
+                    final = job.errored("No job results returned from athena")
 
         else:
             response.add_error(message)
-            final =  job.errored(f"Invalid Job: {message}")
-            
+            final = job.errored(f"Invalid Job: {message}")
         return final, response
 
     def query(self, job: QueryJob, resp: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        
         response = resp or Response()
 
         try:

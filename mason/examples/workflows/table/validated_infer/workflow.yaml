@@ -1,0 +1,28 @@
+type: "workflow"
+namespace: "table"
+command: "validated_infer"
+name: "table_validated_infer"
+description: "4 step workflow for inferring table and checking if it worked"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "table"
+      command: "infer"
+    - id: "step_2"
+      type: "operator"
+      namespace: "job"
+      command: "get"
+      retry: "exponential"
+      dependencies: ["step_1"]
+    - id: "step_3"
+      type: "operator"
+      namespace: "table"
+      command: "query"
+      dependencies: ["step_2"]
+    - id: "step_4"
+      type: "operator"
+      namespace: "table"
+      command: "delete"
+      dependencies: ["step_3"]
+supported_schedulers:
+  - "glue"

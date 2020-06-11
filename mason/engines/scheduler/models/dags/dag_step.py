@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List, Optional
 
 from mason.configurations.configurations import get_config_by_id
 from mason.operators.operators import get_operator
@@ -7,21 +7,16 @@ from mason.parameters.input_parameters import InputParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
 
-from mason.util.list import get
-
-
 class DagStep:
     def __init__(self, step_config: dict):
-        self.id = str(step_config.get("id"))
-        self.namespace = step_config.get("namespace")
-        self.command = step_config.get("command")
-
+        self.id: str = str(step_config.get("id")) # type: ignore
+        self.namespace: str = step_config.get("namespace") # type: ignore
+        self.command: str = step_config.get("command") # type: ignore
+        self.dependencies: List[str] = step_config.get("dependencies", []) # type: ignore
+        self.retry: Optional[str] = step_config.get("retry") # type: ignore
+        
     def validate(self, env: MasonEnvironment, parameters: WorkflowParameters) -> Union['ValidDagStep', 'InvalidDagStep']:
-        if len(parameters.parameters) == 1:
-            wfp = get(parameters.parameters, 0) # for parse string simple one step case
-        else:
-            wfp = get([p for p in parameters.parameters if p.step == self.id], 0)
-
+        wfp = parameters.get(self.id)
         if wfp:
             config = get_config_by_id(env, wfp.config_id)
             if config:
@@ -30,7 +25,7 @@ class DagStep:
                 if operator:
                     valid = operator.validate(config, operator_params)
                     if isinstance(valid, ValidOperator):
-                        return ValidDagStep(self.id, valid)
+                        return ValidDagStep(self.id, valid, self.dependencies, self.retry)
                     else:
                         return InvalidDagStep(f"Invalid Dag Step: Invalid Operator Definition: {valid.reason}")
                 else:
@@ -43,9 +38,11 @@ class DagStep:
 
 class ValidDagStep:
 
-    def __init__(self, id: str, operator: ValidOperator):
+    def __init__(self, id: str, operator: ValidOperator, dependencies: List[str], retry: Optional[str]):
         self.id = id
         self.operator = operator
+        self.dependencies = dependencies
+        self.retry = retry
 
 class InvalidDagStep:
 

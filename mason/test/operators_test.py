@@ -27,7 +27,7 @@ class TestRegisterOperator:
         ns, invalid = operators.list_namespaces(env.operator_home)
 
         result = sorted(list(map(lambda n: n.to_dict_brief(), ns)), key=lambda s: list(s.keys())[0])
-        expect = [{'namespace1': ['operator1', 'operator2']}, {'namespace2': ['operator3']}]
+        expect = [{'namespace1': ['operator1', 'operator2']}, {'namespace2': ['operator3', 'operator4']}]
 
         assert(result == expect)
 
@@ -40,7 +40,7 @@ class TestGetOperator:
         base.set_log_level("trace")
         env = base.get_env("/test/support/operators/")
         op = (operators.get_operator(env.operator_home, "namespace1", "operator1") or emptyOperator())
-        expects = {'command': 'operator1', 'description': 'Test Operator', 'namespace': 'namespace1', 'parameters': {'optional': [], 'required': ['test_param']}, 'supported_configurations': [{'execution': None, 'metastore': 'test_client', 'scheduler': None, 'storage': None}]}
+        expects = {'command': 'operator1', 'description': 'Test Operator', 'namespace': 'namespace1', 'parameters': {'optional': [], 'required': ['test_param']}, 'supported_configurations': [{'execution': None, 'metastore': 'test', 'scheduler': None, 'storage': None}]}
         assert(op.to_dict()==expects)
 
     def test_namespace_dne(self):
@@ -68,7 +68,7 @@ class TestListOperators:
           'parameters': {'required': ['test_param'], 'optional': []},
           'command': 'operator1',
           'supported_configurations': [{'execution': None,
-                                        'metastore': 'test_client',
+                                        'metastore': 'test',
                                         'scheduler': None,
                                         'storage': None}]},
          {'namespace': 'namespace1',
@@ -76,7 +76,7 @@ class TestListOperators:
           'parameters': {'required': ['test_param'], 'optional': []},
           'command': 'operator2',
           'supported_configurations': [{'execution': None,
-                                        'metastore': 'unsupported_client',
+                                        'metastore': 'test',
                                         'scheduler': None,
                                         'storage': None}]}]
 

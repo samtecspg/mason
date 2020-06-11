@@ -42,7 +42,7 @@ class Response:
         self.configs.append(config)
 
     def add_current_config(self, config, log: bool = True):
-        if log:
+        if log and config:
             logger.debug(f"Setting current config to {config.id}")
         self.current_config = config
 

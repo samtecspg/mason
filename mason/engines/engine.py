@@ -19,11 +19,7 @@ class Engine:
 
     def validate(self) -> Union[ValidClient, EmptyClient, InvalidClient]:
         if not self.client_name == "":
-            # TODO:  Improve this
-            if (self.config_doc or {}).get("testing", False):
-                schema_path = from_root(f"/test/support/clients/{self.client_name}/schema.json")
-            else:
-                schema_path = from_root(f"/clients/{self.client_name}/schema.json")
+            schema_path = from_root(f"/clients/{self.client_name}/schema.json")
 
             schema = validate_schema(self.config, schema_path)
 

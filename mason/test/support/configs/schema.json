@@ -5,30 +5,19 @@
     "id": { "type": ["string", "integer"]},
     "metastore_engine": {
       "type": "string",
-      "enum": [
-        "glue",
-        "s3",
-        "athena"
-      ]
+      "enum": [ "test" ]
     },
     "execution_engine": {
       "type": "string",
-      "enum": [
-        "spark",
-        "athena"
-      ]
+      "enum": [ "test2" ]
     },
     "storage_engine": {
       "type": "string",
-      "enum": [
-        "s3"
-      ]
+      "enum": [ "test" ]
     },
     "scheduler_engine": {
       "type": "string",
-      "enum": [
-        "glue"
-      ]
+      "enum": [ "test2" ]
     },
     "clients": {
       "type": "object",

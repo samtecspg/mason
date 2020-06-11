@@ -1,3 +1,4 @@
+import gc
 from typing import Optional, List
 import urllib.parse
 
@@ -33,7 +34,7 @@ def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = 
         logger.set_level(params.unsafe_get("log_level"))
 
         operator_response = operators.run(env, config, params, namespace, command)
-        
+
     else:
         response = Response()
         response.add_error("Configuration not found")

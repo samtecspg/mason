@@ -1,12 +1,11 @@
 import os
-from typing import Optional, Dict
+from typing import Optional
 
 from dotenv import load_dotenv
 
 from os import path
 from mason.util.printer import banner
 from pathlib import Path
-
 
 class MasonEnvironment:
     def __init__(self,
@@ -16,13 +15,18 @@ class MasonEnvironment:
              operator_module: Optional[str] = None,
              workflow_home: Optional[str] = None,
              workflow_module: Optional[str] = None,
-    ):
+             config_schema: Optional[str] = None,
+             client_home: Optional[str] = None,
+
+        ):
         self.mason_home: str = mason_home or get_mason_home()
         self.config_home: str = config_home or (self.mason_home + "configurations/")
         self.operator_home: str = operator_home or (self.mason_home + "registered_operators/")
         self.workflow_home: str = workflow_home or (self.mason_home + "registered_workflows/")
         self.operator_module = operator_module or "registered_operators"
         self.workflow_module = workflow_module or "registered_workflows"
+        
+        self.config_schema = config_schema or ""
 
         load_dotenv(self.mason_home + ".env")
 

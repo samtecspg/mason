@@ -15,9 +15,12 @@ class Config:
     def __init__(self, config: Optional[dict]):
         self.id = (config or {}).get("id")
         self.config = config or {}
+        
+    def config_schema(self) -> str:
+        return from_root("/configurations/schema.json")
 
     def validate(self, source_path: Optional[str] = None) -> Union[ValidConfig, InvalidConfig]:
-        config_schema = from_root("/configurations/schema.json")
+        config_schema = self.config_schema()
         schema = validate_schema(self.config, config_schema)
 
         valid_config: Optional[ValidConfig]
@@ -32,7 +35,7 @@ class Config:
 
                 if isinstance(me.client, InvalidClient) or isinstance(ce.client, InvalidClient) or isinstance(se.client, InvalidClient) or isinstance(ee.client, InvalidClient):
                     reason = "Invalid Engine Configuration. "
-                    for e  in [me.client, ce.client, se.client, ee.client]:
+                    for e in [me.client, ce.client, se.client, ee.client]:
                         if isinstance(e, InvalidClient):
                             reason += e.reason + ". "
 

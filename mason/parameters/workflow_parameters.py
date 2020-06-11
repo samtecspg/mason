@@ -21,6 +21,9 @@ class WorkflowParameters:
         self.parameters: List[WorkflowParameter] = parameters
         self.invalid: List[InvalidParameter] = invalid
 
+    def get(self, step_id: str) -> Optional[WorkflowParameter]:
+        return next((x for x in self.parameters if x.step == step_id), None)
+
     def parse_param_dict(self, param_dict: dict) -> Tuple[List[WorkflowParameter], List[InvalidParameter]]:
         valid: List[WorkflowParameter] = []
         invalid: List[InvalidParameter] = []

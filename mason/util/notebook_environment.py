@@ -1,7 +1,6 @@
 from typing import Dict, Optional, List
 
 from mason.operators.operator_response import OperatorResponse
-
 from mason.clients.response import Response
 from mason.configurations.configurations import get_all, tabulate_configs
 from mason.configurations.invalid_config import InvalidConfig
@@ -13,8 +12,6 @@ from mason.parameters.input_parameters import InputParameters
 from mason.util.environment import MasonEnvironment
 from mason.operators.operators import get_operator, list_namespaces, tabulate_operators
 from mason.util.logger import logger
-
-# make it so that you can see the full display of configs and operators
 
 class NotebookEnvironment:
     
@@ -46,7 +43,7 @@ class NotebookEnvironment:
         return get_operator(self.env.operator_home, namespace, command)
         
     # TODO: similar to operators run, DRY up
-    def run(self, namespace: str, command: str, parameters: str, config_id: str, log_level: str = "trace", return_response: bool = False):
+    def run(self, namespace: str, command: str, parameters: str, config_id: str, log_level: str = "trace"):
         logger.set_level(log_level)
         response = Response()
         operator = self.operator(namespace, command)
@@ -61,7 +58,4 @@ class NotebookEnvironment:
         else:
             operator_response = response.add_error(f"Operator {namespace} {command} not found")
             
-        if return_response:
-            return operator_response
-        else:
-            return operator_response.object
+        return operator_response
