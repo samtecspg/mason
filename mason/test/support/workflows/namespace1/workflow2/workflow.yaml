@@ -1,6 +1,6 @@
 type: "workflow"
 namespace: "namespace1"
-command: "workflow1"
+command: "workflow2"
 name: "test_schedule"
 description: "Test Workflow"
 dag:
@@ -12,12 +12,22 @@ dag:
       type: "operator"
       namespace: "namespace1"
       command: "operator2"
-      dependencies: ["step_1"]
+      dependencies: ["step_1", "step_4"]  # has a cycle 2->3->4->2
       retry: "exponential"
     - id: "step_3"
       type: "operator"
       namespace: "namespace2"
       command: "operator3"
       dependencies: ["step_2"]
+    - id: "step_4"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator4"
+      dependencies: ["step_3"]
+    - id: "step_5"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: ["step_4"]
 supported_schedulers:
   - "test2"

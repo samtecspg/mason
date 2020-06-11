@@ -17,9 +17,13 @@
         "type":  "object",
         "properties": {
            "id": {"type":  "string" },
-           "type": {"type":  "string", "enum": ["operator"]},
+           "type": { "type":  "string", "enum": ["operator"] },
            "namespace": {"type": "string"},
-           "command": {"type":  "string"}
+           "command": {"type":  "string"},
+           "retry": { "type":  "string" },
+           "dependencies": {"type":  "array",
+             "items": {"type":  "string"}
+           }
         },
         "required": ["id", "type", "namespace", "command"]
       }

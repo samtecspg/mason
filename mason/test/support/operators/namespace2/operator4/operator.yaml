@@ -1,6 +1,6 @@
 type: "operator"
 namespace: "namespace2"
-command: "operator3"
+command: "operator4"
 description:  "Test Operator"
 parameters:
   required:

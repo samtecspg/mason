@@ -1,9 +1,6 @@
-from typing import Union
-
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.api import operator_api as OperatorApi
-from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
