@@ -2,7 +2,7 @@ from typing import Optional, List
 import urllib.parse
 
 from mason.parameters.input_parameters import InputParameters
-from mason.configurations.configurations import get_current_config
+from mason.configurations.configurations import get_current_config, get_config_by_id
 from mason.configurations.valid_config import ValidConfig
 from mason.util.environment import MasonEnvironment
 from mason.util.logger import logger
@@ -13,7 +13,12 @@ import gc
 def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[ValidConfig] = None, *args, **kwargs) :
 
     env: MasonEnvironment = environment or MasonEnvironment()
-    config: Optional[ValidConfig] = configuration or get_current_config(env)
+    config_id = kwargs.get("config_id")
+    
+    if config_id:
+        config = get_config_by_id(env, config_id) 
+    else:
+        config = configuration or get_current_config(env)
 
     if config:
         param_list: List[str] = []

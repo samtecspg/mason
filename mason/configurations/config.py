@@ -9,7 +9,6 @@ from mason.engines.scheduler.scheduler_engine import SchedulerEngine
 from mason.engines.storage.storage_engine import StorageEngine
 from mason.util.environment import MasonEnvironment
 from mason.util.json_schema import validate_schema, ValidSchemaDict
-from mason.util.logger import logger
 
 class Config:
 
