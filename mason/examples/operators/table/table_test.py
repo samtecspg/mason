@@ -15,7 +15,7 @@ from mason.parameters.input_parameters import InputParameters
 from mason.test.support.testing_base import run_tests, clean_string, clean_uuid
 from mason.util.environment import MasonEnvironment
 
-load_dotenv(from_root("/.env.example"))
+load_dotenv(from_root("/../.env.example"), override=True)
 
 def test_index():
     def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):

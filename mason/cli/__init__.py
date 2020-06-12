@@ -7,7 +7,7 @@ from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.server import MasonServer
 from mason.util.logger import logger
 from mason.util.environment import MasonEnvironment, initialize_environment
-from mason.configurations.configurations import get_current_config
+from mason.configurations.configurations import get_current_config, get_config_by_id
 from mason.configurations.actions import run_configuration_actions
 from mason.operators import operators
 from mason.workflows import workflows
@@ -81,14 +81,18 @@ def register(operator_file: str, log_level: Optional[str] = None):
 @click.option('-p', '--parameters', help="Load parameters from mason.parameters string of the format  <param1>:<value1>,<param2>:<value2>")
 @click.option('-f', '--param_file', help="Parameters from yaml file path")
 @click.option("-l", "--log_level", help="Log level for mason")
-def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None):
+@click.option("-c", "--config_id", help="Specified config id for operator run")
+def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters: Optional[str] = None, param_file: Optional[str] = None, log_level: Optional[str] = None, config_id: Optional[str] = None):
     """
     Running without cmd or subcmd will list out all mason operators currently registered.
     Running without subcmd will list out all mason operators under the cmd namespace.
     Running with both cmd and subcmd will execute the operator or print out missing required parameters.
     """
     env = MasonEnvironment()
-    config = get_current_config(env, "debug")
+    if config_id:
+        config = get_config_by_id(env, config_id)
+    else:
+        config = get_current_config(env, "debug")
 
     logger.set_level(log_level or "info")
 
@@ -96,7 +100,11 @@ def operator(cmd: Optional[str] = None, subcmd: Optional[str] = None, parameters
         params = InputParameters(parameters, param_file)
         operators.run(env, config, params, cmd, subcmd)
     else:
-        logger.info("Configuration not found.  Run \"mason config\" first")
+        if config_id:
+            logger.info(f"Configuration {config_id} not found.  Run \"mason config\" first")
+        else:
+            logger.info(f"Current configuration not found.  Run \"mason config\" first")
+
 
 @main.command("workflow", short_help="Registers, lists and executes mason workflows")
 @click.argument("cmd", required=False)
