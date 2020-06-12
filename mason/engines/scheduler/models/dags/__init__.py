@@ -4,7 +4,7 @@ from mason.engines.scheduler.models.dags.dag_step import DagStep, InvalidDagStep
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
 
-from mason.util.list import flatten, sequence, get
+from mason.util.list import flatten, sequence
 
 
 class Dag:
@@ -68,12 +68,42 @@ class ValidDag:
 
     def to_dict(self) -> dict:
         return {}
-
+    
     def display(self) -> str:
-        #  TODO: Print out full dag diagram with multi-steps
-        vs = self.valid_steps
-        vs0 = vs[0]
-        return f"{vs0.id}>> {vs0.operator.display_name()}"
+        # vs = self.valid_steps
+        # from asciidag.graph import Graph
+        # from asciidag.node import Node
+        # 
+        # roots = [v for v in self.valid_steps if len(v.dependencies) == 0]
+        
+        # graph = Graph()
+        # nodes = []
+        
+        # root = Node('root')
+        # grandpa = Node('grandpa', parents=[root])
+        # tips = [
+        #     Node('child', parents=[
+        #         Node('mom', parents=[
+        #             Node('grandma', parents=[
+        #                 Node('greatgrandma', parents=[]),
+        #             ]),
+        #             grandpa,
+        #         ]),
+        #         Node('dad', parents=[
+        #             Node('bill', parents=[
+        #                 Node('martin'),
+        #                 Node('james'),
+        #                 Node('paul'),
+        #                 Node('jon'),
+        #             ])]),
+        #         Node('stepdad', parents=[grandpa]),
+        #     ]),
+        #     Node('foo', [Node('bar')]),
+        # ]
+
+        # graph.show_nodes(nodes)
+        return "DAG"
+
 
 class InvalidDag:
 

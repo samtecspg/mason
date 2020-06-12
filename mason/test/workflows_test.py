@@ -2,6 +2,7 @@ import os
 import shutil
 from unittest import mock
 
+from mason.clients.response import Response
 from mason.configurations.configurations import get_all, get_config
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.test.support.mocks import mock_execution_engine_client, mock_storage_engine_client, \
@@ -71,8 +72,37 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
+    def test_workflow_1_2(self):
+        env, mason_home = self.before()
+        workflows.register_workflows(from_root("/test/support/workflows/"), env)
+        wf = workflows.get_workflow(env, "namespace1", "workflow1")
+        config = get_all(env)[0]['3']
 
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+
+        if wf:
+            params = {
+                "step_1": step_params,
+                "step_2": step_params,
+                "step_3": step_params
+            }
             
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert (isinstance(validated, ValidWorkflow))
+            
+            run = validated.dry_run(env, Response())
+            print(run.formatted())
+
+            self.after(mason_home)
+        else:
+            raise Exception("Workflow not found")
+
     def test_workflow_2(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']

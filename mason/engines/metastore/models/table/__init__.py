@@ -61,6 +61,7 @@ class ConflictingTable(InvalidTable):
 
     def to_response(self, response: Response):
         response.add_error(self.reason)
+        response.add_data(self.schema_conflict.to_dict())
         response.set_status(403)
         return response
 

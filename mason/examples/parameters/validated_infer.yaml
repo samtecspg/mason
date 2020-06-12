@@ -1,0 +1,12 @@
+step_1:
+  config_id: 1
+  parameters: { "database_name": "test", "storage_path": "test" }
+step_2:
+  config_id: 1
+  parameters: {}
+step_3:
+  config_id: 1
+  parameters: {}
+step_4:
+  config_id: 1
+  parameters: {}
