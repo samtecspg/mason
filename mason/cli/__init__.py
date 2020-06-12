@@ -5,7 +5,6 @@ from mason.cli.register import register
 from mason.cli.run import run
 from mason.cli.workflow import workflow
 
-
 @click.group()
 def cli():
     """
@@ -20,10 +19,12 @@ def cli():
     Mason Data Operator Framework
     """
 
-if __name__ == 'cli':
-    cli.add_command(Config.config)
-    cli.add_command(Run.run)
-    cli.add_command(Operator.operator)
-    cli.add_command(Register.register)
-    cli.add_command(Workflow.workflow)
+cli.add_command(config)
+cli.add_command(run)
+cli.add_command(operator)
+cli.add_command(register)
+cli.add_command(workflow)
+
+if __name__ == "__cli__":
     cli()
+

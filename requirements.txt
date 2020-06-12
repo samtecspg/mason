@@ -28,6 +28,7 @@ distributed==2.16.0
 docopt==0.6.2
 docutils==0.15.2
 entrypoints==0.3
+enum34==1.1.10
 et-xmlfile==1.0.1
 fastparquet==0.3.3
 Flask==1.1.1
@@ -136,6 +137,7 @@ typed-ast==1.4.1
 typing-extensions==3.7.4.1
 unicodecsv==0.14.1
 urllib3==1.25.8
+uvloop==0.12.0rc1
 wcwidth==0.1.9
 webencodings==0.5.1
 websocket-client==0.57.0

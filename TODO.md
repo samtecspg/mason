@@ -52,6 +52,8 @@ Legend
 - [x] Clean up mock implementations: C: 04/23/2020
 - [ ] Consolidate all AWS response error parsing methods.
 - [ ] Improve performance by moving around imports
+- [ ] Version checking in installed operators
+- [ ] Replace operator installation method with something more robust
 
 ## Test Cases
 
