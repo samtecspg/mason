@@ -7,7 +7,7 @@ from mason.configurations.valid_config import ValidConfig
 from mason.engines.scheduler.models.schedule import Schedule
 
 from mason.util.environment import MasonEnvironment
-from mason.engines.scheduler.models.dags import ValidDag
+from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 
 class ValidWorkflow:
 
@@ -32,6 +32,8 @@ class ValidWorkflow:
         response.add_info(f"-" * 80)
         response.add_info(f"{self.dag.display()}")
         response.add_info("")
+        for r in list(map(lambda s: s.reason, self.dag.invalid_steps)):
+            response.add_warning(r)
         return response
 
     def deploy(self, env: MasonEnvironment, response: Response, run_now: bool, schedule_name: Optional[str] = None) -> Response:
@@ -44,7 +46,7 @@ class ValidWorkflow:
                 response.add_info(f"Registered schedule {schedule_id}")
             if run_now:
                 response.add_info(f"Triggering schedule: {schedule_id}")
-                response = scheduler.client.trigger_schedule(schedule_id, response)
+                response = scheduler.client.trigger_schedule(schedule_id, response, env)
         else:
             response.add_error("Scheduler client not defined")
 

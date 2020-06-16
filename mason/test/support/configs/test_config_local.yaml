@@ -1,0 +1,14 @@
+id: 8
+metastore_engine: test
+storage_engine: test
+scheduler_engine: local
+execution_engine: test2
+clients:
+  test:
+    configuration:
+      test_param_1: test
+      test_param_2: test
+  test2:
+    configuration:
+      test_param_3: test2
+      test_param_4: test2

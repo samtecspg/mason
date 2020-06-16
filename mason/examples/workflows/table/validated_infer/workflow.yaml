@@ -25,4 +25,4 @@ dag:
       command: "delete"
       dependencies: ["step_3"]
 supported_schedulers:
-  - "glue"
+  - "local"

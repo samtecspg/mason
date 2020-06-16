@@ -1,3 +1,7 @@
+from mason.util.environment import MasonEnvironment
+
+from mason.engines.scheduler.models.dags import ValidDag
+
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.glue.glue_client import GlueClient
 from mason.clients.response import Response
@@ -9,7 +13,7 @@ class GlueSchedulerClient(SchedulerClient):
     def __init__(self, config: dict):
         self.client: GlueClient = GlueClient(config)
 
-    def register_dag(self, schedule_name: str, valid_dag, response: Response):
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response):
         #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator
         if len(valid_dag.valid_steps) == 1 and valid_dag.valid_steps[0].operator.type_name() == "TableInfer":
             op = valid_dag.valid_steps[0].operator
@@ -27,7 +31,7 @@ class GlueSchedulerClient(SchedulerClient):
         response = self.client.register_schedule(database_name, path, schedule_name, response)
         return response
 
-    def trigger_schedule(self, schedule_name: str, response: Response) -> Response:
+    def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         response = self.client.trigger_schedule(schedule_name, response)
         return response
 
