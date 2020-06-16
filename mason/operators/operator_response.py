@@ -9,7 +9,7 @@ class OperatorResponse:
         self.object = object
         self.response = self.to_response(response, object)
 
-    def to_response(self, response: Response, object: Optional[Responsable]) -> Response:
+    def to_response(self, response: Response, object: Optional[Responsable] = None) -> Response:
         if object:
             response = object.to_response(response)
         return response

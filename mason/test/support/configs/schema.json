@@ -17,7 +17,7 @@
     },
     "scheduler_engine": {
       "type": "string",
-      "enum": [ "test2" ]
+      "enum": [ "test2" , "local"]
     },
     "clients": {
       "type": "object",

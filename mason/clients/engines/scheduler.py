@@ -1,17 +1,18 @@
 from typing import Tuple
 from abc import abstractmethod
 
+from mason.util.environment import MasonEnvironment
+
 from mason.clients.client import Client
 from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.response import Response
 from mason.engines.storage.models.path import Path
-from mason.util.logger import logger
 
 
 class SchedulerClient(Client):
 
     @abstractmethod
-    def register_dag(self, schedule_name: str, valid_dag, response: Response) -> Tuple[str, Response]:
+    def register_dag(self, schedule_name: str, valid_dag: 'ValidDag', response: Response) -> Tuple[str, Response]: # type: ignore
         raise NotImplementedError("Client method not implemented")
 
     @abstractmethod
@@ -19,7 +20,7 @@ class SchedulerClient(Client):
         raise NotImplementedError("Client method not implemented")
 
     @abstractmethod
-    def trigger_schedule(self, schedule_name: str, response: Response) -> Response:
+    def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         raise NotImplementedError("Client method not implemented")
 
     @abstractmethod

@@ -1,0 +1,33 @@
+type: "workflow"
+namespace: "namespace1"
+command: "workflow4"
+name: "test_schedule"
+description: "Test Workflow"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator1"
+    - id: "step_2"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: ["step_1", "step_5", "step_4"]
+      retry: "exponential"
+    - id: "step_3"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator3"
+      dependencies: ["step_2"]
+    - id: "step_4"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator4"
+      dependencies: []
+    - id: "step_5"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: []
+supported_schedulers:
+  - "test2"

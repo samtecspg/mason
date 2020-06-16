@@ -2,7 +2,8 @@ import shutil
 from os import path
 from typing import Optional, List, Union
 
-from mason.engines.scheduler.models.dags import ValidDag, Dag
+from mason.engines.scheduler.models.dags.valid_dag import ValidDag
+from mason.engines.scheduler.models.dags.dag import Dag
 from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.uuid import uuid4
 from mason.configurations.valid_config import ValidConfig
@@ -19,7 +20,7 @@ class Workflow:
         self.namespace = namespace
         self.command = command
         self.description = description
-        self.dag = Dag(dag)
+        self.dag = Dag(namespace, command, dag)
         self.name = name + "_" + str(uuid4())
         self.supported_schedulers = supported_schedulers
         self.schedule = self.validate_schedule(schedule)

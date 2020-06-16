@@ -27,7 +27,8 @@
     "scheduler_engine": {
       "type": "string",
       "enum": [
-        "glue"
+        "glue",
+        "local"
       ]
     },
     "clients": {

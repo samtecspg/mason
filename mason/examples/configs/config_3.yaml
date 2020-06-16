@@ -1,6 +1,7 @@
 id: 3
 metastore_engine: athena
 storage_engine: s3
+scheduler_engine: local
 clients:
   s3:
     configuration:

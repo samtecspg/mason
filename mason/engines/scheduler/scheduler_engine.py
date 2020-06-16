@@ -18,6 +18,9 @@ class SchedulerEngine(Engine):
             if client.client_name == "glue":
                 from mason.clients.glue.scheduler import GlueSchedulerClient
                 return GlueSchedulerClient(client.config)
+            elif client.client_name == "local":
+                from mason.clients.local.scheduler import LocalSchedulerClient
+                return LocalSchedulerClient(client.config)
             else:
                 return InvalidSchedulerClient(f"Client type not supported: {client.client_name}")
         elif isinstance(client, EmptyClient):

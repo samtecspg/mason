@@ -3,6 +3,7 @@ from typing import Tuple, Union, List, Optional
 import boto3
 from botocore.client import BaseClient
 from botocore.errorfactory import ClientError
+from mason.util.environment import MasonEnvironment
 
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response

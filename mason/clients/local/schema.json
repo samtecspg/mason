@@ -4,7 +4,7 @@
   "properties": {
     "threads": {
       "type": "integer"
-    },
+    }
   },
   "additionalProperties": false
 }

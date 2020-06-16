@@ -3,10 +3,10 @@ step_1:
   parameters: { "database_name": "test", "storage_path": "test" }
 step_2:
   config_id: 1
-  parameters: {}
+  parameters: {"job_id": "1"}
 step_3:
   config_id: 1
-  parameters: {}
+  parameters: {"query_string": "SELECT * FROM STUFF LIMIT 5", database_name: "test"}
 step_4:
   config_id: 1
-  parameters: {}
+  parameters: {"database_name": "test", "table_name": "test"}
