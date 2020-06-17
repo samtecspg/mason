@@ -28,6 +28,36 @@ class LocalSchedulerClient(SchedulerClient):
 
     def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
+    
+    #  returns next_steps, invalid_steps, pending_steps, all_finished_steps
+    def progress_steps(self, dag: ValidDag, env: MasonEnvironment, response: Response, steps: List[ValidDagStep], pending_steps: List[ExecutedDagStep], executed_steps: List[ExecutedDagStep]) -> Tuple[List[ValidDagStep], List[InvalidDagStep], List[ExecutedDagStep], List[ExecutedDagStep]]:
+        # TODO: Thread this with number of threads equal to max available len(list)
+        message = ", ".join(list(map(lambda n: n.id, steps)))
+        logger.debug(f"Running steps: {message}")
+        
+        st = sorted(steps)
+        new_executed_steps = list(map(lambda r: ExecutedDagStep(r, r.run(env, response)), st)) + pending_steps
+        executed_steps += new_executed_steps
+        next_steps: List[Union[ValidDagStep, InvalidDagStep, ExecutedDagStep]] = flatten_array(list(map(lambda e: e.next_steps(dag, env, executed_steps), new_executed_steps)))
+        valid: List[ValidDagStep] = []
+        invalid: List[InvalidDagStep] = []
+        pending: List[ExecutedDagStep] = []
+        for s in next_steps:
+            if isinstance(s, ValidDagStep):
+                valid.append(s)
+            elif isinstance(s, InvalidDagStep):
+                invalid.append(s)
+            else:
+                pending.append(s)
+
+        for e in new_executed_steps:
+            response = e.operator_response.to_response(response)
+
+        for i in invalid:
+            response.add_error(i.reason)
+            
+
+        return list(set(valid)), list(set(invalid)), list(set(pending)), list(set(executed_steps))
 
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         dag = self.dag
@@ -35,40 +65,10 @@ class LocalSchedulerClient(SchedulerClient):
             response.add_info(f"Running dag \n{self.dag.display()}")
             roots: List[ValidDagStep] = self.dag.roots()
             
-            # TODO: Thread this with number of threads equal to max available len(list)
-
-            message = ", ".join(list(map(lambda n: n.id, roots)))
-            logger.debug(f"Running steps: {message}")
-
-            exec_steps = list(map(lambda r: ExecutedDagStep(r, r.run(env, response)), roots))
-            next: List[Union[ValidDagStep, InvalidDagStep]] = flatten_array(list(map(lambda e: e.next_steps(dag, env), exec_steps)))
-            nxt, invalid = sequence(next, ValidDagStep, InvalidDagStep)
+            valid, invalid, pending, executed = self.progress_steps(dag, env, response, roots, [], [])
             
-            nxt = list(set(nxt))
-            message = ", ".join(list(map(lambda n: n.id, nxt)))
-            logger.debug(f"Running steps: {message}")
-
-            for e in exec_steps:
-                response = e.operator_response.to_response(response)
-
-            for i in invalid:
-                response.add_error(i.reason)
-
-            while len(nxt) > 0:
-                exec_steps = list(map(lambda r: ExecutedDagStep(r, r.run(env, response)), nxt))
-                next: List[Union[ValidDagStep, InvalidDagStep]] = flatten_array(list(map(lambda e: e.next_steps(dag, env), exec_steps)))
-                nxt, invalid = sequence(next, ValidDagStep, InvalidDagStep)
-                
-                if len(nxt) > 0:
-                    nxt = list(set(nxt))
-                    message = ", ".join(list(map(lambda n: n.id, nxt)))
-                    logger.debug(f"Running steps: {message}")
-
-                    for e in exec_steps:
-                        response = e.operator_response.to_response(response)
-
-                    for i in invalid:
-                        response.add_error(i.reason)
+            while len(valid) > 0:
+                valid, invalid,pending, executed = self.progress_steps(dag, env, response, valid, pending, executed)
 
         return response
             
