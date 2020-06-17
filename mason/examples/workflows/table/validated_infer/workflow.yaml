@@ -12,7 +12,7 @@ dag:
       type: "operator"
       namespace: "job"
       command: "get"
-      retry: "exponential"
+      retry: "exponential(5)"
       dependencies: ["step_1"]
     - id: "step_3"
       type: "operator"

@@ -11,8 +11,8 @@ import shutil
 def print_result(result):
     print()
     print(result.output)
-    # if result.exception:
-    print(result.exception)
+    if result.exception:
+        print(result.exception)
 
 
 @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
@@ -33,5 +33,4 @@ class TestCLI:
         print_result(runner.invoke(register, [from_root('/examples/operators/')]))
         print_result(runner.invoke(workflow, ['register', from_root('/examples/workflows/')]))
         print_result(runner.invoke(operator))
-        # print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/validated_infer.yaml")]))
         print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/validated_infer.yaml"), "-r", "-d"]))

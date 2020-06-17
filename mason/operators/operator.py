@@ -46,7 +46,7 @@ class Operator:
         if test:
             return config
         else:
-            return InvalidConfig(config.config, "Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.")
+            return InvalidConfig(config.config, f"Configuration {config.id} not supported by configured engines for operator {self.namespace}:{self.command}.  Check operator.yaml for supported engine configurations.")
 
     def register_to(self, operator_home: str):
         if self.source_path:

@@ -4,7 +4,8 @@ from mason.clients.responsable import Responsable
 from mason.clients.response import Response
 
 class ExecutedJob(Responsable):
-    def __init__(self, message: Optional[str] = None, logs: Optional[List[Union[str, dict]]] = None):
+    def __init__(self, id: str, message: Optional[str] = None, logs: Optional[List[Union[str, dict]]] = None):
+        self.id = id
         self.message = message or ""
         self.logs = logs or []
     
