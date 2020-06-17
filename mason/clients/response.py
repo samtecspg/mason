@@ -15,11 +15,14 @@ class Response:
         self.status_code: int = 200
         self.data: List[dict] = []
 
-    def add_timestamp(self, s: Optional[str] = None):
-        if s:
-            return f"{datetime.now()}: {s}"
+    def add_timestamp(self, s: Optional[str] = None) -> str:
+        if not logger.log_level.fatal():
+            if s:
+                return f"{datetime.now()}: {s}"
+            else:
+                return f"{datetime.now()}"
         else:
-            return f"{datetime.now()}"
+            return s or ""
     
     def errored(self):
         return not (len(self.errors) == 0)
