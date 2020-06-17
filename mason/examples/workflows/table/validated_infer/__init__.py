@@ -28,7 +28,6 @@ def step(current: ExecutedDagStep, next: ValidDagStep) -> Union[ValidDagStep, In
             return InvalidDagStep(f"Invalid object returned from step_2: {object}")
     elif current_step_id == "step_3":
         if isinstance(object, ExecutedJob):
-            next.operator.parameters.set_required("job_id", object.id)
             return InvalidDagStep("Query Succesful, not cleaning up table", current.operator_response)
         elif isinstance(object, InvalidJob):
             return next
