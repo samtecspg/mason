@@ -44,7 +44,7 @@ class InvalidSchedulerClient(SchedulerClient, InvalidClient):
     def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
 
-    def trigger_schedule(self, schedule_name: str, response: Response) -> Response:
+    def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         raise NotImplementedError("Client method not implemented")
 
     def delete_schedule(self, schedule_name: str, response: Response) -> Response:

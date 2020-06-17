@@ -62,8 +62,8 @@ class LocalSchedulerClient(SchedulerClient):
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         dag = self.dag
         if dag:
-            response.add_info(f"Running dag \n{self.dag.display()}")
-            roots: List[ValidDagStep] = self.dag.roots()
+            response.add_info(f"Running dag \n{dag.display()}")
+            roots: List[ValidDagStep] = dag.roots()
             
             valid, invalid, pending, executed = self.progress_steps(dag, env, response, roots, [], [])
             

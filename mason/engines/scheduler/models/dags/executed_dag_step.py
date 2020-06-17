@@ -4,6 +4,7 @@ from typing import List, Union
 
 from mason.engines.scheduler.models.dags.failed_dag_step import FailedDagStep
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
+from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 from mason.operators.operator_response import OperatorResponse
 from mason.util.logger import logger
@@ -14,7 +15,7 @@ class ExecutedDagStep:
         self.step = step
         self.operator_response = response
 
-    def next_steps(self, dag: 'ValidDag', env: MasonEnvironment, executed_steps: List['ExecutedDagStep']) -> List[Union[ValidDagStep, InvalidDagStep, 'ExecutedDagStep']]:
+    def next_steps(self, dag: ValidDag, env: MasonEnvironment, executed_steps: List['ExecutedDagStep']) -> List[Union[ValidDagStep, InvalidDagStep, 'ExecutedDagStep']]:
         next_steps: List[ValidDagStep]
         next_steps = dag.get_next_steps(self.step)
         
@@ -27,11 +28,11 @@ class ExecutedDagStep:
     def failed(self, reason: str):
         return FailedDagStep(reason, self.step, self.operator_response)
 
-    def check_step(self, env: MasonEnvironment, step: ValidDagStep, dag: 'ValidDag', executed_steps: List['ExecutedDagStep']) -> Union[ValidDagStep, InvalidDagStep, 'ExecutedDagStep']:
+    def check_step(self, env: MasonEnvironment, step: ValidDagStep, dag: ValidDag, executed_steps: List['ExecutedDagStep']) -> Union[ValidDagStep, InvalidDagStep, 'ExecutedDagStep']:
         step_response: Union[ValidDagStep, InvalidDagStep]
         try:
             mod = import_module(f'{env.workflow_module}.{dag.namespace}.{dag.command}')
-            stepped: Union[ValidDagStep, FailedDagStep] = mod.step(self, step)
+            stepped: Union[ValidDagStep, FailedDagStep] = mod.step(self, step) # type: ignore
             if isinstance(stepped, FailedDagStep):
                 step_response = stepped.retry()
             else:

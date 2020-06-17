@@ -1,6 +1,5 @@
+from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.util.environment import MasonEnvironment
-
-from mason.engines.scheduler.models.dags import ValidDag
 
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.glue.glue_client import GlueClient

@@ -2,17 +2,18 @@ import time
 from typing import Union, Optional
 
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
+from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 from mason.operators.operator_response import OperatorResponse
 from mason.util.logger import logger
 
 
 class FailedDagStep:
-    def __init__(self, reason: str, step: 'ValidDagStep', response: OperatorResponse):
+    def __init__(self, reason: str, step: ValidDagStep, response: OperatorResponse):
         self.reason = reason
         self.step = step
         self.response = response
 
-    def retry(self) -> Union['ValidDagStep', InvalidDagStep]:
+    def retry(self) -> Union[ValidDagStep, InvalidDagStep]:
         retry_method: Optional[str] = self.step.retry_method        
         if retry_method:
             

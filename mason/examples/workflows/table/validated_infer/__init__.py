@@ -1,16 +1,9 @@
-from mason.api import workflow_api as WorkflowApi
-from mason.engines.scheduler.models.dags import DagStep
+from typing import Union
 
+from mason.engines.scheduler.models.dags.failed_dag_step import FailedDagStep
+from mason.engines.scheduler.models.dags.executed_dag_step import ExecutedDagStep
+from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 
-def api(*args, **kwargs): return WorkflowApi.get("table", "validated_infer", *args, **kwargs)
-
-
-def step(current: DagStep, next: DagStep):
-    if current.id == "step_1" and next.id == "step_2":
-        pass
-    elif current.id == "step_2" and next.id == "step_3":
-        pass
-    elif current.id == "step_3" and next.id == "step_4":
-        pass
-    else:
-        pass
+def step(current: ExecutedDagStep, next: ValidDagStep) -> Union[ValidDagStep, FailedDagStep]:
+    return next
+    
