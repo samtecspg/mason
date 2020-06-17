@@ -6,6 +6,7 @@ from mason.configurations.invalid_config import InvalidConfig
 from mason.definitions import from_root
 from mason.operators.operator import emptyOperator
 from mason.test.support import testing_base as base
+from mason.util.logger import logger
 from mason.util.list import flatten_array
 from mason.operators import operators, namespaces
 
@@ -27,7 +28,7 @@ class TestRegisterOperator:
         ns, invalid = operators.list_namespaces(env.operator_home)
 
         result = sorted(list(map(lambda n: n.to_dict_brief(), ns)), key=lambda s: list(s.keys())[0])
-        expect = [{'namespace1': ['operator1', 'operator2']}, {'namespace2': ['operator3', 'operator4']}]
+        expect = [{'namespace1': ['operator1', 'operator2']}, {'namespace2': ['operator3', 'operator4', 'operator5', 'operator6']}]
 
         assert(result == expect)
 
