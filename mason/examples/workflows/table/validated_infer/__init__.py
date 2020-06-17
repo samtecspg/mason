@@ -9,30 +9,30 @@ from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 
 
 def step(current: ExecutedDagStep, next: ValidDagStep) -> Union[ValidDagStep, InvalidDagStep, FailedDagStep]:
-    if current.step.id == "step_1":
-        executed_job = current.operator_response.object
-        if isinstance(executed_job, ExecutedJob):
-            next.operator.parameters.set_required("job_id", executed_job.id)
+    current_step_id = current.step.id
+    object = current.operator_response.object
+    
+    if current_step_id == "step_1":
+        if isinstance(object, ExecutedJob):
+            next.operator.parameters.set_required("job_id", object.id)
             return next
         else:
             return InvalidDagStep("ExecutedJob not returned from step_1", current.operator_response)
-    elif current.step.id == "step_2":
-        job = current.operator_response.object
-        if isinstance(job, ExecutedJob):
-            next.operator.parameters.set_required("job_id", job.id)
+    elif current_step_id == "step_2":
+        if isinstance(object, ExecutedJob):
+            next.operator.parameters.set_required("job_id", object.id)
             return next
-        elif isinstance(job, InvalidJob):
-            return FailedDagStep(f"Executed job not returned from step_2: {job.reason}", current.step, current.operator_response) 
+        elif isinstance(object, InvalidJob):
+            return FailedDagStep(f"Executed job not returned from step_2: {object.reason}", current.step, current.operator_response) 
         else:
-            return InvalidDagStep(f"Invalid object returned from step_2: {job}")
-    elif current.step.id == "step_3":
-        job = current.operator_response.object
-        if isinstance(job, ExecutedJob):
-            next.operator.parameters.set_required("job_id", job.id)
+            return InvalidDagStep(f"Invalid object returned from step_2: {object}")
+    elif current_step_id == "step_3":
+        if isinstance(object, ExecutedJob):
+            next.operator.parameters.set_required("job_id", object.id)
             return InvalidDagStep("Query Succesful, not cleaning up table", current.operator_response)
-        elif isinstance(job, InvalidJob):
+        elif isinstance(object, InvalidJob):
             return next
         else:
-            return InvalidDagStep(f"Invalid object returned from step_3: {job}")
+            return InvalidDagStep(f"Invalid object returned from step_3: {object}")
     else:
-        raise NotImplementedError(f"Step transition not implemented {current.step.id}->{next.id}")
+        raise NotImplementedError(f"Step transition not implemented {current_step_id}->{next.id}")

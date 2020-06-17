@@ -100,7 +100,7 @@ class TestListOperators:
         if op:
             valid = op.validate_config(config)
             if isinstance(valid, InvalidConfig):
-                expects = 'Configuration not supported by configured engines.  Check operator.yaml for supported engine configurations.'
+                expects = 'Configuration 1 not supported by configured engines for operator namespace1:operator2.  Check operator.yaml for supported engine configurations.'
                 assert(valid.reason == expects)
             else:
                 raise Exception("BadTest")
