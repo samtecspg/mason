@@ -32,9 +32,11 @@ class ExecutedDagStep:
         step_response: Union[ValidDagStep, InvalidDagStep]
         try:
             mod = import_module(f'{env.workflow_module}.{dag.namespace}.{dag.command}')
-            stepped: Union[ValidDagStep, FailedDagStep] = mod.step(self, step) # type: ignore
+            stepped: Union[ValidDagStep, InvalidDagStep, FailedDagStep] = mod.step(self, step) # type: ignore
             if isinstance(stepped, FailedDagStep):
                 step_response = stepped.retry()
+            elif isinstance(stepped, InvalidDagStep):
+                step_response = stepped
             else:
                 # check that all dependencies are satisfied, otherwise return the step as pending
                 dep = stepped.dependencies
@@ -44,7 +46,6 @@ class ExecutedDagStep:
                     return self
                 else:
                     return stepped
-                    
                     
         except ModuleNotFoundError as e:
             logger.debug(f"step function not defined for {dag.namespace}:{dag.command}")

@@ -21,6 +21,9 @@ load_dotenv(from_root('/.env.example'))
 def clean_uuid(s: str, subst: str = ''):
     return uuid_regex().sub(subst, s)
 
+def clean_date(s: str, subst: str = ''):
+    return uuid_regex().sub(subst, s)
+
 def ansi_escape(text):
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
     return ansi_escape.sub('', text)

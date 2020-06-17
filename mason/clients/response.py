@@ -1,4 +1,5 @@
-from typing import List, Tuple
+from datetime import datetime
+from typing import List, Tuple, Optional
 
 from mason.util.logger import logger
 
@@ -14,20 +15,29 @@ class Response:
         self.status_code: int = 200
         self.data: List[dict] = []
 
+    def add_timestamp(self, s: Optional[str] = None):
+        if s:
+            return f"{datetime.now()}: {s}"
+        else:
+            return f"{datetime.now()}"
+    
     def errored(self):
         return not (len(self.errors) == 0)
 
     def add_warning(self, warning: str, log: bool = True):
+        warning = self.add_timestamp(warning)
         if log:
             logger.warning(warning)
         self.warnings.append(warning)
 
     def add_info(self, info: str, log: bool = True):
+        info = self.add_timestamp(info)
         if log:
             logger.info(str(info))
         self.info.append(info)
 
     def add_error(self, error: str, log: bool = True):
+        error = self.add_timestamp(error)
         if log:
             logger.error(error)
         self.errors.append(error)
@@ -35,6 +45,7 @@ class Response:
     def add_response(self, response: dict, log: bool = False):
         if log:
             logger.debug(f"Response {str(response)}")
+        response["timestamp"] = self.add_timestamp()
         self.responses.append(response)
 
     def add_config(self, i: str, config: dict):

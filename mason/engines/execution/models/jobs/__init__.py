@@ -21,7 +21,7 @@ class Job:
     def running(self, message: Optional[str] = None, past=False) -> ExecutedJob:
         if not past:
             self.add_log(f"Running job id={self.id}")
-        return ExecutedJob(message, self.logs)
+        return ExecutedJob(self.id, message, self.logs)
 
     def set_id(self, id: Optional[str] = None):
         self.id = id or str(uuid4())

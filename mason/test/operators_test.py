@@ -6,7 +6,6 @@ from mason.configurations.invalid_config import InvalidConfig
 from mason.definitions import from_root
 from mason.operators.operator import emptyOperator
 from mason.test.support import testing_base as base
-from mason.util.logger import logger
 from mason.util.list import flatten_array
 from mason.operators import operators, namespaces
 
