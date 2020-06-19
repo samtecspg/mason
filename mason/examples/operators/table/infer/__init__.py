@@ -33,6 +33,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
         else:
             final = job.errored(f"Metastore database {database_name} not found")
     else:
+        response = table.to_response(response)
         final = job.errored(f"Invalid Tables: {table.message()}")
         
     return OperatorResponse(response, final)

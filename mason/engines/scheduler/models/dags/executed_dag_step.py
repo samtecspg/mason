@@ -1,3 +1,4 @@
+import time
 from functools import total_ordering
 from importlib import import_module
 from typing import List, Union
@@ -7,13 +8,20 @@ from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 from mason.operators.operator_response import OperatorResponse
-from mason.util.logger import logger
 from mason.util.environment import MasonEnvironment
 
+@total_ordering
 class ExecutedDagStep:
     def __init__(self, step: ValidDagStep, response: OperatorResponse):
         self.step = step
         self.operator_response = response
+        self.runtime = time.time()
+
+    def __ge__(self, other: 'ExecutedDagStep'):
+        return self.runtime > other.runtime
+
+    def __le__(self, other: 'ExecutedDagStep'):
+        return not self.__ge__(other)
 
     def next_steps(self, dag: ValidDag, env: MasonEnvironment, executed_steps: List['ExecutedDagStep']) -> List[Union[ValidDagStep, InvalidDagStep, 'ExecutedDagStep']]:
         next_steps: List[ValidDagStep]
@@ -29,13 +37,15 @@ class ExecutedDagStep:
         return FailedDagStep(reason, self.step, self.operator_response)
 
     def check_step(self, env: MasonEnvironment, step: ValidDagStep, dag: ValidDag, executed_steps: List['ExecutedDagStep']) -> Union[ValidDagStep, InvalidDagStep, 'ExecutedDagStep']:
-        step_response: Union[ValidDagStep, InvalidDagStep]
+        step_response: Union[ValidDagStep, InvalidDagStep, ExecutedDagStep]
         try:
             mod = import_module(f'{env.workflow_module}.{dag.namespace}.{dag.command}')
-            stepped: Union[ValidDagStep, InvalidDagStep, FailedDagStep] = mod.step(self, step) # type: ignore
+            stepped: Union[ValidDagStep, InvalidDagStep, FailedDagStep, ExecutedDagStep] = mod.step(self, step) # type: ignore
             if isinstance(stepped, FailedDagStep):
                 step_response = stepped.retry()
             elif isinstance(stepped, InvalidDagStep):
+                step_response = stepped
+            elif isinstance(stepped, ExecutedDagStep):
                 step_response = stepped
             else:
                 # check that all dependencies are satisfied, otherwise return the step as pending
@@ -48,7 +58,7 @@ class ExecutedDagStep:
                     return stepped
                     
         except ModuleNotFoundError as e:
-            logger.debug(f"step function not defined for {dag.namespace}:{dag.command}")
+            self.operator_response.response.add_warning(f"step function not defined for {dag.namespace}:{dag.command}")
             step_response = step
             
         return step_response

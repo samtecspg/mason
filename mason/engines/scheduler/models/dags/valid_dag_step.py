@@ -23,7 +23,9 @@ class ValidDagStep:
     def __le__(self, other: 'ValidDagStep'):
         return not self.__ge__(other) 
 
-    def run(self, env: MasonEnvironment, response: Response) -> OperatorResponse:
+    def run(self, env: MasonEnvironment) -> OperatorResponse:
+        response = Response()
+        response.add_info(f"Running step {self.id}")
         return self.operator.run(env, response)
     
     def retryable(self):

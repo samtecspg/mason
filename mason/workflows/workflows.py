@@ -43,7 +43,6 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParamete
         print_json(response.formatted())
     return response
 
-
 def parse_workflows(workflow_file: str) -> Tuple[List[Workflow], List[InvalidWorkflow]]:
     workflows, errors = parse_schemas(workflow_file, "workflow", Workflow)
     schema_errors = list(map(lambda e: InvalidWorkflow("Invalid Workflow Schema: " + e), errors))
@@ -53,7 +52,7 @@ def parse_workflows(workflow_file: str) -> Tuple[List[Workflow], List[InvalidWor
 
 def register_workflows(workflow_file: str, env: MasonEnvironment):
     valid_workflows, invalid_workflows = parse_workflows(workflow_file)
-
+    
     for i in invalid_workflows:
         logger.error(f"Invalid Workflow Schema Definition {i.reason}")
 

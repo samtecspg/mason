@@ -170,7 +170,7 @@ def test_infer():
         # bad path
         params = InputParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/bad-table")
         good = op.validate(config, params).run(env, Response())
-        assert(good.with_status() == ({'Errors': ['Job errored: Invalid Tables: No keys at s3://crawler-poc/bad-table'], 'Info': [], 'Warnings': []}, 404))
+        assert(good.with_status() == ({'Errors': ['No keys at s3://crawler-poc/bad-table', 'Job errored: Invalid Tables: No keys at s3://crawler-poc/bad-table'], 'Info': [], 'Warnings': []}, 404))
 
          # valid path
         params = InputParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/catalog_poc_data,output_path:crawler-poc/athena/")

@@ -1,3 +1,5 @@
+from os import path
+
 from click.testing import CliRunner
 from dotenv import load_dotenv
 
@@ -22,7 +24,8 @@ class TestCLI:
     def run_around_tests(self):
         os.environ["MASON_HOME"] = ".tmp/"
         yield
-        shutil.rmtree(".tmp/")
+        if path.exists(".tmp/"):
+            shutil.rmtree(".tmp/")
 
     def test_config_0(self):
         load_dotenv(from_root("/../.env"))
@@ -33,4 +36,12 @@ class TestCLI:
         print_result(runner.invoke(register, [from_root('/examples/operators/')]))
         print_result(runner.invoke(workflow, ['register', from_root('/examples/workflows/')]))
         print_result(runner.invoke(operator))
-        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/validated_infer.yaml"), "-r", "-d"]))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer']))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/bad_validated_infer_1.yaml")]))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/bad_validated_infer_2.yaml")]))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/bad_validated_infer_2.yaml"), "-d"]))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/bad_validated_infer_3.yaml"), "-d", "-r"]))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/bad_validated_infer_4.yaml"), "-d", "-r"]))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/bad_validated_infer_5.yaml"), "-d", "-r"]))
+        print_result(runner.invoke(workflow, ['table', 'validated_infer', '-f', from_root("/examples/parameters/validated_infer.yaml"), "-r", "-d", "-l", "info"]))
+

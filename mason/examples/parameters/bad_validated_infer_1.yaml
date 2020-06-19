@@ -1,0 +1,6 @@
+step_1:
+  config_id: 3
+  parameters: { "database_name": "bad_database", "storage_path": "spg-mason-demo/part_data", "table_name": "test_table"}
+step_2:
+  config_id: 1
+  parameters: {"job_id": "<<PULLED FROM step_1>>"}

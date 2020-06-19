@@ -10,7 +10,7 @@ from mason.engines.storage.models.path import Path
 from mason.util.logger import logger
 from mason.engines.metastore.models.schemas import schemas
 from mason.engines.metastore.models.schemas import check_schemas as CheckSchemas
-from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
+from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema
 from mason.util.list import get, sequence
 
 
@@ -91,7 +91,8 @@ class S3Client(AWSClient):
 
         if len(keys) > 0:
             valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key), options or {}), keys)), Schema, InvalidSchema)
-            validated = CheckSchemas.find_conflicts(list(set(valid)))
+            non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
+            validated = CheckSchemas.find_conflicts(list(set(non_empty)))
             table = CheckSchemas.get_table(self.get_name(name, path), validated)
             invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
             if isinstance(table, Table):

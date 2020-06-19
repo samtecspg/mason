@@ -14,16 +14,25 @@ class Response:
         self.current_config = None
         self.status_code: int = 200
         self.data: List[dict] = []
+        
+    def merge(self, response: 'Response') -> 'Response':
+        self.responses = self.responses + response.responses
+        self.warnings = self.warnings + response.warnings
+        self.info = self.info + response.info
+        self.errors = self.errors + response.errors
+        self.status_code = response.status_code
+        self.data = self.data + response.data
+        return self
 
     def add_timestamp(self, s: Optional[str] = None) -> str:
-        if not logger.log_level.fatal():
+        if logger.log_level.level > 4:
+            return s or ""
+        else:
             if s:
                 return f"{datetime.now()}: {s}"
             else:
                 return f"{datetime.now()}"
-        else:
-            return s or ""
-    
+
     def errored(self):
         return not (len(self.errors) == 0)
 

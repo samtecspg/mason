@@ -81,7 +81,10 @@ class AthenaClient(AWSClient):
 
             if not ((error or "") == ""):
                 response.set_status(status)
-                final = job.errored(message)
+                if message and "Query has not yet finished" in message:
+                    final = job.errored(message, True)
+                else:
+                    final = job.errored(message)
             else:
                 response.set_status(status)
                 results = athena_response_2.get("ResultSet")

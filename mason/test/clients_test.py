@@ -159,11 +159,17 @@ class TestLocal:
             * step_5
             * step_6
 
+            Running step step_1
             Running operator1
+            Running step step_2
             Running operator2
+            Running step step_3
             Running operator3
+            Running step step_4
             Running operator4
+            Running step step_5
             Running operator5
+            Running step step_6
             Running operator6
             """
             assert(clean_uuid(clean_string("\n".join(response.info))) == clean_uuid(clean_string(info)))

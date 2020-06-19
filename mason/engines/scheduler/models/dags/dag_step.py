@@ -33,11 +33,11 @@ class DagStep:
                         if isinstance(valid, ValidOperator):
                             return ValidDagStep(self.id, valid, self.dependencies, self.retry_method, self.retry_max)
                         else:
-                            return InvalidDagStep(f"Invalid Dag Step: Invalid Operator Definition: {valid.reason}")
+                            return InvalidDagStep(f"Invalid Dag Step {self.id}: Invalid Operator Definition: {valid.reason}")
                     else:
-                        return InvalidDagStep(f"Invalid Dag Step: Operator not found {self.namespace}:{self.command}")
+                        return InvalidDagStep(f"Invalid Dag Step {self.id}: Operator not found {self.namespace}:{self.command}")
                 else:
-                    return InvalidDagStep(f"Invalid Dag Step: Config not found with id {wfp.config_id}")
+                    return InvalidDagStep(f"Invalid Dag Step {self.id}: Config not found with id {wfp.config_id}")
             else:
                 messages = ", ".join(list(map(lambda p: p.reason, parameters.invalid)))
                 return InvalidDagStep(f"Workflow Parameters for step:{self.id} not specified. Invalid Parameters: {messages}")
