@@ -1,14 +1,12 @@
 from importlib import import_module
-from typing import List, Optional, Union, Any
+from typing import List, Optional
 
-from mason.engines.execution.models.jobs import Job
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.operators.operator_response import OperatorResponse
 from mason.operators.supported_engines import SupportedEngineSet
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
-from mason.util.logger import logger
 
 
 class ValidOperator:

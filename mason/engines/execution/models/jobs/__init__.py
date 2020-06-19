@@ -1,7 +1,7 @@
 from typing import Optional, List, Union
 
 from mason.engines.execution.models.jobs.executed_job import ExecutedJob
-from mason.engines.execution.models.jobs.invalid_job import InvalidJob
+from mason.engines.execution.models.jobs.invalid_job import InvalidJob, RetryableJob, FailedJob
 from mason.util.uuid import uuid4
 
 class Job:
@@ -15,8 +15,12 @@ class Job:
     def add_log(self, log: Union[str, dict]):
         self.logs.append(log)
 
-    def errored(self, error: Optional[str] = None) -> InvalidJob:
-        return InvalidJob(error)
+    def errored(self, error: Optional[str] = None, retryable: Optional[bool] = None) -> InvalidJob:
+        r = retryable or False
+        if r:
+            return RetryableJob(error)
+        else:
+            return FailedJob(error)
 
     def running(self, message: Optional[str] = None, past=False) -> ExecutedJob:
         if not past:

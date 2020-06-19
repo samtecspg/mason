@@ -58,6 +58,12 @@ class EmptySchema(Schema):
         self.type = ""
         self.columns: Sequence[SchemaElement] = []
 
+    def __eq__(self, other):
+        return isinstance(other, EmptySchema)
+
+    def __hash__(self):
+        return 0
+
     def to_dict(self):
         return {}
 

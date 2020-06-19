@@ -11,9 +11,9 @@ def parse_yaml(file: str):
                 if type(yaml_load).__name__ == "dict":
                     return yaml_load
                 else:
-                    logger.error(f"\nInvalid YAML: {yaml_load}\n")
+                    logger.error(f"\nInvalid YAML {file}: {yaml_load}\n")
             except yaml.YAMLError as exc:
-                logger.error(f"\nInvalid YAML: {exc}\n")
+                logger.error(f"\nInvalid YAML {file}: {exc}\n")
     except FileNotFoundError as e:
         logger.error(f"Specified YAML does not exist: {e}")
 
@@ -25,9 +25,9 @@ def parse_yaml_invalid(file: str) -> Union[dict, str]:
                 if type(yaml_load).__name__ == "dict":
                     return yaml_load
                 else:
-                    return f"\nInvalid YAML: {yaml_load}\n"
+                    return f"\nInvalid YAML {file}: {yaml_load}\n"
             except yaml.YAMLError as exc:
-                return f"\nInvalid YAML: {exc}\n"
+                return f"\nInvalid YAML {file}: {exc}\n"
     except FileNotFoundError as e:
         return f"Specified YAML does not exist: {e}"
 

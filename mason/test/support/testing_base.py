@@ -33,6 +33,7 @@ def clean_string(s1: str):
 def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
     logger.set_level(log_level)
     env = get_env()
+    load_dotenv(from_root("/../.env.example"))
     workflow = kwargs.get("workflow") or False
     if do_mock:
         patches = get_patches()

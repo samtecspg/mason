@@ -6,11 +6,11 @@ step_2:
   parameters: {"job_id": "<<PULLED FROM step_1>>"}
 step_3:
   config_id: 1
-  parameters: {"query_string": "SELECT * FROM merged_csv LIMIT 5", database_name: "crawler_poc"}
+  parameters: {"query_string": "SELECT * FROM test_table LIMIT 5", database_name: "bad"}
 step_4:
   config_id: 1
-  parameters: {"job_id": "<<PULLED FROM step_4>>"}
+  parameters: {"job_id": "<<PULLED FROM step_3>>"}
 step_5:
   config_id: 1
-  parameters: {"database_name": "crawler_poc", "table_name": "test_table"}
-
+  parameters: {"database_name": "test", "table_name": "test"}
+  

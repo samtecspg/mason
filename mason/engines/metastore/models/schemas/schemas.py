@@ -4,7 +4,7 @@ from s3fs import S3File
 from fsspec.spec import AbstractBufferedFile
 
 from mason.engines.metastore.models.schemas import json as JsonSchema, text as TextSchema, parquet as ParquetSchema
-from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
+from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema
 
 
 def header_length(file: AbstractBufferedFile):
@@ -28,6 +28,8 @@ def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, I
         return JsonSchema.from_file(get_name(file))
     elif file_type == "CSV text" or file_type == "ASCII text":
         return TextSchema.from_file(get_name(file), "none", header_length(file), options.get("read_headers"))
+    elif file_type == "empty":
+        return EmptySchema()
     else:
         name = get_name(file)
         return InvalidSchema(f"File type not supported for file {name}")

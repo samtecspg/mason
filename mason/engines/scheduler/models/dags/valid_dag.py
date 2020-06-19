@@ -7,7 +7,6 @@ from mason.resources.asciidag.graph import Graph
 from mason.resources.asciidag.node import Node
 from mason.util.list import flatten_array, flatten
 
-
 class ValidDag:
 
     def __init__(self, namespace: str, command: str, valid_steps: List[ValidDagStep], invalid_steps: List[InvalidDagStep]):

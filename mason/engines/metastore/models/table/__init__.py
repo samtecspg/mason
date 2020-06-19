@@ -83,16 +83,3 @@ class InvalidTables(Responsable):
         return response
             
         
-# if isinstance(table, Table):
-#     response.add_data(table.to_dict())
-# else:
-#     else:
-#         tables = table
-# 
-#     for table in tables:
-#         if table.schema_conflict:
-#             response.add_data(table.schema_conflict.to_dict())
-#         response.add_error(table.reason)
-#         if "not found" in table.reason:
-#             response.set_status(404)
-

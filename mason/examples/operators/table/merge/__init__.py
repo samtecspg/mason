@@ -42,7 +42,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParamet
                     if isinstance(executed, ExecutedJob):
                         final = job.running()
                     else:
-                        final = InvalidJob(f"Job errored: {executed.reason}")
+                        final = InvalidJob(f"Job {job.id} errored: {executed.reason}")
                 else:
                     final = InvalidJob("Mixed schemas not supported at this time.")
             else:
