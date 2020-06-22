@@ -24,8 +24,7 @@ RUN ./scripts/install.sh
 
 # Remove if you do not wish to install the example configuration or operators
 RUN mason config mason/examples/configs/
-RUN mason register mason/examples/operators/
-RUN mason workflow register mason/examples/workflows/
+RUN mason register mason/examples/
 
 RUN ./scripts/install_kubectl.sh
 
