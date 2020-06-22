@@ -100,9 +100,8 @@ elif [ $1 == "1.5.0" ]
 then
   commands=(
       "mason config mason/examples/configs/"
-      "mason register mason/examples/operators"
+      "mason register mason/examples/"
       "mason operator"
-      "mason workflow register mason/examples/workflows"
       "mason workflow"
       "mason workflow table validated_infer"
       "mason config -s 3"
