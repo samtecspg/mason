@@ -657,11 +657,11 @@ Clients are being added they include a number of prioprietary technologies such 
 
 Clients have 3 necessary parts:
 
-(1) A schema.json located in `clients/<CLIENT_NAME>/`  
+(1) A schema.json located in `mason/clients/<CLIENT_NAME>/`  
 (2) An `__init__.py` which contains a Client definition which defines all possible actions to be made by a client on behalf of mason
 (3) For each engine type "role" of a particular client an accompanying engine definition file.  For example if you intend to use Glue as both a metastore (accessing Glue Data Catalog) as well as a Scheduler (creating Glue crawlers) then you would have an accompanying `metastore.py` as well as `scheduler.py`
 
 Every metastore client implementation has a set of "canonical" functions which are defined to be the set of things an engine type can do.  See `clients/engines/`.  If you extend an engine to include a new action type you will need to add accompanying abstract methods to these classes which will be enforced by mypy.   If a particular client will not currently support an function then an accompying empty action which raises NotImplemented will need to be added.  Mason is built around a "white list" approach to support for clients and engines so this is encouraged.  However new functions (especially ones that have very bespoke applications to one client), should be added infrequently.  If a particular action is extremely bespoke and cannot be expressed in terms of existing canonical verbs for an engine type then it is recommended that a new engine type is created.
 
-For more information looking at existing client implementations in `clients/`
+For more information looking at existing client implementations in `mason/clients/`
 
