@@ -96,6 +96,25 @@ then
       "echo \$JOB_ID"
       "mason operator job get -p \"job_id:\$JOB_ID\""
   )
+elif [ $1 == "1.5.0" ]
+then
+  commands=(
+      "mason config mason/examples/configs/"
+      "mason register mason/examples/"
+      "mason operator"
+      "mason workflow"
+      "mason workflow table validated_infer"
+      "mason config -s 3"
+      "mason workflow table validated_infer"
+      "mason workflow table validated_infer -f mason/examples/parameters/bad_validated_infer_1.yaml"
+      "mason workflow table validated_infer -f mason/examples/parameters/bad_validated_infer_2.yaml"
+      "mason workflow table validated_infer -f mason/examples/parameters/bad_validated_infer_2.yaml -d -r"
+      "mason workflow table validated_infer -f mason/examples/parameters/bad_validated_infer_3.yaml -d -r"
+      "mason workflow table validated_infer -f mason/examples/parameters/bad_validated_infer_4.yaml -d -r"
+      "mason workflow table validated_infer -f mason/examples/parameters/bad_validated_infer_5.yaml -d -r"
+      "mason workflow table validated_infer -f mason/examples/parameters/validated_infer.yaml -d -r"
+  )
+ 
 else
   commands=()
 fi
@@ -107,5 +126,7 @@ do
   read -p ">> $i"
   eval "$i"
 done
+
+rm -rf .tmp/
 
 

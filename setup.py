@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages, find_namespace_packages
+from setuptools import setup, find_packages
 
 with open('requirements.txt') as f:
     requirements = f.readlines()
@@ -21,7 +21,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'mason = mason.cli:main'
+            'mason = mason.cli:cli'
         ]
     },
     install_requires=requirements,

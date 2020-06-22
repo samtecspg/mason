@@ -27,10 +27,16 @@
     "scheduler_engine": {
       "type": "string",
       "enum": [
-        "glue"
+        "glue",
+        "local"
       ]
+    },
+    "clients": {
+      "type": "object",
+      "properties": {}
     }
   },
+  "additionalProperties": false,
   "required": [ "id" ]
 }
 

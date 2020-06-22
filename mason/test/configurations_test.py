@@ -1,3 +1,4 @@
+from mason.configurations.invalid_config import InvalidConfig
 from mason.test.support import testing_base as base
 from mason.util.environment import MasonEnvironment
 from mason.definitions import from_root
@@ -19,25 +20,26 @@ class TestConfiguration:
         config_home = from_root(config)
         env = MasonEnvironment(config_home=config_home)
         config_doc = parse_yaml(env.config_home)
-        conf = Config(config_doc).validate(env)
+        conf = Config(config_doc).validate()
         return conf, env
 
 
     def test_configuration_path_dne(self):
         conf, env = self.before("/path_dne")
-        assert(conf.engines == empty_config())
+        assert(isinstance(conf, InvalidConfig))
 
     def test_configuration_invalid_yaml(self):
         conf, env = self.before("/test/support/invalid_yaml.yaml")
-        assert(conf.engines == empty_config())
+        assert(isinstance(conf, InvalidConfig))
+        assert("Invalid config schema. Reason: Schema error " in conf.reason)
 
     def test_configuration_invalid_yaml_2(self):
         conf, env = self.before("/test/support/invalid_yaml_2.yaml")
-        assert(conf.engines == empty_config())
+        assert(isinstance(conf, InvalidConfig))
 
     def test_configuration_invalid_config(self):
         conf, env = self.before("/test/support/test_bad_config.yaml")
-        assert(conf.engines == empty_config())
+        assert(isinstance(conf, InvalidConfig))
 
     def test_configuration_valid(self):
         conf, env = self.before("/test/support/configs/valid_config_1.yaml")

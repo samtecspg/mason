@@ -1,14 +1,25 @@
+import os
+import shutil
+from unittest import mock
 
 from hiyapyco import dump as hdump
+from mason.clients.response import Response
 
-from mason.clients.spark import SparkConfig
-from mason.clients.spark.runner.kubernetes_operator import merge_config
-from mason.configurations.config import Config
-from mason.configurations.valid_config import ValidConfig
+from mason.test.support.mocks import mock_execution_engine_client, mock_storage_engine_client, mock_metastore_engine_client, mock_config_schema
+from mason.util.logger import logger
+from mason.workflows.valid_workflow import ValidWorkflow
+from mason.parameters.workflow_parameters import WorkflowParameters
+from mason.definitions import from_root
+from mason.configurations.configurations import get_all
+
+from mason.clients.spark.spark_client import SparkConfig
+from mason.clients.spark.runner.kubernetes_operator.kubernetes_operator import merge_config
 from mason.engines.execution.models.jobs.merge_job import MergeJob
 from mason.engines.storage.models.path import Path
-from mason.test.support.testing_base import clean_string
-from mason.util.environment import MasonEnvironment
+from mason.test.support.testing_base import clean_string, clean_uuid
+from mason.workflows import workflows
+from mason.test.support import testing_base as base
+
 
 class TestSpark:
 
@@ -84,6 +95,87 @@ class TestSpark:
                 name: test-volume
         """
         assert clean_string(dumped) == clean_string(expects)
+
+
+
+@mock.patch("mason.engines.execution.execution_engine.ExecutionEngine.get_client", mock_execution_engine_client)
+@mock.patch("mason.engines.storage.storage_engine.StorageEngine.get_client", mock_storage_engine_client)
+@mock.patch("mason.engines.metastore.metastore_engine.MetastoreEngine.get_client", mock_metastore_engine_client)
+@mock.patch("mason.configurations.config.Config.config_schema", mock_config_schema)
+class TestLocal:
+
+    def before(self):
+        base.set_log_level("fatal")
+        mason_home = from_root("/test/.tmp/")
+
+        if os.path.exists(mason_home):
+            shutil.rmtree(mason_home)
+
+        env = base.get_env(workflow_home="/test/.tmp/workflows/", operator_home="/test/support/operators/",
+                           config_home="/test/support/configs/", operator_module="mason.test.support.operators", workflow_module="mason.test.support.workflows")
+
+        return env, mason_home
+
+    def test_local_client(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['8']
+
+        # DAG has cycle
+        step_params = {
+            "config_id": "8",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params,
+            "step_6": step_params,
+        }
+
+        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow5/"), env)
+        wf = workflows.get_workflow(env, "namespace1", "workflow5")
+        logger.set_level("fatal")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, ValidWorkflow))
+            response = validated.run(env, Response(), False, True)
+            info = """
+            Registering workflow dag test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5 with local.
+            Registering DAG in local memory
+            Registered schedule test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5
+            Triggering schedule: test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5
+            Running dag
+            * step_1
+            | * step_2
+            | | * step_3
+            | |/  
+            * | step_4
+            |/  
+            * step_5
+            * step_6
+
+            Running step step_1
+            Running operator1
+            Running step step_2
+            Running operator2
+            Running step step_3
+            Running operator3
+            Running step step_4
+            Running operator4
+            Running step step_5
+            Running operator5
+            Running step step_6
+            Running operator6
+            """
+            assert(len(response.errors)  == 0)
+            assert(clean_uuid(clean_string("\n".join(response.info))) == clean_uuid(clean_string(info)))
+        else:
+            raise Exception("Workflow not found")
 
 
 

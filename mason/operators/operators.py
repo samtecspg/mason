@@ -10,17 +10,21 @@ from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.namespaces.namespace import Namespace
 
 from mason.operators.operator import Operator
+from mason.operators.operator_definition import OperatorDefinition
+from mason.operators.operator_response import OperatorResponse
 from mason.operators.valid_operator import ValidOperator
 from typing import Optional, Union, Tuple
 from mason.configurations.valid_config import ValidConfig
 from mason.parameters.input_parameters import InputParameters
 from mason.clients.response import Response
+from mason.util.list import sequence
 from mason.util.swagger import update_yaml_file
 from mason.util.environment import MasonEnvironment
 from mason.util.printer import banner
 from mason.util.json_schema import parse_schemas
 from mason.util.logger import logger
 from mason.util.json import print_json
+
 
 def import_all(env: MasonEnvironment):
     path.append(env.mason_home)
@@ -33,7 +37,7 @@ def import_all(env: MasonEnvironment):
 def update_yaml(env: MasonEnvironment, base_swagger: str):
     update_yaml_file(base_swagger, [env.operator_home, env.workflow_home])
 
-def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None):
+def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None) -> OperatorResponse:
     sys.path.append(env.mason_home)
 
     #  TODO: Allow single step commands without subcommands
@@ -52,15 +56,18 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters,
 
         if op:
             operator: Union[ValidOperator, InvalidOperator] = op.validate(config, parameters)
-            response = operator.run(env, response)
+            operator_response: OperatorResponse = operator.run(env, response)
         else:
             response.add_error(f"Operator {namespace} {command} not found.  Check operators with 'mason operator'")
+            operator_response = OperatorResponse(response)
 
         banner("Operator Response")
-        print_json(response.formatted())
-        return response
+        print_json(operator_response.formatted())
     else:
         tabulate_operators(env, ns, cmd)
+        operator_response = OperatorResponse(response)
+        
+    return operator_response
 
 
 def from_config(config: dict, source_path: Optional[str] = None):
@@ -72,12 +79,22 @@ def from_config(config: dict, source_path: Optional[str] = None):
     if namespace and command:
         return Operator(namespace, command, description, parameters, supported_configurations, source_path)
     else:
-        None
+        return None
 
-def list_operators(operator_file: str, env: Optional[MasonEnvironment] = None) -> Tuple[List[Operator], List[InvalidOperator]]:
+def check_definition(operator: Operator) -> Union[Operator, InvalidOperator]:
+    module = operator.module()
+    if isinstance(module, OperatorDefinition):
+        return operator
+    else:
+        return module
 
+def list_operators(operator_file: str, validate_source: bool = False) -> Tuple[List[Operator], List[InvalidOperator]]:
     valid, errors = parse_schemas(operator_file, "operator", Operator)
     invalid = list(map(lambda e: InvalidOperator(e), errors))
+
+    if validate_source:
+        valid, invalid_def = sequence(list(map(lambda v: check_definition(v), valid)), Operator, InvalidOperator)
+        invalid = invalid + invalid_def
 
     return valid, invalid
 
@@ -85,8 +102,8 @@ def get_operator(env: MasonEnvironment, namespace: str, command: str) -> Optiona
     return namespaces.get(list_namespaces(env, namespace)[0], namespace, command)
 
 def list_namespaces(env: MasonEnvironment, cmd: Optional[str] = None) -> Tuple[List[Namespace], List[InvalidOperator]]:
-    path = env.operator_home
-    ops, invalid = list_operators(path)
+    operator_path = env.operator_home
+    ops, invalid = list_operators(operator_path)
 
     ns = namespaces.from_ops(ops)
     filtered = namespaces.filter(ns, cmd)

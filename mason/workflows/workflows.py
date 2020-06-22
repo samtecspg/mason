@@ -1,12 +1,10 @@
-from importlib import import_module
-
 from tabulate import tabulate
 
 from mason.configurations.valid_config import ValidConfig
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 from mason.clients.response import Response
 from mason.parameters.workflow_parameters import WorkflowParameters
-from mason.util.list import get
+from mason.util.list import get, sequence
 from mason.util.printer import banner
 from sys import path
 from mason.util.json_schema import parse_schemas
@@ -17,12 +15,8 @@ from mason.util.environment import MasonEnvironment
 from mason.workflows.invalid_workflow import InvalidWorkflow
 from mason.workflows.valid_workflow import ValidWorkflow
 from mason.workflows.workflow import Workflow
+from mason.workflows.workflow_definition import WorkflowDefinition
 
-def import_all(env: MasonEnvironment):
-    path.append(env.mason_home)
-    workflows = list_workflows(env)
-    for workflow in workflows:
-        import_module(f"{env.workflow_module}.{workflow.namespace}.{workflow.command}")
 
 def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
     #  TODO: Allow single step commands without subcommands
@@ -49,23 +43,33 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParamete
         print_json(response.formatted())
     return response
 
-
-def parse_workflows(workflow_file: str) -> Tuple[List[Workflow], List[InvalidWorkflow]]:
+def parse_workflows(workflow_file: str, check_def: bool = False) -> Tuple[List[Workflow], List[InvalidWorkflow]]:
     workflows, errors = parse_schemas(workflow_file, "workflow", Workflow)
     schema_errors = list(map(lambda e: InvalidWorkflow("Invalid Workflow Schema: " + e), errors))
     invalid_workflows = schema_errors
+
+    if check_def:
+        workflows, invalid_def = sequence(list(map(lambda v: check_definition(v),workflows)), Workflow, InvalidWorkflow)
+        invalid_workflows = invalid_def + invalid_workflows
 
     return workflows, invalid_workflows
 
 def register_workflows(workflow_file: str, env: MasonEnvironment):
     valid_workflows, invalid_workflows = parse_workflows(workflow_file)
-
-    for i in invalid_workflows:
+    
+    for i in (invalid_workflows):
         logger.error(f"Invalid Workflow Schema Definition {i.reason}")
 
     for w in valid_workflows:
         logger.info(f"Valid Workflow Definition: Saving {w.source_path} to {env.workflow_home}")
         w.register_to(env.workflow_home)
+
+def check_definition(workflow: Workflow) -> Union[Workflow, InvalidWorkflow]:
+    module = workflow.module()
+    if isinstance(module, WorkflowDefinition):
+        return workflow
+    else:
+        return module
 
 def list_workflows(env: MasonEnvironment, namespace: Optional[str] = None) -> List[Workflow]:
     valid, invalid = parse_workflows(env.workflow_home)

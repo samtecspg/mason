@@ -8,5 +8,16 @@ dag:
       type: "operator"
       namespace: "namespace1"
       command: "operator1"
+    - id: "step_2"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: ["step_1"]
+      retry: "exponential"
+    - id: "step_3"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator3"
+      dependencies: ["step_2"]
 supported_schedulers:
-  - "test"
+  - "test2"

@@ -85,8 +85,8 @@ def test_merge():
     def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # unsupported merge schema
         params = InputParameters(parameter_string="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
-        unsupported = op.validate(config, params).run(env, Response())
-        assert(unsupported.formatted()["Errors"] == ["Multiple Invalid Schemas detected."])
+        unsupported = op.validate(config, params).run(env, Response()).response
+        assert('No conflicting schemas found at good_input_bucket/good_input_path. Merge unecessary. ' in unsupported.formatted()["Errors"][0])
 
         # invalid merge params
         # params = InputParameters(parameter_string="input_path:test,bad:test")
@@ -165,12 +165,12 @@ def test_infer():
         # database DNE
         params = InputParameters(parameter_string=f"database_name:bad-database,storage_path:crawler-poc/catalog_poc_data")
         good = op.validate(config, params).run(env, Response())
-        assert(good.with_status() == ({'Errors': ['Metastore database bad-database not found'], 'Info': ['Table inferred: catalog_poc_data'], 'Warnings': []}, 200))
+        assert(good.with_status() == ({'Errors': ['Job errored: Metastore database bad-database not found'], 'Info': ['Table inferred: catalog_poc_data'], 'Warnings': []}, 404))
 
         # bad path
         params = InputParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/bad-table")
         good = op.validate(config, params).run(env, Response())
-        assert(good.with_status() == ({'Errors': ['No valid tables could be inferred at crawler-poc/bad-table'], 'Info': [], 'Warnings': ['Invalid Tables: No keys at s3://crawler-poc/bad-table']}, 200))
+        assert(good.with_status() == ({'Errors': ['No keys at s3://crawler-poc/bad-table', 'Job errored: Invalid Tables: No keys at s3://crawler-poc/bad-table'], 'Info': [], 'Warnings': []}, 404))
 
          # valid path
         params = InputParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/catalog_poc_data,output_path:crawler-poc/athena/")
@@ -181,7 +181,7 @@ def test_infer():
         infos = clean(good.formatted()["Info"])
 
         expect = [
-            'RunningQuery"CREATEEXTERNALTABLEIFNOTEXISTS`crawler-poc`.`catalog_poc_data`(`test_column_1`INT,`test_column_2`STRING)STOREDASPARQUETLOCATION\'s3://crawler-poc/catalog_poc_data\'"',
+            'Tableinferred:catalog_poc_data',
             'RunningAthenaquery.query_id:test_id',
             'Runningjobid=test_id'
         ]

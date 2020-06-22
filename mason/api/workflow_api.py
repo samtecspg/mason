@@ -2,7 +2,7 @@ import gc
 from typing import Optional
 
 from mason.workflows import workflows
-from mason.configurations.configurations import get_current_config
+from mason.configurations.configurations import get_current_config, get_config_by_id
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.parameters.workflow_parameters import WorkflowParameters
@@ -13,7 +13,12 @@ from mason.util.logger import logger
 def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[ValidConfig] = None, *args, **kwargs) :
 
     env: MasonEnvironment = environment or MasonEnvironment()
-    config: Optional[ValidConfig] = configuration or get_current_config(env)
+    config_id = kwargs.get("config_id")
+
+    if config_id:
+        config = get_config_by_id(env, config_id)
+    else:
+        config = configuration or get_current_config(env)
 
     if config:
         log_level: str = kwargs.get("log_level", "info")

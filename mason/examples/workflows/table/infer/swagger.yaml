@@ -23,6 +23,10 @@ paths:
           in: query
           required: false
           type: string
+        - name: config_id
+          in: query
+          required: false
+          type: string
         - name: log_level
           in: query
           enum: [ "info", "warning", "error", "debug", "trace", "fatal"]

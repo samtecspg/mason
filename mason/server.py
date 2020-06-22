@@ -6,7 +6,6 @@ from mason.util.printer import banner
 from mason.util.environment import MasonEnvironment
 from mason.util.logger import logger
 from mason.operators import operators
-from mason.workflows import workflows
 
 class MasonServer:
     def run(self):

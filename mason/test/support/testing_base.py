@@ -33,6 +33,7 @@ def clean_string(s1: str):
 def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
     logger.set_level(log_level)
     env = get_env()
+    load_dotenv(from_root("/../.env.example"))
     workflow = kwargs.get("workflow") or False
     if do_mock:
         patches = get_patches()
@@ -56,11 +57,11 @@ def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], work
         types = "Operator"
     if op:
         for config in configs:
-            conf = get_config(env, from_root("/examples/operators/table/test_configs/") + config + ".yaml")
+            conf = get_config(from_root("/examples/operators/table/test_configs/") + config + ".yaml")
             if isinstance(conf, ValidConfig):
                 callable(env, conf, op)
             else:
-                raise Exception(f"No matching valid configuration found for {op.namespace}, {op.command}. Reason {conf.reason}")
+                raise Exception(f"No matching valid configuration found for {op.namespace}:{op.command}. Reason: {conf.reason}")
 
     else:
         raise Exception(f"{types} not found {cmd} {sub}")

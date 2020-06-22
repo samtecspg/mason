@@ -1,12 +1,10 @@
 import os
 from typing import Optional
-
-from dotenv import load_dotenv
-
-from mason.definitions import from_root
 from os import path
-from mason.util.printer import banner
+from dotenv import load_dotenv
 from pathlib import Path
+
+from mason.util.printer import banner
 
 class MasonEnvironment:
     def __init__(self,
@@ -16,24 +14,38 @@ class MasonEnvironment:
              operator_module: Optional[str] = None,
              workflow_home: Optional[str] = None,
              workflow_module: Optional[str] = None,
-    ):
+             config_schema: Optional[str] = None
+
+        ):
         self.mason_home: str = mason_home or get_mason_home()
         self.config_home: str = config_home or (self.mason_home + "configurations/")
         self.operator_home: str = operator_home or (self.mason_home + "registered_operators/")
         self.workflow_home: str = workflow_home or (self.mason_home + "registered_workflows/")
         self.operator_module = operator_module or "registered_operators"
         self.workflow_module = workflow_module or "registered_workflows"
-        self.config_schema = from_root("/configurations/schema.json")
+        
+        self.config_schema = config_schema or ""
 
-        load_dotenv(self.mason_home + ".env")
+        self.load_environment_variables()
+
+
+    def load_environment_variables(self):
+        env_search_path = [
+            self.mason_home + ".env",
+            ".env",
+            path.join(path.expanduser('~'), '.env'),
+            path.join(path.expanduser('~'), '.mason_env')
+        ]
+
+        for p in env_search_path:
+            if path.exists(p):
+                load_dotenv(p)
+                break
 
 def get_mason_home() -> str:
-    try:
-        return os.environ['MASON_HOME']
-    except KeyError:
-        return os.path.join(os.path.expanduser('~'), '.mason/')
+    return os.environ.get('MASON_HOME') or os.path.join(os.path.expanduser('~'), '.mason/')
 
-def initialize_environment(env: MasonEnvironment):
+def initialize_environment(env: 'MasonEnvironment'):
     if not path.exists(env.mason_home):
         banner(f"Creating MASON_HOME at {env.mason_home}", "fatal")
         os.mkdir(env.mason_home)

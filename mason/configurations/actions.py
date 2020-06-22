@@ -4,10 +4,12 @@ import shutil
 
 from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
-from mason.util.logger import logger
-from mason.configurations.configurations import set_current_config, tabulate_configs, get_all, set_current_config_id
 
 def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=None, set_current: Optional[str]=None,  log_level: Optional[str]=None) -> Response:
+    
+    from mason.util.logger import logger
+    from mason.configurations.configurations import set_current_config, tabulate_configs, get_all, set_current_config_id
+    
     response = Response()
     logger.set_level(log_level)
 
@@ -33,11 +35,14 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
         set_current_config_id(env, str(set_current), response)
     else:
         if path.exists(env.config_home):
-            all_configs, invalid = get_all(env)
+            all_configs, invalid_configs = get_all(env)
             current_config = tabulate_configs(all_configs, env)
             response.add_current_config(current_config)
             for id, config in all_configs.items():
                 response.add_config(id, config.engines)
+                
+            for ic in invalid_configs:
+                response.add_error(ic.reason)
         else:
             logger.error()
             logger.error("Configuration not found.")

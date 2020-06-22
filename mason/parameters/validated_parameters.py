@@ -15,6 +15,16 @@ class ValidatedParameters:
 
     def get(self, params, attribute) -> Optional[str]:
         return next((x.value for x in params if x.key == attribute), None)
+    
+    def set_required(self, attribute: str, value: str):
+        def sub_value(p: ValidatedParameter, attribute: str, value: str) -> ValidatedParameter:
+            if p.key == attribute:
+                p.value = value
+            return p
+                
+        subbed = [sub_value(p, attribute, value) for p in self.validated_parameters]
+        self.validated_parameters = subbed
+        return self
 
     def get_required(self, attribute: str) -> str:
         return self.get(self.validated_parameters, attribute) or ""
