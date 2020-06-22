@@ -29,7 +29,7 @@ class NotebookEnvironment:
         valid, invalid = get_all(self.env)
         self.configs: Dict[str, ValidConfig] = valid
         self.invalid_configs: List[InvalidConfig] = invalid
-        namespaces, invalid_op = list_namespaces(self.env.operator_home)
+        namespaces, invalid_op = list_namespaces(self.env)
         self.namespaces = namespaces
         self.operators = to_ops(namespaces)
         self.invalid_operators = invalid_op
@@ -49,7 +49,7 @@ class NotebookEnvironment:
         return self.configs.get(id)
         
     def operator(self, namespace: str, command: str) -> Optional[Operator]:
-        return get_operator(self.env.operator_home, namespace, command)
+        return get_operator(self.env, namespace, command)
 
     def workflow(self, namespace: str, command: str) -> Optional[Workflow]:
         return get_workflow(self.env, namespace, command)

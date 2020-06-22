@@ -27,7 +27,7 @@ class DagStep:
                 config = get_config_by_id(env, wfp.config_id)
                 if config:
                     operator_params: InputParameters = wfp.parameters
-                    operator = get_operator(env.operator_home, self.namespace or "", self.command or "")
+                    operator = get_operator(env, self.namespace or "", self.command or "")
                     if operator:
                         valid = operator.validate(config, operator_params)
                         if isinstance(valid, ValidOperator):

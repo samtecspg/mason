@@ -21,7 +21,7 @@ class ValidDagStep:
         return self.id > other.id
 
     def __le__(self, other: 'ValidDagStep'):
-        return not self.__ge__(other) 
+        return not self.__ge__(other)
 
     def run(self, env: MasonEnvironment) -> OperatorResponse:
         response = Response()

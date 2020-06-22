@@ -9,6 +9,7 @@ from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.environment import MasonEnvironment
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 
+
 class ValidWorkflow:
 
     def __init__(self, name: str, dag: ValidDag, config: ValidConfig, schedule: Optional[Schedule]):
@@ -24,6 +25,7 @@ class ValidWorkflow:
             response = self.deploy(env, response, run_now, schedule_name)
 
         return response
+
 
     def dry_run(self, env: MasonEnvironment, response: Response) -> Response:
         response.add_info(f"Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag")
@@ -51,8 +53,5 @@ class ValidWorkflow:
             response.add_error("Scheduler client not defined")
 
         return response
-
-
-
 
 

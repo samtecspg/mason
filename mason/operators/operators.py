@@ -10,12 +10,14 @@ from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.namespaces.namespace import Namespace
 
 from mason.operators.operator import Operator
+from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.operators.valid_operator import ValidOperator
 from typing import Optional, Union, Tuple
 from mason.configurations.valid_config import ValidConfig
 from mason.parameters.input_parameters import InputParameters
 from mason.clients.response import Response
+from mason.util.list import sequence
 from mason.util.swagger import update_yaml_file
 from mason.util.environment import MasonEnvironment
 from mason.util.printer import banner
@@ -26,7 +28,7 @@ from mason.util.json import print_json
 
 def import_all(env: MasonEnvironment):
     path.append(env.mason_home)
-    namespaces, invalid = list_namespaces(env.operator_home)
+    namespaces, invalid = list_namespaces(env)
     for namespace in namespaces:
         for op in namespace.operators:
             cmd = op.command
@@ -41,7 +43,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters,
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
-    ns, invalid = list_namespaces(env.operator_home, cmd)
+    ns, invalid = list_namespaces(env, cmd)
 
     if len(invalid) > 0:
         for i in invalid:
@@ -77,19 +79,30 @@ def from_config(config: dict, source_path: Optional[str] = None):
     if namespace and command:
         return Operator(namespace, command, description, parameters, supported_configurations, source_path)
     else:
-        None
+        return None
 
-def list_operators(operator_file: str) -> Tuple[List[Operator], List[InvalidOperator]]:
+def check_definition(operator: Operator) -> Union[Operator, InvalidOperator]:
+    module = operator.module()
+    if isinstance(module, OperatorDefinition):
+        return operator
+    else:
+        return module
 
+def list_operators(operator_file: str, validate_source: bool = False) -> Tuple[List[Operator], List[InvalidOperator]]:
     valid, errors = parse_schemas(operator_file, "operator", Operator)
     invalid = list(map(lambda e: InvalidOperator(e), errors))
 
+    if validate_source:
+        valid, invalid_def = sequence(list(map(lambda v: check_definition(v), valid)), Operator, InvalidOperator)
+        invalid = invalid + invalid_def
+
     return valid, invalid
 
-def get_operator(operator_path: str, namespace: str, command: str) -> Optional[Operator]:
-    return namespaces.get(list_namespaces(operator_path, namespace)[0], namespace, command)
+def get_operator(env: MasonEnvironment, namespace: str, command: str) -> Optional[Operator]:
+    return namespaces.get(list_namespaces(env, namespace)[0], namespace, command)
 
-def list_namespaces(operator_path: str, cmd: Optional[str] = None) -> Tuple[List[Namespace], List[InvalidOperator]]:
+def list_namespaces(env: MasonEnvironment, cmd: Optional[str] = None) -> Tuple[List[Namespace], List[InvalidOperator]]:
+    operator_path = env.operator_home
     ops, invalid = list_operators(operator_path)
 
     ns = namespaces.from_ops(ops)

@@ -27,15 +27,8 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, param_file
     config = get_current_config(env, "debug")
 
     if config:
-        if cmd == "register":
-            register_file = subcmd
-            if register_file:
-                workflows.register_workflows(register_file, env)
-            else:
-                logger.error("No file path provided to register operator")
-        else:
-            params = WorkflowParameters(param_file)
-            workflows.run(env, config, params, cmd, subcmd, deploy, run, schedule_name)
+        params = WorkflowParameters(param_file)
+        workflows.run(env, config, params, cmd, subcmd, deploy, run, schedule_name)
     else:
         logger.error("Configuration not found.  Run \"mason config\" first")
 
