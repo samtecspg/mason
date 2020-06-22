@@ -1,13 +1,14 @@
-from mason.clients.response import Response
-from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse
+from abc import abstractmethod
 
-from mason.parameters.validated_parameters import ValidatedParameters
+from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
+from mason.operators.operator_response import OperatorResponse
+from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
-class Namespace2Operator4(OperatorDefinition):
 
+class OperatorDefinition:
+    
+    @abstractmethod
     def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
-        response.add_info("Running operator4")
-        return OperatorResponse(response)
+        raise NotImplementedError("Operator Run Definition no implemented")

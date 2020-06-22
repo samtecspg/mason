@@ -53,7 +53,7 @@ def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], work
         op = workflows.get_workflow(env, cmd, sub)
         types = "Workflow"
     else:
-        op = operators.get_operator(env.operator_home, cmd, sub)
+        op = operators.get_operator(env, cmd, sub)
         types = "Operator"
     if op:
         for config in configs:

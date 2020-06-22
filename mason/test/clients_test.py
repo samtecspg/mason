@@ -172,6 +172,7 @@ class TestLocal:
             Running step step_6
             Running operator6
             """
+            assert(len(response.errors)  == 0)
             assert(clean_uuid(clean_string("\n".join(response.info))) == clean_uuid(clean_string(info)))
         else:
             raise Exception("Workflow not found")
