@@ -44,14 +44,11 @@ Legend
 - [x] Allow for multiple configurations C: 04/08/2020
 - [x] Clean up multiple configurations -> add id, don't use enumerate. C:05/10/2020
 - [x] ~~Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)~~: not going to do right now
-- [ ] Establish session for current configuration
-- [ ] Add redis or sqllite for session 
-- [ ] Move operator/configs over to redis
 - [X] :arrow_up: Consolidate response.add_  actions and logger._ actions into one command C: 04/13/2020
 - [x] Interpolate environment variables into config and have that affect config validation: C: 04/23/2020
 - [x] Clean up mock implementations: C: 04/23/2020
 - [ ] Consolidate all AWS response error parsing methods.
-- [ ] Improve performance by moving around imports
+- [x] Improve performance by moving around imports. C: 06/15/2020
 - [ ] Version checking in installed operators
 - [ ] Replace operator installation method with something more robust
 
@@ -66,6 +63,7 @@ Legend
 - [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Workflows
+- [ ] Validated Infer Workflow (5-step)
 - [x] Infer Workflow (1-step)
     - [x] Glue Support C: 05/10/2020
     - [x] Athena Support with local scheduler (this ended up just being local instantiating of underlying infer operator)
@@ -79,8 +77,8 @@ Legend
 - [x] Schema merge operator C:09/04/2020
 - [ ] JSON explode operator
 - [ ] S3 -> ES egress operator 
-- [ ] :large_blue_circle: Table Export operator with S3 support (export csv's of metastore tables)
-- [ ] :large_blue_circle: Table "join" operator (on set of columns)
+- [ ] :large_blue_circle: Table Format operator (reformats and repartitions data)
+- [ ] :large_blue_diamond: Table "join" operator (on set of columns)
 - [ ] Dedupe Operator
 - [ ] Table Operators
     - [x] Query (requires metastore and execution engine) C:04/28/2020
@@ -140,13 +138,16 @@ Legend
     - [x] Kubernetes Runner
 
 ### Scheduler
-- [ ] Multiple step workflow implementation
-- [ ] DAG validation (validate that it is a Directed Acyclic Dag, not that its valid, thats already done)
+- [x] Multiple step workflow implementation
+- [x] DAG validation (validate that it is a Directed Acyclic Dag, not that its valid, thats already done)
 ### Glue
 - [x] Basic set up
 - [x] Workflow Implementation
 #### Airflow
 - [ ] Basic setup 
+### Local (synchronous)
+- [x] Basic setup: C: 06/10/2020
+
 
 ### Storage
 #### Redshift

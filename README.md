@@ -93,8 +93,7 @@ Commands:
   operator  Executes and lists mason operators
   register  Registers mason operators or workflows
   run       Runs mason flask server on port 5000
-  workflow  Registers, lists and executes mason workflows
-
+  workflow  Executes and lists mason workflows 
 ```
 
 Note that the Dockerfile registers a set of example operators by default.  Comment out these lines and register different operators if you wish to do so during docker build.

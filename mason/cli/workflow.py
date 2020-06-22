@@ -1,7 +1,7 @@
 from typing import Optional
 import click
 
-@click.command("workflow", short_help="Registers, lists and executes mason workflows")
+@click.command("workflow", short_help="Executes and lists mason workflows")
 @click.argument("cmd", required=False)
 @click.argument("subcmd", required=False)
 @click.option("-l", "--log_level", help="Log level for mason")
@@ -14,14 +14,13 @@ def workflow(cmd: Optional[str] = None, subcmd: Optional[str] = None, param_file
     Running without cmd or subcmd will list out all mason workflows currently registered.
     Running without subcmd will list out all mason workflows under the cmd namespace.
     Running with both cmd and subcmd will execute the workflow or print out missing required parameters.
-    Running with 'register' registers workflow from specified <workflow_file>, workflow_file must contain a valid workflow.yaml
     """
     from mason.configurations.configurations import get_current_config
     from mason.parameters.workflow_parameters import WorkflowParameters
     from mason.util.environment import MasonEnvironment
     from mason.util.logger import logger
     from mason.workflows import workflows
-    
+
     env = MasonEnvironment()
     logger.set_level(log_level)
     config = get_current_config(env, "debug")
