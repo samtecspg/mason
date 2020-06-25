@@ -73,6 +73,7 @@ Swagger ui for registered operators can then be found at: `http://localhost:5000
 You can access additional mason commands by shelling into the running docker container and running them via docker_attach script:
 
 ```
+./docker_attach
 root@<SHA>:/app# mason
 Usage: mason [OPTIONS] COMMAND [ARGS]...
 
