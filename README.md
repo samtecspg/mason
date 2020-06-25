@@ -35,7 +35,7 @@ The four main engines mason ships with by default are Metastore Engines, Executi
 ![Operator Engines](images/OperatorConfigs.png)
 
 1.   Metastore - Defines concepts like databases and tables, and allows interacting with dataset metadata such as partitioning or schema information.  Some example metastore clients would be Glue, or Hive.
-2.   Execution - Defines a means to "compute" or derive additional datasets on source data in metastore tables.   This includes programatic serial or SQL analytical computation on data.  Example exeuction engines would be spark, presto, or athena.
+2.   Execution - Defines a means to "compute" or derive additional datasets on source data in metastore tables.   This includes programatic serial or SQL analytical computation on data.  Example execution engines would be spark, presto, or athena.
 3.   Scheduler -  Anything that involves scheduling frequency of data jobs and job DAGS.  Example scheduler clients would be airflow, DigDag or Azkaban.
 4.   Storage - Any activity that involves serial (row level) access and storage of data.  Some example storage clients would be S3 or HDFS.
 
