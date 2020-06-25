@@ -437,7 +437,7 @@ class TableGet(OperatorDefinition):
 ```
 
 
-Notice that 
+Notice that it inherits from `OperatorDefintion`, mypy to enforce the operator to be defined consistently.  The class inhereting the definition must also be the camel cased version of the operator namespace and command (`table:get -> TableGet`).  This provides the abstract class from which all operators should be defined, namely, it enforces that operators should have a `run` method which defines the instructions for how the operator should execute on canonical engine model objects.
 
 
 #### Note on operator.yaml
@@ -616,7 +616,7 @@ class Namespace1Workflow5(WorkflowDefinition):
 
 ```
 
-Notice that it inherits from `OperatorDefinition`, this allows mypy to enforce the operator to be defined consistently.  The class inhereting the definition must also be the camel cased version of the operator namespace and command (`table:get -> TableGet`).  This provides the abstract class from which all workflows should be defined, namely, it enforces that workflows should have a `run` method which defines the instructions for how the operator should execute on canonical engine model objects.
+Notice that it inherits from `WorkflowDefinition`, this allows mypy to enforce the operator to be defined consistently.  The class inhereting the definition must also be the camel cased version of the operator namespace and command (`namespace1:workflow1 -> Namespace1Workflow1`).  This provides the abstract class from which all workflows should be defined, namely, it enforces that workflows should have a `step` method which defines the instructions for how the workflow should progress from one step to the next in the DAG along its edges.
 
 Workflows require a `workflow.yaml` file with specified values of `dag` for the dag instructions of the workflow and `supported_schedulers` for the scheduler of the workflow.  Here is an example `workflow.yaml` file:
 
