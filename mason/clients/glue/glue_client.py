@@ -45,7 +45,9 @@ class GlueClient(AWSClient):
                 valid, invalid = sequence(list(map(lambda x: self.parse_table(x), table_list)), Table, InvalidTable)
                 if len(invalid) > 0:
                     invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
-                    return InvalidDatabase(f"Invalid Tables in glue response: {invalid_messages}"), resp
+                    resp.add_warning(f"Invalid Tables in glue response: {invalid_messages}")
+                if len(valid) == 0:
+                    return InvalidDatabase(f"No valid tables"), resp
                 else:
                     return Database(database_name, valid), resp
             else:
@@ -280,7 +282,7 @@ class GlueClient(AWSClient):
                         return InvalidTable("No table Name found in glue response")
 
             else:
-                return InvalidTable("Columns not found in glue response")
+                return InvalidTable(f"Columns not found in glue response for {glue_response.get('Name', '')}")
         else:
             return InvalidTable("StorageDescriptor not found in glue response")
 
