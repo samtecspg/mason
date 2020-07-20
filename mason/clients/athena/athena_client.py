@@ -14,7 +14,6 @@ from mason.engines.metastore.models.table import Table
 from mason.engines.storage.models.path import Path
 from mason.util.uuid import uuid4
 
-
 class AthenaClient(AWSClient):
 
     def __init__(self, config: dict):
