@@ -507,7 +507,7 @@ table        infer            One step workfow for table infer operator
 
 ```
 
-### Doing a Dry Run for a Workflow (dry-run is set to True by default).  
+Doing a Dry Run for a Workflow (dry-run is set to True by default):
 
 Note that workflows, unlike operators, must be run using `parameter.yaml` files. There is no shorthand syntax for workflow parameters (`-p` flag).  You must use the `-f` flag and provide a parameter yaml file:
 
