@@ -24,9 +24,9 @@ mason operator job get -p "job_id:<<JOB_ID>>"
 mason operator table infer -p "storage_path:<<STORAGE_PATH>>,database_name:<<DATABASE_NAME>>,table_name:<<TABLE_NAME>>"
 ```
 
-and for the operators to perform sensible actions regardless of the clents used for each engine, be they local file systems, S3, Athena, or Spark.
+and for the operators to perform sensible actions regardless of the clients used for each engine, be they local file systems, S3, Athena, or Spark.
 
-The four engines Mason ships with by default are Metastore Engines, Execution Engines, Scheduler Engines, and Storage Engines.
+The four engines Mason ships with by default are Metastore, Execution, Scheduler, and Storage.
 
 ![Operator Engines](images/OperatorConfigs.png)
 
@@ -48,7 +48,7 @@ If you are implementing AWS clients, remember to update `~/.mason/.env` to inclu
 AWS_ACCESS_KEY_ID=<KEY_ID>
 AWS_SECRET_ACCESS_KEY=<SECRET_KEY>
 ```
-These credentials should have the needed permissions for the AWS services you are specifying as engine clients.  You can see all such configurations for various cloud providers in `.env.example`
+These credentials should have the needed permissions for the AWS services you are specifying as engine clients.  You can see all such configurations for various cloud providers in `.env.example`.
 
 If you are using a kubernetes-based execution engine or scheduler, make sure that your kubernetes config is located at `~/.kube/config`.
 
@@ -61,7 +61,7 @@ Then run `docker-compose` to start a mason server locally:
 docker-compose up
 ```
 
-Swagger UI for registered operators can then be found at: `http://localhost:5000/api/ui/`  
+Swagger UI for registered operators can then be found at `http://localhost:5000/api/ui/`. 
 
 You can access additional mason commands by shelling into the running Docker container and running them via `docker_attach`:
 
@@ -406,7 +406,7 @@ By convention, an `operator.yaml` file and its `__init__.py` are colocated in a 
 
 However, this is not strictly required.  All that is required is for the necessary files for a single operator definition to be colocated in a folder containing the operator.yaml.
 
-### OperatorDefintions
+### Operator Defintions
 
 Here is an example `__init__.py` for the operator `table:get`:
 
@@ -457,7 +457,7 @@ execution_engine: athena
 clients:
  ...
 ```
-because the scheduler is defined to be glue, the other engines in this case do not matter, and it  would only not accept a configuration with a different scheduler engine.  However an operator with supported_configurations like this:
+Because the scheduler is defined to be glue, the other engines in this case do not matter, and it would only reject configurations with a different scheduler engine. However, an operator with supported_configurations like this:
 ```
 type: "operator"
 namespace: "table"
@@ -476,7 +476,7 @@ supported_configurations:
     execution: "spark"
 ```
 
-would only accept an operator with both `metastore: s3` and `execution:spark` simultaneously defined as such, in this case storage and scheduler do not matter.  
+would only accept an operator configured with both `metastore: s3` and `execution: spark`.  
 
 ## Workflows 
 
@@ -507,7 +507,9 @@ table        infer            One step workfow for table infer operator
 
 ```
 
-Doing a dry run for a workflow (dry-run is set to True by default).  Note that workflows unlike operators must be run using parameter.yaml files, there is no short hand syntax for workflow parameters (`-p` flag).  You must use the `-f` flag and provide a parameter yaml file:
+### Doing a Dry Run for a Workflow (dry-run is set to True by default).  
+
+Note that workflows, unlike operators, must be run using `parameter.yaml` files. There is no shorthand syntax for workflow parameters (`-p` flag).  You must use the `-f` flag and provide a parameter yaml file:
 
 ```
 >> mason workflow table validated_infer -f mason/examples/parameters/validated_infer.yaml 
@@ -629,7 +631,7 @@ supported_schedulers:
   - "glue"
 ```
 
-Notice that the `dag` attribute is an array with steps that each have an "id".  This "id" is what is referenced by the parameters file when running the workflow.   Here is an example `parameters.yaml file` that you would use when running a workflow:
+Notice that the `dag` attribute is an array with steps that each have an "id".  This "id" is what is referenced by the parameters file when running the workflow.   Here is an example `parameters.yaml` file for running a workflow:
 
 ```
 step_1:
