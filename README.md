@@ -8,7 +8,7 @@ What is Mason?
 
 All of these statements are true to varying degrees. In short, Mason is the connecting tissue for your data projects.  
 
-Mason defines 4 main abstracted roles a client can take, called Engines. These engines mediate between Operators, which define a particular task, and the clients that execute said task. 
+Out of the box, Mason defines 4 main abstractions called Engines. These Engines broker the relationship between Operators and Workflows, which define a particular job, and the various Clients that get the job done. 
 
 Once configured, Mason gives you a declarative ability to perform simple statements like these:
 
