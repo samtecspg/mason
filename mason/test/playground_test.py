@@ -34,6 +34,5 @@ class TestCLI:
         print_result(runner.invoke(config))
         print_result(runner.invoke(config, ["-s", "1"]))
         print_result(runner.invoke(register, [from_root('/examples/')]))
-        print_result(runner.invoke(operator))
-        print_result(runner.invoke(operator, ['table', 'get', '-p', 'table_name:test,database_name:test']))
+        print_result(runner.invoke(workflow), ["table", "query"])
 

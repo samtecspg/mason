@@ -1,5 +1,6 @@
 from typing import Optional, Tuple
 
+from mason.clients.airflow.airflow_client import AirflowClient
 from mason.clients.response import Response
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.clients.engines.scheduler import SchedulerClient
@@ -8,11 +9,11 @@ from mason.engines.storage.models.path import Path
 from mason.util.environment import MasonEnvironment
 
 
-class LocalSchedulerClient(SchedulerClient):
+class AirflowSchedulerClient(SchedulerClient):
 
     #  This is a local synchronous scheduler.   For asynchronous see AsyncLocal (WIP)
     def __init__(self, config: dict):
-        self.client: LocalClient = LocalClient(config)
+        self.client: LocalClient = AirflowClient(config)
         self.dag: Optional[ValidDag] = None
 
     def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response]:

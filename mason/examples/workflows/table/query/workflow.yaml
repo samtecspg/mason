@@ -1,0 +1,12 @@
+type: "workflow"
+namespace: "table"
+command: "validated_infer"
+name: "table_validated_infer"
+description: "Workflow to query table and format result set."
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "table"
+      command: "query"
+supported_schedulers:
+  - "airflow"
