@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "AthenaConfiguration",
+  "properties": {
+    "endpoint": {
+      "type": "string"
+    },
+    "user": {
+      "type": "string"
+    },
+    "password": {
+      "type": "string"
+    }
+  },
+  "required": ["endpoint", "user", "password"]
+}

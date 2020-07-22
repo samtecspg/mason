@@ -28,7 +28,8 @@
       "type": "string",
       "enum": [
         "glue",
-        "local"
+        "local",
+        "airflow"
       ]
     },
     "clients": {

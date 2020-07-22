@@ -17,7 +17,7 @@ def index(client_type: str, exists=True):
             return ({'Errors': ['Database bad-database not found'], 'Info': [], 'Warnings': []}, 404)
     elif client_type == "s3":
         if exists:
-            return ({'Data': [{'Prefixes': [{'Prefix': '/user-data/'}]}],
+            return ({'Data': [{'Prefixes': [{'Prefix': '/test_path/'}]}],
               'Errors': [],
               'Info': [],
               'Warnings': []},

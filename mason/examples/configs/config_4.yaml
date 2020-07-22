@@ -1,0 +1,20 @@
+id: 4
+metastore_engine: athena
+storage_engine: s3
+scheduler_engine: airflow
+clients:
+  s3:
+    configuration:
+      aws_region: "{{AWS_REGION}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+  athena:
+    configuration:
+      aws_region: "{{AWS_REGION}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+  airflow:
+    configuration:
+      endpoint: "{{AWS_REGION}}"
+      user: "{{AIRFLOW_USER}}"
+      password: "{{AIRFLOW_PASSWORD}}"

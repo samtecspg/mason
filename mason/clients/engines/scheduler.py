@@ -16,10 +16,6 @@ class SchedulerClient(Client):
         raise NotImplementedError("Client method not implemented")
 
     @abstractmethod
-    def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
-        raise NotImplementedError("Client method not implemented")
-
-    @abstractmethod
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         raise NotImplementedError("Client method not implemented")
 

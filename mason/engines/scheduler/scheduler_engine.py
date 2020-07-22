@@ -21,6 +21,9 @@ class SchedulerEngine(Engine):
             elif client.client_name == "local":
                 from mason.clients.local.scheduler import LocalSchedulerClient
                 return LocalSchedulerClient(client.config)
+            elif client.client_name == "airflow":
+                from mason.clients.airflow.scheduler import AirflowSchedulerClient
+                return AirflowSchedulerClient(client.config)
             else:
                 return InvalidSchedulerClient(f"Client type not supported: {client.client_name}")
         elif isinstance(client, EmptyClient):
