@@ -3,6 +3,7 @@ from typing import Tuple, Optional
 
 from mason.engines.scheduler.models.dags.client_dag import ClientDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
+from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
 from mason.workflows.workflow_run import WorkflowRun
@@ -16,7 +17,7 @@ class LocalClient:
     def client(self) -> BaseClient:
         pass
 
-    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response, Optional[ClientDag]]:
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response) -> Tuple[str, Response, Optional[ClientDag]]:
         response.add_info("Registering DAG in local memory")
         self.dag = valid_dag
         return (schedule_name, response, None)

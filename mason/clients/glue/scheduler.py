@@ -1,4 +1,7 @@
+from typing import Optional
+
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
+from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.environment import MasonEnvironment
 
 from mason.clients.engines.scheduler import SchedulerClient
@@ -12,7 +15,7 @@ class GlueSchedulerClient(SchedulerClient):
     def __init__(self, config: dict):
         self.client: GlueClient = GlueClient(config)
 
-    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response):
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response):
         #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator
         if len(valid_dag.valid_steps) == 1 and valid_dag.valid_steps[0].operator.type_name() == "TableInfer":
             op = valid_dag.valid_steps[0].operator

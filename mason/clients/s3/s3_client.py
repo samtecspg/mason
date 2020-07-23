@@ -115,7 +115,7 @@ class S3Client(AWSClient):
     
     def save_to(self, inpath: Path, outpath: Path, response: Response):
         try:
-            self.client().upload(inpath, outpath.path_str)
+            self.client().upload(inpath.path_str, outpath.path_str)
         except Exception as e:
             response.add_error(f"Error saving {inpath} to {outpath.path_str}")
             response.add_error(message(e))

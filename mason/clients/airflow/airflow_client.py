@@ -2,6 +2,7 @@ from typing import Tuple, Optional
 
 from mason.clients.airflow.airflow_dag import AirflowDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
+from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
 
@@ -16,14 +17,14 @@ class AirflowClient:
         # IMPLEMENT underlying client, likely just requests for API calls: 
         pass
 
-    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response, Optional[AirflowDag]]:
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response) -> Tuple[str, Response, Optional[AirflowDag]]:
         
-        airflow_dag: Optional[AirflowDag] = self.mason_dag_to_airflow_dag(valid_dag)
+        airflow_dag: Optional[AirflowDag] = self.mason_dag_to_airflow_dag(valid_dag, schedule)
         
         return (schedule_name, response, airflow_dag)
     
 
-    def mason_dag_to_airflow_dag(self, dag: ValidDag) -> Optional[AirflowDag]:
+    def mason_dag_to_airflow_dag(self, dag: ValidDag, schedule: Optional[Schedule]) -> Optional[AirflowDag]:
         #  IMPLEMENT
         return AirflowDag()
 

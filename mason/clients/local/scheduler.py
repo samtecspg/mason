@@ -5,6 +5,7 @@ from mason.engines.scheduler.models.dags.client_dag import ClientDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.local.local_client import LocalClient
+from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.environment import MasonEnvironment
 
 
@@ -15,8 +16,8 @@ class LocalSchedulerClient(SchedulerClient):
         self.client: LocalClient = LocalClient(config)
         self.dag: Optional[ValidDag] = None
     
-    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response, Optional[ClientDag]]:
-        return self.client.register_dag(schedule_name, valid_dag, response)
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response) -> Tuple[str, Response, Optional[ClientDag]]:
+        return self.client.register_dag(schedule_name, valid_dag, schedule, response)
 
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         return self.client.trigger_schedule(schedule_name, response, env)

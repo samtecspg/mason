@@ -45,7 +45,7 @@ class ValidWorkflow:
         if isinstance(scheduler.client, SchedulerClient):
             name = schedule_name or self.name
             response.add_info(f"Registering workflow dag {name} with {scheduler.client_name}.")
-            schedule_id, response, client_dag = scheduler.client.register_dag(name, self.dag, response)
+            schedule_id, response, client_dag = scheduler.client.register_dag(name, self.dag, self.schedule, response)
             if not response.errored():
                 response.add_info(f"Registered schedule {schedule_id}")
                 
