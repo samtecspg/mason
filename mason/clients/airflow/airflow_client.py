@@ -1,6 +1,6 @@
-from botocore.client import BaseClient
 from typing import Tuple, Optional
 
+from mason.clients.airflow.airflow_dag import AirflowDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
@@ -12,27 +12,29 @@ class AirflowClient:
         self.user = config.get("user")
         self.password = config.get("password")
 
-    def client(self) -> BaseClient:
-        # TODO: 
-        # return airflow client using endpoint, user, password 
+    def client(self):
+        # IMPLEMENT underlying client, likely just requests for API calls: 
         pass
 
-    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response]:
-        # TODO:  How to register DAGS to airflow using API?   Api proxy to sync? 
-        response: Response = response
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response, Optional[AirflowDag]]:
         
-        self.dag = valid_dag
+        airflow_dag: Optional[AirflowDag] = self.mason_dag_to_airflow_dag(valid_dag)
         
-        return (schedule_name, response)
+        return (schedule_name, response, airflow_dag)
     
+
+    def mason_dag_to_airflow_dag(self, dag: ValidDag) -> Optional[AirflowDag]:
+        #  IMPLEMENT
+        return AirflowDag()
+
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
-        
-        #  TODO :  client POST /api/experimental/dags/<schedule_name>/dag_runs to airflow_response
+        #  IMPLEMENT :  client POST /api/experimental/dags/<schedule_name>/dag_runs to airflow_response
         # airflow_response = {}
         # if airflow_response.sucess:
         #     response.add_info("Dag ${id} triggered")
         # else:
-        #     response.add_error("Dag not found.  Run 'register_dag' first.")
+        #     response.add_error("Dag not found in airflow.  Run 'register_dag' first.")
 
         return response
+
 

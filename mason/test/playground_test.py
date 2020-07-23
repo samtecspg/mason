@@ -3,7 +3,7 @@ from os import path
 from click.testing import CliRunner
 from dotenv import load_dotenv
 
-from mason.cli import config, register, operator
+from mason.cli import config, register, operator, workflow
 from mason.definitions import from_root
 import os
 import pytest  # type: ignore
@@ -34,5 +34,5 @@ class TestCLI:
         print_result(runner.invoke(config))
         print_result(runner.invoke(config, ["-s", "1"]))
         print_result(runner.invoke(register, [from_root('/examples/')]))
-        print_result(runner.invoke(workflow), ["table", "query"])
+        print_result(runner.invoke(workflow, ["table", "query", "-f", "/Users/kyle/dev/mason/mason/examples/parameters/table_query.yaml", "-o", "spg-mason-demo/dag_out/", "-r", "-d"]))
 

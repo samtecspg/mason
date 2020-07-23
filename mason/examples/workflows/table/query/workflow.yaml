@@ -1,7 +1,7 @@
 type: "workflow"
 namespace: "table"
-command: "validated_infer"
-name: "table_validated_infer"
+command: "query"
+name: "table_query"
 description: "Workflow to query table and format result set."
 dag:
     - id: "step_1"

@@ -10,6 +10,6 @@ from mason.workflows.workflow_definition import WorkflowDefinition
 
 def api(*args, **kwargs): return WorkflowApi.get("table", "query", *args, **kwargs)
 
-class TableValidatedInfer(WorkflowDefinition):
+class TableQuery(WorkflowDefinition):
     def step(self, current: ExecutedDagStep, next: ValidDagStep) -> Union[ValidDagStep, InvalidDagStep, FailedDagStep, ExecutedDagStep]:
-        next
+        return next

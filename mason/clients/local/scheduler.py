@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 
 from mason.clients.response import Response
+from mason.engines.scheduler.models.dags.client_dag import ClientDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.local.local_client import LocalClient
@@ -14,7 +15,7 @@ class LocalSchedulerClient(SchedulerClient):
         self.client: LocalClient = LocalClient(config)
         self.dag: Optional[ValidDag] = None
     
-    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response]:
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response) -> Tuple[str, Response, Optional[ClientDag]]:
         return self.client.register_dag(schedule_name, valid_dag, response)
 
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:

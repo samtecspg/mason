@@ -24,7 +24,7 @@ class GlueSchedulerClient(SchedulerClient):
         else:
             response.add_error("Glue Scheduler only defined for InferJob type which registers a glue crawler")
 
-        return schedule_name, response
+        return (schedule_name, response, None)
 
     def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
         response = self.client.register_schedule(database_name, path, schedule_name, response)
