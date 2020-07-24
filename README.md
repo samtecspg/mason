@@ -8,7 +8,7 @@ What is Mason?
 
 All of these statements are true to varying degrees. In short, Mason is the connecting tissue for your data projects.  
 
-Out of the box, Mason defines 4 main abstractions called Engines. These Engines broker the relationship between Operators and Workflows, which define a particular job, and the various Clients that get the job done. 
+Mason interfaces with clients using abstractions called Engines. These Engines broker the relationship between Operators and Workflows, which define a particular job, and the various Clients that get the job done. Out of the box, Mason defines four Engines - Storage, Execution, Metastore, and Scheduler.
 
 Once configured, Mason gives you a declarative ability to perform simple statements like these:
 
@@ -309,8 +309,8 @@ mason run
 ![uml-diagram](images/uml-diagram.png)
 
 Mason's main function is to broker the relationship between 3 main objects:
-1. Clients -  Technologies which can be used in various capacities as engines
-2. Engines -  The 4 main types of data engines by default (storage, execution, metastore and scheduler) which comprise the various ways in which a client can be utilized.  This creates an abstraction for the main types of objects (Tables, Jobs, Schemas, etc.) that you would interact with while building data pipelines.
+1. Clients - Technologies which can be used in various capacities as engines
+2. Engines - The data engines which comprise the various ways in which a client can be used. On install, Mason includes the Storage, Execution, Metastore, and Scheduler Engines. Engines act as abstractions for the main types of objects (Tables, Jobs, Schemas, etc.) that you would interact with while building data pipelines.
 3. Operators - Parameterized definitions of work which interact with the various engines.
 
 You can think of the interaction between these 3 types of entities as follows:  
@@ -326,7 +326,7 @@ For <S3> as a <Metastore> do <List Partitions(:table_name = 'test-table')>
 
 ## Engines 
 
-Mason creates Engines as a layer of abstraction above clients, defining four roles under which clients act: Storage, Metastore, Scheduler, and Execution. This is based on the observation that most data pipelines execute operations which interact with clients serving primarily in these 4 roles.
+Mason creates Engines as a layer of abstraction above clients, defining out-of-the-box four roles under which clients act: Storage, Metastore, Scheduler, and Execution. This is based on the observation that most data pipelines execute operations which interact with clients serving primarily in these 4 roles. Mason allows the definition of additional Engines, should a use case not covered by the default Engines arise.
 
 ### Engine Models:
 Each engine has a set of associated "canonical models" (located in engines/<ENGINE_TYPE>/models) which are used in the creation of operators.  These canonical models frequently correspond to operator namespaces but don't necessarily have to.  Some example canonical models currently defined in the operator examples are:
