@@ -8,7 +8,9 @@ from mason.test.support import testing_base as base
 from mason.util.logger import logger
 from mason.util.yaml import parse_yaml
 from mason.definitions import from_root
-from os import environ
+from os import environ, unlink
+import tempfile
+
 
 class TestExecutionEngine:
     def before(self, config: str):
@@ -98,17 +100,21 @@ class TestEnvironmentInterpolation:
     def test_interpolation(self):
         logger.set_level("fatal")
         # valid interpolation
-        environ["AWS_REGION"] = "test"
-        test_config = {"test": "{{AWS_REGION}}"}
-        expect = {"test": "test"}
-        d = safe_interpolate_environment(test_config)
+        environ["AWS_SECRET_ACCESS_KEY"] = "test-key"
+        environ["SENSITIVE"] = "test-region"
+        
+        test_config = {"test": "{{AWS_REGION}}", "test2": "{{AWS_SECRET_ACCESS_KEY}}", "other": "{{SENSITIVE}}"}
+        expect = {"test": "test-region", "test2": "test-key", "other": None}
+
+        with tempfile.NamedTemporaryFile(delete=False, mode = "w") as tmp:
+            tmp.write("""
+            [default]
+            aws_region = test-region 
+            """)
+
+        d = safe_interpolate_environment(test_config, tmp.name)
         assert(d == expect)
 
-        # unpermitted
-        environ["SENSITIVE"] = "test"
-        test_config = {"test": "{{SENSITIVE}}"}
-        d = safe_interpolate_environment(test_config)
-        assert(d == {"test": None})
 
 
 
