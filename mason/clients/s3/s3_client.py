@@ -22,8 +22,9 @@ class S3Client(AWSClient):
         super().__init__(**s3_config)
 
     def client(self) -> S3FileSystem:
+        s3 = s3fs.S3FileSystem(key=self.access_key, secret=self.secret_key, client_kwargs={'region_name': self.aws_region})
 
-        return s3fs.S3FileSystem(key=self.access_key, secret=self.secret_key, client_kwargs={'region_name': self.aws_region})
+        return s3
 
     def parse_responses(self, s3_response: dict):
         error = s3_response.get('Error', {}).get('Code', '')
@@ -77,7 +78,7 @@ class S3Client(AWSClient):
         return self.infer_table(database_name + "/" + table_name, table_name, options, response)
 
     def get_path(self, path: str) -> Path:
-        return Path(path)
+        return Path(path, "s3")
 
     def get_name(self, name: Optional[str], path: str) -> str:
         if not name or name == "":
@@ -87,19 +88,20 @@ class S3Client(AWSClient):
 
     def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None, resp: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         logger.info(f"Fetching keys at {path}")
-        keys = self.client().find(path)
-        
         response: Response = resp or Response()
+        
+        keys, response = self.list_keys(path, response)
+        
         final: Union[Table, InvalidTables]
 
         if len(keys) > 0:
-            valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key), options or {}), keys)), Schema, InvalidSchema)
+            valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key.full_path()), options or {}), keys)), Schema, InvalidSchema)
             non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
             validated = CheckSchemas.find_conflicts(list(set(non_empty)))
             table = CheckSchemas.get_table(self.get_name(name, path), validated)
             invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
             if isinstance(table, Table):
-                final= table
+                final = table
             else:
                 invalid_tables.append(table)
                 final = InvalidTables(invalid_tables)
@@ -108,14 +110,25 @@ class S3Client(AWSClient):
             final = InvalidTables([TableNotFound(f"No keys at {path}")])
             
         return final, response
+    
+    def list_keys(self, path: str,  response: Optional[Response] = None) -> Tuple[List[Path], Response]:
+        resp: Response = response or Response()
+        keys = self.client().find(path)
+        if len(keys) > 0:
+            paths = list(map(lambda k: self.get_path(k), keys))
+        else:
+            paths = []
+        
+        return paths, resp
 
     def path(self, path: str):
         if not path[0:4] == "s3://":
             path = "s3://" + path
             
-        return Path(path)
-    
-    def save_to(self, inpath: Path, outpath: Path, response: Response):
+        return Path(path, "s3")
+
+
+def save_to(self, inpath: Path, outpath: Path, response: Response):
         try:
             self.client().upload(inpath.path_str, outpath.path_str)
         except Exception as e:
@@ -125,4 +138,3 @@ class S3Client(AWSClient):
         return response
         
         
-

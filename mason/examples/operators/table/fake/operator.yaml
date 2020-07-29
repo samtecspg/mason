@@ -1,0 +1,10 @@
+type: "operator"
+namespace: "table"
+command: "fake"
+description:  "Create fake table data"
+parameters:
+  required:
+    - size
+supported_configurations:
+  - execution: "dask"
+  - storage: "s3"

@@ -57,7 +57,7 @@ def test_get():
         response, status = table_get_api(env, config, database_name="crawler-poc", table_name="catalog_poc_data", log_level="fatal")
         assert((response, status) == expects.get(config.metastore.client_name, 1))
 
-    run_tests("table", "get", True, "fatal",["config_1", "config_2"],  tests)
+    run_tests("table", "get", True, "fatal", ["config_1", "config_2"],  tests)
 
 
 def test_refresh():

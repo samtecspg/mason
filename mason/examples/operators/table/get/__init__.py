@@ -14,5 +14,6 @@ class TableGet(OperatorDefinition):
         table_name: str = parameters.get_required("table_name")
 
         table, response = config.metastore.client.get_table(database_name, table_name, response=resp)
-        return OperatorResponse(response, table)
+        oR = OperatorResponse(response, table)
+        return oR 
 

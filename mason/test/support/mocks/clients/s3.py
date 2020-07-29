@@ -31,16 +31,16 @@ class S3Mock:
         self.s3 = S3ClientMock()
 
     def open(self, key: str):
-        if (key == "crawler-poc/catalog_poc_data/test1.csv" or key == "crawler-poc/catalog_poc_data/test2.csv"):
+        if (key == "s3://crawler-poc/catalog_poc_data/test1.csv" or key == "s3://crawler-poc/catalog_poc_data/test2.csv"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
-        elif (key == "test-data/test-path/test1.usf"):
+        elif (key == "s3://test-data/test-path/test1.usf"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/unsupported_file_type.usf'))
-        elif (key == "test-data/test-path/test2.usf"):
+        elif (key == "s3://test-data/test-path/test2.usf"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/unsupported_file_type.usf'))
-        elif (key == "test-data/test-path/sample.snappy.parquet"):
+        elif (key == "s3://test-data/test-path/sample.snappy.parquet"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
 

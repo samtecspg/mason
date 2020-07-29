@@ -9,7 +9,7 @@ from mason.engines.metastore.models.schemas.schema import SchemaConflict, Invali
 
 class Table(Responsable):
 
-    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None):
+    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None):
         self.name = name
         self.schema = schema
         self.created_at = created_at
@@ -32,7 +32,7 @@ class Table(Responsable):
     def to_response(self, response: Response):
         response.add_data(self.to_dict())
         return response
-
+    
 class InvalidTable(Responsable):
     def __init__(self, reason: str, invalid_schema: Optional[InvalidSchema] = None):
         self.invalid_schema = invalid_schema
@@ -76,10 +76,9 @@ class InvalidTables(Responsable):
     def message(self) -> str:
         return ", ".join(list(map(lambda i: i.reason, self.invalid_tables)))
         
-    def to_response(self, response: Response):
+    def to_response(self, response: Response) -> Response:
         for it in self.invalid_tables:
             response = it.to_response(response)
             
         return response
             
-        

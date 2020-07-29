@@ -27,8 +27,7 @@ class S3MetastoreClient(MetastoreClient, ValidClient):
         return response
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
-        a =  self.client.get_table(database_name, table_name, options, response)
-        return a
+        return self.client.get_table(database_name, table_name, options, response)
 
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
         raise NotImplementedError("s3 client delete_table not implemented")
@@ -50,6 +49,3 @@ class S3MetastoreClient(MetastoreClient, ValidClient):
 
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         return InvalidJob("Client 'execute_ddl' not implemented"), response or Response()
-
-
-

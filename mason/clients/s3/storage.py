@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, Tuple
+from typing import Optional, Union, Tuple, List
 
 from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
@@ -15,12 +15,15 @@ class S3StorageClient(StorageClient):
         return self.client.path(path)
 
     def infer_table(self, path: str,  name: Optional[str] = None, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
-        return self.client.infer_table((self.path(path) or Path("")).path_str, name, options, response)
+        return self.client.infer_table((self.path(path) or Path("", "s3")).path_str, name, options, response)
 
     def save_to(self, inpath: str, outpath: str, response: Response) -> Response:
         inp: Path = Path(inpath) # TODO:  allow saving between paths of different storage clients
         outp: Path = self.path(outpath)
         return self.client.save_to(inp, outp, response)
+
+    def list_keys(self, path: str, response: Optional[Response] = None) -> Tuple[List[Path], Response]:
+        return self.client.list_keys(path, response)
 
 
 

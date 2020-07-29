@@ -5,11 +5,11 @@ from typing import List, Union, Optional, Tuple
 from mason.clients.client import Client
 from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.response import Response
-from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
+from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
 from mason.engines.metastore.models.database import InvalidDatabase, Database
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table import Table, InvalidTable, InvalidTables
+from mason.engines.metastore.models.table import Table, InvalidTables
 from mason.engines.storage.models.path import Path
 
 
@@ -43,6 +43,9 @@ class MetastoreClient(Client):
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         raise NotImplementedError("Client execute_ddl not implemented")
 
+    # @abstractmethod
+    # def list_partitions(self, database_name: str, table: Table, response: Optional[Response] = None) -> Tuple[List[Partition], Response]:
+    #     raise NotImplementedError("Client list_partitions not implemented")
 
 
 class InvalidMetastoreClient(InvalidClient, MetastoreClient):

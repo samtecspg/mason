@@ -22,3 +22,4 @@ htmlcov/
 htmlcov/*
 .tmp/
 .tmp/*
+/Notebooks/dask-worker-space/*

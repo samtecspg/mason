@@ -1,16 +1,12 @@
-id: 4
+id: 5
 metastore_engine: s3
 storage_engine: s3
-execution_engine: dask
+execution_engine: local
 clients:
   s3:
     configuration:
       aws_region: "{{AWS_REGION}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  dask:
-    configuration:
-      runner:
-        type: "kubernetes_worker"
-        scheduler: "{{DASK_SCHEDULER}}"
-        
+  local:
+    configuration: {}

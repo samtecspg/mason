@@ -1,0 +1,19 @@
+type: "operator"
+namespace: "table"
+command: "format"
+description:  "Reformat and partition table data"
+parameters:
+  required:
+    - database_name
+    - table_name
+    - format
+supported_configurations:
+    - execution: "dask"
+      metastore: "s3"
+      storage: "s3"
+    - execution: "local"
+      metastore: "s3"
+      storage: "s3"
+    - execution: "spark"
+      metastore: "s3"
+      storage: "s3"
