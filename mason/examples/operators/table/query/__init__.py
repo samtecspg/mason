@@ -1,8 +1,8 @@
-from typing import Union, Tuple
+from typing import Union
 
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
-from mason.engines.execution.models.jobs import Job, InvalidJob
+from mason.engines.execution.models.jobs import InvalidJob
 from mason.engines.execution.models.jobs.executed_job import ExecutedJob
 from mason.engines.execution.models.jobs.query_job import QueryJob
 from mason.engines.metastore.models.database import Database

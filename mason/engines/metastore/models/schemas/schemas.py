@@ -4,6 +4,7 @@ from s3fs import S3File
 from fsspec.spec import AbstractBufferedFile
 
 from mason.engines.metastore.models.schemas import json as JsonSchema, text as TextSchema, parquet as ParquetSchema
+from mason.engines.metastore.models.schemas.text import SUPPORTED_TYPES as supported_text_types
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema
 
 
@@ -21,18 +22,19 @@ def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, I
     header = file.read(header_size)
     file_type = magic.from_buffer(header)
     file.seek(0)
+    
 
     if file_type == "Apache Parquet":
         return ParquetSchema.from_file(file)
     elif file_type == "JSON data":
         return JsonSchema.from_file(get_name(file))
-    elif file_type == "CSV text" or file_type == "ASCII text":
-        return TextSchema.from_file(get_name(file), "none", header_length(file), options.get("read_headers"))
+    elif file_type in list(supported_text_types.keys()):
+        return TextSchema.from_file(get_name(file), file_type, header_length(file), options.get("read_headers"))
     elif file_type == "empty":
         return EmptySchema()
     else:
         name = get_name(file)
-        return InvalidSchema(f"File type not supported for file {name}")
+        return InvalidSchema(f"File type not supported for file {name}.  Type: {file_type}")
 
 def get_name(file: Union[S3File, AbstractBufferedFile]) -> str:
     if isinstance(file, S3File):

@@ -7,19 +7,30 @@ from mason.clients.response import Response
 from mason.engines.metastore.models.schemas.schema import Schema
 from mason.engines.metastore.models.schemas.schema import SchemaConflict, InvalidSchema
 
+from dask.dataframe.core import DataFrame as DDataFrame
+from pandas import DataFrame as PDataFrame
+
+from mason.engines.storage.models.path import Path
+
+
 class Table(Responsable):
 
-    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None):
+    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None, paths: List[Path] = []):
         self.name = name
         self.schema = schema
         self.created_at = created_at
         self.created_by = created_by
+        self.paths = paths
 
-    def as_df(self):
+    def as_df(self) -> PDataFrame:
         pd_dict: Dict[str, str] = self.schema.to_pd_dict()
         column_names: List[str] = list(pd_dict.keys())
 
         return pd.DataFrame(columns=column_names).astype(pd_dict)
+
+    def as_dask_df(self) -> DDataFrame:
+        import dask.dataframe as dd
+        return dd.from_pandas(self.as_df(), npartitions=8)
 
     def to_dict(self):
         return {

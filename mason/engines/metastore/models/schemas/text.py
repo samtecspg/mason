@@ -6,6 +6,10 @@ from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema,
 from mason.util.list import sequence
 from mason.util.exception import message
 
+SUPPORTED_TYPES = {
+    "CSV text": "csv",
+    "ASCII text, with CRLF, LF line terminators": "csv-crlf"
+}
 
 class TextElement(SchemaElement):
 
@@ -27,11 +31,13 @@ class TextSchema(Schema):
 
     def __init__(self, columns: Sequence[TextElement], type: str):
         self.columns = columns
-        if type == "none":
-            self.type = 'text'
+        self.inferred_type = type
+        self.type = SUPPORTED_TYPES.get(type)
+        if (type == "csv-crlf"):
+            line_terminator = "\r\n"
         else:
-            self.type = 'text' + "-" + type
-
+            line_terminator = "\n"
+        self.line_terminator = line_terminator
 
 def from_file(file_name: str, type: str, header_length: int, read_headers: Optional[str]) -> Union[TextSchema, InvalidSchema]:
     headers = read_headers or False
@@ -64,7 +70,10 @@ def from_file(file_name: str, type: str, header_length: int, read_headers: Optio
         if len(invalid) > 0:
             return InvalidSchema(f"Table Parse errors: {all_error_messages}")
         elif len(valid) > 0:
-            return TextSchema(valid, type)
+            if type in SUPPORTED_TYPES:
+                return TextSchema(valid, type)
+            else:
+                return InvalidSchema(f"Unsupported text type: {type}")
         else:
             return InvalidSchema("No valid table elements")
 

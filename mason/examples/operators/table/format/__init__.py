@@ -24,10 +24,6 @@ class TableFormat(OperatorDefinition):
         if isinstance(table, Table):
             job = FormatJob(table, outp, format)
             executed, response = config.execution.client.run_job(job, response)
-            if isinstance(executed, ExecutedJob):
-                executed = job.running()
-            else:
-                executed = InvalidJob(f"Job {job.id} errored: {executed.reason}")
         else:
             message = f"Table not found: {table_name}, {database_name}"
             executed = InvalidJob(message)

@@ -98,7 +98,7 @@ class S3Client(AWSClient):
             valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key.full_path()), options or {}), keys)), Schema, InvalidSchema)
             non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
             validated = CheckSchemas.find_conflicts(list(set(non_empty)))
-            table = CheckSchemas.get_table(self.get_name(name, path), validated)
+            table = CheckSchemas.get_table(self.get_name(name, path), validated, paths=keys)
             invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
             if isinstance(table, Table):
                 final = table

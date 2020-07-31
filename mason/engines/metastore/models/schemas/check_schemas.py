@@ -5,6 +5,7 @@ from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
 from mason.engines.metastore.models.schemas.json import merge_json_schemas, JsonSchema
 from mason.engines.metastore.models.schemas.schema import SchemaConflict
 from mason.engines.metastore.models.table import Table, InvalidTable, ConflictingTable
+from mason.engines.storage.models.path import Path
 from mason.util.list import get
 
 def diff_schemas(schema1: Schema, schema2: Schema) -> Schema:
@@ -42,9 +43,9 @@ def find_conflicts(schemas: List[Schema]) -> Union[Schema, SchemaConflict, Inval
                 return InvalidSchema("No valid schemas found")
 
 
-def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema]) -> Union[Table, InvalidTable]:
+def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema], paths: List[Path]) -> Union[Table, InvalidTable]:
     if isinstance(schema, Schema):
-        return Table(name, schema, created_by="mason")
+        return Table(name, schema, created_by="mason", paths=paths)
     else:
         if isinstance(schema, InvalidSchema):
             return InvalidTable(f"Invalid Schema: {schema.reason}")

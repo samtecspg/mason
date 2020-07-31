@@ -40,9 +40,8 @@ class TestJSONSchema:
         with fs.open(from_root('/test/sample_data/bad_json.json')) as f:
             schema = from_file(f, {})
             assert(isinstance(schema, InvalidSchema))
-            message = f"File type not supported for file {from_root('/test/sample_data/bad_json.json')}"
+            message = f"File type not supported for file {from_root('/test/sample_data/bad_json.json')}.  Type: ASCII text, with no line terminators"
             assert(message in schema.reason)
-
 
     def test_complex_json(self):
         fs = LocalFileSystem()
@@ -124,6 +123,14 @@ class TestTextSchema:
             assert(isinstance(schema, TextSchema))
             assert(list(map(lambda c: c.name,schema.columns)) == ["type","price"])
             assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
+
+    def test_valid_csv_crlf_lf(self):
+        fs = LocalFileSystem()
+        with fs.open(from_root('/test/sample_data/csv_crlf_sample.csv')) as f:
+            schema = from_file(f, {"read_headers": True})
+            assert(isinstance(schema, TextSchema))
+            # assert(list(map(lambda c: c.name,schema.columns)) == ["type","price"])
+            # assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
 
     def test_csv_equality(self):
         fs = LocalFileSystem()
