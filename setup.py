@@ -26,6 +26,7 @@ setup(
     },
     install_requires=requirements,
     zip_safe=False,
-    include_package_data=True
+    include_package_data=True,
+    python_requires='>=3.6',
 )
 
