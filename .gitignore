@@ -23,3 +23,4 @@ htmlcov/*
 .tmp/
 .tmp/*
 /Notebooks/dask-worker-space/*
+mason/test/dask-worker-space/*

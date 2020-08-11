@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List, Dict
 import pandas as pd
+from mason.engines.metastore.models.schemas.text import TextSchema
 
 from mason.clients.responsable import Responsable
 from mason.clients.response import Response
@@ -17,10 +18,18 @@ class Table(Responsable):
 
     def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None, paths: List[Path] = []):
         self.name = name
+        self.database_name = database_name
         self.schema = schema
         self.created_at = created_at
         self.created_by = created_by
         self.paths = paths
+        
+        if (isinstance(schema, TextSchema)):
+            lt = schema.line_terminator
+        else:
+            lt = None
+            
+        self.line_terminator: Optional[str] = lt
 
     def as_df(self) -> PDataFrame:
         pd_dict: Dict[str, str] = self.schema.to_pd_dict()

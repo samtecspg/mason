@@ -8,13 +8,12 @@ parameters:
     - table_name
     - format
     - output_path
+  optional:
+    - "partition_columns"
+    - "filter_columns"
+    - "sample_size"
 supported_configurations:
     - execution: "dask"
       metastore: "s3"
       storage: "s3"
-    - execution: "local"
-      metastore: "s3"
-      storage: "s3"
-    - execution: "spark"
-      metastore: "s3"
-      storage: "s3"
+

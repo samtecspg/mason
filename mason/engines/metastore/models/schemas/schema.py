@@ -1,7 +1,8 @@
 
 from typing import Sequence, Set, List, Dict
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
+from mason.engines.storage.models.path import Path
 from mason.util.dict import merge
 
 class SchemaElement:
@@ -26,9 +27,11 @@ class Schema(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, columns: Sequence[SchemaElement], type: str):
+    @abstractmethod
+    def __init__(self, columns: Sequence[SchemaElement], type: str, path: Path):
+        self.path = path
         self.type = type
-        self.columns: Sequence[SchemaElement] = columns
+        self.columns = columns
 
     def __hash__(self):
         return 0

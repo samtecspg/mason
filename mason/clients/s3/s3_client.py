@@ -87,18 +87,35 @@ class S3Client(AWSClient):
             return name
 
     def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None, resp: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
+        opt = options or {}
         logger.info(f"Fetching keys at {path}")
         response: Response = resp or Response()
         
         keys, response = self.list_keys(path, response)
-        
+
+        logger.debug(f"{len(keys)} keys at {path}")
+
         final: Union[Table, InvalidTables]
+        
+        sample_size = opt.get("sample_size")
+        if sample_size:
+            import random
+            try: 
+                ss = int(sample_size)
+            except TypeError:
+                logger.warning(f"Invalid sample size (int): {sample_size}")
+                ss = 3
+                
+            logger.warning(f"Sampling keys to determine schema. Sample size: {ss}.")
+            if ss < len(keys):
+                keys = random.sample(keys, ss)
 
         if len(keys) > 0:
-            valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key.full_path()), options or {}), keys)), Schema, InvalidSchema)
+            valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key.full_path()), opt), keys)), Schema, InvalidSchema)
             non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
-            validated = CheckSchemas.find_conflicts(list(set(non_empty)))
-            table = CheckSchemas.get_table(self.get_name(name, path), validated, paths=keys)
+            validated, paths = CheckSchemas.find_conflicts(non_empty)
+            table = CheckSchemas.get_table(self.get_name(name, path), validated, paths)
+            logger.info(f"Table Inferred: {table.to_response(Response()).formatted()}")
             invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
             if isinstance(table, Table):
                 final = table
@@ -122,10 +139,7 @@ class S3Client(AWSClient):
         return paths, resp
 
     def path(self, path: str):
-        if not path[0:4] == "s3://":
-            path = "s3://" + path
-            
-        return Path(path, "s3")
+        return Path(path.replace("s3://", ""), "s3")
 
 
 def save_to(self, inpath: Path, outpath: Path, response: Response):

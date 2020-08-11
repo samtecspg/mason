@@ -1,3 +1,5 @@
+from typing import Optional
+
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
 from mason.engines.execution.models.jobs.format_job import FormatJob
 from mason.engines.metastore.models.table import Table
@@ -18,14 +20,19 @@ class TableFormat(OperatorDefinition):
         database_name: str = parameters.get_required("database_name")
         output_path: str = parameters.get_required("output_path")
         format: str = parameters.get_required("format")
+        sample_size: str = parameters.get_optional("sample_size") or "3"
         
+        partition_columns: Optional[str] = parameters.get_optional("partition_columns")
+        filter_columns: Optional[str] = parameters.get_optional("filter_columns")
+
         outp = config.storage.client.path(output_path)
-        table, response = config.metastore.client.get_table(database_name, table_name, response=response)
+        table, response = config.metastore.client.get_table(database_name, table_name, options={"sample_size": sample_size}, response=response)
+        # credentials = config.metastore.client.credentials()
         if isinstance(table, Table):
-            job = FormatJob(table, outp, format)
+            job = FormatJob(table, outp, format, partition_columns, filter_columns)
             executed, response = config.execution.client.run_job(job, response)
         else:
-            message = f"Table not found: {table_name}, {database_name}"
+            message = f"Table not found: {table_name}, {database_name}. Messages:  {table.message()}"
             executed = InvalidJob(message)
 
         return OperatorResponse(response, executed)

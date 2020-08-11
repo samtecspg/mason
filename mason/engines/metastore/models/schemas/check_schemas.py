@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List, Union, Tuple
 from functools import reduce
 
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
@@ -17,30 +17,31 @@ def diff_schemas(schema1: Schema, schema2: Schema) -> Schema:
     return gen
 
 
-def find_conflicts(schemas: List[Schema]) -> Union[Schema, SchemaConflict, InvalidSchema]:
+def find_conflicts(schemas: List[Schema]) -> Tuple[Union[Schema, SchemaConflict, InvalidSchema], List[Path]]:
 
     schema_types = set(map(lambda s: s.type, schemas))
-    # TODO:  ValidSchema {'Schema': schema.schema}
 
     if schema_types == {'json'} or schema_types == {'jsonl'} or schema_types == { 'json', 'jsonl' }:
         for schema in schemas:
             assert(isinstance(schema, JsonSchema))
-        return merge_json_schemas(schemas)
+        paths: List[Path] = list(map(lambda s: s.path, schemas))
+        return merge_json_schemas(schemas), paths
     elif len(schema_types) > 1:
-        return InvalidSchema("Mixed type schemas not supported at this time.  Ensure that files are of one type")
+        return InvalidSchema("Mixed type schemas not supported at this time.  Ensure that files are of one type"), []
     else:
-        non_empty_schemas = filter(lambda s: s.columns != [], schemas)
+        non_empty_schemas = list(filter(lambda s: s.columns != [], schemas))
+        paths: List[Path] = list(map(lambda s: s.path, non_empty_schemas))
         unique_schemas = set(non_empty_schemas)
 
         if len(unique_schemas) > 1:
             diff = reduce(diff_schemas, unique_schemas)
-            return SchemaConflict(list(unique_schemas), diff)
+            return SchemaConflict(list(unique_schemas), diff), paths
         else:
             s = get(list(unique_schemas), 0)
             if s:
-                return s
+                return s, paths
             else:
-                return InvalidSchema("No valid schemas found")
+                return InvalidSchema("No valid schemas found"), paths
 
 
 def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema], paths: List[Path]) -> Union[Table, InvalidTable]:
