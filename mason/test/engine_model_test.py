@@ -1,3 +1,5 @@
+from mason.engines.storage.models.path import Path
+
 from mason.engines.metastore.models.schemas.check_schemas import find_conflicts
 from mason.engines.metastore.models.schemas.parquet import ParquetElement, ParquetSchema
 from mason.engines.metastore.models.schemas.schema import InvalidSchema, SchemaConflict
@@ -60,7 +62,7 @@ class TestJSONSchema:
             assert(schema.schema == expect)
 
     def test_file_dne(self):
-        schema = json_from_file('test/sample_data/dne.json')
+        schema = json_from_file(Path('test/sample_data/dne.json'))
         assert (isinstance(schema, InvalidSchema))
         message = 'File not found test/sample_data/dne.json'
         assert(schema.reason[0:97] == message)
@@ -169,9 +171,9 @@ class TestParquetSchema:
             ParquetElement("test_name_3", "test_type_3", "converted_type_3", "repitition_type_2")
         ]
 
-        schema1 = ParquetSchema(columns1)
-        schema2 = ParquetSchema(columns1)
-        schema3 = ParquetSchema(columns2)
+        schema1 = ParquetSchema(columns1, Path(""))
+        schema2 = ParquetSchema(columns1, Path(""))
+        schema3 = ParquetSchema(columns2, Path(""))
 
         assert(schema1.__eq__(schema2))
         assert(not schema1.__eq__(schema3))

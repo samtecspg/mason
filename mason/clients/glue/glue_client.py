@@ -5,8 +5,6 @@ from botocore.client import BaseClient
 from botocore.errorfactory import ClientError
 from mason.engines.scheduler.models.schedule import Schedule
 
-from mason.util.environment import MasonEnvironment
-
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.database import Database, InvalidDatabase
@@ -44,7 +42,7 @@ class GlueClient(AWSClient):
 
             table_list = result.get("TableList")
             if table_list:
-                valid, invalid = sequence(list(map(lambda x: self.parse_table(x), table_list)), Table, InvalidTable)
+                valid, invalid = sequence(list(map(lambda x: self.parse_table(x, Path(database_name, "glue")), table_list)), Table, InvalidTable)
                 if len(invalid) > 0:
                     invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
                     resp.add_warning(f"Invalid Tables in glue response: {invalid_messages}")
@@ -71,7 +69,7 @@ class GlueClient(AWSClient):
             response.set_status(404)
         elif 200 <= status < 300:
             valid: List[Table]
-            valid, invalid = self.parse_table_list_data(result)
+            valid, invalid = self.parse_table_list_data(result, Path(database_name, "glue"))
             if len(valid) > 0:
                 #  TODO move out
                 data = {'Tables': list(map(lambda v: v.to_dict(), valid))}
@@ -203,7 +201,7 @@ class GlueClient(AWSClient):
         response.add_response(result)
 
         error, status, message = self.parse_response(result)
-        table = self.parse_table(result.get("Table", {}))
+        table = self.parse_table(result.get("Table", {}), Path(database_name + ":" + table_name, "glue"))
 
         final: Union[Table, InvalidTables]
         if error == "EntityNotFoundException":
@@ -264,7 +262,7 @@ class GlueClient(AWSClient):
 
         return error, status, message
 
-    def parse_table(self, glue_response: dict) -> Union[Table, InvalidTable]:
+    def parse_table(self, glue_response: dict, path: Path) -> Union[Table, InvalidTable]:
         sd = glue_response.get("StorageDescriptor")
         crawler_name = glue_response.get("Parameters", {}).get("UPDATED_BY_CRAWLER")
 
@@ -288,7 +286,7 @@ class GlueClient(AWSClient):
                         else:
                             created_by = glue_response.get("CreatedBy")
 
-                        schema = Schema(valid, "glue")
+                        schema = Schema(valid, "glue", path)
                         return Table(name, schema, created_at, created_by)
                     else:
                         return InvalidTable("No table Name found in glue response")
@@ -306,10 +304,10 @@ class GlueClient(AWSClient):
         else:
             return InvalidSchemaElement("Name or Type for not found in SchemaElement")
 
-    def parse_table_list_data(self, glue_response: dict) -> Tuple[List[Table], List[InvalidTable]]:
+    def parse_table_list_data(self, glue_response: dict, path: Path) -> Tuple[List[Table], List[InvalidTable]]:
         table_list = glue_response.get('TableList')
         if isinstance(table_list, List):
-            parsed: List[Union[Table, InvalidTable]] = list(map(lambda x: self.parse_table(x), table_list))
+            parsed: List[Union[Table, InvalidTable]] = list(map(lambda x: self.parse_table(x, path), table_list))
             valid, invalid = sequence(parsed, Table, InvalidTable)
             return valid, invalid
         else:

@@ -13,24 +13,24 @@ def diff_schemas(schema1: Schema, schema2: Schema) -> Schema:
     #  NOTE: if two schemas differ in type all columns will differ by default
     #  Therefore choosing to take first schema's types arbitrarily
     # TODO: Look into why type isn't working here
-    gen: Schema = Schema(list(column_diff), schema1.type)
+    gen: Schema = Schema(list(column_diff), schema1.type, schema1.path)
     return gen
-
 
 def find_conflicts(schemas: List[Schema]) -> Tuple[Union[Schema, SchemaConflict, InvalidSchema], List[Path]]:
 
     schema_types = set(map(lambda s: s.type, schemas))
 
+    paths: List[Path]
     if schema_types == {'json'} or schema_types == {'jsonl'} or schema_types == { 'json', 'jsonl' }:
         for schema in schemas:
             assert(isinstance(schema, JsonSchema))
-        paths: List[Path] = list(map(lambda s: s.path, schemas))
+        paths = list(map(lambda s: s.path, schemas))
         return merge_json_schemas(schemas), paths
     elif len(schema_types) > 1:
-        return InvalidSchema("Mixed type schemas not supported at this time.  Ensure that files are of one type"), []
+        return InvalidSchema(f"Mixed type schemas not supported at this time.  Ensure that files are of one type: {schema_types}"), []
     else:
         non_empty_schemas = list(filter(lambda s: s.columns != [], schemas))
-        paths: List[Path] = list(map(lambda s: s.path, non_empty_schemas))
+        paths = list(map(lambda s: s.path, non_empty_schemas))
         unique_schemas = set(non_empty_schemas)
 
         if len(unique_schemas) > 1:

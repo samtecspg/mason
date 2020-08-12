@@ -27,7 +27,6 @@ class Schema(object):
 
     __metaclass__ = ABCMeta
 
-    @abstractmethod
     def __init__(self, columns: Sequence[SchemaElement], type: str, path: Path):
         self.path = path
         self.type = type

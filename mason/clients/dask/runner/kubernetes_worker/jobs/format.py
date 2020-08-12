@@ -9,12 +9,18 @@ from dask.delayed import delayed
 from distributed import Client, fire_and_forget
 from fsspec.core import OpenFile
 from pandas import DataFrame as PDataFrame
+import pandas as pd
+from pyexcelerate import Workbook
+
 
 def run(spec: dict, scheduler: str):
     
-    def _write_excel(df: PDataFrame, fil, *, depend_on=None, **kwargs):
+    def _write_excel(df: PDataFrame, fil: OpenFile, *, depend_on=None, **kwargs):
         with fil as f:
-            df.to_excel(f, **kwargs)
+            values = [df.columns] + list(df.values)
+            wb = Workbook()
+            wb.new_sheet('sheet 1', data=values)
+            wb.save(f)
         return None
 
     class CompleteDaskJob:
@@ -75,10 +81,11 @@ def run(spec: dict, scheduler: str):
 
         def df_to(self, df: DataFrame) -> Union[CompleteDaskJob, InvalidDaskJob]:
 
+            writer = pd.ExcelWriter('test_out.xlsx', engine='xlsxwriter')
             to_excel_chunk = delayed(_write_excel, pure=False)
 
             def to_xlsx(df: DataFrame, output_path: str):
-                dfs = df.to_delayed()
+                dfs = df.repartition(partition_size="10MB").to_delayed()
                 def name_function(i: int):
                     return f"part_{i}.xlsx"
                 
@@ -88,6 +95,7 @@ def run(spec: dict, scheduler: str):
                     num=df.npartitions,
                     name_function=name_function
                 )
+                
                 def replace_path(f: OpenFile) -> OpenFile:
                     p = f.path
                     f.path = p.replace(".xlsx.part", ".xlsx")

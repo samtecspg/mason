@@ -1,10 +1,8 @@
 from itertools import islice
 from json import JSONDecodeError
-from typing import List, Union
+from typing import List, Union, Optional
 import json
 import fsspec
-import jsonlines
-import os
 from genson import SchemaBuilder
 
 from mason.engines.metastore.models.schemas.schema import InvalidSchema, Schema
@@ -48,7 +46,7 @@ def merge_json_schemas(schemas: List[Schema]) -> Union[JsonSchema, InvalidSchema
             else:
                 return InvalidSchema("merge_json_schemas Only supports JsonSchema type")
         merged = builder.to_schema()
-        return JsonSchema(merged, [])
+        return JsonSchema(merged, schemas[0].path) # path does not matter here
     except Exception as e:
         return InvalidSchema(f"Invalid Schema, builder error: {message(e)}")
 

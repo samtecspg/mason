@@ -24,6 +24,7 @@ class Table(Responsable):
         self.created_by = created_by
         self.paths = paths
         
+        lt: Optional[str]
         if (isinstance(schema, TextSchema)):
             lt = schema.line_terminator
         else:
