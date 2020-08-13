@@ -18,15 +18,22 @@ class TableQuery(OperatorDefinition):
     def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
         query_string = parameters.get_required("query_string")
         database_name = parameters.get_required("database_name")
+        output_path = parameters.get_optional("output_path")
 
         # TODO?: Sanitize the query string
         query = query_string
         final: Union[ExecutedJob, InvalidJob]
 
         database, response = config.metastore.client.get_database(database_name)
+        
+        if output_path:
+            outp = config.storage.client.path(output_path)
+        else:
+            outp = None
+            
         if isinstance(database, Database):
             response.add_info(f"Running Query \"{query}\"")
-            job = QueryJob(query_string, database)
+            job = QueryJob(query_string, database, outp)
             final, response = config.execution.client.run_job(job, response)
         else:
             response.add_error(f"Database not found {database_name}")

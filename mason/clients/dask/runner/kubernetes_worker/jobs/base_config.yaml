@@ -10,13 +10,15 @@ spec:
     args: [dask-worker, --nthreads, '2', --no-dashboard, --memory-limit, 6GB, --death-timeout, '60']
     name: dask
     env:
+      - name: EXTRA_CONDA_PACKAGES
+        value: fastparquet -c conda-forge 
       - name: EXTRA_PIP_PACKAGES
-        value: git+https://github.com/dask/distributed
+        value: git+https://github.com/dask/distributed s3fs pyexcelerate --upgrade
     resources:
       limits:
         cpu: "2"
-        memory: 6G
+        memory: 8G
       requests:
         cpu: "2"
-        memory: 6G
+        memory: 8G
 

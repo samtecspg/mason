@@ -5,6 +5,7 @@ from dask.dataframe import DataFrame
 import dask.dataframe as dd
 from dask.bytes import open_files
 from dask.delayed import delayed
+from dask_kubernetes import KubeCluster, make_pod_spec
 
 from distributed import Client, fire_and_forget
 from fsspec.core import OpenFile
@@ -12,17 +13,8 @@ from pandas import DataFrame as PDataFrame
 import pandas as pd
 from pyexcelerate import Workbook
 
-
 def run(spec: dict, scheduler: str):
     
-    def _write_excel(df: PDataFrame, fil: OpenFile, *, depend_on=None, **kwargs):
-        with fil as f:
-            values = [df.columns] + list(df.values)
-            wb = Workbook()
-            wb.new_sheet('sheet 1', data=values)
-            wb.save(f)
-        return None
-
     class CompleteDaskJob:
         def __init__(self, message: str = ""):
             self.message = message
@@ -30,6 +22,14 @@ def run(spec: dict, scheduler: str):
     class InvalidDaskJob():
         def __init__(self, message: str = ""):
             self.message = message
+
+    def _write_excel(df: PDataFrame, fil: OpenFile, *, depend_on=None, **kwargs):
+        with fil as f:
+            values = [df.columns] + list(df.values)
+            wb = Workbook()
+            wb.new_sheet('sheet 1', data=values)
+            wb.save(f)
+        return None
 
     class DaskFormatJob():
         VALID_TEXT_FORMATS = ["csv", "csv-crlf"]
@@ -164,13 +164,36 @@ def run(spec: dict, scheduler: str):
 
     dask_job = DaskFormatJob(spec)
     mode = "async"
+    adaptive = True
     
+    # TODO:  Abstract out mason-dask so local scheduler can inherit job
     if scheduler == "local":
         client = Client()
         dask_job.run_job()
     else:
         dask.config.set({'distributed.scheduler.allowed-failures': 50})
-        client = Client(scheduler)
+        spl = scheduler.split(":")
+        
+        if adaptive:
+            host = spl[0]
+            port = spl[1]
+
+            pod_spec = make_pod_spec(
+                image='daskdev/dask:latest', 
+                memory_limit = '4G', 
+                memory_request = '4G', 
+                cpu_limit = 2, 
+                cpu_request = 2, 
+                env = { 'EXTRA_PIP_PACKAGES': 'git+https://github.com/dask/distributed s3fs pyexcelerate --upgrade', 'EXTRA_CONDA_PACKAGES': 'fastparquet -c conda-forge'}
+            )
+            cluster = KubeCluster(pod_spec)
+            cluster.port = port
+            cluster.host = host
+            cluster.adapt(minimum=0, maximum=100)
+            client = Client(cluster)
+        else:
+            client = Client(scheduler)
+            
         future = client.submit(dask_job.run_job)
         if mode == "sync":
             client.gather(future)

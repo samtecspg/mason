@@ -9,3 +9,6 @@ parameters:
 supported_configurations:
   - metastore: "glue"
     execution: "athena"
+  - metastore: "s3"
+    storage: "s3"
+    execution: "dask"
