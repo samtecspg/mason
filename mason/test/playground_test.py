@@ -17,7 +17,7 @@ def print_result(result):
         print(result.exception)
 
 
-# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestCLI:
 
     @pytest.fixture(autouse=True)
@@ -29,10 +29,11 @@ class TestCLI:
 
     def test_play(self):
         load_dotenv(from_root("/../.env"), verbose=True, override=True)
+        load_dotenv(from_root("/../.env"))
         runner = CliRunner()
         print_result(runner.invoke(config, [from_root('/examples/configs/')]))
         print_result(runner.invoke(config))
         print_result(runner.invoke(config, ["-s", "1"]))
         print_result(runner.invoke(register, [from_root('/examples/')]))
-        print_result(runner.invoke(workflow, ["table", "query", "-f", "/Users/kyle/dev/mason/mason/examples/parameters/table_query.yaml", "-o", "spg-mason-demo/dag_out/", "-r", "-d"]))
+        print_result(runner.invoke(workflow, ["table", "infer", "-f", "/Users/kyle/dev/mason/mason/examples/parameters/workflow_table_infer.yaml", "-r", "-d"],catch_exceptions=False))
 

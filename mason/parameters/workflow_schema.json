@@ -3,7 +3,8 @@
   "title": "WorkflowParameterSchema",
   "type": "object",
   "patternProperties": {
-    "^.*": {
+    "schedule": {"type":  "string"},
+    "^step_.*": {
       "type": "object",
       "properties": {
         "config_id": { "type": ["string","integer"] },

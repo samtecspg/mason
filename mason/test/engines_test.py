@@ -100,6 +100,7 @@ class TestEnvironmentInterpolation:
     def test_interpolation(self):
         logger.set_level("fatal")
         # valid interpolation
+        environ["AWS_PROFILE"] = "default"
         environ["AWS_SECRET_ACCESS_KEY"] = "test-key"
         environ["SENSITIVE"] = "test-region"
         

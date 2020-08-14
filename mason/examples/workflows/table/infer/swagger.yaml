@@ -39,6 +39,8 @@ paths:
           schema:
             type: object
             properties:
+              schedule:
+                type: string
               step_1:
                 type: object
                 properties:

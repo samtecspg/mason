@@ -23,14 +23,14 @@ class GlueSchedulerClient(SchedulerClient):
             db_name = params.get_required("database_name")
 
             storage_path = op.config.storage.client.path(params.get_required("storage_path"))
-            response = self.register_schedule(db_name, storage_path, schedule_name, response)
+            response = self.register_schedule(db_name, storage_path, schedule_name, schedule, response)
         else:
             response.add_error("Glue Scheduler only defined for InferJob type which registers a glue crawler")
 
         return (schedule_name, response, None)
 
-    def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
-        response = self.client.register_schedule(database_name, path, schedule_name, response)
+    def register_schedule(self, database_name: str, path: Path, schedule_name: str, schedule: Optional[Schedule], response: Response) -> Response:
+        response = self.client.register_schedule(database_name, path, schedule_name, schedule, response)
         return response
 
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:

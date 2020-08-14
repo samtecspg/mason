@@ -58,6 +58,9 @@ class ValidWorkflow:
                     response = self.config.storage.client.save_to(f.name, output_path, response)
                     
             if run_now:
+                if self.schedule:
+                    response.add_warning(f"Triggering workflow off schedule: {self.schedule.definition}")
+                    
                 response.add_info(f"Triggering schedule: {schedule_id}")
                 response = scheduler.client.trigger_schedule(schedule_id, response, env)
         else:

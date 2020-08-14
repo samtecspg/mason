@@ -3,6 +3,8 @@ from typing import Tuple, Union, List, Optional
 import boto3
 from botocore.client import BaseClient
 from botocore.errorfactory import ClientError
+from mason.engines.scheduler.models.schedule import Schedule
+
 from mason.util.environment import MasonEnvironment
 
 from mason.clients.aws_client import AWSClient
@@ -105,12 +107,13 @@ class GlueClient(AWSClient):
 
         return response
 
-    def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response):
+    def register_schedule(self, database_name: str, path: Path, schedule_name: str, schedule: Optional[Schedule], response: Response):
         create_crawler_response = self.create_glue_crawler(
             database=database_name,
             name=schedule_name,
             role=self.aws_role_arn or "",
-            path=path.path_str
+            path=path.clean_path_str(),
+            schedule=schedule
         )
 
         response.add_response(create_crawler_response)
@@ -223,7 +226,7 @@ class GlueClient(AWSClient):
             result = e.response
         return result
 
-    def create_glue_crawler(self, database: str, name: str, role: str, path: str):
+    def create_glue_crawler(self, database: str, name: str, role: str, path: str, schedule: Optional[Schedule]):
         targets = {
             'S3Targets': [
                 {
@@ -234,12 +237,21 @@ class GlueClient(AWSClient):
         }
 
         try:
-            result = self.client().create_crawler(
-                DatabaseName=database,
-                Name=name,
-                Role=role,
-                Targets=targets
-            )
+            if schedule:
+                result = self.client().create_crawler(
+                    DatabaseName=database,
+                    Name=name,
+                    Role=role,
+                    Targets=targets,
+                    Schedule=schedule.definition
+                )
+            else:
+                result = self.client().create_crawler(
+                    DatabaseName=database,
+                    Name=name,
+                    Role=role,
+                    Targets=targets
+                )
         except ClientError as e:
             result = e.response
 
