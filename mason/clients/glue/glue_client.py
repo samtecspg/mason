@@ -13,7 +13,6 @@ from mason.engines.metastore.models.table import Table, InvalidTable, InvalidTab
 from mason.engines.storage.models.path import Path
 from mason.util.list import sequence
 
-
 class GlueClient(AWSClient):
 
     def __init__(self, config: dict):

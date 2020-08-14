@@ -10,7 +10,7 @@ class QueryJob(Job):
         super().__init__("query")
         self.query_string = query_string
         self.database = database
-        self.output_path = output_path
+        self.output_path = output_path or Path("")
         
     def spec(self) -> dict:
         spec = {

@@ -112,17 +112,20 @@ class S3Client(AWSClient):
                 keys = random.sample(keys, ss)
 
         if len(keys) > 0:
-            valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key.full_path()), opt), keys)), Schema, InvalidSchema)
-            non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
-            validated, paths = CheckSchemas.find_conflicts(non_empty)
-            table = CheckSchemas.get_table(self.get_name(name, path), validated, paths)
-            logger.info(f"Table Inferred: {table.to_response(Response()).formatted()}")
-            invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
-            if isinstance(table, Table):
-                final = table
-            else:
-                invalid_tables.append(table)
-                final = InvalidTables(invalid_tables)
+            try:
+                valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key.full_path()), opt), keys)), Schema, InvalidSchema)
+                non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
+                validated, paths = CheckSchemas.find_conflicts(non_empty)
+                table = CheckSchemas.get_table(self.get_name(name, path), validated, paths)
+                logger.info(f"Table Inferred: {table.to_response(Response()).formatted()}")
+                invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
+                if isinstance(table, Table):
+                    final = table
+                else:
+                    invalid_tables.append(table)
+                    final = InvalidTables(invalid_tables)
+            except (ClientError, PermissionError) as e:
+                final = InvalidTables([InvalidTable(f"Not able to infer table: {message(e)}")])
         else:
             response.set_status(404)
             final = InvalidTables([TableNotFound(f"No keys at {path}")])
