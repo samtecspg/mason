@@ -1,11 +1,11 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from mason.clients.response import Response
 from mason.engines.scheduler.models.dags.client_dag import ClientDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.local.local_client import LocalClient
-from mason.engines.scheduler.models.schedule import Schedule
+from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.environment import MasonEnvironment
 
 
@@ -27,4 +27,8 @@ class LocalSchedulerClient(SchedulerClient):
 
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
+
+    def validate_schedule(self, schedule: Optional[str]) -> Union[Optional[Schedule], InvalidSchedule]:
+        # Schedule should not be defined for synchronous local scheduler
+        return None
 

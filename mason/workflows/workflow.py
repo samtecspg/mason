@@ -52,7 +52,7 @@ class Workflow:
         if config.scheduler.client_name in self.supported_schedulers:
             validated_dag = self.dag.validate(env, parameters)
             if isinstance(validated_dag, ValidDag):
-                schedule = parameters.schedule
+                schedule = config.scheduler.client.validate_schedule(parameters.schedule)
                 if isinstance(schedule, InvalidSchedule):
                     return InvalidWorkflow(f"Invalid Workflow - Bad Schedule: {schedule.reason}")
                 else:

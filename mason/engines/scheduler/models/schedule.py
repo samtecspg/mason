@@ -2,8 +2,7 @@
 class Schedule:
 
     def __init__(self, definition: str):
-        self.definition = f"cron({definition})"
-        # self.definition = definition
+        self.definition = definition
 
 class InvalidSchedule:
     

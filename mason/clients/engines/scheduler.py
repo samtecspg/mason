@@ -1,8 +1,8 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 from abc import abstractmethod
 
 from mason.engines.scheduler.models.dags.client_dag import ClientDag
-from mason.engines.scheduler.models.schedule import Schedule
+from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.environment import MasonEnvironment
 
 from mason.clients.client import Client
@@ -24,12 +24,17 @@ class SchedulerClient(Client):
     @abstractmethod
     def delete_schedule(self, schedule_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
+    
+    @abstractmethod
+    def validate_schedule(self, schedule: Optional[str]) -> Union[Optional[Schedule], InvalidSchedule]:
+        raise NotImplementedError("Client method not implemented")
 
     # TODO: Remove
     @abstractmethod
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
 
+        
 
 class InvalidSchedulerClient(SchedulerClient, InvalidClient):
     
@@ -46,6 +51,9 @@ class InvalidSchedulerClient(SchedulerClient, InvalidClient):
         raise NotImplementedError("Client method not implemented")
 
     def delete_schedule(self, schedule_name: str, response: Response) -> Response:
+        raise NotImplementedError("Client method not implemented")
+
+    def validate_schedule(self, schedule: Optional[str]) -> Union[Optional[Schedule], InvalidSchedule]:
         raise NotImplementedError("Client method not implemented")
 
     # TODO: Remove

@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Optional, Union
 
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
-from mason.engines.scheduler.models.schedule import Schedule
+from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.environment import MasonEnvironment
 
 from mason.clients.engines.scheduler import SchedulerClient
@@ -40,6 +40,12 @@ class GlueSchedulerClient(SchedulerClient):
     def delete_schedule(self, schedule_name: str, response: Response) -> Response:
         response = self.client.delete_schedule(schedule_name, response)
         return response
+
+    def validate_schedule(self, schedule: Optional[str]) -> Union[Optional[Schedule], InvalidSchedule]:
+        if schedule:
+            return Schedule(f"cron({schedule})")
+        else:
+            return None
 
     # TODO: Remove
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
