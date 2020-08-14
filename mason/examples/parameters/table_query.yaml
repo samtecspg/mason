@@ -1,0 +1,5 @@
+step_1:
+  config_id: 4
+  parameters:
+    database_name: "test-database"
+    query_string: "SELECT * from table limit 10"

@@ -6,7 +6,7 @@ from typing import Optional, List, Union
 
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.dags.dag import Dag
-from mason.engines.scheduler.models.schedule import Schedule
+from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.string import to_class_case
 from mason.util.uuid import uuid4
 from mason.configurations.valid_config import ValidConfig
@@ -20,23 +20,15 @@ from mason.workflows.workflow_definition import WorkflowDefinition
 
 class Workflow:
 
-    def __init__(self, namespace: str, command: str, name: str, dag: List[dict], supported_schedulers: List[str], schedule: Optional[str] = None, description: Optional[str] = None, source_path: Optional[str] = None):
+    def __init__(self, namespace: str, command: str, name: str, dag: List[dict], supported_schedulers: List[str], description: Optional[str] = None, source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
         self.description = description
         self.dag = Dag(namespace, command, dag)
         self.name = name + "_" + str(uuid4())
         self.supported_schedulers = supported_schedulers
-        self.schedule = self.validate_schedule(schedule)
         self.source_path = source_path
 
-    def validate_schedule(self, schedule: Optional[str]) -> Optional[Schedule]:
-        # TODO: Validate that schedule is valid cron definition
-        if schedule:
-            return Schedule(schedule)
-        else:
-            return None
-        
 
     def module(self) -> Union[WorkflowDefinition, InvalidWorkflow]:
         if self.source_path:
@@ -60,7 +52,11 @@ class Workflow:
         if config.scheduler.client_name in self.supported_schedulers:
             validated_dag = self.dag.validate(env, parameters)
             if isinstance(validated_dag, ValidDag):
-                return ValidWorkflow(self.name, validated_dag, config, self.schedule)
+                schedule = parameters.schedule
+                if isinstance(schedule, InvalidSchedule):
+                    return InvalidWorkflow(f"Invalid Workflow - Bad Schedule: {schedule.reason}")
+                else:
+                    return ValidWorkflow(self.name, validated_dag, config, schedule)
             else:
                 return InvalidWorkflow(f"Invalid DAG definition: {validated_dag.reason}")
         else:

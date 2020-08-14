@@ -1,0 +1,12 @@
+type: "workflow"
+namespace: "table"
+command: "query"
+name: "table_query"
+description: "Workflow to query table and format result set."
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "table"
+      command: "query"
+supported_schedulers:
+  - "airflow"

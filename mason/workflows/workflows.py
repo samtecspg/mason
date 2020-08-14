@@ -17,8 +17,7 @@ from mason.workflows.valid_workflow import ValidWorkflow
 from mason.workflows.workflow import Workflow
 from mason.workflows.workflow_definition import WorkflowDefinition
 
-
-def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None):
+def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None, deploy: bool = False, run: bool = False, schedule_name: Optional[str] = None, output_path: Optional[str] = None):
     #  TODO: Allow single step commands without subcommands
     response = Response()
 
@@ -33,7 +32,7 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: WorkflowParamete
         if wf:
             validated = wf.validate(env, config, parameters)
             if isinstance(validated, ValidWorkflow):
-                response = validated.run(env, response, not deploy, run, schedule_name)
+                response = validated.run(env, response, not deploy, run, schedule_name, output_path)
             else:
                 response.add_error(f"Invalid Workflow: {validated.reason}")
         else:

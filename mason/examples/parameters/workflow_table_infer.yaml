@@ -3,3 +3,4 @@ step_1:
   parameters:
     database_name: "test-database"
     storage_path: "spg-mason-demo/part_data_merged/"
+schedule: "0 12 * * ? *"

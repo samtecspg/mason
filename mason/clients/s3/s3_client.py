@@ -1,3 +1,5 @@
+import re
+
 from botocore.errorfactory import ClientError
 from typing import Optional, List, Union, Tuple
 import s3fs
@@ -7,6 +9,7 @@ from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.table import InvalidTable, Table, TableNotFound, InvalidTables
 from mason.engines.storage.models.path import Path
+from mason.util.exception import message
 from mason.util.logger import logger
 from mason.engines.metastore.models.schemas import schemas
 from mason.engines.metastore.models.schemas import check_schemas as CheckSchemas
@@ -111,4 +114,15 @@ class S3Client(AWSClient):
             path = "s3://" + path
             
         return Path(path)
+    
+    def save_to(self, inpath: Path, outpath: Path, response: Response):
+        try:
+            self.client().upload(inpath.path_str, outpath.path_str)
+        except Exception as e:
+            response.add_error(f"Error saving {inpath} to {outpath.path_str}")
+            response.add_error(message(e))
+            
+        return response
+        
+        
 

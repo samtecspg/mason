@@ -21,6 +21,9 @@ def interpolate_value(value: Union[str, dict], credentials: Optional[dict]) -> O
         'KUBECONFIG',
         'GLUE_ROLE_ARN',
         'DASK_SCHEDULER'
+        'AIRLFLOW_SCHEDULER',
+        'AIRFLOW_USER',
+        'AIRFLOW_PASSWORD'
     ]
 
     r = re.compile(r'^\{\{[A-Z0-9_]+\}\}$')

@@ -200,3 +200,30 @@ class TestWorkflows:
             raise Exception("Workflow not found")
 
 
+    def test_workflow_parameters(self):
+        pass
+        # TODO:  Test AWS schedule expression here
+        # 
+        # step_params = {
+        #     "config_id": "5",
+        #     "parameters": {
+        #         "test_param": "test"
+        #     }
+        # }
+        # 
+        # params = {
+        #     "step_1": step_params,
+        #     "step_2": step_params,
+        #     "step_3": step_params
+        # }
+        # 
+        # params["schedule"] = "0 12 * * ? *"
+        # parameters = WorkflowParameters(parameter_dict=params)
+        # assert(parameters.schedule.definition == "test")
+
+        # params["schedule"] = "bogus"
+        # parameters = WorkflowParameters(parameter_dict=params)
+        # assert(parameters.schedule.definition == "test")
+
+
+

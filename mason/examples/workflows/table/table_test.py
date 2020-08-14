@@ -30,7 +30,7 @@ def test_post():
         { "step_1": {
             "config_id": 1,
             "parameters":
-                {"database_name": "crawler-poc", "storage_path": "lake-working-copy-feb-20-2020/user-data/kyle.prifogle/catalog_poc_data/"}
+                {"database_name": "crawler-poc", "storage_path": "test_bucket/test_path"}
             }
         }
 

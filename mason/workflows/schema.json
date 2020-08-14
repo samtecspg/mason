@@ -10,7 +10,6 @@
     "command": { "type": "string" },
     "description": { "type": "string" },
     "name": {"type":  "string"},
-    "schedule": {"type":  "string"},
     "dag": {
       "type":  "array",
       "items": {

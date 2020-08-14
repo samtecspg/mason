@@ -1,4 +1,7 @@
+from typing import Optional
+
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
+from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.environment import MasonEnvironment
 
 from mason.clients.engines.scheduler import SchedulerClient
@@ -12,7 +15,7 @@ class GlueSchedulerClient(SchedulerClient):
     def __init__(self, config: dict):
         self.client: GlueClient = GlueClient(config)
 
-    def register_dag(self, schedule_name: str, valid_dag: ValidDag, response: Response):
+    def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response):
         #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator
         if len(valid_dag.valid_steps) == 1 and valid_dag.valid_steps[0].operator.type_name() == "TableInfer":
             op = valid_dag.valid_steps[0].operator
@@ -20,14 +23,14 @@ class GlueSchedulerClient(SchedulerClient):
             db_name = params.get_required("database_name")
 
             storage_path = op.config.storage.client.path(params.get_required("storage_path"))
-            response = self.register_schedule(db_name, storage_path, schedule_name, response)
+            response = self.register_schedule(db_name, storage_path, schedule_name, schedule, response)
         else:
             response.add_error("Glue Scheduler only defined for InferJob type which registers a glue crawler")
 
-        return schedule_name, response
+        return (schedule_name, response, None)
 
-    def register_schedule(self, database_name: str, path: Path, schedule_name: str, response: Response) -> Response:
-        response = self.client.register_schedule(database_name, path, schedule_name, response)
+    def register_schedule(self, database_name: str, path: Path, schedule_name: str, schedule: Optional[Schedule], response: Response) -> Response:
+        response = self.client.register_schedule(database_name, path, schedule_name, schedule, response)
         return response
 
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
