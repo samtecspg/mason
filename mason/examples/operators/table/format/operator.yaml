@@ -9,9 +9,9 @@ parameters:
     - format
     - output_path
   optional:
-    - "partition_columns"
-    - "filter_columns"
-    - "sample_size"
+    - partition_columns
+    - filter_columns
+    - sample_size
 supported_configurations:
     - execution: "dask"
       metastore: "s3"
