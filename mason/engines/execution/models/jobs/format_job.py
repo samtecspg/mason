@@ -6,7 +6,7 @@ from mason.engines.execution.models.jobs import Job
 
 class FormatJob(Job):
 
-    def __init__(self, table: Table, output_path: Path, format: str, partition_columns: Optional[str], filter_columns: Optional[str]):
+    def __init__(self, table: Table, output_path: Path, format: str, partition_columns: Optional[str], filter_columns: Optional[str], partitions: Optional[str]):
         self.table: Table = table
         self.output_path: Path = output_path
         self.format: str = format
@@ -24,12 +24,13 @@ class FormatJob(Job):
         else:
             fc = []
         self.filter_columns = fc
+        self.partitions = partitions
         
         super().__init__("format")
 
 
     def spec(self) -> dict:
-        return {
+        spec =  {
             'input_paths': list(map(lambda p: p.full_path(), self.table.paths)),
             'input_format': self.table.schema.type,
             'output_format': self.format,
@@ -38,3 +39,8 @@ class FormatJob(Job):
             'partition_columns': self.partition_columns,
             'filter_columns': self.filter_columns
         }
+        
+        if self.partitions:
+            spec['partitions'] = self.partitions
+            
+        return spec

@@ -32,4 +32,4 @@ class TestCLI:
         print_result(runner.invoke(config, [from_root('/examples/configs/')]))
         print_result(runner.invoke(config, ["-s", "4"]))
         print_result(runner.invoke(register, [ from_root('/examples/') ]))
-        print_result(runner.invoke(operator, ['table', 'format', '-p', 'format:csv,database_name:mason-sample-data,table_name:tests/in/csv/,output_path:mason-sample-data/tests/out/csv/,partition_columns:vendor_name'], catch_exceptions=False))
+        print_result(runner.invoke(operator, ['table', 'format', '-p', 'sample_size:1,format:parquet,database_name:mason-sample-data,table_name:nyctaxi/yellow/year=2009/,output_path:mason-sample-data/tests/out/parquet/,partition_columns:vendor_name'], catch_exceptions=False))

@@ -10,21 +10,20 @@ from mason.util.exception import message
 
 from typing import Union
 
-
 class KubernetesWorker(DaskRunner):
 
     def __init__(self, config: dict):
-        # dask scheduler location, not to be confused with mason engine scheduler
         self.scheduler = config.get("scheduler")
+        self.num_workers = config.get("num_workers")
 
     def run(self, job: Job, resp: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         final: Union[ExecutedJob, InvalidJob]
         response: Response = resp or Response()
-
+        
         try:
             if self.scheduler:
                 if isinstance(job, FormatJob):
-                    final = run_job(job.type, job.spec(), self.scheduler) or ExecutedJob("format_job", f"Job queued to format {job.table.schema.type} table as {job.format} and save to {job.output_path.path_str}")
+                    final = run_job(job.type, job.spec(), self.scheduler, self.num_workers) or ExecutedJob("format_job", f"Job queued to format {job.table.schema.type} table as {job.format} and save to {job.output_path.path_str}")
                 elif isinstance(job, QueryJob):
                     run_job(job.type, job.spec(), self.scheduler)
                 else:

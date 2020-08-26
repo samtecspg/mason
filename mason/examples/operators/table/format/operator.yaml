@@ -12,6 +12,7 @@ parameters:
     - partition_columns
     - filter_columns
     - sample_size
+    - partitions
 supported_configurations:
     - execution: "dask"
       metastore: "s3"

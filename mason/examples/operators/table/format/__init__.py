@@ -1,6 +1,6 @@
 from typing import Optional
 
-from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
+from mason.engines.execution.models.jobs import InvalidJob
 from mason.engines.execution.models.jobs.format_job import FormatJob
 from mason.engines.metastore.models.table import Table
 
@@ -24,12 +24,13 @@ class TableFormat(OperatorDefinition):
         
         partition_columns: Optional[str] = parameters.get_optional("partition_columns")
         filter_columns: Optional[str] = parameters.get_optional("filter_columns")
+        partitions: Optional[str] = parameters.get_optional("partitions")
 
         outp = config.storage.client.path(output_path)
         table, response = config.metastore.client.get_table(database_name, table_name, options={"sample_size": sample_size}, response=response)
         # credentials = config.metastore.client.credentials()
         if isinstance(table, Table):
-            job = FormatJob(table, outp, format, partition_columns, filter_columns)
+            job = FormatJob(table, outp, format, partition_columns, filter_columns, partitions)
             executed, response = config.execution.client.run_job(job, response)
         else:
             message = f"Table not found: {table_name}, {database_name}. Messages:  {table.message()}"

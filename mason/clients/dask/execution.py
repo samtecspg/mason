@@ -5,7 +5,6 @@ from mason.clients.engines.execution import ExecutionClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
 
-
 class DaskExecutionClient(ExecutionClient):
 
     def __init__(self, config: dict):

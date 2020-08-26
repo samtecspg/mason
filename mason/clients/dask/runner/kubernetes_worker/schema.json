@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "SparkConfiguration",
+  "title": "DaskConfiguration",
   "properties": {
     "configuration": {
       "type": "object",

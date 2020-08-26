@@ -6,7 +6,7 @@ from mason.engines.metastore.models.database import Database
 
 class QueryJob(Job):
 
-    def __init__(self, query_string: str, database: Database, output_path: Optional[Path]):
+    def __init__(self, query_string: str, database: Database, output_path: Optional[Path] = None):
         super().__init__("query")
         self.query_string = query_string
         self.database = database
