@@ -5,6 +5,7 @@ import os
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.definitions import from_root
+from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
 from mason.examples.operators.table.get import api as table_get_api
 from mason.examples.operators.table.list import api as table_list_api
 from mason.examples.operators.table.refresh import api as table_refresh_api
@@ -203,12 +204,12 @@ def test_format():
     def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         params = InputParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:boogo,output_path:mason-sample-data/tests/out/csv/")
         good = op.validate(config, params).run(env, Response())
-        print(good.response.formatted())
-        
-        # InvalidJob
-        # OSError: Timed out trying to connect to 'tcp://dask-scheduler:8786'
-        # ExecutedJob 'Table succesfully formatted as csv and exported to s3://mason-sample-data/tests/out/csv/'
-        
-        logger.remove("HERE")
+        invalid_job = good.object
+        assert(isinstance(invalid_job, InvalidJob))
 
-    run_tests("table", "format", False, "fatal", ["config_6"], tests)
+        params = InputParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:csv,output_path:good_output_path")
+        good = op.validate(config, params).run(env, Response())
+        executed_job = good.object
+        assert(isinstance(executed_job, ExecutedJob))
+
+    run_tests("table", "format", True, "fatal", ["config_6"], tests)
