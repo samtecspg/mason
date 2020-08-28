@@ -6,7 +6,7 @@ from typing import Optional, List, Union
 
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.dags.dag import Dag
-from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
+from mason.engines.scheduler.models.schedule import InvalidSchedule
 from mason.util.string import to_class_case
 from mason.util.uuid import uuid4
 from mason.configurations.valid_config import ValidConfig
