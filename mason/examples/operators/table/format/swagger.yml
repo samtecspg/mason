@@ -1,0 +1,18 @@
+paths:
+  /table/{table_name}:
+    get:
+      operationId: "registered_operators.table.format.api"
+      parameters:
+        - name: log_level
+          in: query
+          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
+          required: false
+          type: string
+          default: "info"
+      tags:
+        - "Table"
+      summary: "Format and repartition table and output to specified path"
+      description: "Format and repartition table and output to specified path"
+      responses:
+        200:
+          description: "Successful Format"

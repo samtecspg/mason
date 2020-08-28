@@ -1,10 +1,7 @@
 
 from typing import Union
 import dask
-from dask.dataframe import DataFrame
 from distributed import Client, fire_and_forget
-
-import dask.dataframe as dd
 
 def run(spec: dict, scheduler: str):
     

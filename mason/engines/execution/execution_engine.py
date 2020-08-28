@@ -3,6 +3,8 @@ from typing import Union
 from mason.clients.engines.execution import ExecutionClient, InvalidExecutionClient
 from mason.clients.engines.valid_client import EmptyClient
 from mason.engines.engine import Engine
+from mason.util.logger import logger
+
 
 class ExecutionEngine(Engine):
 
@@ -34,3 +36,11 @@ class ExecutionEngine(Engine):
         else:
             return InvalidExecutionClient(client.reason)
 
+    def set_mode(self, mode: str):
+        if mode.lower() == "async":
+            self.mode = "async"
+        elif mode.lower() == "sync":
+            self.mode = "sync"
+        else:
+            logger.error(f"Invalid Mode: {mode}")
+            pass

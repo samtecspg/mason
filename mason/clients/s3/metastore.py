@@ -20,7 +20,7 @@ class S3MetastoreClient(MetastoreClient, ValidClient):
         self.client = S3Client(config)
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
-        pass
+        raise NotImplementedError("s3 client get_database not implemented")
 
     def list_tables(self, database_name: str, response: Response) -> Response:
         response = self.client.list_tables(database_name, response)

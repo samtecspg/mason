@@ -14,6 +14,7 @@ from mason.operators.operator import Operator
 from mason.parameters.input_parameters import InputParameters
 from mason.test.support.testing_base import run_tests, clean_string, clean_uuid
 from mason.util.environment import MasonEnvironment
+from mason.util.logger import logger
 
 load_dotenv(from_root("/../.env.example"), override=True)
 
@@ -195,3 +196,19 @@ def test_infer():
     run_tests("table", "infer", True, "fatal", ["config_5"], tests)
 
 
+def test_format():
+    
+    load_dotenv(from_root("/../.env"), override=True)
+    
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
+        params = InputParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:boogo,output_path:mason-sample-data/tests/out/csv/")
+        good = op.validate(config, params).run(env, Response())
+        print(good.response.formatted())
+        
+        # InvalidJob
+        # OSError: Timed out trying to connect to 'tcp://dask-scheduler:8786'
+        # ExecutedJob 'Table succesfully formatted as csv and exported to s3://mason-sample-data/tests/out/csv/'
+        
+        logger.remove("HERE")
+
+    run_tests("table", "format", False, "fatal", ["config_6"], tests)

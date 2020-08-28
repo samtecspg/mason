@@ -7,6 +7,7 @@ from mason.definitions import from_root
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.test.support.mocks import clients as mock_clients
 
+from mason.util.string import to_class_case
 from mason.util.logger import logger
 
 
@@ -14,6 +15,7 @@ CONFIGURED_MOCKS = {
     "glue": "glue",
     "s3": "s3",
     "spark": "kubernetes",
+    "dask": "kubernetes_worker",
     "athena": "athena"
 }
 
@@ -25,7 +27,7 @@ def get_patches():
 
 def get_magic_mock(mock_name: str):
     logger.debug(f"Mocking {mock_name} client")
-    return MagicMock(return_value=eval(f"mock_clients.{mock_name.capitalize()}Mock()"))
+    return MagicMock(return_value=eval(f"mock_clients.{to_class_case(mock_name)}Mock()"))
 
 
 class TestClient:
