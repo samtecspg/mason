@@ -54,9 +54,6 @@ class S3Mock:
 
 
     def find(self, path: str):
-        if not path[0:5] == "s3://":
-            path = "s3://" + path
-            
         if path == "s3://crawler-poc/catalog_poc_data":
             return ["crawler-poc/catalog_poc_data/test1.csv", "crawler-poc/catalog_poc_data/test2.csv"]
         elif path == "s3://bad-database/catalog_poc_data":

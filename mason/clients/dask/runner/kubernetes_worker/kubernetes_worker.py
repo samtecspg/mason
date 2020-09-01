@@ -14,7 +14,7 @@ from typing import Union
 class KubernetesWorker(DaskRunner):
 
     def __init__(self, config: dict):
-        self.scheduler = config.get("scheduler")
+        self.scheduler: str = config.get("scheduler") or "local:8786"
         self.num_workers = config.get("num_workers")
         
     def client(self):
@@ -60,7 +60,7 @@ class KubernetesWorker(DaskRunner):
         return final, response
 
 
-    def run_job(self, job_type: str, spec: dict, scheduler: str, mode: str) -> Union[ExecutedJob, InvalidJob]:
+    def run_job(self, job_type: str, spec: dict, scheduler: str, mode: str = "async") -> Union[ExecutedJob, InvalidJob]:
 
         from distributed import fire_and_forget
         import dask
@@ -91,14 +91,15 @@ class KubernetesWorker(DaskRunner):
             if isinstance(dask_job, InvalidDaskJob):
                 final = InvalidJob(f"Invalid Dask Job: {dask_job.message}")
             else:
+                result: Union[ExecutedDaskJob, InvalidDaskJob]
                 if scheduler.startswith("local"):
-                    result: Union[ExecutedDaskJob, InvalidDaskJob] = dask_job.run(cluster_spec)
+                    result = dask_job.run(cluster_spec)
                     final = to_mason_job(result)
                 else:
                     dask.config.set({'distributed.scheduler.allowed-failures': 50})
                     future = client.submit(dask_job.run, cluster_spec)
                     if mode == "sync":
-                        result: Union[ExecutedDaskJob, InvalidDaskJob] = client.gather(future)
+                        result = client.gather(future)
                         final = to_mason_job(result)
                     else:
                         fire_and_forget(future)

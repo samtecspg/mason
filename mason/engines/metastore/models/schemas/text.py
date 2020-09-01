@@ -36,7 +36,7 @@ class TextSchema(Schema):
         self.line_terminator = line_terminator
         super().__init__(columns, SUPPORTED_TYPES.get(type, ""), path)
 
-def from_file(path: Path, type: str, header_length: int, sample, read_headers: Optional[str]) -> Union[TextSchema, InvalidSchema]:
+def from_file(path: Path, type: str, header_length: int, sample, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
     headers = read_headers or False
     header_list: Union[List[str], bool]
 
@@ -45,15 +45,18 @@ def from_file(path: Path, type: str, header_length: int, sample, read_headers: O
     else:
         line_terminator = "\n"
 
-    # TODO:  Figure out read_headers option
+    header: Optional[int] = None
+    if headers:
+        header = 0
+
     logger.debug(f"Reading Path: {path.full_path()}")
-    reader = pd.read_csv(path.full_path(), lineterminator=line_terminator, iterator=True)
+    reader = pd.read_csv(path.full_path(), lineterminator=line_terminator, iterator=True, header=header)
     df = reader.get_chunk(100)
 
     try:
-        fields = df.dtypes
-        
-        elements = list(map(lambda i: TextElement(*i), fields.items()))
+
+        fields = [(k, v.name) for k, v in dict(df.dtypes).items()]
+        elements = list(map(lambda i: TextElement(*i), fields))
 
         if len(elements) > 0:
             if type in SUPPORTED_TYPES:

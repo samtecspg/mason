@@ -98,20 +98,20 @@ class TestJSONSchema:
             schema7 = from_file(f)
             assert(isinstance(schema7, JsonSchema))
 
-        schema = find_conflicts([schema1, schema2])
+        schema = find_conflicts([schema1, schema2])[0]
         expect = {'$schema': 'http://json-schema.org/schema#','properties': {'data': {'items': {'properties': {'field1': {'type': 'string'},'field2': {'type': ['integer','string']},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'properties': {'some_other_stuff': {'type': 'string'}},'required': ['some_other_stuff'],'type': 'object'},'field6': {'type': 'string'}},'type': 'object'},'type': 'array'}},'required': ['data'],'type': 'object'}
         assert(isinstance(schema, JsonSchema))
         assert(schema.schema == expect)
 
-        schema = find_conflicts([schema1, schema2, schema3])
+        schema = find_conflicts([schema1, schema2, schema3])[0]
         assert(isinstance(schema, JsonSchema))
         expect = {'$schema': 'http://json-schema.org/schema#', 'properties': {'data': {'items': {'properties': {'field1': {'type': 'string'},'field2': {'type': ['integer','string']},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'properties': {'some_other_stuff': {'type': 'string'}},'required': ['some_other_stuff'],'type': 'object'},'field6': {'type': 'string'}}, 'type': 'object'}, 'type': 'array'},'field': {'type': 'string'},'field2': {'type': 'string'},'field3': {'type': 'string'}}, 'required': [], 'type': 'object'}
         assert(schema.schema == expect)
-        schema = find_conflicts([schema1, schema2, schema3,  schema5])
+        schema = find_conflicts([schema1, schema2, schema3,  schema5])[0]
         assert(isinstance(schema, InvalidSchema))
-        assert(schema.reason == "Mixed type schemas not supported at this time.  Ensure that files are of one type")
+        assert(schema.reason == "Mixed type schemas not supported at this time.  Ensure that files are of one type: ['csv', 'json']")
 
-        schema = find_conflicts([schema6, schema7])
+        schema = find_conflicts([schema6, schema7])[0]
         assert(isinstance(schema, JsonSchema))
         expect = {'$schema': 'http://json-schema.org/schema#', 'properties': {'field': {'type': 'string'},'field2': {'type': 'string'},'field3': {'type': 'string'},'field4': {'type': 'string'},'field5': {'type': 'string'},'field6': {'type': 'string'},'field7': {'type': 'string'},'other': {'type': 'string'},'other2': {'type': 'string'},'other3': {'type': 'string'}}, 'required': ['other'], 'type': 'object'}
         assert(schema.schema == expect)
@@ -123,8 +123,8 @@ class TestTextSchema:
         with fs.open(from_root('/test/sample_data/csv_sample.csv')) as f:
             schema = from_file(f, {"read_headers": True})
             assert(isinstance(schema, TextSchema))
-            assert(list(map(lambda c: c.name,schema.columns)) == ["type","price"])
-            assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
+            assert(list(map(lambda c: c.name, schema.columns)) == ["type","price"])
+            assert(list(map(lambda c: c.type,schema.columns)) == ["object","float64"])
 
     def test_valid_csv_crlf_lf(self):
         fs = LocalFileSystem()
@@ -144,9 +144,9 @@ class TestTextSchema:
             schema2 = from_file(f, {"read_headers": True})
             assert(isinstance(schema2, TextSchema))
 
-        schema = find_conflicts([schema1, schema2])
+        schema = find_conflicts([schema1, schema2])[0]
         assert(isinstance(schema, SchemaConflict))
-        expect = {'CountDistinctSchemas': 2, 'DistinctSchemas': [{'SchemaType': 'text', 'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}]},{'SchemaType': 'text', 'Columns': [{'Name': 'type', 'Type': 'string'}, {'Name': 'price', 'Type': 'number'}, {'Name': 'availabile', 'Type': 'boolean'}, {'Name': 'date', 'Type': 'date'}]}], 'NonOverlappingColumns': [{'name': 'availabile', 'type': 'boolean'}, {'name': 'date', 'type': 'date'}]}
+        expect = {'CountDistinctSchemas': 2, 'DistinctSchemas': [{'SchemaType': 'csv', 'Columns': [{'Name': 'type', 'Type': 'object'}, {'Name': 'price', 'Type': 'float64'}]},{'SchemaType': 'csv', 'Columns': [{'Name': 'type', 'Type': 'object'}, {'Name': 'price', 'Type': 'float64'}, {'Name': 'availabile', 'Type': 'bool'}, {'Name': 'date', 'Type': 'object'}]}], 'NonOverlappingColumns': [{'name': 'availabile', 'type': 'bool'}, {'name': 'date', 'type': 'object'}]}
         assert(schema.to_dict() == {'SchemaConflicts': expect})
 
 
@@ -155,8 +155,8 @@ class TestTextSchema:
         with fs.open(from_root('/test/sample_data/csv_no_header.csv')) as f:
             schema = from_file(f)
             assert(isinstance(schema, TextSchema))
-            assert(list(map(lambda c: c.name,schema.columns)) == ["col_0","col_1"])
-            assert(list(map(lambda c: c.type,schema.columns)) == ["string","number"])
+            assert(list(map(lambda c: c.name,schema.columns)) == [0,1])
+            assert(list(map(lambda c: c.type,schema.columns)) == ["object","float64"])
 
 class TestParquetSchema:
 
@@ -182,7 +182,7 @@ class TestParquetSchema:
         s = set([schema1, schema2, schema3])
         assert(len(s) == 2)
 
-        schema = find_conflicts([schema1, schema3])
+        schema = find_conflicts([schema1, schema3])[0]
         assert(isinstance(schema, SchemaConflict))
 
         assert(schema.to_dict()['SchemaConflicts']['NonOverlappingColumns'] == [{'name': 'test_name_2', 'type': 'test_type_2'}, {'name': 'test_name_3', 'type': 'test_type_3'}])

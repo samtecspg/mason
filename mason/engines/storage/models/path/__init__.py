@@ -8,7 +8,10 @@ class Path:
         self.path_str = path_str
         
     def clean_path_str(self) -> str:
-        return re.sub(r'(?<=[^:])\/\/', '/', self.path_str)
+        return re.sub(r'(?<=[^:])\/\/', '/', self.full_path())
 
     def full_path(self) -> str:
-        return "://".join([self.protocal, self.path_str])
+        if self.protocal != "file":
+            return "://".join([self.protocal, self.path_str])
+        else:
+            return self.path_str

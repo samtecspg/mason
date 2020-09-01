@@ -27,7 +27,7 @@ def find_conflicts(schemas: List[Schema]) -> Tuple[Union[Schema, SchemaConflict,
         paths = list(map(lambda s: s.path, schemas))
         return merge_json_schemas(schemas), paths
     elif len(schema_types) > 1:
-        return InvalidSchema(f"Mixed type schemas not supported at this time.  Ensure that files are of one type: {schema_types}"), []
+        return InvalidSchema(f"Mixed type schemas not supported at this time.  Ensure that files are of one type: {sorted(schema_types)}"), []
     else:
         non_empty_schemas = list(filter(lambda s: s.columns != [], schemas))
         paths = list(map(lambda s: s.path, non_empty_schemas))

@@ -39,9 +39,9 @@ def get(client_type: str, switch: int):
         if switch == 1:
             return ({'Errors': [], 'Info': [], 'Warnings': [], 'Data': [{'Name': 'catalog_poc_data', 'CreatedAt': '', 'CreatedBy': 'mason', 'Schema': {'SchemaType': 'parquet', 'Columns': [ {'Name': 'test_column_1', 'Type': 'INT32', 'ConvertedType': 'REQUIRED', 'RepititionType': None}, {'Name': 'test_column_2', 'Type': 'BYTE_ARRAY', 'ConvertedType': 'UTF8', 'RepititionType': 'OPTIONAL'}]}}]}, 200)
         elif switch == 2:
-            return ({'Errors': ['No keys at bad-database/catalog_poc_data'], 'Info': [],'Warnings': []}, 404)
+            return ({'Errors': ['No keys at s3://bad-database/catalog_poc_data'], 'Info': [],'Warnings': []}, 404)
         elif switch == 3:
-            return ({'Errors': ['No keys at crawler-poc/bad-table'], 'Info': [], 'Warnings': []}, 404)
+            return ({'Errors': ['No keys at s3://crawler-poc/bad-table'], 'Info': [], 'Warnings': []}, 404)
 
 def post(exists = True):
     if exists:

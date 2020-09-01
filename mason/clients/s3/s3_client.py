@@ -92,6 +92,7 @@ class S3Client(AWSClient):
         logger.info(f"Fetching keys at {path}")
         response: Response = resp or Response()
         
+        path = self.get_path(path).full_path()
         keys, response = self.list_keys(path, response)
 
         logger.debug(f"{len(keys)} keys at {path}")

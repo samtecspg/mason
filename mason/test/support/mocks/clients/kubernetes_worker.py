@@ -16,4 +16,6 @@ class KubernetesWorkerMock():
                 return (ExecutedJob('Table succesfully formatted as csv'), r)
             else:
                 return (InvalidJob('Invalid Dask Job: Invalid Schema'), r)
+        else:
+            raise Exception(f"Mock job not implemented: {job.type}")
 
