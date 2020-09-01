@@ -1,13 +1,13 @@
-from typing import Optional, Any
+from typing import Optional
 
 from mason.clients.responsable import Responsable
 from mason.clients.response import Response
 
 class OperatorResponse:
     
-    def __init__(self, response: Response, object: Optional[Responsable] = None):   #TODO: Generalize object
+    def __init__(self, resp: Response, object: Optional[Responsable] = None):   #TODO: Generalize object
         self.object = object
-        self.response = self.to_response(response, object)
+        self.response = self.to_response(resp, object)
 
     def to_response(self, response: Response, object: Optional[Responsable] = None) -> Response:
         if object:

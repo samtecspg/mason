@@ -1,27 +1,16 @@
 id: 4
+metastore_engine: s3
 storage_engine: s3
-scheduler_engine: airflow
-execution_engine: athena
-metastore_engine: glue
+execution_engine: dask
 clients:
   s3:
     configuration:
       aws_region: "{{AWS_REGION}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  glue:
+  dask:
     configuration:
-      aws_region: "{{AWS_REGION}}"
-      aws_role_arn: "{{GLUE_ROLE_ARN}}"
-      access_key: "{{AWS_ACCESS_KEY_ID}}"
-      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  athena:
-    configuration:
-      aws_region: "{{AWS_REGION}}"
-      access_key: "{{AWS_ACCESS_KEY_ID}}"
-      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  airflow:
-    configuration:
-      endpoint: "{{AWS_REGION}}"
-      user: "{{AIRFLOW_USER}}"
-      password: "{{AIRFLOW_PASSWORD}}"
+      runner:
+        type: "kubernetes_worker"
+        scheduler: "{{DASK_SCHEDULER}}"
+        

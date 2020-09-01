@@ -4,7 +4,15 @@
   "properties": {
     "runner": {
       "type": "object",
-      "properties": {}
+      "properties": {
+        "type": { 
+          "type":  "string",
+          "enum": [
+            "kubernetes_worker"
+          ]
+        }
+      },
+      "required": ["type"]
     }
   },
   "required": [ "runner" ]

@@ -8,7 +8,6 @@ from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
 from mason.workflows.workflow_run import WorkflowRun
 
-
 class LocalClient:
 
     def __init__(self, config: dict):
@@ -23,12 +22,12 @@ class LocalClient:
         return (schedule_name, response, None)
 
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
-        if self.dag:
-            workflow_run = WorkflowRun(self.dag)
+        dag = self.dag
+        if dag:
+            workflow_run = WorkflowRun(dag)
             response = workflow_run.run(env, response)
         else:
             response.add_error("Dag not found.  Run 'register_dag' first.")
-            
             
         return response
 

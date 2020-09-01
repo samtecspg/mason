@@ -5,6 +5,7 @@ import os
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.definitions import from_root
+from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
 from mason.examples.operators.table.get import api as table_get_api
 from mason.examples.operators.table.list import api as table_list_api
 from mason.examples.operators.table.refresh import api as table_refresh_api
@@ -14,6 +15,7 @@ from mason.operators.operator import Operator
 from mason.parameters.input_parameters import InputParameters
 from mason.test.support.testing_base import run_tests, clean_string, clean_uuid
 from mason.util.environment import MasonEnvironment
+from mason.util.logger import logger
 
 load_dotenv(from_root("/../.env.example"), override=True)
 
@@ -57,7 +59,7 @@ def test_get():
         response, status = table_get_api(env, config, database_name="crawler-poc", table_name="catalog_poc_data", log_level="fatal")
         assert((response, status) == expects.get(config.metastore.client_name, 1))
 
-    run_tests("table", "get", True, "fatal",["config_1", "config_2"],  tests)
+    run_tests("table", "get", True, "fatal", ["config_1", "config_2"],  tests)
 
 
 def test_refresh():
@@ -195,3 +197,19 @@ def test_infer():
     run_tests("table", "infer", True, "fatal", ["config_5"], tests)
 
 
+def test_format():
+    
+    load_dotenv(from_root("/../.env"), override=True)
+    
+    def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
+        params = InputParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:boogo,output_path:mason-sample-data/tests/out/csv/")
+        good = op.validate(config, params).run(env, Response())
+        invalid_job = good.object
+        assert(isinstance(invalid_job, InvalidJob))
+
+        params = InputParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:csv,output_path:good_output_path")
+        good = op.validate(config, params).run(env, Response())
+        executed_job = good.object
+        assert(isinstance(executed_job, ExecutedJob))
+
+    run_tests("table", "format", True, "fatal", ["config_6"], tests)

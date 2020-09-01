@@ -7,7 +7,6 @@ from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
 
-
 class ExecutionClient(Client):
 
     @abstractmethod

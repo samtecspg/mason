@@ -1,5 +1,6 @@
 id: 2
 metastore_engine: s3
+storage_engine: s3
 execution_engine: spark
 clients:
   s3:

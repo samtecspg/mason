@@ -31,27 +31,29 @@ class S3Mock:
         self.s3 = S3ClientMock()
 
     def open(self, key: str):
-        if (key == "crawler-poc/catalog_poc_data/test1.csv" or key == "crawler-poc/catalog_poc_data/test2.csv"):
+        if (key == "s3://crawler-poc/catalog_poc_data/test1.csv" or key == "s3://crawler-poc/catalog_poc_data/test2.csv"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
-        elif (key == "test-data/test-path/test1.usf"):
+        elif key in ["s3://tests/in/csv/sample.csv", "s3://tests/in/csv/sample2.csv"]:
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/csv_sample.csv'))
+        elif (key == "s3://test-data/test-path/test1.usf"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/unsupported_file_type.usf'))
-        elif (key == "test-data/test-path/test2.usf"):
+        elif (key == "s3://test-data/test-path/test2.usf"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/unsupported_file_type.usf'))
-        elif (key == "test-data/test-path/sample.snappy.parquet"):
+        elif (key == "s3://test-data/test-path/sample.snappy.parquet"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
-
+        elif (key == "s3://test-data/test-path/sample.snappy.parquet"):
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/sample.snappy.parquet'))
         else:
             raise Exception(f"Unmocked S3 API endpoint: {key}")
 
 
     def find(self, path: str):
-        if not path[0:5] == "s3://":
-            path = "s3://" + path
-
         if path == "s3://crawler-poc/catalog_poc_data":
             return ["crawler-poc/catalog_poc_data/test1.csv", "crawler-poc/catalog_poc_data/test2.csv"]
         elif path == "s3://bad-database/catalog_poc_data":
@@ -60,6 +62,8 @@ class S3Mock:
             return ["test-data/test-path/test1.usf", "test-data/test-path/test2.usf"]
         elif path == "s3://good_input_bucket_2/good_input_path":
             return ["test-data/test-path/sample.snappy.parquet"]
+        elif path == "s3://mason-sample-data/tests/in/csv/":
+            return ["tests/in/csv/sample.csv", "tests/in/csv/sample2.csv"]
         elif path == "s3://crawler-poc/bad-table":
             return []
         else:

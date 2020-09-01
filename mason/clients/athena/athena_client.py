@@ -150,7 +150,7 @@ class AthenaClient(AWSClient):
         return final, response
 
     def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
-        statement = generate_ddl(df=table.as_df(), name=table.name, location=path.path_str, schema=database.name)
+        statement = generate_ddl(df=table.as_df(), name=table.name, location=path.full_path(), schema=database.name)
         return DDLStatement(statement)
 
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:

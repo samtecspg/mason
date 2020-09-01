@@ -25,7 +25,7 @@ class GlueSchedulerClient(SchedulerClient):
             storage_path = op.config.storage.client.path(params.get_required("storage_path"))
             response = self.register_schedule(db_name, storage_path, schedule_name, schedule, response)
         else:
-            response.add_error("Glue Scheduler only defined for InferJob type which registers a glue crawler")
+            response.add_error("Glue Scheduler only defined for TableInfer type which registers a glue crawler")
 
         return (schedule_name, response, None)
 

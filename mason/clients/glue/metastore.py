@@ -18,7 +18,7 @@ class GlueMetastoreClient(MetastoreClient, ValidClient):
         self.client = GlueClient(config)
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
-        return self.client.get_database(database_name)
+        return self.client.get_database(database_name, response)
 
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
         return self.client.delete_table(database_name, table_name, response)

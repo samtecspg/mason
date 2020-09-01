@@ -8,7 +8,6 @@ parameters:
     - input_path
   optional:
     - extract_paths
-    - repartition_keys
     - parse_headers
 supported_configurations:
   - storage: "s3"

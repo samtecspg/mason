@@ -1,0 +1,20 @@
+type: "operator"
+namespace: "table"
+command: "format"
+description:  "Reformat and partition table data"
+parameters:
+  required:
+    - database_name
+    - table_name
+    - format
+    - output_path
+  optional:
+    - partition_columns
+    - filter_columns
+    - sample_size
+    - partitions
+supported_configurations:
+    - execution: "dask"
+      metastore: "s3"
+      storage: "s3"
+

@@ -14,6 +14,6 @@ class DaskRunner:
 class EmptyDaskRunner(DaskRunner):
 
     def run(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        raise NotImplementedError("Runner not implemented")
+        raise NotImplementedError("Empty Runner: not implemented")
 
 
