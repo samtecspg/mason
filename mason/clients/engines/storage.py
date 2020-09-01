@@ -1,4 +1,4 @@
-from typing import List, Optional, Union, Tuple
+from typing import Optional, Union, Tuple
 from abc import abstractmethod
 
 from mason.clients.client import Client
@@ -6,7 +6,6 @@ from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.table import Table, InvalidTables
 from mason.engines.storage.models.path import Path
-
 
 class StorageClient(Client):
 

@@ -42,4 +42,8 @@ class AthenaMetastoreClient(MetastoreClient, ValidClient):
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         return self.client.execute_ddl(ddl, database, response)
 
+    def list_partitions(self, table: Table, response: Optional[Response] = None) ->  Tuple[List[Path], Response]:
+        # SELECT "$path" FROM "my_database"."my_table" WHERE year=2019;
+        raise NotImplementedError("Athena Client list_partitions not implemented")
+
 

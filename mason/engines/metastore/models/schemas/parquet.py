@@ -6,6 +6,7 @@ from fastparquet import ParquetFile
 from fastparquet.schema import SchemaHelper
 
 from mason.engines.metastore.models.schemas.schema import SchemaElement, InvalidSchema, Schema
+from mason.engines.storage.models.path import Path
 from mason.util.list import get, flatten
 from typing import Optional, List
 from fsspec.spec import AbstractBufferedFile
@@ -52,24 +53,27 @@ class ParquetElement(SchemaElement):
 
 class ParquetSchema(Schema):
 
-    def __init__(self, columns: List[ParquetElement], schema_helper: Optional[SchemaHelper] = None):
+    def __init__(self, columns: List[ParquetElement], path: Path, schema_helper: Optional[SchemaHelper] = None):
         self._schema = schema_helper
-        self.columns = columns
-        self.type = 'parquet'
+        super().__init__(columns, 'parquet', path)
 
-def from_file(file: Union[AbstractBufferedFile, BufferedReader, LocalFileOpener]) -> Union[ParquetSchema, InvalidSchema]:
+def from_file(file: Union[AbstractBufferedFile, BufferedReader, LocalFileOpener], path: Path) -> Union[ParquetSchema, InvalidSchema]:
     if isinstance(file, AbstractBufferedFile) or isinstance(file, BufferedReader) or isinstance(file, LocalFileOpener):
-        schema: SchemaHelper = ParquetFile(file).schema
-        return schema_from_text(schema)
+        try:
+            schema: SchemaHelper = ParquetFile(file).schema
+            return schema_from_text(schema, path)
+        except ValueError as e:
+            from mason.util.exception import message
+            return InvalidSchema(f"Invalid Schema: {message(e)}")
     else:
         return InvalidSchema(f"Invalid Schema {file}")
 
-def schema_from_text(schema: SchemaHelper) -> ParquetSchema:
+def schema_from_text(schema: SchemaHelper, path: Path) -> ParquetSchema:
     text = schema.text
     split = text.split("\n")
     split.pop(0)
     column_elements: List[ParquetElement] = flatten(list(map(lambda line: element_from_text(line), split)))
-    return ParquetSchema(column_elements, schema)
+    return ParquetSchema(column_elements, path, schema)
 
 def element_from_text(line: str) -> Optional[ParquetElement]:
     split = line.lstrip("| - ").split(":")

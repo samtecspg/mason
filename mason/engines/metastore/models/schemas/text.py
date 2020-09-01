@@ -1,11 +1,17 @@
-from typing import Sequence, Optional, Union, List
-from tableschema import Table
-from tabulator import FormatError
+from typing import Sequence, Optional, Union, List, Tuple
 
 from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema, InvalidSchemaElement
+from mason.engines.storage.models.path import Path
 from mason.util.list import sequence
 from mason.util.exception import message
+import pandas as pd
 
+from mason.util.logger import logger
+
+SUPPORTED_TYPES = {
+    "CSV text": "csv",
+    "ASCII text, with CRLF, LF line terminators": "csv-crlf"
+}
 
 class TextElement(SchemaElement):
 
@@ -25,51 +31,43 @@ class TextElement(SchemaElement):
 
 class TextSchema(Schema):
 
-    def __init__(self, columns: Sequence[TextElement], type: str):
-        self.columns = columns
-        if type == "none":
-            self.type = 'text'
-        else:
-            self.type = 'text' + "-" + type
+    def __init__(self, columns: Sequence[TextElement], type: str, path: Path, line_terminator: str = "\n"):
+        self.inferred_type = type
+        self.line_terminator = line_terminator
+        super().__init__(columns, SUPPORTED_TYPES.get(type, ""), path)
 
-
-def from_file(file_name: str, type: str, header_length: int, read_headers: Optional[str]) -> Union[TextSchema, InvalidSchema]:
+def from_file(path: Path, type: str, header_length: int, sample, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
     headers = read_headers or False
     header_list: Union[List[str], bool]
 
-    if (headers == False):
-        header_list = list(map(lambda i: f"col_{i}", list(range(header_length))))
+    if (SUPPORTED_TYPES.get(type) == "csv-crlf"):
+        line_terminator = "\r"
     else:
-        header_list = True
+        line_terminator = "\n"
 
-    table = Table(file_name, headers=header_list)
+    header: Optional[int] = None
+    if headers:
+        header = 0
+
+    logger.debug(f"Reading Path: {path.full_path()}")
+    reader = pd.read_csv(path.full_path(), lineterminator=line_terminator, iterator=True, header=header)
+    df = reader.get_chunk(100)
+
     try:
-        table.infer()
-        fields = table.schema.descriptor.get('fields')
 
-        def get_element(f: dict) -> Union[TextElement, InvalidSchemaElement]:
-            name = f.get('name')
-            type = f.get('type')
-            if name and type:
-                return TextElement(name, type)
+        fields = [(k, v.name) for k, v in dict(df.dtypes).items()]
+        elements = list(map(lambda i: TextElement(*i), fields))
+
+        if len(elements) > 0:
+            if type in SUPPORTED_TYPES:
+                return TextSchema(elements, type, path, line_terminator)
             else:
-                return InvalidSchemaElement(f"Schema name or type not found: {f}")
-
-        valid, invalid = sequence(list(map(lambda f: get_element(f), fields)), TextElement, InvalidSchemaElement)
-        errors = list(map(lambda e: InvalidSchemaElement(str(e) + f" File: {file_name}"), table.schema.errors))
-
-        all_errors = invalid + errors
-        all_error_messages = " ,".join(list(map(lambda e: e.reason, all_errors)))
-
-        if len(invalid) > 0:
-            return InvalidSchema(f"Table Parse errors: {all_error_messages}")
-        elif len(valid) > 0:
-            return TextSchema(valid, type)
+                return InvalidSchema(f"Unsupported text type: {type}")
         else:
             return InvalidSchema("No valid table elements")
 
-    except FormatError as e:
-            return InvalidSchema(f'File type not supported for file {file_name} {message(e)}')
+    except Exception as e:
+            return InvalidSchema(f'File type not supported for file {path.path_str} {message(e)}')
 
 
 

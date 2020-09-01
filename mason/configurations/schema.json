@@ -15,7 +15,9 @@
       "type": "string",
       "enum": [
         "spark",
-        "athena"
+        "athena",
+        "dask",
+        "local"
       ]
     },
     "storage_engine": {
