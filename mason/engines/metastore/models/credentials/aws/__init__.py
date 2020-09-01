@@ -8,5 +8,5 @@ class AWSCredentials(MetastoreCredentials):
         self.secret_key = secret_key
 
     def to_dict(self):
-        {'access_key': self.access_key, 'secret_key': self.secret_key }
+        return {'access_key': self.access_key, 'secret_key': self.secret_key }
 

@@ -25,3 +25,4 @@ htmlcov/*
 /Notebooks/dask-worker-space/*
 mason/test/dask-worker-space/*
 mason/examples/operators/table/dask-worker-space/*
+dask-worker-space/*

@@ -16,6 +16,7 @@ class KubernetesWorker(DaskRunner):
     def __init__(self, config: dict):
         self.scheduler: str = config.get("scheduler") or "local:8786"
         self.num_workers = config.get("num_workers")
+        self.credentials = config.get("credentials")
         
     def client(self):
         if self.scheduler.startswith("local"):
@@ -85,7 +86,7 @@ class KubernetesWorker(DaskRunner):
                 return InvalidJob(job.message)
 
         with self.client() as client:
-            cluster_spec = ClusterSpec(client)
+            cluster_spec = ClusterSpec(client, scheduler=self.scheduler)
 
             final: Union[ExecutedJob, InvalidJob]
             if isinstance(dask_job, InvalidDaskJob):

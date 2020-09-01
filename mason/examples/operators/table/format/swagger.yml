@@ -1,10 +1,10 @@
 paths:
-  /table/{table_name}:
+  /table/format:
     get:
       operationId: "registered_operators.table.format.api"
       parameters:
         - name: database_name
-          in: path
+          in: query
           type: string
           required: true
         - name: table_name
@@ -19,19 +19,24 @@ paths:
           in: query
           type: string
           required: true
-          
         - name: partition_columns
           in: query
           type: string
-          required: true
-          
+        - name: filter_columns
+          in: query
+          type: string
+        - name: sample_size
+          in: query
+          type: string
+        - name: partitions
+          in: query
+          type: string
         - name: log_level
           in: query
           enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
           required: false
           type: string
           default: "info"
-          
       tags:
         - "Table"
       summary: "Format and repartition table and output to specified path"
@@ -40,13 +45,3 @@ paths:
         200:
           description: "Successful Format"
 
-#  required:
-#    - database_name
-#    - table_name
-#    - format
-#    - output_path
-#  optional:
-#    - partition_columns
-#    - filter_columns
-#    - sample_size
-#    - partitions

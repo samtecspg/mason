@@ -2,6 +2,7 @@ from typing import Optional
 
 from mason.engines.execution.models.jobs import InvalidJob
 from mason.engines.execution.models.jobs.format_job import FormatJob
+from mason.engines.metastore.models.credentials import MetastoreCredentials
 from mason.engines.metastore.models.table import Table
 
 from mason.clients.response import Response
@@ -28,12 +29,17 @@ class TableFormat(OperatorDefinition):
 
         outp = config.storage.client.path(output_path)
         table, response = config.metastore.client.get_table(database_name, table_name, options={"sample_size": sample_size}, response=response)
-        # credentials = config.metastore.client.credentials()
-        if isinstance(table, Table):
-            job = FormatJob(table, outp, format, partition_columns, filter_columns, partitions)
-            executed, response = config.execution.client.run_job(job, response)
+        credentials = config.metastore.client.credentials()
+        
+        if isinstance(credentials, MetastoreCredentials):
+            if isinstance(table, Table):
+                job = FormatJob(table, outp, format, partition_columns, filter_columns, partitions, credentials)
+                executed, response = config.execution.client.run_job(job, response)
+            else:
+                message = f"Table not found: {table_name}, {database_name}. Messages:  {table.message()}"
+                executed = InvalidJob(message)
         else:
-            message = f"Table not found: {table_name}, {database_name}. Messages:  {table.message()}"
+            message = f"Invalid Metastore Credentials: {credentials.reason}"
             executed = InvalidJob(message)
 
         return OperatorResponse(response, executed)
