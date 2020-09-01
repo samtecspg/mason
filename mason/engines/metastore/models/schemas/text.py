@@ -40,8 +40,8 @@ def from_file(path: Path, type: str, header_length: int, sample, read_headers: O
     headers = read_headers or False
     header_list: Union[List[str], bool]
 
-    if (type == "csv-crlf"):
-        line_terminator = "\r\n"
+    if (SUPPORTED_TYPES.get(type) == "csv-crlf"):
+        line_terminator = "\r"
     else:
         line_terminator = "\n"
 

@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python:3.8
 
 COPY ./requirements.txt /app/requirements.txt
 
@@ -12,6 +12,8 @@ RUN chmod +x /app/demos/run_demo.sh
 RUN pip3 install mypy
 
 RUN mkdir /mason
+run mkdir /root/.aws/
+run touch /root/.aws/credentials
 
 ENV MASON_HOME /mason/
 RUN cp .env.example ${MASON_HOME}/.env

@@ -21,6 +21,10 @@ def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, I
     sample_size = 10000
     sample = file.read(sample_size)
     file_type = magic.from_buffer(sample)
+    # TODO: Remove this hack for Debian  https://github.com/ahupp/python-magic/issues/208
+    if file.name.endswith(".csv") and file_type == "ASCII text":
+        file_type = "CSV text"
+        
     file.seek(0)
 
     path = get_path(file)
