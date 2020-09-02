@@ -194,7 +194,6 @@ class TestWorkflows:
             *step_2
             *step_3
             """
-            display = validated.dag.display()
             assert(clean_string(validated.dag.display()) == clean_string(display))
         else:
             raise Exception("Workflow not found")
@@ -223,49 +222,10 @@ class TestWorkflows:
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
-            assert(isinstance(validated, ValidWorkflow))
-            #TODO: How does display show multiple children, exactly?
-            display = """
-            *step_1
-            | |
-            | *step_4
-            | |
-            | *step_5
-            | /
-            *step_2
-            *step_3
-            """
-            # This overwrites the string to test against.
-            # Why is this in test 4?
-            # display = validated.dag.display()
-            assert(clean_string(validated.dag.display()) == clean_string(display))
+            assert(isinstance(validated, InvalidWorkflow))
+            assert(validated.reason == "Invalid DAG definition: Invalid Dag:  Cycle detected. Repeated steps: {'step_2'} Invalid Dag Steps: ")
         else:
             raise Exception("Workflow not found")
-
-    def test_workflow_parameters(self):
-        pass
-        # TODO:  Test AWS schedule expression here
-        # 
-        # step_params = {
-        #     "config_id": "5",
-        #     "parameters": {
-        #         "test_param": "test"
-        #     }
-        # }
-        # 
-        # params = {
-        #     "step_1": step_params,
-        #     "step_2": step_params,
-        #     "step_3": step_params
-        # }
-        # 
-        # params["schedule"] = "0 12 * * ? *"
-        # parameters = WorkflowParameters(parameter_dict=params)
-        # assert(parameters.schedule.definition == "test")
-
-        # params["schedule"] = "bogus"
-        # parameters = WorkflowParameters(parameter_dict=params)
-        # assert(parameters.schedule.definition == "test")
 
 
 
