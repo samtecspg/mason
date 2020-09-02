@@ -73,6 +73,35 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
+    def test_invalid_2(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+
+        # DAG has cycle
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
+
+        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow6/"), env)
+        wf = workflows.get_workflow(env, "namespace1", "workflow6")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, InvalidWorkflow))
+            assert(validated.reason == "Invalid DAG definition: Invalid Dag:  Cycle detected. Repeated steps: {'step_2'} Invalid Dag Steps: ")
+        else:
+            raise Exception("Workflow not found")
+
     def test_workflow_1_valid(self):
         env, mason_home = self.before()
         workflows.register_workflows(from_root("/test/support/workflows/"), env)
@@ -198,34 +227,6 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_6(self):
-        env, mason_home = self.before()
-        config = get_all(env)[0]['3']
-
-        # DAG has cycle
-        step_params = {
-            "config_id": "5",
-            "parameters": {
-                "test_param": "test"
-            }
-        }
-        params = {
-            "step_1": step_params,
-            "step_2": step_params,
-            "step_3": step_params,
-            "step_4": step_params,
-            "step_5": step_params
-        }
-
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow6/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow6")
-        if wf:
-            parameters = WorkflowParameters(parameter_dict=params)
-            validated = wf.validate(env, config, parameters)
-            assert(isinstance(validated, InvalidWorkflow))
-            assert(validated.reason == "Invalid DAG definition: Invalid Dag:  Cycle detected. Repeated steps: {'step_2'} Invalid Dag Steps: ")
-        else:
-            raise Exception("Workflow not found")
 
 
 
