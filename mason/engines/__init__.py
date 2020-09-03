@@ -3,11 +3,17 @@ from os import environ
 import re
 
 from botocore.configloader import raw_config_parse
+from botocore.exceptions import ConfigNotFound
+
 from mason.util.logger import logger
 
 def safe_interpolate_environment(config_doc: dict, credential_file:str = "~/.aws/credentials"):
     aws_profile = environ.get('AWS_PROFILE') or "default"
-    config = raw_config_parse(credential_file).get(aws_profile)
+    try:
+        config = raw_config_parse(credential_file).get(aws_profile)
+    except ConfigNotFound as e:
+        logger.warning("AWS Config not found")
+        config = None
 
     return {k: interpolate_value(v, config) for k, v in config_doc.items()}
 
