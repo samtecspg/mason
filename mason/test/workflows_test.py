@@ -265,6 +265,105 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
+def test_workflow_operator_multiple_roots_valid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
 
+        # DAG has multiple roots, but is structurally sound.
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
 
+        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow8_1/"), env)
+        wf = workflows.get_workflow(env, "namespace1", "workflow8_1")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, ValidWorkflow))
+            display = """
+            * step_1
+            * step_4
+            | * step_2
+            | * step_3
+            |/  
+            * step_5
+            """
+            assert(clean_string(validated.dag.display()) == clean_string(display))
+        else:
+            raise Exception("Workflow not found")
 
+def test_workflow_operator_multiple_roots_cycle_invalid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+
+        # DAG has multiple roots, and a cycle occurs downstream of the second root.
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
+
+        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow8_2/"), env)
+        wf = workflows.get_workflow(env, "namespace1", "workflow8_2")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, InvalidWorkflow))
+            assert(validated.reason == "Invalid DAG definition: Invalid Dag: Cycle detected. Repeated steps: step_3 Invalid Dag Steps: ")
+        else:
+            raise Exception("Workflow not found")
+
+def test_workflow_operator_multiple_roots_forest_valid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+
+        # DAG has multiple disconnected roots, but is structurally sound.
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
+
+        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow8_3/"), env)
+        wf = workflows.get_workflow(env, "namespace1", "workflow8_3")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, ValidWorkflow))
+            #TODO: Ensure display string matches good grapher output.
+            display = """
+            * step_1
+            * step_4
+            * step_5
+            | * step_2
+            | * step_3
+            """
+            assert(clean_string(validated.dag.display()) == clean_string(display))
+        else:
+            raise Exception("Workflow not found")
