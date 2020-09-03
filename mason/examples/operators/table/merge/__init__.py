@@ -19,7 +19,7 @@ class TableMerge(OperatorDefinition):
     def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
         SUPPORTED_SCHEMAS = {
             "parquet",
-            "text",
+            "csv",
             "json",
             "jsonl"
         }

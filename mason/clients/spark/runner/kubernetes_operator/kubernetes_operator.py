@@ -62,7 +62,7 @@ class KubernetesOperator(SparkRunner):
         
         response: Response = resp or Response()
 
-        job.set_id(job.type + "_" + str(uuid4()))
+        job.set_id(job.type + "-" + str(uuid4()))
         merged_config = merge_config(config, job)
         job_id = merged_config["metadata"]["name"]
         conf = dict(merged_config)
@@ -77,12 +77,10 @@ class KubernetesOperator(SparkRunner):
             stdout, stderr = run_sys_call(command)
 
             if len(stdout) > 0:
-                job.add_log(stdout)
-                final = job.running()
+                final = job.running(stdout)
             else:
                 if len(stderr) > 0:
-                    job.add_log(stderr)
-                    final = job.errored()
+                    final = job.errored(stderr)
                 else:
                     final =  job.running()
                     

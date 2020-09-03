@@ -9,7 +9,6 @@ import os
 import pytest  # type: ignore
 import shutil
 
-
 def print_result(result):
     print()
     print(result.output)
@@ -32,4 +31,4 @@ class TestCLI:
         print_result(runner.invoke(config, [from_root('/examples/configs/')]))
         print_result(runner.invoke(config, ["-s", "2"]))
         print_result(runner.invoke(register, [ from_root('/examples/') ]))
-        print_result(runner.invoke(operator, ['table', 'merge', '-p', 'input_path:mason-sample-data/tests/in/csv/,output_path:mason-sample-data/tests/out/merge/'], catch_exceptions=False))
+        print_result(runner.invoke(operator, ['table', 'merge', '-p', 'input_path:mason-sample-data/tests/in/merge/,output_path:mason-sample-data/tests/out/merge/'], catch_exceptions=False))
