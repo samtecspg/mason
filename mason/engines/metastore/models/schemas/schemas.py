@@ -21,10 +21,16 @@ def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, I
     sample_size = 10000
     sample = file.read(sample_size)
     file_type = magic.from_buffer(sample)
+    
+    # file magic is not great, find a way to replace it 
     # TODO: Remove this hack for Debian  https://github.com/ahupp/python-magic/issues/208
-    if file.name.endswith(".csv") and file_type == "ASCII text":
+    path_str = get_path(file).path_str
+    if path_str.endswith(".csv") and file_type == "ASCII text":
         file_type = "CSV text"
-        
+    # TODO: Remove this hack for Ubuntu 
+    elif (path_str.endswith(".json") or path_str.endswith(".jsonl")) and file_type == "ASCII text":
+        file_type = "JSON data"
+
     file.seek(0)
 
     path = get_path(file)
