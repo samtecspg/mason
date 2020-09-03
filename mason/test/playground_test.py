@@ -30,6 +30,6 @@ class TestCLI:
         load_dotenv(from_root("/../.env"), override=True)
         runner = CliRunner()
         print_result(runner.invoke(config, [from_root('/examples/configs/')]))
-        print_result(runner.invoke(config, ["-s", "4"]))
+        print_result(runner.invoke(config, ["-s", "2"]))
         print_result(runner.invoke(register, [ from_root('/examples/') ]))
-        print_result(runner.invoke(operator, ['table', 'format', '-p', 'sample_size:1,format:csv,database_name:mason-sample-data,table_name:tests/in/csv/,output_path:mason-sample-data/tests/out/csv/,partition_columns:vendor_name,partitions=20'], catch_exceptions=False))
+        print_result(runner.invoke(operator, ['table', 'merge', '-p', 'input_path:mason-sample-data/tests/in/csv/,output_path:mason-sample-data/tests/out/merge/'], catch_exceptions=False))
