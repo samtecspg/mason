@@ -1,6 +1,6 @@
 ![Mason Logo](images/mason_logo.png) 
 
-# Mason - Data Operator Framework 
+# Mason Data Operator Framework 
 
 What is Mason?
 1.  It creates a data-aware alternative to Airflow operators that depends less heavily on Python scripting.
