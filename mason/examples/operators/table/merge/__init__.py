@@ -1,11 +1,11 @@
-from typing import Set, Union, Tuple
+from typing import Set, Union
 
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
-from mason.engines.execution.models.jobs import InvalidJob, Job
+from mason.engines.execution.models.jobs import InvalidJob
 from mason.engines.execution.models.jobs.executed_job import ExecutedJob
 from mason.engines.execution.models.jobs.merge_job import MergeJob
-from mason.engines.metastore.models.table import Table, InvalidTable, ConflictingTable
+from mason.engines.metastore.models.table import Table
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
@@ -52,5 +52,5 @@ class TableMerge(OperatorDefinition):
                     final = InvalidJob(f"Unsupported schemas for merge operator: {', '.join(list(schema_types.difference(SUPPORTED_SCHEMAS)))}")
             else:
                 final = InvalidJob(f"No conflicting schemas found at {input_path}. Merge unecessary. Invalid Schemas {table.message()}")
-        
+                
         return OperatorResponse(response, final) 
