@@ -1,8 +1,8 @@
 type: "workflow"
-namespace: "namespace1"
-command: "workflow4"
-name: "test_schedule"
-description: "Test Workflow"
+namespace: "testing_namespace"
+command: "workflow_multiple_roots_forest"
+name: "test_multiple_roots_forest_valid"
+description: "Test Workflow: A Graph of a Forest"
 dag:
     - id: "step_1"
       type: "operator"
@@ -12,22 +12,20 @@ dag:
       type: "operator"
       namespace: "namespace1"
       command: "operator2"
-      dependencies: ["step_1", "step_5", "step_4"]
-      retry: "exponential"
     - id: "step_3"
       type: "operator"
-      namespace: "namespace2"
+      namespace: "namespace1"
       command: "operator3"
       dependencies: ["step_2"]
     - id: "step_4"
       type: "operator"
-      namespace: "namespace2"
+      namespace: "namespace1"
       command: "operator4"
-      dependencies: []
+      dependencies: ["step_1"]
     - id: "step_5"
       type: "operator"
       namespace: "namespace1"
       command: "operator2"
-      dependencies: []
+      dependencies: ["step_4"]
 supported_schedulers:
   - "test2"

@@ -1,7 +1,7 @@
 type: "workflow"
-namespace: "namespace1"
-command: "workflow7"
-name: "test_self_reference"
+namespace: "testing_namespace"
+command: "workflow_basic"
+name: "test_basic_workflow"
 description: "Test Workflow"
 dag:
     - id: "step_1"
@@ -12,22 +12,12 @@ dag:
       type: "operator"
       namespace: "namespace1"
       command: "operator2"
-      dependencies: ["step_1", "step_2"]  # depends on itself
+      dependencies: ["step_1"]
       retry: "exponential"
     - id: "step_3"
       type: "operator"
       namespace: "namespace2"
       command: "operator3"
       dependencies: ["step_2"]
-    - id: "step_4"
-      type: "operator"
-      namespace: "namespace2"
-      command: "operator4"
-      dependencies: ["step_3"]
-    - id: "step_5"
-      type: "operator"
-      namespace: "namespace1"
-      command: "operator2"
-      dependencies: ["step_4"]
 supported_schedulers:
   - "test2"

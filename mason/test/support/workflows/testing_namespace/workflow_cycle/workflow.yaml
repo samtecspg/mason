@@ -1,8 +1,8 @@
 type: "workflow"
-namespace: "namespace1"
-command: "workflow8_3"
-name: "test_multiple_roots_forest_valid"
-description: "Test Workflow"
+namespace: "testing_namespace"
+command: "workflow_cycle"
+name: "test_workflow_with_cycle"
+description: "Test Workflow: Invalid due to Cycle"
 dag:
     - id: "step_1"
       type: "operator"
@@ -12,16 +12,18 @@ dag:
       type: "operator"
       namespace: "namespace1"
       command: "operator2"
+      dependencies: ["step_1", "step_4"]  # has a cycle 2->3->4->2
+      retry: "exponential"
     - id: "step_3"
       type: "operator"
-      namespace: "namespace1"
+      namespace: "namespace2"
       command: "operator3"
       dependencies: ["step_2"]
     - id: "step_4"
       type: "operator"
-      namespace: "namespace1"
+      namespace: "namespace2"
       command: "operator4"
-      dependencies: ["step_1"]
+      dependencies: ["step_3"]
     - id: "step_5"
       type: "operator"
       namespace: "namespace1"

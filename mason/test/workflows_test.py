@@ -38,10 +38,10 @@ class TestWorkflows:
         if os.path.exists(mason_home):
             shutil.rmtree(mason_home)
 
-    def test_workflow_1_valid(self):
+    def test_workflow_basic_valid(self):
         env, mason_home = self.before()
         workflows.register_workflows(from_root("/test/support/workflows/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow1")
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_basic")
         config = get_all(env)[0]['3']
 
         step_params = {
@@ -67,11 +67,11 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_1_invalid(self):
+    def test_workflow_step_params_invalid(self):
         env, mason_home = self.before()
         
         workflows.register_workflows(from_root("/test/support/workflows/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow1")
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_basic")
         config = get_all(env)[0]['3']
 
         step_params = {
@@ -82,7 +82,7 @@ class TestWorkflows:
         }
         
         # Broken dag, unreachable nodes
-        params = {  "step_2": step_params }
+        params = { "step_2": step_params }
         parameters = WorkflowParameters(parameter_dict=params)
         if wf:
             validated = wf.validate(env, config, parameters)
@@ -102,7 +102,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_3_valid(self):
+    def test_workflow_nonexistent_step_and_cycle_valid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -119,8 +119,8 @@ class TestWorkflows:
             "step_4": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow3/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow3")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_nonexistent_step_and_cycle/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_nonexistent_step_and_cycle")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
@@ -132,7 +132,7 @@ class TestWorkflows:
             raise Exception("Workflow not found")
 
 
-    def test_workflow_2_invalid(self):
+    def test_workflow_cycle_invalid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -149,8 +149,8 @@ class TestWorkflows:
             "step_4": step_params
         }
         
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow2/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow2")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_cycle/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_cycle")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
@@ -161,7 +161,7 @@ class TestWorkflows:
             raise Exception("Workflow not found")
     
 
-    def test_workflow_4_valid(self):
+    def test_workflow_with_multiple_roots_valid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
         
@@ -179,8 +179,8 @@ class TestWorkflows:
             "step_5": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow4/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow4")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
@@ -198,7 +198,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_6_valid(self):
+    def test_workflow_parallel_without_cycles_valid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
         
@@ -216,8 +216,8 @@ class TestWorkflows:
             "step_5": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow6/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow6")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_parallel_without_cycles/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_parallel_without_cycles")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
@@ -236,7 +236,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_operator_self_dep_invalid(self):
+    def test_workflow_operator_self_dependency_invalid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -255,8 +255,8 @@ class TestWorkflows:
             "step_5": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow7/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow7")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_operator_self_dependency/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_operator_self_dependency")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
@@ -265,7 +265,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_operator_multiple_roots_valid(self):
+def test_workflow_with_multiple_roots_valid_2(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -284,8 +284,8 @@ class TestWorkflows:
             "step_5": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow8_1/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow8_1")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots_2/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots_2")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
@@ -302,7 +302,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_operator_multiple_roots_cycle_invalid(self):
+def test_workflow_multiple_roots_cycle_invalid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -321,8 +321,8 @@ class TestWorkflows:
             "step_5": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow8_2/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow8_2")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots_cycle/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots_cycle")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
@@ -331,7 +331,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_operator_multiple_roots_forest_valid(self):
+def test_workflow_multiple_roots_forest_valid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -350,8 +350,8 @@ class TestWorkflows:
             "step_5": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow8_3/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow8_3")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots_forest/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots_forest")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
