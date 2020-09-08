@@ -136,8 +136,8 @@ class TestLocal:
             "step_6": step_params,
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow5/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow5")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_local_scheduler/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_local_scheduler")
         logger.set_level("fatal")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
