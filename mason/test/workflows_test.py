@@ -265,7 +265,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-def test_workflow_with_multiple_roots_valid_2(self):
+    def test_workflow_with_multiple_roots_valid_2(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -302,7 +302,7 @@ def test_workflow_with_multiple_roots_valid_2(self):
         else:
             raise Exception("Workflow not found")
 
-def test_workflow_multiple_roots_cycle_invalid(self):
+    def test_workflow_multiple_roots_cycle_invalid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -331,7 +331,7 @@ def test_workflow_multiple_roots_cycle_invalid(self):
         else:
             raise Exception("Workflow not found")
 
-def test_workflow_multiple_roots_forest_valid(self):
+    def test_workflow_multiple_roots_forest_valid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
