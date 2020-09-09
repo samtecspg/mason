@@ -18,14 +18,21 @@ class Dag:
         self.command = command
         self.steps = flatten(list(map(lambda step: DagStep(step), dag_config)))
 
-    def validate(self, env: MasonEnvironment, all_parameters: WorkflowParameters) -> Union[ValidDag, InvalidDag]:
+    def validate(self, env: MasonEnvironment, all_parameters: WorkflowParameters, strict: bool = True) -> Union[ValidDag, InvalidDag]:
         all_steps = self.steps
         all_step_ids = list(map(lambda s: s.id,all_steps))
         validated: List[Union[ValidDagStep, InvalidDagStep]] = flatten(list(map(lambda s: s.validate(env, all_parameters, all_step_ids), self.steps)))
         valid_steps, invalid_steps = sequence(validated, ValidDagStep, InvalidDagStep)
         
         roots: List[ValidDagStep] = [v for v in valid_steps if len(v.dependencies) == 0]
-        return self.validate_dag(valid_steps, invalid_steps, roots)
+        
+        if strict:
+            if len(invalid_steps) > 0:
+                return InvalidDag("Invalid DAG, contains invalid steps.  Turn strict to false to allow more permissive validation", valid_steps, invalid_steps)
+            else:
+                return self.validate_dag(valid_steps, invalid_steps, roots)
+        else:
+            return self.validate_dag(valid_steps, invalid_steps, roots)
 
     def validate_dag(self, valid_steps: List[ValidDagStep], invalid_steps: List[InvalidDagStep], roots: List[ValidDagStep]) -> Union[ValidDag, InvalidDag]:
         if len(valid_steps) == 0:
