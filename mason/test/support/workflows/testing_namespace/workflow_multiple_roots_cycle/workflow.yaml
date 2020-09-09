@@ -14,12 +14,12 @@ dag:
       command: "operator2"
     - id: "step_3"
       type: "operator"
-      namespace: "namespace1"
+      namespace: "namespace2"
       command: "operator3"
       dependencies: ["step_2", "step_4"] # Cycle: 3 -> 4 -> 3
     - id: "step_4"
       type: "operator"
-      namespace: "namespace1"
+      namespace: "namespace2"
       command: "operator4"
       dependencies: ["step_3"]
     - id: "step_5"
