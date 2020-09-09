@@ -31,6 +31,8 @@ class Dag:
                 return InvalidDag("Invalid DAG, contains invalid steps.  Turn strict to false to allow more permissive validation", valid_steps, invalid_steps)
             else:
                 return self.validate_dag(valid_steps, invalid_steps, roots)
+        else:
+            return self.validate_dag(valid_steps, invalid_steps, roots)
 
     def validate_dag(self, valid_steps: List[ValidDagStep], invalid_steps: List[InvalidDagStep], roots: List[ValidDagStep]) -> Union[ValidDag, InvalidDag]:
         if len(valid_steps) == 0:
