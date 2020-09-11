@@ -26,11 +26,8 @@ class Dag:
         
         roots: List[ValidDagStep] = [v for v in valid_steps if len(v.dependencies) == 0]
         
-        if strict:
-            if len(invalid_steps) > 0:
-                return InvalidDag("Invalid DAG, contains invalid steps.  Turn strict to false to allow more permissive validation", valid_steps, invalid_steps)
-            else:
-                return self.validate_dag(valid_steps, invalid_steps, roots)
+        if strict and len(invalid_steps) > 0:
+            return InvalidDag("Invalid DAG, contains invalid steps.  Turn strict to false to allow more permissive validation", valid_steps, invalid_steps)
         else:
             return self.validate_dag(valid_steps, invalid_steps, roots)
 
