@@ -82,12 +82,16 @@ class TestWorkflows:
         }
         
         # Broken dag, unreachable nodes
+        # With strict DAG validation setting, throws an error earlier in validation.
         params = { "step_2": step_params }
         parameters = WorkflowParameters(parameter_dict=params)
         if wf:
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, InvalidWorkflow))
-            assert("Invalid DAG definition: Invalid Dag: Unreachable steps:"  in validated.reason)
+            # assert("Invalid DAG definition: Invalid Dag: Unreachable steps:"  in validated.reason)
+            # What's `Invalid Parameters: ` indicating? It's folllowed only by a blank for both of these.
+            assert("Workflow Parameters for step:step_1 not specified. Invalid Parameters: " in validated.reason)
+            assert("Workflow Parameters for step:step_3 not specified. Invalid Parameters: " in validated.reason)
 
             params = {
                 "step_1": step_params,
@@ -102,7 +106,7 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_nonexistent_step_and_cycle_valid(self):
+    def test_workflow_nonexistent_step_and_cycle_invalid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
@@ -127,7 +131,9 @@ class TestWorkflows:
 
             # step 3 is invalid due to non-existent reference.  This removes the cycle and marks workflow valid.
             # Q:  is this desired?
-            assert(isinstance(validated, ValidWorkflow))
+            # assert(isinstance(validated, ValidWorkflow))
+            # With strict DAG validation setting, this is marked invalid.
+            assert(isinstance(validated, InvalidWorkflow))
         else:
             raise Exception("Workflow not found")
 
@@ -146,7 +152,8 @@ class TestWorkflows:
             "step_1": step_params,
             "step_2": step_params,
             "step_3": step_params,
-            "step_4": step_params
+            "step_4": step_params,
+            "step_5": step_params
         }
         
         workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_cycle/"), env)
@@ -156,7 +163,7 @@ class TestWorkflows:
             validated = wf.validate(env, config, parameters)
 
             assert(isinstance(validated, InvalidWorkflow))
-            assert(validated.reason == 'Invalid DAG definition: Invalid Dag: Cycle detected. Repeated steps: step_2 Invalid Dag Steps: Workflow Parameters for step:step_5 not specified. Invalid Parameters: ')
+            assert(validated.reason == 'Invalid DAG definition: Invalid Dag: Cycle detected. Repeated steps: step_2 Invalid Dag Steps: ')
         else:
             raise Exception("Workflow not found")
     
@@ -188,9 +195,9 @@ class TestWorkflows:
             display = """
             *step_1
             | *step_5
-            | /
+            |/
             | *step_4
-            | /
+            |/
             *step_2
             *step_3
             """
@@ -291,11 +298,11 @@ class TestWorkflows:
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, ValidWorkflow))
             display = """
-            * step_1
-            * step_4
-            | * step_2
-            | * step_3
-            |/  
+            * step_2
+            | * step_1
+            * | step_3
+            | * step_4
+            |/
             * step_5
             """
             assert(clean_string(validated.dag.display()) == clean_string(display))
@@ -358,11 +365,12 @@ class TestWorkflows:
             assert(isinstance(validated, ValidWorkflow))
             #TODO: Ensure display string matches good grapher output.
             display = """
-            * step_1
+            * step_2
+            | * step_1
+            * | step_3
+             /
             * step_4
             * step_5
-            | * step_2
-            | * step_3
             """
             assert(clean_string(validated.dag.display()) == clean_string(display))
         else:
