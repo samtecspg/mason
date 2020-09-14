@@ -14,7 +14,6 @@ from mason.engines.metastore.models.schemas import check_schemas as CheckSchemas
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema
 from mason.util.list import get, sequence
 
-
 class S3Client(AWSClient):
     def __init__(self, s3_config: dict):
         super().__init__(**s3_config)

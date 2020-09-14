@@ -35,4 +35,5 @@ mason_dask==0.1.22
 Markdown==3.2.2
 lambdas==0.1.0
 returns==0.14.0
+partd>=0.3.10
 
