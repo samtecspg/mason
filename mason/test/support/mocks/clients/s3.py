@@ -62,6 +62,8 @@ class S3Mock:
             return ["test-data/test-path/test1.usf", "test-data/test-path/test2.usf"]
         elif path == "s3://good_input_bucket_2/good_input_path":
             return ["test-data/test-path/sample.snappy.parquet"]
+        elif path == "s3://good_database/good_table" or path == "s3://access_denied/good_table":
+            return ["tests/in/csv/sample.csv", "tests/in/csv/sample2.csv"]
         elif path == "s3://mason-sample-data/tests/in/csv/":
             return ["tests/in/csv/sample.csv", "tests/in/csv/sample2.csv"]
         elif path == "s3://crawler-poc/bad-table":

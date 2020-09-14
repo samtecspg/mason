@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 
 from distributed import Client
+from returns.result import Result
 
 from mason.engines.execution.models.jobs.query_job import QueryJob
 from mason.clients.dask.runner.dask_runner import DaskRunner
@@ -10,6 +11,9 @@ from mason.engines.execution.models.jobs.format_job import FormatJob
 from mason.util.exception import message
 
 from typing import Union
+
+from mason.util.result import compute
+
 
 class KubernetesWorker(DaskRunner):
 
@@ -50,7 +54,7 @@ class KubernetesWorker(DaskRunner):
                 if isinstance(job, FormatJob):
                     final = self.run_job(job.type, job.spec(), self.scheduler, mode) or ExecutedJob("format_job", f"Job queued to format {job.table.schema.type} table as {job.format} and save to {job.output_path.path_str}")
                 elif isinstance(job, QueryJob):
-                    self.run_job(job.type, job.spec(), self.scheduler)
+                    final = self.run_job(job.type, job.spec(), self.scheduler)
                 else:
                     final = job.errored("Job type not supported for Dask")
             else:
@@ -69,21 +73,27 @@ class KubernetesWorker(DaskRunner):
         from mason_dask.jobs.executed import ExecutedJob as ExecutedDaskJob
         from mason_dask.jobs.executed import InvalidJob as InvalidDaskJob
 
-        from mason_dask.jobs.format import FormatJob as DaskFormatJob
         from mason_dask.utils.cluster_spec import ClusterSpec
 
         if job_type == "format":
+            from mason_dask.jobs.format import FormatJob as DaskFormatJob
             job = DaskFormatJob(spec)
+        elif job_type == "query":
+            from mason_dask.jobs.query import QueryJob as DaskQueryJob
+            job = DaskQueryJob(spec)
         else:
             raise NotImplementedError(f"Job not implemented: {job_type}")
 
         dask_job = job.validate()
 
-        def to_mason_job(job: Union[ExecutedDaskJob, InvalidDaskJob]):
-            if isinstance(job, ExecutedDaskJob):
-                return ExecutedJob("format-job", job.message)
+        def to_mason_job(job: Result[ExecutedDaskJob, InvalidDaskJob]):
+            j = compute(job)
+            if isinstance(j, ExecutedDaskJob):
+                return ExecutedJob("format-job", j.message)
             else:
-                return InvalidJob(job.message)
+                value = job._inner_value
+                assert(isinstance(value, InvalidDaskJob))
+                return InvalidJob(value.message)
 
         with self.client() as client:
             cluster_spec = ClusterSpec(client, scheduler=self.scheduler)
@@ -92,9 +102,9 @@ class KubernetesWorker(DaskRunner):
             if isinstance(dask_job, InvalidDaskJob):
                 final = InvalidJob(f"Invalid Dask Job: {dask_job.message}")
             else:
-                result: Union[ExecutedDaskJob, InvalidDaskJob]
+                result: Result[ExecutedDaskJob, InvalidDaskJob]
                 if scheduler.startswith("local"):
-                    result = dask_job.run(cluster_spec)
+                    result = dask_job.run()
                     final = to_mason_job(result)
                 else:
                     dask.config.set({'distributed.scheduler.allowed-failures': 50})

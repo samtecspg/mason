@@ -5,7 +5,6 @@ from distributed import Client, fire_and_forget
 
 def run(spec: dict, scheduler: str):
     
-    # TODO: Abstract out mason-dask into its own package
     class CompleteDaskJob:
         def __init__(self, message: str = ""):
             self.message = message

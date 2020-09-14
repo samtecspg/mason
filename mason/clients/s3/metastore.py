@@ -1,5 +1,5 @@
 from urllib.parse import urlparse
-from typing import Tuple, List, Union, Optional
+from typing import Tuple, Union, Optional
 
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.valid_client import ValidClient

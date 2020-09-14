@@ -106,10 +106,10 @@ class AthenaClient(AWSClient):
         try:
             request_token = str(uuid4())
             athena_response = self.client().start_query_execution(
-                QueryString=job.query_string,
+                QueryString=job.query_string.replace("$table", job.table.name),
                 ClientRequestToken=request_token,
                 QueryExecutionContext={
-                    'Database': job.database.name
+                    'Database': job.table.database_name
                 },
                 WorkGroup='mason'
             )
@@ -154,7 +154,7 @@ class AthenaClient(AWSClient):
         return DDLStatement(statement)
 
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        job = QueryJob(ddl.statement, database)
+        job = QueryJob(ddl.statement, database.tables[0])
         return self.query(job, response)
 
 

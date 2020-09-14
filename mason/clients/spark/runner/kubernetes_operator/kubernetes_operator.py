@@ -62,7 +62,7 @@ class KubernetesOperator(SparkRunner):
         
         response: Response = resp or Response()
 
-        job.set_id(job.type + "-" + str(uuid4()))
+        job.set_id("mason" + "-" + job.type + "-" + str(uuid4()))
         merged_config = merge_config(config, job)
         job_id = merged_config["metadata"]["name"]
         conf = dict(merged_config)

@@ -13,7 +13,6 @@ from pandas import DataFrame as PDataFrame
 
 from mason.engines.storage.models.path import Path
 
-
 class Table(Responsable):
 
     def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None, paths: List[Path] = []):
@@ -88,8 +87,9 @@ class ConflictingTable(InvalidTable):
 
 class InvalidTables(Responsable):
 
-    def __init__(self, invalid_tables: List[InvalidTable]):
+    def __init__(self, invalid_tables: List[InvalidTable], error: Optional[str] = None):
         self.invalid_tables = invalid_tables
+        self.error = error
 
     def conflicting_table(self):
         return next((x for x in self.invalid_tables if isinstance(x, ConflictingTable)), None)
@@ -100,6 +100,9 @@ class InvalidTables(Responsable):
     def to_response(self, response: Response) -> Response:
         for it in self.invalid_tables:
             response = it.to_response(response)
+            
+        if self.error:
+            response.add_error(self.error)
             
         return response
             

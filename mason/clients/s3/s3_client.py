@@ -1,5 +1,3 @@
-import re
-
 from botocore.errorfactory import ClientError
 from typing import Optional, List, Union, Tuple
 import s3fs

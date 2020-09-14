@@ -4,8 +4,11 @@ command: "query"
 description:  "Query metastore tables"
 parameters:
   required:
-    - query_string
     - database_name
+    - table_name
+    - query_string
+  optional:
+    - output_path
 supported_configurations:
   - metastore: "glue"
     execution: "athena"
