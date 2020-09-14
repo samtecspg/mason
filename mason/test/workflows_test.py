@@ -373,5 +373,8 @@ class TestWorkflows:
             * step_5
             """
             # assert(clean_string(validated.dag.display()) == clean_string(display))
+            
+            # In place of a defstring, ensure that the DAG contains as many nodes as it should.
+            assert(len(validated.dag.get_nodes()) == 5)
         else:
             raise Exception("Workflow not found")
