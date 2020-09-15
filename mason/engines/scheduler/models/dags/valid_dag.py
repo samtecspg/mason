@@ -93,7 +93,7 @@ class ValidDag:
     def display(self) -> str:
         with tempfile.NamedTemporaryFile(mode='w+', delete=False) as temp:
             graph = Graph(fh=temp)
-            nodes = self.get_nodes()
+            nodes = sorted(self.get_nodes(), key=lambda n: n.item)
             graph.show_nodes(nodes)
                 
         with open(temp.name) as f:

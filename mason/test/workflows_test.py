@@ -194,13 +194,13 @@ class TestWorkflows:
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, ValidWorkflow))
             display = """
-            *step_1
-            | *step_5
-            |/
-            | *step_4
-            |/
-            *step_2
-            *step_3
+            * step_1
+            | * step_4
+            |/  
+            | * step_5
+            |/  
+            * step_2
+            * step_3
             """
             assert(clean_string(validated.dag.display()) == clean_string(display))
         else:
@@ -299,11 +299,11 @@ class TestWorkflows:
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, ValidWorkflow))
             display = """
-            * step_2
-            | * step_1
-            * | step_3
-            | * step_4
-            |/
+            * step_1
+            | * step_2
+            * | step_4
+            | * step_3
+            |/  
             * step_5
             """
             assert(clean_string(validated.dag.display()) == clean_string(display))
@@ -364,18 +364,18 @@ class TestWorkflows:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, ValidWorkflow))
-            #TODO: asciidag doesn't seem to have consistent output here. Once patched, add assert back.
+            
             display = """
-            * step_2
-            | * step_1
-            * | step_3
-             /
-            * step_4
+            * step_1
+            | * step_2
+            * | step_4
+            | * step_3
             * step_5
             """
-            # assert(clean_string(validated.dag.display()) == clean_string(display))
+
+            print(validated.dag.display())
             
-            # In place of a defstring, ensure that the DAG contains as many nodes as it should.
-            assert(len(validated.dag.get_nodes()) == 5)
+            assert(clean_string(validated.dag.display()) == clean_string(display))
+            assert(len(validated.dag.valid_steps) == 5)
         else:
             raise Exception("Workflow not found")

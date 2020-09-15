@@ -7,7 +7,7 @@ from mason.engines.scheduler.models.dags.executed_dag_step import ExecutedDagSte
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 from mason.workflows.workflow_definition import WorkflowDefinition
 
-class Namespace1Workflow5(WorkflowDefinition):
+class TestingNamespaceWorkflowLocalScheduler(WorkflowDefinition):
     def step(self, current: ExecutedDagStep, next: ValidDagStep) -> Union[ValidDagStep, FailedDagStep]:
         if current.step.id == "step_1":
             if isinstance(current.operator_response.object, Table):

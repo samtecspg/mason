@@ -145,10 +145,10 @@ class TestLocal:
             assert(isinstance(validated, ValidWorkflow))
             response = validated.run(env, Response(), False, True)
             info = """
-            Registering workflow dag test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5 with local.
+            Registering workflow dag test_workflow_local_scheduler_ea5b602c-261c-4e06-af21-375ea912b6a5 with local.
             Registering DAG in local memory
-            Registered schedule test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5
-            Triggering schedule: test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5
+            Registered schedule test_workflow_local_scheduler_ea5b602c-261c-4e06-af21-375ea912b6a5
+            Triggering schedule: test_workflow_local_scheduler_ea5b602c-261c-4e06-af21-375ea912b6a5
             Running dag
             * step_1
             | * step_2
