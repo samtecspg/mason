@@ -130,9 +130,11 @@ class TestWorkflows:
             
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, InvalidWorkflow))
-            
+            assert("Invalid DAG definition: Invalid DAG, contains invalid steps." in validated.reason)
+
             validated = wf.validate(env, config, parameters, False)
-            assert(isinstance(validated, ValidWorkflow))
+            assert(isinstance(validated, InvalidWorkflow))
+            assert("Invalid DAG definition: Invalid Dag: Unreachable steps: [\'step_4\'] Invalid Dag Steps: Undefined dependent steps:" in validated.reason)
         else:
             raise Exception("Workflow not found")
 
