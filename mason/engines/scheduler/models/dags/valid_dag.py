@@ -3,8 +3,8 @@ from typing import List, Tuple, Optional
 
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
-from mason.resources.asciidag.graph import Graph
-from mason.resources.asciidag.node import Node
+from asciidag.graph import Graph
+from asciidag.node import Node
 from mason.util.list import flatten_array, flatten
 
 class ValidDag:

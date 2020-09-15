@@ -33,4 +33,5 @@ swagger-ui-bundle
 connexion[swagger-ui]>2.6
 mason_dask==0.1.20
 Markdown==3.2.2
+asciidag==0.1.0
 
