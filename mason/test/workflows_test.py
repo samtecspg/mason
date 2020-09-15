@@ -85,7 +85,7 @@ class TestWorkflows:
         params = { "step_2": step_params }
         parameters = WorkflowParameters(parameter_dict=params)
         if wf:
-            validated = wf.validate(env, config, parameters)
+            validated = wf.validate(env, config, parameters, False)
             assert(isinstance(validated, InvalidWorkflow))
             assert("Invalid DAG definition: Invalid Dag: Unreachable steps:"  in validated.reason)
 
@@ -123,10 +123,11 @@ class TestWorkflows:
         wf = workflows.get_workflow(env, "testing_namespace", "workflow_nonexistent_step_and_cycle")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
+            
             validated = wf.validate(env, config, parameters)
-
-            # step 3 is invalid due to non-existent reference.  This removes the cycle and marks workflow valid.
-            # Q:  is this desired?
+            assert(isinstance(validated, InvalidWorkflow))
+            
+            validated = wf.validate(env, config, parameters, False)
             assert(isinstance(validated, ValidWorkflow))
         else:
             raise Exception("Workflow not found")
