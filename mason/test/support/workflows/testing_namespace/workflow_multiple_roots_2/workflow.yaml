@@ -1,0 +1,31 @@
+type: "workflow"
+namespace: "testing_namespace"
+command: "workflow_multiple_roots_2"
+name: "test_workflow_with_multiple_roots_2"
+description: "Test Workflow"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator1"
+    - id: "step_2"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+    - id: "step_3"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator3"
+      dependencies: ["step_2"]
+    - id: "step_4"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator4"
+      dependencies: ["step_1"]
+    - id: "step_5"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: ["step_3", "step_4"]
+supported_schedulers:
+  - "test2"

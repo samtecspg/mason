@@ -5,7 +5,7 @@ from unittest import mock
 from mason.test.support.testing_base import clean_string
 
 from mason.clients.response import Response
-from mason.configurations.configurations import get_all, get_config
+from mason.configurations.configurations import get_all
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.test.support.mocks import mock_execution_engine_client, mock_storage_engine_client, \
     mock_scheduler_engine_client, mock_metastore_engine_client, mock_config_schema
@@ -38,11 +38,40 @@ class TestWorkflows:
         if os.path.exists(mason_home):
             shutil.rmtree(mason_home)
 
-    def test_workflow_1_invalid(self):
+    def test_workflow_basic_valid(self):
+        env, mason_home = self.before()
+        workflows.register_workflows(from_root("/test/support/workflows/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_basic")
+        config = get_all(env)[0]['3']
+
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+
+        if wf:
+            params = {
+                "step_1": step_params,
+                "step_2": step_params,
+                "step_3": step_params
+            }
+
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert (isinstance(validated, ValidWorkflow))
+
+            run = validated.dry_run(env, Response())
+            self.after(mason_home)
+        else:
+            raise Exception("Workflow not found")
+
+    def test_workflow_step_params_invalid(self):
         env, mason_home = self.before()
         
         workflows.register_workflows(from_root("/test/support/workflows/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow1")
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_basic")
         config = get_all(env)[0]['3']
 
         step_params = {
@@ -53,12 +82,16 @@ class TestWorkflows:
         }
         
         # Broken dag, unreachable nodes
-        params = {  "step_2": step_params }
+        # With strict DAG validation setting, throws an error earlier in validation.
+        params = { "step_2": step_params }
         parameters = WorkflowParameters(parameter_dict=params)
         if wf:
-            validated = wf.validate(env, config, parameters)
+            validated = wf.validate(env, config, parameters, False)
             assert(isinstance(validated, InvalidWorkflow))
-            assert("Invalid DAG definition: Invalid Dag: Unreachable steps:"  in validated.reason)
+            # assert("Invalid DAG definition: Invalid Dag: Unreachable steps:"  in validated.reason)
+            # What's `Invalid Parameters: ` indicating? It's folllowed only by a blank for both of these.
+            assert("Workflow Parameters for step:step_1 not specified. Invalid Parameters: " in validated.reason)
+            assert("Workflow Parameters for step:step_3 not specified. Invalid Parameters: " in validated.reason)
 
             params = {
                 "step_1": step_params,
@@ -73,40 +106,10 @@ class TestWorkflows:
         else:
             raise Exception("Workflow not found")
 
-    def test_workflow_1_valid(self):
-        env, mason_home = self.before()
-        workflows.register_workflows(from_root("/test/support/workflows/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow1")
-        config = get_all(env)[0]['3']
-
-        step_params = {
-            "config_id": "5",
-            "parameters": {
-                "test_param": "test"
-            }
-        }
-
-        if wf:
-            params = {
-                "step_1": step_params,
-                "step_2": step_params,
-                "step_3": step_params
-            }
-            
-            parameters = WorkflowParameters(parameter_dict=params)
-            validated = wf.validate(env, config, parameters)
-            assert (isinstance(validated, ValidWorkflow))
-            
-            run = validated.dry_run(env, Response())
-            self.after(mason_home)
-        else:
-            raise Exception("Workflow not found")
-
-    def test_workflow_2(self):
+    def test_workflow_nonexistent_step_and_cycle_invalid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
 
-        # DAG has cycle
         step_params = {
             "config_id": "5",
             "parameters": {
@@ -119,52 +122,57 @@ class TestWorkflows:
             "step_3": step_params,
             "step_4": step_params
         }
+
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_nonexistent_step_and_cycle/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_nonexistent_step_and_cycle")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, InvalidWorkflow))
+            assert("Invalid DAG definition: Invalid DAG, contains invalid steps." in validated.reason)
+
+            validated = wf.validate(env, config, parameters, False)
+            assert(isinstance(validated, InvalidWorkflow))
+            assert("Invalid DAG definition: Invalid Dag: Unreachable steps: [\'step_4\'] Invalid Dag Steps: Undefined dependent steps:" in validated.reason)
+        else:
+            raise Exception("Workflow not found")
+
+
+    def test_workflow_cycle_invalid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
         
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow2/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow2")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_cycle/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_cycle")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
 
             assert(isinstance(validated, InvalidWorkflow))
-            assert("Invalid DAG definition: Invalid Dag:  Cycle detected. Repeated steps: {'step_2'}" in validated.reason)
+            assert(validated.reason == 'Invalid DAG definition: Invalid Dag: Cycle detected. Repeated steps: step_2 Invalid Dag Steps: ')
         else:
             raise Exception("Workflow not found")
     
-    def test_workflow_3(self):
+
+    def test_workflow_with_multiple_roots_valid(self):
         env, mason_home = self.before()
         config = get_all(env)[0]['3']
-
-        # DAG has cycle
-        step_params = {
-            "config_id": "5",
-            "parameters": {
-                "test_param": "test"
-            }
-        }
-        params = {
-            "step_1": step_params,
-            "step_2": step_params,
-            "step_3": step_params,
-            "step_4": step_params
-        }
-
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow3/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow3")
-        if wf:
-            parameters = WorkflowParameters(parameter_dict=params)
-            validated = wf.validate(env, config, parameters)
-
-            assert(isinstance(validated, InvalidWorkflow))
-            assert(validated.reason == 'Invalid DAG definition: Invalid Dag: Unreachable steps: {\'step_4\'} Invalid Dag Steps: Undefined dependent steps: {\'step_nonexistent\'} ,Workflow Parameters for step:step_5 not specified. Invalid Parameters: ')
-        else:
-            raise Exception("Workflow not found")
-
-    def test_workflow_4(self):
-        env, mason_home = self.before()
-        config = get_all(env)[0]['3']
-
-        # DAG has cycle
+        
         step_params = {
             "config_id": "5",
             "parameters": {
@@ -179,51 +187,195 @@ class TestWorkflows:
             "step_5": step_params
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow4/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow4")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, ValidWorkflow))
             display = """
-            *step_1
-            | *step_5
-            | /
-            | *step_4
-            | /
-            *step_2
-            *step_3
+            * step_1
+            | * step_4
+            |/  
+            | * step_5
+            |/  
+            * step_2
+            * step_3
             """
-            display = validated.dag.display()
             assert(clean_string(validated.dag.display()) == clean_string(display))
         else:
             raise Exception("Workflow not found")
 
+    def test_workflow_parallel_without_cycles_valid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+        
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
 
-    def test_workflow_parameters(self):
-        pass
-        # TODO:  Test AWS schedule expression here
-        # 
-        # step_params = {
-        #     "config_id": "5",
-        #     "parameters": {
-        #         "test_param": "test"
-        #     }
-        # }
-        # 
-        # params = {
-        #     "step_1": step_params,
-        #     "step_2": step_params,
-        #     "step_3": step_params
-        # }
-        # 
-        # params["schedule"] = "0 12 * * ? *"
-        # parameters = WorkflowParameters(parameter_dict=params)
-        # assert(parameters.schedule.definition == "test")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_parallel_without_cycles/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_parallel_without_cycles")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, ValidWorkflow))
+            # TODO:  Improve asciidag rendering of this case
+            display = """
+            * step_1
+            | * step_1
+            | * step_4
+            | * step_5
+            |/  
+            * step_2
+            * step_3
+            """
+            assert(clean_string(validated.dag.display()) == clean_string(display))
+        else:
+            raise Exception("Workflow not found")
 
-        # params["schedule"] = "bogus"
-        # parameters = WorkflowParameters(parameter_dict=params)
-        # assert(parameters.schedule.definition == "test")
+    def test_workflow_operator_self_dependency_invalid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
 
+        # DAG has step with dependency on itself.
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
 
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_operator_self_dependency/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_operator_self_dependency")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, InvalidWorkflow))
+            assert(validated.reason == "Invalid DAG definition: Invalid Dag: Cycle detected. Repeated steps: step_2 Invalid Dag Steps: ")
+        else:
+            raise Exception("Workflow not found")
 
+    def test_workflow_with_multiple_roots_valid_2(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+
+        # DAG has multiple roots, but is structurally sound.
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
+
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots_2/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots_2")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, ValidWorkflow))
+            display = """
+            * step_1
+            | * step_2
+            * | step_4
+            | * step_3
+            |/  
+            * step_5
+            """
+            assert(clean_string(validated.dag.display()) == clean_string(display))
+        else:
+            raise Exception("Workflow not found")
+
+    def test_workflow_multiple_roots_cycle_invalid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+
+        # DAG has multiple roots, and a cycle occurs downstream of the second root.
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
+
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots_cycle/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots_cycle")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, InvalidWorkflow))
+            assert(validated.reason == "Invalid DAG definition: Invalid Dag: Cycle detected. Repeated steps: step_3 Invalid Dag Steps: ")
+        else:
+            raise Exception("Workflow not found")
+
+    def test_workflow_multiple_roots_forest_valid(self):
+        env, mason_home = self.before()
+        config = get_all(env)[0]['3']
+
+        # DAG has multiple disconnected roots, but is structurally sound.
+        step_params = {
+            "config_id": "5",
+            "parameters": {
+                "test_param": "test"
+            }
+        }
+        params = {
+            "step_1": step_params,
+            "step_2": step_params,
+            "step_3": step_params,
+            "step_4": step_params,
+            "step_5": step_params
+        }
+
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_multiple_roots_forest/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_multiple_roots_forest")
+        if wf:
+            parameters = WorkflowParameters(parameter_dict=params)
+            validated = wf.validate(env, config, parameters)
+            assert(isinstance(validated, ValidWorkflow))
+            
+            display = """
+            * step_1
+            | * step_2
+            * | step_4
+            | * step_3
+            * step_5
+            """
+
+            print(validated.dag.display())
+            
+            assert(clean_string(validated.dag.display()) == clean_string(display))
+            assert(len(validated.dag.valid_steps) == 5)
+        else:
+            raise Exception("Workflow not found")

@@ -1,7 +1,7 @@
 type: "workflow"
-namespace: "namespace1"
-command: "workflow1"
-name: "test_schedule"
+namespace: "testing_namespace"
+command: "workflow_basic"
+name: "test_basic_workflow"
 description: "Test Workflow"
 dag:
     - id: "step_1"

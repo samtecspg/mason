@@ -1,0 +1,39 @@
+type: "workflow"
+namespace: "testing_namespace"
+command: "workflow_local_scheduler"
+name: "test_workflow_local_scheduler"
+description: "Test Workflow: Local Scheduler"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator1"
+      dependencies: []
+    - id: "step_2"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: []
+      retry: "constant(1)"
+    - id: "step_3"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator3"
+      dependencies: []
+    - id: "step_4"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator4"
+      dependencies: ["step_1"]
+    - id: "step_5"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator5"
+      dependencies: ["step_4", "step_2", "step_3"]
+    - id: "step_6"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator6"
+      dependencies: ["step_5"]
+supported_schedulers:
+  - "local"

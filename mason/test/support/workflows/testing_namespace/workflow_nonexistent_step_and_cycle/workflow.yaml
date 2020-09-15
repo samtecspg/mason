@@ -1,8 +1,8 @@
 type: "workflow"
-namespace: "namespace1"
-command: "workflow3"
-name: "test_schedule"
-description: "Test Workflow"
+namespace: "testing_namespace"
+command: "workflow_nonexistent_step_and_cycle"
+name: "test_workflow_with_nonexistent_step_and_cycle"
+description: "Test Workflow: Interaction between an Invalid Step and a Cycle"
 dag:
     - id: "step_1"
       type: "operator"
