@@ -136,8 +136,8 @@ class TestLocal:
             "step_6": step_params,
         }
 
-        workflows.register_workflows(from_root("/test/support/workflows/namespace1/workflow5/"), env)
-        wf = workflows.get_workflow(env, "namespace1", "workflow5")
+        workflows.register_workflows(from_root("/test/support/workflows/testing_namespace/workflow_local_scheduler/"), env)
+        wf = workflows.get_workflow(env, "testing_namespace", "workflow_local_scheduler")
         logger.set_level("fatal")
         if wf:
             parameters = WorkflowParameters(parameter_dict=params)
@@ -145,10 +145,10 @@ class TestLocal:
             assert(isinstance(validated, ValidWorkflow))
             response = validated.run(env, Response(), False, True)
             info = """
-            Registering workflow dag test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5 with local.
+            Registering workflow dag test_workflow_local_scheduler_ea5b602c-261c-4e06-af21-375ea912b6a5 with local.
             Registering DAG in local memory
-            Registered schedule test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5
-            Triggering schedule: test_schedule_ea5b602c-261c-4e06-af21-375ea912b6a5
+            Registered schedule test_workflow_local_scheduler_ea5b602c-261c-4e06-af21-375ea912b6a5
+            Triggering schedule: test_workflow_local_scheduler_ea5b602c-261c-4e06-af21-375ea912b6a5
             Running dag
             * step_1
             | * step_2

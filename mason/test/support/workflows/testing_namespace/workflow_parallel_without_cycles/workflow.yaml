@@ -1,0 +1,33 @@
+type: "workflow"
+namespace: "testing_namespace"
+command: "workflow_parallel_without_cycles"
+name: "test_parallel_without_cycles"
+description: "Test Workflow: Parallel Dependency Chains without Cycles"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator1"
+    - id: "step_2"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: ["step_1", "step_5"]
+      retry: "exponential"
+    - id: "step_3"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator3"
+      dependencies: ["step_2"]
+    - id: "step_4"
+      type: "operator"
+      namespace: "namespace2"
+      command: "operator4"
+      dependencies: ["step_1"]
+    - id: "step_5"
+      type: "operator"
+      namespace: "namespace1"
+      command: "operator2"
+      dependencies: ["step_4"]
+supported_schedulers:
+  - "test2"
