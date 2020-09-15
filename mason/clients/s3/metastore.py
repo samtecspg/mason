@@ -1,6 +1,8 @@
 from urllib.parse import urlparse
 from typing import Tuple, Union, Optional
 
+from returns.result import Result
+
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.valid_client import ValidClient
 from mason.clients.response import Response
@@ -19,12 +21,13 @@ class S3MetastoreClient(MetastoreClient, ValidClient):
     def __init__(self, config: dict):
         self.client = S3Client(config)
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
-        raise NotImplementedError("s3 client get_database not implemented")
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
+        tables, response =  self.list_tables(database_name, response or Response())
+        database = tables.map(lambda a: Database("s3_table", a)).alt(lambda b: InvalidDatabase(b.error or b.message()))
+        return database, response
 
-    def list_tables(self, database_name: str, response: Response) -> Response:
-        response = self.client.list_tables(database_name, response)
-        return response
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]:
+        return self.client.list_tables(database_name, response)
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         return self.client.get_table(database_name, table_name, options, response)

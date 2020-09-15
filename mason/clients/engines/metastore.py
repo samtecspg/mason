@@ -2,6 +2,8 @@
 from abc import abstractmethod
 from typing import List, Union, Optional, Tuple
 
+from returns.result import Result
+
 from mason.clients.client import Client
 from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.response import Response
@@ -16,11 +18,11 @@ from mason.engines.storage.models.path import Path
 class MetastoreClient(Client):
 
     @abstractmethod
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         raise NotImplementedError("Client get_database not implemented")
 
     @abstractmethod
-    def list_tables(self, database_name: str, response: Response) -> Response: 
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]: 
         raise NotImplementedError("Client list_tables not implemented")
 
     @abstractmethod
@@ -53,11 +55,10 @@ class InvalidMetastoreClient(InvalidClient, MetastoreClient):
     def __init__(self, reason: str):
         super().__init__(reason)
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         raise NotImplementedError("Client get_database not implemented")
 
-    def list_tables(self, database_name: str,
-                    response: Response) -> Response:  # TODO: Make return Union[List[Tables], List[InvalidTables]]
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]: 
         raise NotImplementedError("Client list_tables not implemented")
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None,

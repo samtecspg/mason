@@ -3,6 +3,8 @@ from typing import Tuple, Union, List, Optional
 import boto3
 from botocore.client import BaseClient
 from botocore.errorfactory import ClientError
+from returns.result import Result, Failure, Success
+
 from mason.engines.scheduler.models.schedule import Schedule
 
 from mason.clients.aws_client import AWSClient
@@ -23,7 +25,7 @@ class GlueClient(AWSClient):
         return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key,
                             aws_secret_access_key=self.secret_key)
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         resp = response or Response()
 
         try:
@@ -36,7 +38,7 @@ class GlueClient(AWSClient):
 
         if error == "EntityNotFoundException":
             resp.set_status(404)
-            return InvalidDatabase(f"Database {database_name} not found"), resp
+            return Failure(InvalidDatabase(f"Database {database_name} not found")), resp
         elif 200 <= status < 300:
 
             table_list = result.get("TableList")
@@ -46,16 +48,16 @@ class GlueClient(AWSClient):
                     invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
                     resp.add_warning(f"Invalid Tables in glue response: {invalid_messages}")
                 if len(valid) == 0:
-                    return InvalidDatabase(f"No valid tables"), resp
+                    return Failure(InvalidDatabase(f"No valid tables")), resp
                 else:
-                    return Database(database_name, valid), resp
+                    return Success(Database(database_name, valid)), resp
             else:
-                return InvalidDatabase("TableList not found in glue response"), resp
+                return Failure(InvalidDatabase("TableList not found in glue response")), resp
         else:
             resp.set_status(status)
-            return InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}"), resp
+            return Failure(InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}")), resp
 
-    def list_tables(self, database_name: str, response: Response) -> Response:
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]:
         try:
             result = self.client().get_tables(DatabaseName=database_name)
         except ClientError as e:
@@ -64,21 +66,21 @@ class GlueClient(AWSClient):
         error, status, message = self.parse_response(result)
 
         if error == "EntityNotFoundException":
-            response.add_error(f"Database {database_name} not found")
+            final = Failure(InvalidTables([], f"Database {database_name} not found"))
             response.set_status(404)
+            return final, response
         elif 200 <= status < 300:
             valid: List[Table]
-            valid, invalid = self.parse_table_list_data(result, Path(database_name, "glue"))
+            valid, invalid = self.parse_table_list_data(result, Path(database_name, "glue"), database_name)
             if len(valid) > 0:
-                #  TODO move out
-                data = {'Tables': list(map(lambda v: v.to_dict(), valid))}
-                response.add_data(data)
-            response.set_status(status)
+                response.set_status(status)
+                return Success(valid), response
+            else:
+                return Failure(InvalidTables([], "No Valid tables found")), response
         else:
             response.set_status(status)
-            response.add_error(message)
-
-        return response
+            # response.add_error(message)
+            return Failure(InvalidTables(message)), response
 
     def delete_table(self, database_name: str, table_name: str, resp: Optional[Response] = None) -> Response:
         response = resp or Response()

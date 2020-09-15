@@ -1,6 +1,7 @@
 from botocore.errorfactory import ClientError
 from typing import Optional, List, Union, Tuple
 import s3fs
+from returns.result import safe, Result, Success, Failure
 from s3fs import S3FileSystem
 
 from mason.clients.aws_client import AWSClient
@@ -53,24 +54,56 @@ class S3Client(AWSClient):
     def parse_items(self, s3_response: dict):
         return list(map(lambda x: self.parse_item(x), s3_response.get('Contents', [])))
 
-    #  List tables for s3 only lists out folders, not schemas in folders.  You can specify subfolders and it will be split out
-    def list_tables(self, database_name: str, response: Response):
+    @safe
+    def list_objects(self, database_name: str) -> dict:
         split = database_name.split("/", 1)
-        try:
-            result = self.client().s3.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
-            response.add_data({"Prefixes": result.get("CommonPrefixes", {})})
-        except ClientError as e:
-            result = e.response
-            error = result.get("Error", {})
-            code = error.get("Code", "")
-            if code == "NoSuchBucket":
-                response.add_error(error.get("Message") + f": {database_name}")
-                response.set_status(404)
-            else:
-                raise e
+        return self.client().s3.list_objects(Bucket=split[0], Prefix=(get(split, 1) or '/'), Delimiter='/')
 
-        response.add_response(result)
-        return response
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]:
+        result: Result[dict, InvalidTables] = self.list_objects(database_name).alt(lambda e: InvalidTables([], message(e)))
+        
+        def parse_response(result: dict, response: Response) -> Result[List[Table], InvalidTables]:
+            contents: Optional[List[dict]] = result.get("Contents")
+            prefixes: Optional[List[dict]] = result.get("CommonPrefixes")
+            
+            if contents:
+                tables: List[Union[Table, InvalidTables]] = []
+                for c in contents:
+                    key: Optional[str] = c.get("Key")
+                    if key:
+                        table, response = self.get_table(database_name.split("/")[0], key, response=response)
+                        tables.append(table)
+                valid, invalid = sequence(tables, Table, InvalidTables) 
+                if len(valid) > 0:
+                    return Success(valid)
+                else:
+                    invalid_tables: List[InvalidTable] = []
+                    for i in invalid:
+                        invalid_tables += (i.invalid_tables)
+                        
+                    return Failure(InvalidTables(invalid_tables, f"No valid tables at {database_name}"))
+            elif prefixes:
+                for p in prefixes:
+                    response.add_data(p)
+                return Failure(InvalidTables([], f"No valid tables at {database_name}.  Try appending '/' or specify deeper key."))
+            else:
+                return Failure(InvalidTables([], "No Data returned from AWS"))
+
+        final = result.bind(lambda r: parse_response(r, response))
+        
+        # except ClientError as e:
+        #     result = e.response
+        #     error = result.get("Error", {})
+        #     code = error.get("Code", "")
+        #     if code == "NoSuchBucket":
+        #         response.add_error(error.get("Message") + f": {database_name}")
+        #         response.set_status(404)
+        #     else:
+        #         raise e
+        # 
+        # response.add_response(result)
+        
+        return final, response
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         return self.infer_table(database_name + "/" + table_name, table_name, options, response)

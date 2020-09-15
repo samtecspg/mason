@@ -1,5 +1,7 @@
 from typing import Optional, Union, List, Tuple
 
+from returns.result import Result
+
 from mason.clients.athena.athena_client import AthenaClient
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.valid_client import ValidClient
@@ -21,10 +23,10 @@ class AthenaMetastoreClient(MetastoreClient, ValidClient):
     def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
         return self.client.generate_table_ddl(table, path, database)
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         return self.client.get_database(database_name, response)
 
-    def list_tables(self, database_name: str, response: Response) -> Response:
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]:
         raise NotImplementedError("Athena Client list_tables not implemented")
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:

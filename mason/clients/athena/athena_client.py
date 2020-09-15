@@ -2,6 +2,7 @@ import boto3
 from typing import Tuple, Union, Optional
 from botocore.exceptions import ClientError
 from pyathena.util import generate_ddl
+from returns.result import Result
 
 from mason.clients.glue.glue_client import GlueClient
 from mason.clients.aws_client import AWSClient
@@ -22,7 +23,7 @@ class AthenaClient(AWSClient):
     def client(self):
         return boto3.client('athena', region_name=self.aws_region, aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
 
-    def get_database(self, database_name: str, response: Optional[Response]) -> Tuple[Union[Database, InvalidDatabase], Response]:
+    def get_database(self, database_name: str, response: Optional[Response]) -> Tuple[Result[Database, InvalidDatabase], Response]:
         # Parlaying over to glue for now
         glue_client = GlueClient({"access_key": self.access_key, "secret_key": self.secret_key, "aws_region": self.aws_region, "aws_role_arn": ""})
         return glue_client.get_database(database_name, response)
