@@ -49,17 +49,13 @@ class Dag:
                 test, visited, stack = self.is_cyclic(step, visited, stack, valid_steps)
                 if isinstance(test, str):
                     return test
-                else:
-                    return False
-            else:
-                return False
         
         diff = valid_steps.difference(visited)
         if len(diff) > 0:
             diff_ids = list(map(lambda s: s.id, diff))
             return f"Unreachable steps: {diff_ids}"
-        else:
-            return False
+        
+        return False
 
     def is_cyclic(self, step: ValidDagStep, visited: Set[ValidDagStep], stack: Set[ValidDagStep], valid_steps: Set[ValidDagStep]) -> Tuple[Union[bool, str], Set[ValidDagStep], Set[ValidDagStep]]:
         visited.add(step)
