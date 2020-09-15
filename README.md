@@ -2,13 +2,13 @@
 
 # Mason Data Operator Framework 
 
-What is Mason?
+What is Mason?  In short, Mason is the connecting tissue for your data projects.  
 1.  It creates a data-aware alternative to Airflow operators that depends less heavily on Python scripting.
 2.  It's like react components, but for data pipelines.
 3.  It's an open source answer to Glue.
 4.  It gives you self-contained, composable, parameterized, and functional data operators.
 
-All of these statements are true to varying degrees. In short, Mason is the connecting tissue for your data projects.  
+Mason is a curated library of data pipeline components with abstracted backend implementations for various big data clients.
 
 Mason interfaces with clients using abstractions called Engines. These Engines broker the relationship between Operators and Workflows, which define a particular job, and the various Clients that get the job done. Out of the box, Mason defines four Engines - Storage, Execution, Metastore, and Scheduler.
 
@@ -26,13 +26,13 @@ mason operator job get -p "job_id:<<JOB_ID>>"
 mason operator table infer -p "storage_path:<<STORAGE_PATH>>,database_name:<<DATABASE_NAME>>,table_name:<<TABLE_NAME>>"
 ```
 
-and for the operators to perform sensible actions regardless of the clients used for each engine, be they local file systems, S3, Athena, or Spark.
+and for the operators to perform sensible actions regardless of the clients used for each engine, be they local file systems, S3, Athena, Spark, Dask, Presto, Glue, etc.
 
 The four engines Mason ships with by default are Metastore, Execution, Scheduler, and Storage.
 
 ![Operator Engines](images/OperatorConfigs.png)
 
-1.   Metastore - Defines concepts like databases and tables, and allows interacting with dataset metadata such as partitioning or schema information.  Some example metastore clients would be Glue and Hive.
+1.   Metastore - Defines concepts like databases and tables, and allows interacting with dataset metadata such as partitioning or schema information.  Some example metastore clients would be Glue or Hive.
 2.   Execution - Defines a means to "compute" or derive additional datasets on source data in metastore tables.   This includes programmatic serial or SQL analytical computation on data.  Example execution engines would be Spark, Presto, and Athena.
 3.   Scheduler -  Anything that involves scheduling frequency of data jobs and job DAGs.  Example scheduler clients would be Airflow, DigDag and Azkaban.
 4.   Storage - Any activity that involves serial (row level) access and storage of data.  Some example storage clients would be S3 and HDFS.
