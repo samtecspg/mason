@@ -18,15 +18,11 @@ class AirflowClient:
         pass
 
     def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response) -> Tuple[str, Response, Optional[AirflowDag]]:
-        
-        airflow_dag: Optional[AirflowDag] = self.mason_dag_to_airflow_dag(valid_dag, schedule)
+        # Checks for incompatible features go here.
+
+        airflow_dag = AirflowDag(schedule_name, valid_dag, schedule)
         
         return (schedule_name, response, airflow_dag)
-    
-
-    def mason_dag_to_airflow_dag(self, dag: ValidDag, schedule: Optional[Schedule]) -> Optional[AirflowDag]:
-        #  IMPLEMENT
-        return AirflowDag()
 
     def trigger_schedule(self, schedule_name: str, response: Response, env: MasonEnvironment) -> Response:
         #  IMPLEMENT :  client POST /api/experimental/dags/<schedule_name>/dag_runs to airflow_response
