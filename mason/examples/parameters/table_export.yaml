@@ -1,0 +1,15 @@
+step_1:
+  config_id: 4
+  parameters:
+    database_name: "mason-sample-data"
+    table_name: "tests/in/csv/"
+    query_string: "SELECT * from $table where vendor_name = 'VTS' LIMIT 10"
+    output_path: "mason-sample-data/tests/out/queried/"
+step_2:
+  config_id: 4
+  parameters:
+    database_name: "mason-sample-data"
+    table_name: "tests/out/queried/"
+    format: "xlsx"
+    output_path: "mason-sample-data/tests/out/queried_xlsx/"
+    

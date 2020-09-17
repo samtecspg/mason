@@ -11,7 +11,7 @@ from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
 from mason.engines.metastore.models.database import InvalidDatabase, Database
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table import Table, InvalidTables
+from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
 
@@ -22,7 +22,7 @@ class MetastoreClient(Client):
         raise NotImplementedError("Client get_database not implemented")
 
     @abstractmethod
-    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]: 
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]: 
         raise NotImplementedError("Client list_tables not implemented")
 
     @abstractmethod
@@ -58,7 +58,7 @@ class InvalidMetastoreClient(InvalidClient, MetastoreClient):
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         raise NotImplementedError("Client get_database not implemented")
 
-    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]: 
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]: 
         raise NotImplementedError("Client list_tables not implemented")
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None,

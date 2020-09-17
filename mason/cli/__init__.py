@@ -1,5 +1,3 @@
-import cProfile
-
 import click
 
 from mason.cli.config import config
@@ -24,19 +22,12 @@ def cli():
     Mason Data Operator Framework 
     """
 
-pr = cProfile.Profile()
-pr.enable()
-
 cli.add_command(config)
 cli.add_command(run)
 cli.add_command(operator)
 cli.add_command(register)
 cli.add_command(workflow)
 
-
 if __name__ == "__cli__":
     cli()
-    
-pr.disable()
-pr.print_stats()
 

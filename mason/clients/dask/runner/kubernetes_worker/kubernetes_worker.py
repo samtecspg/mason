@@ -104,7 +104,7 @@ class KubernetesWorker(DaskRunner):
             else:
                 result: Result[ExecutedDaskJob, InvalidDaskJob]
                 if scheduler.startswith("local"):
-                    result = dask_job.run()
+                    result = dask_job.run(cluster_spec)
                     final = to_mason_job(result)
                 else:
                     dask.config.set({'distributed.scheduler.allowed-failures': 50})

@@ -3,7 +3,7 @@ from os import path
 from click.testing import CliRunner
 from dotenv import load_dotenv
 
-from mason.cli import config, register, operator
+from mason.cli import config, register, operator, workflow
 from mason.definitions import from_root
 import os
 import pytest  # type: ignore
@@ -29,7 +29,7 @@ class TestCLI:
         load_dotenv(from_root("/../.env"), override=True)
         runner = CliRunner()
         print_result(runner.invoke(config, [from_root('/examples/configs/')]))
-        print_result(runner.invoke(config, ["-s", "4"]))
         print_result(runner.invoke(register, [ from_root('/examples/') ]))
-        print_result(runner.invoke(operator, ['table', 'query', '-p', 'database_name:mason-sample-data,table_name:tests/in/csv/,query_string:SELECT * from $dataframe LIMIT 3,output_path:mason-sample-data/tests/out/queried/'], catch_exceptions=False))
+        print_result(runner.invoke(config, ["-s", "3"]))
+        print_result(runner.invoke(workflow, ['table', 'export', '-f', from_root("/examples/parameters/table_export.yaml"), '-d', '-r'], catch_exceptions=False))
 

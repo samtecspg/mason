@@ -1,6 +1,7 @@
 from typing import Optional
 
 from mason.clients.engines.scheduler import SchedulerClient
+from mason.clients.local.scheduler import LocalSchedulerClient
 
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
@@ -48,7 +49,6 @@ class ValidWorkflow:
             schedule_id, response, client_dag = scheduler.client.register_dag(name, self.dag, self.schedule, response)
             if not response.errored():
                 response.add_info(f"Registered schedule {schedule_id}")
-                
             if client_dag and output_path:
                 with tempfile.NamedTemporaryFile("w", delete=False) as f:
                     json = client_dag.to_json()
@@ -63,6 +63,9 @@ class ValidWorkflow:
                     
                 response.add_info(f"Triggering schedule: {schedule_id}")
                 response = scheduler.client.trigger_schedule(schedule_id, response, env)
+            else:
+                if isinstance(scheduler.client, LocalSchedulerClient):
+                    response.add_warning("Registering DAG to Local memory will have no effect without running now.   Pass -r flag to run now.")
         else:
             response.add_error("Scheduler client not defined")
 

@@ -155,7 +155,7 @@ class AthenaClient(AWSClient):
         return DDLStatement(statement)
 
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        job = QueryJob(ddl.statement, database.tables[0])
+        job = QueryJob(ddl.statement, database.tables.tables[0])
         return self.query(job, response)
 
 

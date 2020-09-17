@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple
+from typing import List
 from dotenv import load_dotenv
 import os
 
@@ -15,7 +15,6 @@ from mason.operators.operator import Operator
 from mason.parameters.input_parameters import InputParameters
 from mason.test.support.testing_base import run_tests, clean_string, clean_uuid
 from mason.util.environment import MasonEnvironment
-from mason.util.logger import logger
 
 load_dotenv(from_root("/../.env.example"), override=True)
 
@@ -188,9 +187,8 @@ def test_infer():
         good = op.validate(config, params).run(env, Response())
         def clean(s: List[str]):
             return list(map(lambda i: clean_uuid(clean_string(i)), s))
-
+        
         infos = clean(good.formatted()["Info"])
-
         expect = [
             'Tableinferred:catalog_poc_data',
             'RunningAthenaquery.query_id:test_id',

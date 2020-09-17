@@ -1,0 +1,18 @@
+type: "workflow"
+namespace: "table"
+command: "export"
+name: "table_export"
+description: "Workflow that queries a table and then format and repartitions it"
+dag:
+    - id: "step_1"
+      type: "operator"
+      namespace: "table"
+      command: "query"
+    - id: "step_2"
+      type: "operator"
+      namespace: "table"
+      command: "format"
+      retry: "exponential(5)"
+      dependencies: ["step_1"]
+supported_schedulers:
+  - "local"

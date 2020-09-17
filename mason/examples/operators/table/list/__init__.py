@@ -14,8 +14,7 @@ class TableList(OperatorDefinition):
     def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
         database_name: str = parameters.get_required("database_name")
         tables, response = config.metastore.client.list_tables(database_name, response)
-        return OperatorResponse(response, compute(tables))
-
-
+        tb = compute(tables)
+        return OperatorResponse(response, tb)
 
 

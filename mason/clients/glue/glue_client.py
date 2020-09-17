@@ -11,7 +11,7 @@ from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.schemas.schema import SchemaElement, InvalidSchemaElement, Schema
-from mason.engines.metastore.models.table import Table, InvalidTable, InvalidTables, TableNotFound
+from mason.engines.metastore.models.table import Table, InvalidTable, InvalidTables, TableNotFound, TableList
 from mason.engines.storage.models.path import Path
 from mason.util.list import sequence
 
@@ -50,14 +50,14 @@ class GlueClient(AWSClient):
                 if len(valid) == 0:
                     return Failure(InvalidDatabase(f"No valid tables")), resp
                 else:
-                    return Success(Database(database_name, valid)), resp
+                    return Success(Database(database_name, TableList(valid))), resp
             else:
                 return Failure(InvalidDatabase("TableList not found in glue response")), resp
         else:
             resp.set_status(status)
             return Failure(InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}")), resp
 
-    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[List[Table], InvalidTables], Response]:
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         try:
             result = self.client().get_tables(DatabaseName=database_name)
         except ClientError as e:
@@ -74,12 +74,11 @@ class GlueClient(AWSClient):
             valid, invalid = self.parse_table_list_data(result, Path(database_name, "glue"), database_name)
             if len(valid) > 0:
                 response.set_status(status)
-                return Success(valid), response
+                return Success(TableList(valid)), response
             else:
                 return Failure(InvalidTables([], "No Valid tables found")), response
         else:
             response.set_status(status)
-            # response.add_error(message)
             return Failure(InvalidTables(message)), response
 
     def delete_table(self, database_name: str, table_name: str, resp: Optional[Response] = None) -> Response:
