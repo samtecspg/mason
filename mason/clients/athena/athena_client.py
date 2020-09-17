@@ -2,6 +2,7 @@ import boto3
 from typing import Tuple, Union, Optional
 from botocore.exceptions import ClientError
 from pyathena.util import generate_ddl
+from returns.result import Result
 
 from mason.clients.glue.glue_client import GlueClient
 from mason.clients.aws_client import AWSClient
@@ -22,7 +23,7 @@ class AthenaClient(AWSClient):
     def client(self):
         return boto3.client('athena', region_name=self.aws_region, aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
 
-    def get_database(self, database_name: str, response: Optional[Response]) -> Tuple[Union[Database, InvalidDatabase], Response]:
+    def get_database(self, database_name: str, response: Optional[Response]) -> Tuple[Result[Database, InvalidDatabase], Response]:
         # Parlaying over to glue for now
         glue_client = GlueClient({"access_key": self.access_key, "secret_key": self.secret_key, "aws_region": self.aws_region, "aws_role_arn": ""})
         return glue_client.get_database(database_name, response)
@@ -106,10 +107,10 @@ class AthenaClient(AWSClient):
         try:
             request_token = str(uuid4())
             athena_response = self.client().start_query_execution(
-                QueryString=job.query_string,
+                QueryString=job.query_string.replace("$table", job.table.name),
                 ClientRequestToken=request_token,
                 QueryExecutionContext={
-                    'Database': job.database.name
+                    'Database': job.table.database_name
                 },
                 WorkGroup='mason'
             )
@@ -154,7 +155,7 @@ class AthenaClient(AWSClient):
         return DDLStatement(statement)
 
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        job = QueryJob(ddl.statement, database)
+        job = QueryJob(ddl.statement, database.tables.tables[0])
         return self.query(job, response)
 
 

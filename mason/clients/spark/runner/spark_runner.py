@@ -6,7 +6,6 @@ from mason.clients.response import Response
 from mason.clients.spark.config import SparkConfig
 from mason.engines.execution.models.jobs import ExecutedJob, Job, InvalidJob
 
-
 class SparkRunner:
 
     @abstractmethod

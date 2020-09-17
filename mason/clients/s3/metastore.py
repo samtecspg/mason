@@ -1,30 +1,32 @@
 from urllib.parse import urlparse
-from typing import Tuple, List, Union, Optional
+from typing import Tuple, Union, Optional, List
+
+from returns.result import Result
 
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.valid_client import ValidClient
 from mason.clients.response import Response
 from mason.clients.s3.s3_client import S3Client
-from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
+from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table import Table, InvalidTables
+from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
-
 
 class S3MetastoreClient(MetastoreClient, ValidClient):
 
     def __init__(self, config: dict):
         self.client = S3Client(config)
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Union[Database, InvalidDatabase], Response]:
-        raise NotImplementedError("s3 client get_database not implemented")
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
+        tables, response =  self.list_tables(database_name, response or Response())
+        database = tables.map(lambda a: Database("s3_table", a)).alt(lambda b: InvalidDatabase(b.error or b.message()))
+        return database, response
 
-    def list_tables(self, database_name: str, response: Response) -> Response:
-        response = self.client.list_tables(database_name, response)
-        return response
+    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
+        return self.client.list_tables(database_name, response)
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         return self.client.get_table(database_name, table_name, options, response)

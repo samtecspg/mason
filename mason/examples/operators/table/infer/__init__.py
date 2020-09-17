@@ -1,5 +1,7 @@
 from typing import Optional, Union
 
+from mason.util.result import compute
+
 from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.api import operator_api as OperatorApi
@@ -27,11 +29,12 @@ class TableInfer(OperatorDefinition):
         if isinstance(table, Table):
             response.add_info(f"Table inferred: {table.name}")
             database, response = config.metastore.client.get_database(database_name, response)
-            if isinstance(database, Database):
+            db = compute(database)
+            if isinstance(db, Database):
                 path = config.storage.client.path(storage_path)
-                ddl = config.metastore.client.generate_table_ddl(table, path, database)
+                ddl = config.metastore.client.generate_table_ddl(table, path, db)
                 if isinstance(ddl, DDLStatement):
-                    final, response = config.metastore.client.execute_ddl(ddl, database, response)
+                    final, response = config.metastore.client.execute_ddl(ddl, db, response)
                 else:
                     final = job.errored(f"Invalid DDL generated: {ddl.reason}")
             else:

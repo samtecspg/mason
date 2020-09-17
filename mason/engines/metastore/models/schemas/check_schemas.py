@@ -1,4 +1,4 @@
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional
 from functools import reduce
 
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
@@ -44,9 +44,9 @@ def find_conflicts(schemas: List[Schema]) -> Tuple[Union[Schema, SchemaConflict,
                 return InvalidSchema("No valid schemas found"), paths
 
 
-def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema], paths: List[Path]) -> Union[Table, InvalidTable]:
+def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema], paths: List[Path], database: Optional[str] = None) -> Union[Table, InvalidTable]:
     if isinstance(schema, Schema):
-        return Table(name, schema, created_by="mason", paths=paths)
+        return Table(name, schema, created_by="mason", paths=paths, database_name=database)
     else:
         if isinstance(schema, InvalidSchema):
             return InvalidTable(f"Invalid Schema: {schema.reason}")

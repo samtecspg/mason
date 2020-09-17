@@ -13,13 +13,17 @@ paths:
           in: query
           required: true
           type: string
+        - name: config_id
+          in: query
+          required: false
+          type: string
         - name: database_name
           in: query
           required: true
           type: string
-        - name: config_id
+        - name: table_name
           in: query
-          required: false
+          required: true
           type: string
         - name: log_level
           in: query

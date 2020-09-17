@@ -15,7 +15,6 @@ from mason.operators.operator import Operator
 from mason.parameters.input_parameters import InputParameters
 from mason.test.support.testing_base import run_tests, clean_string, clean_uuid
 from mason.util.environment import MasonEnvironment
-from mason.util.logger import logger
 
 load_dotenv(from_root("/../.env.example"), override=True)
 
@@ -122,21 +121,30 @@ def test_query():
 
     def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # valid query
-        query = "SELECT * from good_table limit 5"
-        params = InputParameters(parameter_string=f"query_string:{query},database_name:good_database")
+        query = "SELECT * from $table limit 3"
+        output_path = from_root("/.tmp/")
+        params = InputParameters(parameter_string=f"query_string:{query},database_name:good_database,table_name:good_table,output_path:{output_path}")
         result = op.validate(config, params).run(env, Response())
-        expect = {'Errors': [], 'Info': ['Running Query "SELECT * from good_table limit 5"', 'Running Athena query.  query_id: test', 'Running job id=test'], 'Warnings': []}
-
+        exp = {
+            3: ['Running Query "SELECT * from $table limit 3"', 'Running Athena query.  query_id: test', 'Running job id=test'],
+            6: [f'Table succesfully formatted as parquet and exported to {output_path}']
+        }
+        
+        expect = {'Errors': [], 'Info': exp[config.config['id']], 'Warnings': []}
         assert(result.with_status() == (expect, 200))
 
         # bad permissions
-        query = "SELECT * from good_table limit 5"
-        params = InputParameters(parameter_string=f"query_string:{query},database_name:access_denied")
+        query = "SELECT * from $table limit 3"
+        params = InputParameters(parameter_string=f"query_string:{query},database_name:access_denied,table_name:good_table,output_path:{output_path}")
         result = op.validate(config, params).run(env, Response())
-        expect = {'Errors': ['Job errored: Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena'], 'Info': ['Running Query "SELECT * from good_table limit 5"'], 'Warnings': []}
-        assert(result.with_status() == (expect, 403))
+        exp_2 = {
+            3: ({'Errors': ['Job errored: Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena'], 'Info': ['Running Query "SELECT * from $table limit 3"'], 'Warnings': []}, 403),
+            6: ({'Errors': [], 'Info': [f'Table succesfully formatted as parquet and exported to {output_path}'], 'Warnings': []}, 200)
+        }
 
-    run_tests("table", "query", True, "fatal", ["config_3"], tests)
+        assert(result.with_status() == exp_2[config.config['id']])
+
+    run_tests("table", "query", True, "fatal", ["config_3", "config_6"], tests)
 
 def test_delete():
 
@@ -179,9 +187,8 @@ def test_infer():
         good = op.validate(config, params).run(env, Response())
         def clean(s: List[str]):
             return list(map(lambda i: clean_uuid(clean_string(i)), s))
-
+        
         infos = clean(good.formatted()["Info"])
-
         expect = [
             'Tableinferred:catalog_poc_data',
             'RunningAthenaquery.query_id:test_id',

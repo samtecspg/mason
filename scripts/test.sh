@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
 
-mypy .
+./scripts/mypy.sh
 pytest --spec -vvvv
