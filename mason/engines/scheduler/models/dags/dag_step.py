@@ -19,7 +19,7 @@ class DagStep:
         self.namespace: str = step_config.get("namespace") # type: ignore
         self.command: str = step_config.get("command") # type: ignore
         self.dependencies: List[str] = step_config.get("dependencies", []) # type: ignore
-        self.retry_method: Optional[str] = step_config.get("retry") # type: ignore
+        self.retry_method_compound: Optional[str] = step_config.get("retry") # type: ignore
         self.retry_max: Optional[int] = step_config.get("retry_max") # type: ignore
 
     def validate(self, env: MasonEnvironment, parameters: WorkflowParameters, all_step_ids: List[str]) -> Union[ValidDagStep, InvalidDagStep]:
@@ -34,15 +34,16 @@ class DagStep:
                     if operator:
                         valid = operator.validate(config, operator_params)
                         if isinstance(valid, ValidOperator):
+                            self.retry_method:Optional[str] = None
                             self.retry_delay:Optional[int] = None
                             self.retry_max = self.retry_max or self._DEFAULT_RETRY_MAX
-                            if self.retry_method is not None:
+                            if self.retry_method_compound is not None:
                                 retry_parser = re.compile("(?P<type>exponential|constant)(?:\((?P<delay>\d+)\))?")
-                                retry_parse_results = retry_parser.match(self.retry_method)
+                                retry_parse_results = retry_parser.match(self.retry_method_compound)
                                 if retry_parse_results is not None:
                                     retry_parse_results = retry_parse_results.groupdict()
                                     self.retry_method = retry_parse_results["type"]
-                                    self.retry_delay = retry_parse_results["delay"] or self._DEFAULT_RETRY_DELAY
+                                    self.retry_delay = int(retry_parse_results["delay"]) or self._DEFAULT_RETRY_DELAY
                                 else:
                                     return InvalidDagStep(f"Invalid Dag Step {self.id}: Invalid retry_method \"{self.retry_method}\".")
                             return ValidDagStep(self.id, valid, self.dependencies, self.retry_method, self.retry_delay, self.retry_max)
