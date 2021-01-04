@@ -1,7 +1,7 @@
 import boto3
 from typing import Tuple, Union, Optional
 from botocore.exceptions import ClientError
-from pyathena.util import generate_ddl
+from pyathena.pandas.util import generate_ddl
 from returns.result import Result
 
 from mason.clients.glue.glue_client import GlueClient

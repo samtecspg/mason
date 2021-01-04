@@ -17,11 +17,11 @@ class ValidDagStep:
         self.retry_max = retry_max or 7  #(for exponential 5 seconds  * (2^7) is roughly 10 minutes)
         self.retries = 1
         
-    def __ge__(self, other: 'ValidDagStep'):
+    def __gt__(self, other: 'ValidDagStep'):
         return self.id > other.id
 
-    def __le__(self, other: 'ValidDagStep'):
-        return not self.__ge__(other)
+    def __lt__(self, other: 'ValidDagStep'):
+        return not self.__gt__(other)
 
     def run(self, env: MasonEnvironment) -> OperatorResponse:
         response = Response()

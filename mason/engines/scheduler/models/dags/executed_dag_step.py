@@ -20,11 +20,11 @@ class ExecutedDagStep:
         self.operator_response = response
         self.runtime = time.time()
 
-    def __ge__(self, other: 'ExecutedDagStep'):
+    def __gt__(self, other: 'ExecutedDagStep'):
         return self.runtime > other.runtime
 
-    def __le__(self, other: 'ExecutedDagStep'):
-        return not self.__ge__(other)
+    def __lt__(self, other: 'ExecutedDagStep'):
+        return not self.__gt__(other)
 
     def failed(self, reason: str):
         return FailedDagStep(reason, self.step, self.operator_response)
