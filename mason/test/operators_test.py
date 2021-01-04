@@ -1,6 +1,5 @@
 import shutil
 import os
-from typing import List, Optional
 
 from mason.clients.response import Response
 from mason.configurations.invalid_config import InvalidConfig
@@ -80,7 +79,9 @@ class TestListOperators:
                                         'metastore': 'test',
                                         'scheduler': None,
                                         'storage': None}]}]
-        assert(dicts == expects)
+        d = sorted(dicts, key=lambda i: i['command']) # type: ignore
+        e = sorted(expects, key=lambda e: e['command']) # type: ignore 
+        assert(d == e)
 
     def test_namespace_dne(self):
         base.set_log_level("fatal")
