@@ -1,7 +1,7 @@
 from typing import Optional
 import click
 
-@click.command("config", short_help="Configures mason clients and engines")
+@click.command("config", short_help="Configure mason session")
 @click.argument('config_file', required=False)
 @click.option("-l", "--log_level", help="Log level for mason")
 @click.option("-s", "--set_current", help="Set current config to config id")

@@ -5,6 +5,8 @@ from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.engines.valid_client import EmptyClient
 from mason.definitions import from_root
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
+from mason.test.support.clients.test import TestClient
+from mason.test.support.clients.test2 import Test2Client
 from mason.test.support.mocks import clients as mock_clients
 
 from mason.util.string import to_class_case
@@ -29,16 +31,6 @@ def get_magic_mock(mock_name: str):
     logger.debug(f"Mocking {mock_name} client")
     return MagicMock(return_value=eval(f"mock_clients.{to_class_case(mock_name)}Mock()"))
 
-
-class TestClient:
-    pass
-
-class Test2Client:
-    def validate_schedule(self, schedule: Optional[str]) -> Union[Optional[Schedule], InvalidSchedule]:
-        if schedule:
-            return Schedule(f"GOOD_SCHEDULE {schedule}")
-        else:
-            return None
 
 def mock_metastore_engine_client(self):
     return mock_engine_client("metastore", self)

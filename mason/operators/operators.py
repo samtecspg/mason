@@ -70,17 +70,6 @@ def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters,
     return operator_response
 
 
-def from_config(config: dict, source_path: Optional[str] = None):
-    namespace = config.get("namespace")
-    command = config.get("command")
-    description = config.get("description", "")
-    parameters = config.get("parameters", {})
-    supported_configurations = config.get("supported_configurations", [])
-    if namespace and command:
-        return Operator(namespace, command, description, parameters, supported_configurations, source_path)
-    else:
-        return None
-
 def check_definition(operator: Operator) -> Union[Operator, InvalidOperator]:
     module = operator.module()
     if isinstance(module, OperatorDefinition):

@@ -7,8 +7,8 @@ from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
 
 class LocalExecutionClient(ExecutionClient):
     
-    def __init__(self, config: dict):
-        self.client = LocalClient(config)
+    def __init__(self, client: LocalClient):
+        self.client = client 
 
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
 

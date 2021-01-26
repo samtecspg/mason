@@ -1,5 +1,7 @@
+type: config
 id: 4
-storage_engine: test
+storage_engines: 
+  - "test"
 clients:
   test:
     configuration:

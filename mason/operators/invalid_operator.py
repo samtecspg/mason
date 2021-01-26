@@ -2,7 +2,6 @@ from mason.clients.response import Response
 from mason.operators.operator_response import OperatorResponse
 from mason.util.environment import MasonEnvironment
 
-
 class InvalidOperator:
 
     def __init__(self, reason: str):

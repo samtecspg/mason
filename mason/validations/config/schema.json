@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MasonConfiguration",
+  "properties": {
+    "id": { "type": ["string", "integer"]},
+    "type": { 
+      "type": "string",
+      "enum": ["config", "Config", "Configuration", "configuration"]
+    },
+    "metastore_engines": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "glue",
+          "s3",
+          "athena"
+        ]
+      }
+    },
+    "execution_engines": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "spark",
+          "athena",
+          "dask",
+          "local"
+        ]
+      }
+    },
+    "storage_engines": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "s3"
+        ]
+      }
+    },
+    "scheduler_engines": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "glue",
+          "local",
+          "airflow"
+        ]
+      }
+    },
+    "clients": {
+      "type": "object",
+      "patternProperties": {
+        "^.*": { 
+          "type": "object",
+          "properties": {
+            "configuration": {"type":  "object"}
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [ "id" , "type"]
+}
+
+
+

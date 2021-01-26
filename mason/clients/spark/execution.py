@@ -7,9 +7,8 @@ from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
 class SparkExecutionClient(ExecutionClient):
 
-    def __init__(self, config: dict):
-        self.config = config
-        self.client = SparkClient(config)
+    def __init__(self, client: SparkClient):
+        self.client = client 
 
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         return self.client.run_job(job, response)

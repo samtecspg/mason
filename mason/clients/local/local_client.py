@@ -1,6 +1,7 @@
 from botocore.client import BaseClient
 from typing import Tuple, Optional
 
+from mason.clients.base import Client
 from mason.engines.scheduler.models.dags.client_dag import ClientDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.schedule import Schedule
@@ -8,7 +9,7 @@ from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
 from mason.workflows.workflow_run import WorkflowRun
 
-class LocalClient:
+class LocalClient(Client):
 
     def __init__(self, config: dict):
         self.threads = config.get("threads")

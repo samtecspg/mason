@@ -19,7 +19,7 @@ from mason.util.string import to_class_case
 
 class Operator:
 
-    def __init__(self, namespace: str, command: str, description: str, parameters: dict, supported_configurations: List[Dict[str, str]], source_path: Optional[str] = None):
+    def __init__(self, namespace: str, command: str, description: str = "", parameters: dict = {}, supported_configurations: List[Dict[str, str]] = [], source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
         self.description = description

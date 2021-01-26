@@ -1,5 +1,7 @@
+
 import click
 
+from mason.cli.apply import apply
 from mason.cli.config import config
 from mason.cli.operator import operator
 from mason.cli.register import register
@@ -22,7 +24,7 @@ def cli():
     Mason Data Operator Framework 
     """
 
-cli.add_command(config)
+# cli.add_command(apply)
 cli.add_command(run)
 cli.add_command(operator)
 cli.add_command(register)

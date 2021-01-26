@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "S3Configuration",
   "properties": {
+    "type": {"type":  "string" },
     "aws_region": {
       "type": "string"
     },

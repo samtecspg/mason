@@ -16,23 +16,23 @@ class TestExecutionEngine:
     def before(self, config: str):
         base.set_log_level("error")
         config_home = from_root(config)
-        env = MasonEnvironment(config_home=config_home)
-        yaml_config_doc = parse_yaml(env.config_home)
+        env = MasonEnvironment(mason_home="/test/support/")
+        yaml_config_doc = parse_yaml(env.config_home + config)
         ee = ExecutionEngine(yaml_config_doc)
         return ee
 
     def test_configuration_exists(self):
-        ee = self.before("/test/support/configs/test_config.yaml")
+        ee = self.before("test_config.yaml")
         assert(ee.client_name == "test2")
         assert(type(ee.client).__name__ == "InvalidExecutionClient")
 
     def test_configuration_dne(self):
-        ee = self.before("/test/support/configs/test_partial_config.yaml")
+        ee = self.before("test_partial_config.yaml")
         assert(ee.client_name == "")
         assert(type(ee.client).__name__ == "EmptyClient")
 
     def test_bad_config(self):
-        ee = self.before("/test/support/configs/test_bad_config.yaml")
+        ee = self.before("test_bad_config.yaml")
         assert(ee.client_name == "")
         assert(type(ee.client).__name__ == "EmptyClient")
 
@@ -40,18 +40,18 @@ class TestMetastoreEngine:
     def before(self, config: str):
         base.set_log_level("fatal")
         config_home = from_root(config)
-        env = MasonEnvironment(config_home=config_home)
-        yaml_config_doc = parse_yaml(env.config_home)
+        env = MasonEnvironment(mason_home="/test/support/")
+        yaml_config_doc = parse_yaml(env.config_home + config)
         me = MetastoreEngine(yaml_config_doc)
         return me
 
     def test_configuration_exists(self):
-        me = self.before("/test/support/configs/test_config.yaml")
+        me = self.before("test_config.yaml")
         assert(me.client_name == "test")
         assert(type(me.client).__name__ == "InvalidMetastoreClient")
 
     def test_configuration_dne(self):
-        me = self.before("/test/support/configs/test_partial_config.yaml")
+        me = self.before("test_partial_config.yaml")
         assert(me.client_name == "")
         assert(type(me.client).__name__ == "EmptyClient")
 
@@ -60,18 +60,18 @@ class TestStorageEngine:
     def before(self, config: str):
         base.set_log_level("error")
         config_home = from_root(config)
-        env = MasonEnvironment(config_home=config_home)
-        yaml_config_doc = parse_yaml(env.config_home)
+        env = MasonEnvironment(mason_home="/test/support/")
+        yaml_config_doc = parse_yaml(env.config_home + config)
         me = StorageEngine(yaml_config_doc)
         return me
 
     def test_configuration_exists(self):
-        me = self.before("/test/support/configs/test_config.yaml")
+        me = self.before("test_config.yaml")
         assert(me.client_name == "test")
         assert(type(me.client).__name__ == "InvalidStorageClient")
 
     def test_configuration_dne(self):
-        me = self.before("/test/support/configs/test_partial_config_2.yaml")
+        me = self.before("test_partial_config_2.yaml")
         assert(me.client_name == "")
         assert(type(me.client).__name__ == "EmptyClient")
 
@@ -81,8 +81,8 @@ class TestSchedulerEngine:
     def before(self, config: str):
         base.set_log_level("error")
         config_home = from_root(config)
-        env = MasonEnvironment(config_home=config_home)
-        yaml_config_doc = parse_yaml(env.config_home)
+        env = MasonEnvironment(mason_home="/test/support/")
+        yaml_config_doc = parse_yaml(env.config_home + config)
         me = SchedulerEngine(yaml_config_doc)
         return me
 

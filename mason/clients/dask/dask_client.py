@@ -1,11 +1,12 @@
 from typing import Union, Tuple, Optional
 
+from mason.clients.base import Client
 from mason.clients.dask.runner.dask_runner import EmptyDaskRunner
 from mason.clients.dask.runner.kubernetes_worker.kubernetes_worker import KubernetesWorker
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
-class DaskClient:
+class DaskClient(Client):
     def __init__(self, dask_config: dict):
         self.runner_config = dask_config.get("runner", {})
         self.runner_type = self.runner_config.get("type")

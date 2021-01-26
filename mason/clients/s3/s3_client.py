@@ -16,8 +16,8 @@ from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema,
 from mason.util.list import get, sequence
 
 class S3Client(AWSClient):
-    def __init__(self, s3_config: dict):
-        super().__init__(**s3_config)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
     def client(self) -> S3FileSystem:
         s3 = s3fs.S3FileSystem(key=self.access_key, secret=self.secret_key, client_kwargs={'region_name': self.aws_region})

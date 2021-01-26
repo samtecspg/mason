@@ -1,9 +1,10 @@
 from typing import Union, Optional
 
+from mason.clients.base import Client
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
 
-class AWSClient:
+class AWSClient(Client):
 
     def __init__(self, access_key: str, secret_key: str, aws_region: str, aws_role_arn: Optional[str] = None):
         self.access_key = access_key

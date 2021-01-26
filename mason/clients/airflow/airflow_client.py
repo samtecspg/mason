@@ -1,18 +1,19 @@
 from typing import Tuple, Optional
 
 from mason.clients.airflow.airflow_dag import AirflowDag
+from mason.clients.base import Client
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.schedule import Schedule
 from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
 
-class AirflowClient:
+class AirflowClient(Client):
 
     def __init__(self, config: dict):
         self.endpoint = config.get("endpoint")
         self.user = config.get("user")
         self.password = config.get("password")
-
+        
     def client(self):
         # IMPLEMENT underlying client, likely just requests for API calls: 
         pass
