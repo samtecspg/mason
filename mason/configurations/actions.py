@@ -14,7 +14,7 @@ def run_configuration_actions(env: MasonEnvironment, config_file: Optional[str]=
     logger.set_level(log_level)
 
     if config_file:
-        valid, invalid = get_all(env, config_file)
+        valid, invalid = get_all(env)
 
         i = 0
         for id, c in valid.items():

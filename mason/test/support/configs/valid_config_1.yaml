@@ -1,6 +1,6 @@
 type: config
 id: 6
-storage_engines: 
+storage_clients: 
   - "s3"
 clients:
   s3:

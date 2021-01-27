@@ -1,10 +1,9 @@
-from typing import TypeVar, List, Union, Optional
+from typing import TypeVar, List, Union
 
 from typistry.protos.invalid_object import InvalidObject
 from typistry.validators.base import validate_files
 
 from mason.configurations.config import Config
-from mason.configurations.invalid_config import InvalidConfig
 from mason.test.support.validations.config import ConfigProto
 from mason.workflows.workflow import Workflow
 from mason.util.environment import MasonEnvironment

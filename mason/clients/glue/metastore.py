@@ -1,9 +1,8 @@
-from typing import Union, Optional, List, Tuple
+from typing import Union, Optional, Tuple
 
 from returns.result import Result
 
 from mason.clients.engines.metastore import MetastoreClient
-from mason.clients.engines.valid_client import ValidClient
 from mason.clients.glue.glue_client import GlueClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
@@ -14,7 +13,7 @@ from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
-class GlueMetastoreClient(MetastoreClient, ValidClient):
+class GlueMetastoreClient(MetastoreClient):
 
     def __init__(self, config: dict):
         self.client = GlueClient(config)

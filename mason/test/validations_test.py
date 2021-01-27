@@ -43,9 +43,26 @@ class TestValidations:
         configs, invalid = sequence(validate_configs(env2, ConfigProto), Config)
         assert(len(configs) == 3)
         assert(len(invalid) == 8)
-        clients = configs[0].clients
+
+        config = configs[0]
+        clients = config.clients
+        assert(config.execution().__class__.__name__ == "SparkExecutionClient")
+        assert(config.scheduler().__class__.__name__ == "InvalidClient")
+        assert(config.storage().__class__.__name__ == "InvalidClient")
+        assert(config.metastore().__class__.__name__ == "InvalidClient")
         assert(sorted(map(lambda c: c.name(), clients)) == ["spark"])
-        clients = configs[1].clients
+        config = configs[1]
+        clients = config.clients
+        assert(config.execution().__class__.__name__ == "InvalidClient")
+        assert(config.scheduler().__class__.__name__ == "InvalidClient")
+        assert(config.storage().__class__.__name__ == "S3StorageClient")
+        assert(config.metastore().__class__.__name__ == "InvalidClient")
         assert(sorted(map(lambda c: c.name(), clients)) == ["s3"])
-        clients = configs[2].clients
+        config = configs[2]
+        clients = config.clients
+        assert(config.execution().__class__.__name__ == "InvalidClient")
+        assert(config.scheduler().__class__.__name__ == "InvalidClient")
+        assert(config.storage().__class__.__name__ == "InvalidClient")
+        assert(config.metastore().__class__.__name__ == "InvalidClient")
         assert(sorted(map(lambda c: c.name(), clients)) == [])
+

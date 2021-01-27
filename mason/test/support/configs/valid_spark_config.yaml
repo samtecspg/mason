@@ -1,6 +1,6 @@
 type: config
 id: 7
-execution_engines: 
+execution_clients: 
   - "spark"
 clients:
   spark:

@@ -5,7 +5,7 @@ from mason.cli.apply import apply
 from mason.cli.config import config
 from mason.cli.operator import operator
 from mason.cli.register import register
-from mason.cli.run import run
+from mason.cli.server import run
 from mason.cli.workflow import workflow
 
 @click.group()

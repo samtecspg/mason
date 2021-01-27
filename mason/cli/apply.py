@@ -5,7 +5,7 @@ from mason.validations.validate import validate_files
 
 
 @click.command("apply", short_help="Apply mason yaml file")
-@click.option('-f', 'file', required=True, help="Mason yaml specification")
+@click.option('-f', 'file', required=True, help="Mason yaml specification or directory")
 @click.option("-l", "--log_level", help="Log level for mason")
 
 def apply(file: str, log_level: Optional[str] = None):

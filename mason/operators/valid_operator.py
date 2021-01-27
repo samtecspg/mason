@@ -2,7 +2,7 @@ from importlib import import_module
 from typing import List, Optional, Union
 
 from mason.clients.response import Response
-from mason.configurations.valid_config import ValidConfig
+from mason.configurations.config import Config
 from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
@@ -10,10 +10,9 @@ from mason.operators.supported_engines import SupportedEngineSet
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
-
 class ValidOperator:
 
-    def __init__(self, namespace: str, command: str, supported_configurations: List[SupportedEngineSet], description: str,  params: ValidatedParameters, config: ValidConfig, source_path: Optional[str] = None):
+    def __init__(self, namespace: str, command: str, supported_configurations: List[SupportedEngineSet], description: str,  params: ValidatedParameters, config: Config, source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
         self.description = description

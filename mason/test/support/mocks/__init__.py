@@ -2,7 +2,6 @@ from typing import Optional, Union
 from unittest.mock import patch, MagicMock
 
 from mason.clients.engines.invalid_client import InvalidClient
-from mason.clients.engines.valid_client import EmptyClient
 from mason.definitions import from_root
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.test.support.clients.test import TestClient

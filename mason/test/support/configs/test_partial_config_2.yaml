@@ -1,6 +1,6 @@
 type: config
 id: 5
-metastore_engines: 
+metastore_clients: 
   - "test"
 clients:
   test:

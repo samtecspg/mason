@@ -1,12 +1,12 @@
 type: config
 id: 3
-metastore_engines: 
+metastore_clients: 
   - "test"
-storage_engines: 
+storage_clients: 
   - "test"
-scheduler_engines: 
+scheduler_clients: 
   - "test2"
-execution_engines: 
+execution_clients: 
   - "test2"
 clients:
   test:

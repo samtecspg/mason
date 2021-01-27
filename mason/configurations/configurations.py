@@ -1,48 +1,41 @@
-import collections
+from collections import OrderedDict
 from typing import List, Union, Optional, Dict, Tuple
-from os import walk
 from tabulate import tabulate
+from typistry.protos.invalid_object import InvalidObject
 
 from mason.configurations.config import Config
 from mason.configurations.invalid_config import InvalidConfig
 from mason.configurations.valid_config import ValidConfig
+from mason.util.list import sequence
 from mason.util.logger import logger
 from mason.util.environment import MasonEnvironment
 from mason.clients.response import Response
 from mason.util.printer import banner
 from mason.util.yaml import parse_yaml_invalid
 from mason.util.session import set_session_config, get_session_config
+from mason.validations.validate import validate_configs
 
-def get_all(env: MasonEnvironment, config_file: Optional[str] = None) -> Tuple[Dict[str, ValidConfig], List[InvalidConfig]]:
-    dir = config_file or env.config_home
-    logger.debug(f"Reading configurations at {dir}")
+def get_all(env: MasonEnvironment) -> Tuple[Dict[str, Config], List[InvalidConfig]]:
+    logger.debug(f"Reading configurations at {env.config_home}")
+    
+    valid_configs, invalid = sequence(validate_configs(env), Config, InvalidObject)
+    invalid_configs = list(map(lambda i: InvalidConfig(i.reference, i.message),invalid))
+    
+    configs = {}
+    for config in valid_configs:
+        configs[config.id] = config
 
-    configs: Dict[str, ValidConfig] = {}
-    invalid: List[InvalidConfig] = []
+    configs_ordered = OrderedDict(sorted(configs.items()))
+    return configs_ordered, invalid_configs
 
-    for subdir, dirs, files in walk(dir):
-        for file in files:
-            if '.yaml' in file:
-                config = get_config(subdir + file)
-                if isinstance(config, ValidConfig):
-                    if not configs.get(config.id):
-                        configs[config.id] = config
-                    else:
-                        invalid.append(InvalidConfig(config.config, f"Duplicate configuration id {config.id}.  Skipping..."))
-                else:
-                     invalid.append(config)
-
-    configs_ordered = collections.OrderedDict(sorted(configs.items()))
-    return configs_ordered, invalid
-
-def get_config(file: str) -> Union[ValidConfig, InvalidConfig]:
+def get_config(file: str) -> Union[Config, InvalidConfig]:
     yaml_config_doc = parse_yaml_invalid(file)
     if isinstance(yaml_config_doc, dict):
         return Config(yaml_config_doc).validate(file)
     else:
         return InvalidConfig({}, yaml_config_doc)
 
-def tabulate_configs(configs: Dict[str, ValidConfig], env: MasonEnvironment, log_level: str = "info") -> Optional[ValidConfig]:
+def tabulate_configs(configs: Dict[str, Config], env: MasonEnvironment, log_level: str = "info") -> Optional[Config]:
     config_id = get_session_config(env)
 
     extended_info: List[List[Union[str, dict, int]]] = []
