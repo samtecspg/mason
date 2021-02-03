@@ -1,18 +1,18 @@
-import gc
+
 from typing import Optional, List
 import urllib.parse
 
+from mason.configurations.config import Config
 from mason.operators.operator_response import OperatorResponse
 from mason.parameters.input_parameters import InputParameters
 from mason.configurations.configurations import get_current_config, get_config_by_id
-from mason.configurations.valid_config import ValidConfig
 from mason.util.environment import MasonEnvironment
 from mason.util.logger import logger
 from mason.clients.response import Response
 from mason.operators import operators
 import gc
 
-def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[ValidConfig] = None, *args, **kwargs) :
+def get(namespace: str, command: str, environment: Optional[MasonEnvironment] = None, configuration: Optional[Config] = None, *args, **kwargs) :
 
     env: MasonEnvironment = environment or MasonEnvironment()
     config_id = kwargs.get("config_id")

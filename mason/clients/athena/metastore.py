@@ -17,8 +17,8 @@ from mason.engines.storage.models.path import Path
 
 class AthenaMetastoreClient(MetastoreClient, ValidClient):
 
-    def __init__(self, config: dict):
-        self.client = AthenaClient(config)
+    def __init__(self, client: AthenaClient):
+        self.client = client
 
     def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
         return self.client.generate_table_ddl(table, path, database)

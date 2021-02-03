@@ -3,7 +3,8 @@
   "title": "MasonConfiguration",
   "properties": {
     "id": { "type": ["string", "integer"]},
-    "type": { 
+    "source": {"type": "string" },
+    "type": {
       "type": "string",
       "enum": ["config", "Config", "Configuration", "configuration"]
     },

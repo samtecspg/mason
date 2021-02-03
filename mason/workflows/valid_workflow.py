@@ -4,7 +4,7 @@ from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.local.scheduler import LocalSchedulerClient
 
 from mason.clients.response import Response
-from mason.configurations.valid_config import ValidConfig
+from mason.configurations.config import Config
 from mason.engines.scheduler.models.schedule import Schedule
 
 from mason.util.environment import MasonEnvironment
@@ -15,7 +15,7 @@ import tempfile
 
 class ValidWorkflow:
 
-    def __init__(self, name: str, dag: ValidDag, config: ValidConfig, schedule: Optional[Schedule]):
+    def __init__(self, name: str, dag: ValidDag, config: Config, schedule: Optional[Schedule]):
         self.name = name
         self.schedule = schedule
         self.dag = dag

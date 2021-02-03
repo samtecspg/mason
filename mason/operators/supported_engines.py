@@ -1,6 +1,9 @@
 
 from typing import Optional, List, Dict
-from mason.configurations.valid_config import ValidConfig
+
+from mason.clients.base import Client
+from mason.clients.engines.invalid_client import InvalidClient
+from mason.configurations.config import Config
 
 def from_array(a: List[Dict[str, str]]):
     return list(map(lambda item: SupportedEngineSet(metastore=item.get("metastore"), scheduler=item.get("scheduler"), execution=item.get("execution"), storage=item.get("storage")), a))
@@ -20,14 +23,13 @@ class SupportedEngineSet:
             'storage': self.storage
         }
 
-    def validate_coverage(self, config: ValidConfig):
-        test = True
+    def validate_coverage(self, config: Config):
         for engine_type, supported_engine in self.all.items():
-            config_engine_client: str = config.engines.get(engine_type, {}).get('client_name', "")
-            if supported_engine:
-                test = (supported_engine == config_engine_client)
-            if not test:
-                break
+            clients: List[Client, InvalidClient] = config.__getattribute__(f"{engine_type}_clients")
+            client_names = list(map(lambda c: c.client_name, clients))
+            if supported_engine in client_names:
+                return True
+            else:
+                return False
 
-        return test
 

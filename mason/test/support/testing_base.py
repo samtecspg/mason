@@ -4,17 +4,17 @@ from dotenv import load_dotenv
 from typing import List, Optional, Union
 
 from mason.workflows import workflows
-from mason.configurations.valid_config import ValidConfig
 from mason.operators import operators
 from mason.test.support.mocks import get_patches
 from mason.util.logger import logger
-from mason.configurations.configurations import get_all, get_config
+from mason.configurations.configurations import get_all
 from mason.definitions import from_root
 from mason.util.uuid import uuid_regex
 from mason.clients.response import Response
 from mason.operators.operator import Operator
 from mason.util.environment import MasonEnvironment
 from mason.workflows.workflow import Workflow
+from mason.configurations.config import Config
 
 load_dotenv(from_root('/.env.example'))
 
@@ -46,25 +46,26 @@ def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[s
 
 
 def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], workflow: bool, callable):
-    response = Response()
-    op: Union[Optional[Operator], Optional[Workflow]] = None
-
-    if workflow:
-        op = workflows.get_workflow(env, cmd, sub)
-        types = "Workflow"
-    else:
-        op = operators.get_operator(env, cmd, sub)
-        types = "Operator"
-    if op:
-        for config in configs:
-            conf = get_config(from_root("/examples/operators/table/test_configs/") + config + ".yaml")
-            if isinstance(conf, ValidConfig):
-                callable(env, conf, op)
-            else:
-                raise Exception(f"No matching valid configuration found for {op.namespace}:{op.command}. Reason: {conf.reason}")
-
-    else:
-        raise Exception(f"{types} not found {cmd} {sub}")
+    pass
+    # response = Response()
+    # op: Union[Optional[Operator], Optional[Workflow]] = None
+    # 
+    # if workflow:
+    #     op = workflows.get_workflow(env, cmd, sub)
+    #     types = "Workflow"
+    # else:
+    #     op = operators.get_operator(env, cmd, sub)
+    #     types = "Operator"
+    # if op:
+    #     for config in configs:
+    #         conf = get_config(from_root("/examples/operators/table/test_configs/") + config + ".yaml")
+    #         if isinstance(conf, Config):
+    #             callable(env, conf, op)
+    #         else:
+    #             raise Exception(f"No matching valid configuration found for {op.namespace}:{op.command}. Reason: {conf.reason}")
+    # 
+    # else:
+    #     raise Exception(f"{types} not found {cmd} {sub}")
 
 def set_log_level(level: str = None):
     logger.set_level(level or "fatal", False)

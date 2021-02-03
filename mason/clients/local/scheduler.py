@@ -8,7 +8,6 @@ from mason.clients.local.local_client import LocalClient
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.environment import MasonEnvironment
 
-
 class LocalSchedulerClient(SchedulerClient):
     
     #  This is a local synchronous scheduler.   For asynchronous see AsyncLocal (WIP)

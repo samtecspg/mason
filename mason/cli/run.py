@@ -15,7 +15,7 @@ def get(file: str, resource_type: str, log_level: Optional[str] = None):
         mason get 
     """
 
-    from mason.util.environment import MasonEnvironment, initialize_environment
+    from mason.util.environment import MasonEnvironment
 
     env = MasonEnvironment()
     initialize_environment(env)

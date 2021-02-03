@@ -3,9 +3,10 @@ from abc import abstractmethod
 
 from mason.engines.scheduler.models.dags.client_dag import ClientDag
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
-from mason.util.environment import MasonEnvironment
 from mason.clients.client import Client
 from mason.clients.response import Response
+from mason.util.environment import MasonEnvironment
+
 
 class SchedulerClient(Client):
 

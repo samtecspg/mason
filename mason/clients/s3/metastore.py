@@ -4,7 +4,6 @@ from typing import Tuple, Union, Optional
 from returns.result import Result
 
 from mason.clients.engines.metastore import MetastoreClient
-from mason.clients.engines.valid_client import ValidClient
 from mason.clients.response import Response
 from mason.clients.s3.s3_client import S3Client
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
@@ -15,7 +14,7 @@ from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
-class S3MetastoreClient(MetastoreClient, ValidClient):
+class S3MetastoreClient(MetastoreClient):
 
     def __init__(self, client: S3Client):
         self.client = client 

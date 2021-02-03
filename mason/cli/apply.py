@@ -1,8 +1,16 @@
 
+from typing import Union
+from typing import List
 from typing import Optional
 import click
-from mason.validations.validate import validate_files
 
+from mason.configurations.config import Config
+from mason.operators.operator import Operator
+
+from mason.validations.validate import validate_all
+from typistry.protos.invalid_object import InvalidObject
+
+from mason.workflows.workflow import Workflow
 
 @click.command("apply", short_help="Apply mason yaml file")
 @click.option('-f', 'file', required=True, help="Mason yaml specification or directory")
@@ -10,17 +18,16 @@ from mason.validations.validate import validate_files
 
 def apply(file: str, log_level: Optional[str] = None):
     """
-    Applies mason yaml file with unspecified use (config, operator, workflow) 
+    Applies mason yaml (Config, Operator, Workflow)
+    Coming soon:  WorkflowRun, OperatorRun, OperatorDryRun, WorkflowDryRun
 
     [FILE] is a yaml file.  See examples/ for reference implementations.
     """
 
-    from mason.util.environment import MasonEnvironment, initialize_environment
+    from mason.util.environment import MasonEnvironment
 
-    env = MasonEnvironment()
-    initialize_environment(env)
-    
-    objects = validate_files(file, env)
-    print("HERE")
-    
+    env = MasonEnvironment().initialize()
+    all: List[Union[Operator, Workflow, Config, InvalidObject]] = validate_all(env, file)
+    results = list(map(lambda i: i.save(env.state_store), all))
+    return results
 

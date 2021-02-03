@@ -1,7 +1,7 @@
 id: 5
-metastore_engine: s3
-storage_engine: s3
-execution_engine: local
+metastore_clients: s3
+storage_clients: s3
+execution_clients: local
 clients:
   s3:
     configuration:

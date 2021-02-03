@@ -9,7 +9,7 @@ from mason.util.environment import initialize_environment
 @click.option("-l", "--log_level", help="Log level for mason")
 def validate(file: str, resource_type: str, log_level: Optional[str] = None):
     """
-    Validates mason workflow or operator with parameters and performs a dry run
+    Validates mason workflow or operator with passed parameters and performs a dry run
     Example:
         
     """

@@ -14,9 +14,9 @@ from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
 class GlueMetastoreClient(MetastoreClient):
-
-    def __init__(self, config: dict):
-        self.client = GlueClient(config)
+    
+    def __init__(self, client: GlueClient):
+        self.client = client
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         return self.client.get_database(database_name, response)

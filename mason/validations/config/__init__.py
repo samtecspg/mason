@@ -19,7 +19,6 @@ from mason.engines.metastore.metastore_engine import MetastoreEngine
 from mason.engines.scheduler.scheduler_engine import SchedulerEngine
 from mason.engines.storage.storage_engine import StorageEngine
 
-
 class ConfigProto(ProtoObject):
     
     # TODO: Make this dynamic like engines
@@ -62,6 +61,7 @@ class ConfigProto(ProtoObject):
         sc = attributes.get("storage_clients")
         cc = attributes.get("scheduler_clients")
         ec = attributes.get("execution_clients")
+        source_path = attributes.get("source")
 
         cl = attributes.get("clients")
 
@@ -78,10 +78,14 @@ class ConfigProto(ProtoObject):
                         client_class = self.supported_client(client_name)
                         if not client_class is None:
                             tdict = TypedDict(configuration, client_name)
-                            valid: Union[ValidDict, InvalidObject] = validate_dict(tdict, from_root(self.client_path()))._inner_value
+                            valid: Union[ValidDict, InvalidObject] = validate_dict(tdict, from_root(self.client_path()), True)._inner_value
                             if isinstance(valid, ValidDict):
                                 valid.typed_dict.type = valid.type() + "_client"
-                                clients.append(build_object(valid, to_class=client_class)._inner_value)
+                                value: Union[Client, InvalidObject] = build_object(valid, to_class=client_class)._inner_value
+                                if isinstance(value, InvalidObject):
+                                    invalid.append(InvalidClient(f"Invalid Client: {value.message}, {value.reference}"))
+                                else:
+                                    clients.append(value)
                             else:
                                 invalid.append(InvalidClient(f"{valid.message}"))
                         else:
@@ -96,7 +100,7 @@ class ConfigProto(ProtoObject):
             scheduler_clients: List[Union[SchedulerClient, InvalidClient]] = SchedulerEngine().get_clients(cc, clients, self.client_module())
             storage_clients: List[Union[StorageClient, InvalidClient]] = StorageEngine().get_clients(sc, clients, self.client_module())
             
-            return Config(id, clients, invalid, metastore_clients, execution_clients, storage_clients, scheduler_clients)
+            return Config(id, clients, invalid, metastore_clients, execution_clients, storage_clients, scheduler_clients, source_path)
         else:
             return InvalidObject("Id not provided for config object", attributes)
 

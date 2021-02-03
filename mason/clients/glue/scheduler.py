@@ -12,8 +12,8 @@ from mason.engines.storage.models.path import Path
 
 class GlueSchedulerClient(SchedulerClient):
 
-    def __init__(self, config: dict):
-        self.client: GlueClient = GlueClient(config)
+    def __init__(self, client: GlueClient):
+        self.client = client
 
     def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response):
         #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator

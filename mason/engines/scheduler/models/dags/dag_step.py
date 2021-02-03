@@ -1,6 +1,5 @@
 from typing import Union, List, Optional
 
-
 from mason.configurations.configurations import get_config_by_id
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
@@ -9,6 +8,7 @@ from mason.operators.valid_operator import ValidOperator
 from mason.parameters.input_parameters import InputParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
+
 
 class DagStep:
     def __init__(self, step_config: dict):

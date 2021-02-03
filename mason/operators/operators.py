@@ -5,6 +5,7 @@ from importlib import import_module
 from sys import path
 from typing import List
 
+from mason.configurations.config import Config
 from mason.operators import namespaces
 from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.namespaces.namespace import Namespace
@@ -14,7 +15,6 @@ from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.operators.valid_operator import ValidOperator
 from typing import Optional, Union, Tuple
-from mason.configurations.valid_config import ValidConfig
 from mason.parameters.input_parameters import InputParameters
 from mason.clients.response import Response
 from mason.util.list import sequence
@@ -37,7 +37,7 @@ def import_all(env: MasonEnvironment):
 def update_yaml(env: MasonEnvironment, base_swagger: str):
     update_yaml_file(base_swagger, [env.operator_home, env.workflow_home])
 
-def run(env: MasonEnvironment, config: ValidConfig, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None) -> OperatorResponse:
+def run(env: MasonEnvironment, config: Config, parameters: InputParameters, cmd: Optional[str] = None, subcmd: Optional[str] = None) -> OperatorResponse:
     sys.path.append(env.mason_home)
 
     #  TODO: Allow single step commands without subcommands
