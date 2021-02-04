@@ -4,7 +4,6 @@ from returns.result import Result
 
 from mason.clients.athena.athena_client import AthenaClient
 from mason.clients.engines.metastore import MetastoreClient
-from mason.clients.engines.valid_client import ValidClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import InvalidCredentials
@@ -15,7 +14,7 @@ from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
 
-class AthenaMetastoreClient(MetastoreClient, ValidClient):
+class AthenaMetastoreClient(MetastoreClient):
 
     def __init__(self, client: AthenaClient):
         self.client = client

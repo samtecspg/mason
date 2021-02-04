@@ -6,9 +6,13 @@ from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.engines.storage import StorageClient
+from mason.configurations import REDACTED_KEYS
+from mason.resources.saveable import Saveable
 from mason.state.base import MasonStateStore
+from mason.util.dict import sanitize
 
-class Config():
+
+class Config(Saveable):
     
     def __init__(self, id: str,
             clients: List[Client],
@@ -18,6 +22,8 @@ class Config():
             storage_clients: List[Union[StorageClient, InvalidClient]],
             scheduler_clients: List[Union[SchedulerClient, InvalidClient]],
             source_path: Optional[str] = None):
+        
+        super().__init__(source_path)
         self.id = id
         self.clients = clients
         self.invalid_clients = invalid_clients
@@ -62,57 +68,11 @@ class Config():
     def save(self, state_store: MasonStateStore, overwrite: bool = False):
         state_store.cp_source(self.source_path, "config", overwrite=overwrite)
 
-    def extended_info(self, config_id: str, current: bool = False):
-        return []
-        # ei = []
-        # 
-        # if not self.metastore(). == "":
-        #     ei.append(
-        #         [
-        #             "",
-        #             "metastore",
-        #             self.metastore.client_name,
-        #             sanitize(self.metastore.config, REDACTED_KEYS),
-        #         ]
-        #     )
-        # 
-        # if not self.scheduler.client_name == "":
-        #     ei.append(
-        #         [
-        #             "",
-        #             "scheduler",
-        #             self.scheduler.client_name,
-        #             sanitize(self.scheduler.config, REDACTED_KEYS),
-        #         ]
-        #     )
-        # 
-        # if not self.storage.client_name == "":
-        #     ei.append(
-        #         [
-        #             "",
-        #             "storage",
-        #             self.storage.client_name,
-        #             sanitize(self.storage.config, REDACTED_KEYS),
-        #         ]
-        #     )
-        # 
-        # if not self.execution.client_name == "":
-        #     ei.append(
-        #         [
-        #             "",
-        #             "execution",
-        #             self.execution.client_name,
-        #             sanitize(self.execution.config, REDACTED_KEYS),
-        #         ]
-        #     )
-        # 
-        # def with_id_item(l, current: bool):
-        #     if current == True:
-        #         cid = "*  " + str(config_id)
-        #     else:
-        #         cid = ".  " + str(config_id)
-        #     return [cid if l.index(x) == 0 else x for x in l]
-        # 
-        # with_id = [with_id_item(x, current) if ei.index(x) == 0 else x for x in ei]
-        # 
-        # return with_id
+    def extended_info(self, current_id: Optional[str] = None) -> List[str]:
+        execution_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.execution_clients)))
+        storage_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.storage_clients)))
+        scheduler_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.scheduler_clients)))
+        metastore_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.metastore_clients)))
+        return [self.id, execution_clients, metastore_clients, storage_clients, scheduler_clients]
+
+

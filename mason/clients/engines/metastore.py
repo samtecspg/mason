@@ -3,7 +3,8 @@ from abc import abstractmethod
 from typing import Union, Optional, Tuple
 
 from returns.result import Result
-from mason.clients.client import Client
+
+from mason.clients.base import Client
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
@@ -12,7 +13,11 @@ from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
-class MetastoreClient(Client):
+class MetastoreClient:
+
+    @abstractmethod
+    def __init__(self, client: Client):
+        self.client = client
 
     @abstractmethod
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:

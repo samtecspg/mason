@@ -40,3 +40,23 @@ def sequence(l: List[Union[A, B]], type_a: Type[A], type_b: Type[B]) -> Tuple[Li
             l2.append(l0)
     return l1, l2
 
+
+C = TypeVar("C")
+D = TypeVar("D")
+def sequence_4(l: List[Union[A, B, C, D]], type_a: Type[A], type_b: Type[B], type_c: Type[C], type_d: Type[D]) -> Tuple[List[A], List[B], List[C], List[D]]:
+    l1: List[A] = []
+    l2: List[B] = []
+    l3: List[C] = []
+    l4: List[D] = []
+    for l0 in l:
+        if isinstance(l0, type_a):
+            l1.append(l0)
+        elif isinstance(l0, type_b):
+            l2.append(l0)
+        elif isinstance(l0, type_c):
+            l3.append(l0)
+        else:
+            assert(isinstance(l0, type_d))
+            l4.append(l0)
+    return l1, l2, l3, l4
+

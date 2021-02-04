@@ -2,7 +2,8 @@
 import click
 
 from mason.cli.apply import apply
-from mason.cli.server import run
+from mason.cli.get import get
+from mason.cli.server import server
 
 @click.group()
 @click.version_option(prog_name="Mason", message='%(prog)s -v %(version)s')
@@ -21,8 +22,9 @@ def cli():
     """
 
 # cli.add_command(apply)
-cli.add_command(run)
+cli.add_command(server)
 cli.add_command(apply)
+cli.add_command(get)
 # cli.add_command(operator)
 # cli.add_command(register)
 # cli.add_command(workflow)

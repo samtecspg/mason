@@ -1,12 +1,16 @@
 from typing import Optional, Union, Tuple
 from abc import abstractmethod
 
-from mason.clients.client import Client
+from mason.clients.base import Client
 from mason.clients.response import Response
 from mason.engines.metastore.models.table import Table, InvalidTables
 from mason.engines.storage.models.path import Path
 
-class StorageClient(Client):
+class StorageClient:
+    
+    @abstractmethod
+    def __init__(self, client: Client):
+        self.client = client
 
     @abstractmethod
     def path(self, path: str) -> Path:

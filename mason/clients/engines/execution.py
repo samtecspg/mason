@@ -1,12 +1,16 @@
-from typing import Union, Tuple, Optional
+from typing import Union, Tuple, Optional, TypeVar, Type
 
 from abc import abstractmethod
 
-from mason.clients.client import Client
+from mason.clients.base import Client
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
 
-class ExecutionClient(Client):
+class ExecutionClient:
+    
+    @abstractmethod
+    def __init__(self, client: Client):
+        self.client = client
 
     @abstractmethod
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:

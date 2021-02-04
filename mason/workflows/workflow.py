@@ -1,6 +1,4 @@
 import importlib
-import shutil
-from os import path
 from sys import path as sys_path
 from typing import Optional, List, Union
 
@@ -8,6 +6,7 @@ from mason.configurations.config import Config
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.dags.dag import Dag
 from mason.engines.scheduler.models.schedule import InvalidSchedule
+from mason.resources.saveable import Saveable
 from mason.state.base import MasonStateStore
 from mason.util.environment import MasonEnvironment
 from mason.util.string import to_class_case
@@ -17,16 +16,16 @@ from mason.workflows.invalid_workflow import InvalidWorkflow
 from mason.workflows.valid_workflow import ValidWorkflow
 from mason.workflows.workflow_definition import WorkflowDefinition
 
-class Workflow:
+class Workflow(Saveable, Validateable):
 
     def __init__(self, namespace: str, command: str, name: str, dag: List[dict], supported_schedulers: List[str], description: Optional[str] = None, source: Optional[str] = None):
+        super().__init__(source)
         self.namespace = namespace
         self.command = command
         self.description = description
         self.dag = Dag(namespace, command, dag)
         self.name = name + "_" + str(uuid4())
         self.supported_schedulers = supported_schedulers
-        self.source_path = source
 
 
     def module(self) -> Union[WorkflowDefinition, InvalidWorkflow]:
@@ -63,4 +62,4 @@ class Workflow:
 
 
     def save(self, state_store: MasonStateStore, overwrite: bool = False):
-        state_store.cp_source(self.source_path, "workflow", f"/{self.namespace}/{self.command}", overwrite)
+        state_store.cp_source(self.source_path, "workflow", self.namespace, self.command, overwrite)

@@ -15,7 +15,7 @@ class MasonStateStore:
         self.workflow_home = self.home + "workflows/"
 
     @abstractmethod
-    def cp_source(self, source: Optional[str], type: str, postfix: str, overwrite: bool = False):
+    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False):
         raise Exception("Config save not configured")
 
     # @abstractmethod

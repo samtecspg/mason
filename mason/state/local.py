@@ -18,19 +18,27 @@ class LocalStateStore(MasonStateStore):
         }
         return destinations.get(type)
     
-    def write_operator_type(self, source: str, type: str, destination: str, overwrite: bool = False):
-        os.makedirs(destination)
-        if path.exists(destination):
+    def write_operator_type(self, source: str, type: str, destination: str, command: str, overwrite: bool = False):
+        if not path.exists(destination):
+            os.makedirs(destination)
+            Path(destination + "__init__.py").touch()
+
+        full_path = destination + f"{command}/"
+
+        if path.exists(full_path):
             if overwrite:
-                shutil.rmtree(destination)
-                shutil.copy(source, destination + f"{type}.yaml")
-                shutil.copy(path.dirname(source), destination + f"{type}.yaml")
+                shutil.rmtree(full_path)
+                shutil.copy(source, full_path + f"{type}.yaml")
+                shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
+                logger.info(f"Valid {type}.  Saved {source} to {destination}")
             else:
-                logger.error(f"Definition already exists for {type}")
+                logger.error(f"Definition already exists for {type}:{destination}:{command}")
         else:
-            shutil.copy(source, destination + f"{type}.yaml")
-            shutil.copy(path.dirname(source), destination + f"{type}.yaml")
-            
+            os.makedirs(full_path)
+            shutil.copy(source, full_path + f"{type}.yaml")
+            shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
+            logger.info(f"Valid {type}.  Saved {source} to {destination}")
+
     def write_config(self, source, destination: str, overwrite: bool = False):
         config_name = path.basename(source)
         config_destination = destination + config_name
@@ -38,25 +46,28 @@ class LocalStateStore(MasonStateStore):
             if overwrite:
                 shutil.rmtree(config_destination)
                 shutil.copy(source, destination + config_name)
+                logger.info(f"Valid config.  Saved {source} to {destination}")
             else:
                 logger.error(f"Config {config_name} already exists.")
         else:
             shutil.copy(source, destination + config_name)
-        
+            logger.info(f"Valid config.  Saved {source} to {destination}")
+
     # TODO: Copy to tmp instead of tracking source, and copy from tmp
-    def cp_source(self, source: Optional[str], type: str, postfix: str = "", overwrite: bool = False):
+    # TODO: Clean up type switches, serialize internal representation
+    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False):
         if source:
             home = self.get_home(type)
             if home:
-                tree_path = ("/").join([home.rstrip("/"), postfix])
                 if type == "config":
-                    self.write_config(source, tree_path, overwrite)
+                    self.write_config(source, home, overwrite)
                 elif type in ["operator", "workflow"]:
-                    self.write_operator_type(source, type, tree_path, overwrite)
+                    tree_path = home + "/" + f"{namespace}/"
+                    self.write_operator_type(source, type, tree_path, command, overwrite)
                 else:
                     logger.error(f"Type not supported: {type}")
         else:
-            logger.error(f"Source path not found for {type}:{postfix}")
+            logger.error(f"Source path not found for {type}:{namespace}:{command}")
 
     def initialize(self) -> str:
         if not path.exists(self.home):

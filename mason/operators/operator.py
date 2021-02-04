@@ -11,12 +11,14 @@ from mason.operators.valid_operator import ValidOperator
 from mason.parameters.parameters import Parameters
 from mason.parameters.input_parameters import InputParameters
 from mason.parameters.validated_parameters import ValidatedParameters
+from mason.resources.saveable import Saveable
 from mason.state.base import MasonStateStore
 from mason.util.string import to_class_case
 
-class Operator:
+class Operator(Saveable):
 
     def __init__(self, namespace: str, command: str, description: str = "", parameters: dict = {}, supported_configurations: List[Dict[str, str]] = [], source: Optional[str] = None):
+        super().__init__(source)
         self.namespace = namespace
         self.command = command
         self.description = description
@@ -25,7 +27,7 @@ class Operator:
         self.source_path = source
 
     def save(self, state_store: MasonStateStore, overwrite: bool = False):
-        state_store.cp_source(self.source_path, "operator", f"{self.namespace}/{self.command}", overwrite)
+        state_store.cp_source(self.source_path, "operator", self.namespace, self.command, overwrite)
         return None
 
     def module(self) -> Union[OperatorDefinition, InvalidOperator]:
