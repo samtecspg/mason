@@ -6,7 +6,7 @@ from mason.definitions import from_root
 from mason.util.environment import MasonEnvironment
 from mason.test.support import testing_base as base
 
-from mason.validations.validate import validate_operators, validate_configs
+from mason.resources.base import get_operators, get_configs
 from mason.validations.config import ConfigProto
 
 from typistry.validators.base import sequence
@@ -18,7 +18,7 @@ class TestValidations:
 
     def test_operators(self):
         env = MasonEnvironment(mason_home=from_root("/test/support/"), validation_path=from_root("/test/support/validations/"))
-        operators, invalid = sequence(validate_operators(env), Operator)
+        operators, invalid = sequence(get_operators(env), Operator)
         assert(len(operators) == 6)
         assert(len(invalid) == 0)
 
@@ -30,8 +30,7 @@ class TestValidations:
 
     def test_configs(self):
         env = MasonEnvironment(mason_home=from_root("/test/support/"), validation_path=from_root("/test/support/validations/"))
-        test_configs, invalid = sequence(validate_configs(env, proto_class=TestConfigProto), Config)
-        print("HERE")
+        test_configs, invalid = sequence(get_configs(env, proto_class=TestConfigProto), Config)
         assert(len(test_configs) == 4)
         assert(len(invalid) == 7)
         clients = test_configs[0].clients
@@ -41,7 +40,7 @@ class TestValidations:
 
         # testing with actual clients
         env2 = MasonEnvironment(mason_home=from_root("/test/support/"))
-        configs, invalid = sequence(validate_configs(env2, ConfigProto), Config)
+        configs, invalid = sequence(get_configs(env2, ConfigProto), Config)
         assert(len(configs) == 3)
         assert(len(invalid) == 8)
 

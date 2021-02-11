@@ -9,42 +9,42 @@ produces:
 - application/json
 swagger: '2.0'
 paths:
-  /configs:
+  /get:
     get:
-      operationId: "mason.api.config_api.get"
-      parameters:
-        - name: log_level
-          in: query
-          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
-          default: "info"
-          required: false
-          type: string
+      operationId: "mason.api.base.get"
       tags:
-        - "Config"
-      summary: "List out current mason configuration"
-      description: "List out mason configuration"
-      responses:
-        200:
-          description: "Successful list"
-  /config:
-    post:
-      operationId: "mason.api.config_api.set"
+        - "Get"
+      summary: "Get mason resource"
+      description: "Get mason resource"
+      consumes:
+        - "application/json"
       parameters:
-        - name: set_current
+        - name: resource_type
           in: query
           required: true
-          description: "Config id you wish to set as current config"
+          type: string
+          enum:
+            - all
+            - operator
+            - workflow
+            - config
+        - name: namespace
+          in: query
+          required: false
+          type: string
+        - name: command
+          in: query
+          required: false
           type: string
         - name: log_level
           in: query
-          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
-          default: "info"
+          default: info
+          enum:
+            - info
+            - warning
+            - error
+            - debug
+            - trace
+            - fatal
           required: false
           type: string
-      tags:
-        - "Config"
-      summary: "Set current mason config"
-      description: "Set current mason config by set_current id"
-      responses:
-        200:
-          description: "Successful list"

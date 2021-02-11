@@ -2,7 +2,7 @@ from mason.clients.response import Response
 from mason.configurations.valid_config import ValidConfig
 from mason.definitions import from_root
 from mason.operators.operator import Operator
-from mason.parameters.input_parameters import InputParameters
+from mason.parameters.operator_parameters import OperatorParameters
 from mason.test.support.testing_base import run_tests
 from mason.util.environment import MasonEnvironment
 from dotenv import load_dotenv
@@ -13,7 +13,7 @@ def test_get():
 
     def tests(env: MasonEnvironment, config: ValidConfig, op: Operator):
         # valid job_id
-        params = InputParameters(parameter_string=f"job_id:good_job_id")
+        params = OperatorParameters(parameter_string=f"job_id:good_job_id")
         # TODO: consolidate these
         expect = {
             'spark': {'Data': [{'Logs': ['<LOG_DATA>']}], 'Errors': [], 'Info': [], 'Warnings': []},
@@ -25,7 +25,7 @@ def test_get():
         assert ((expect[config.execution.client_name], 200) == good.with_status())
 
         # invalid job_id
-        params = InputParameters(parameter_string="job_id:bad_job_id")
+        params = OperatorParameters(parameter_string="job_id:bad_job_id")
         bad = op.validate(config, params).run(env, Response())
 
 

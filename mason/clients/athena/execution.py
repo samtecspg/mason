@@ -8,7 +8,7 @@ from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
 class AthenaExecutionClient(ExecutionClient):
 
     def __init__(self, client: AthenaClient):
-        self.client = client
+        self.client: AthenaClient = client
 
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         return self.client.run_job(job, response)

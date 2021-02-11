@@ -1,7 +1,6 @@
 from typing import List, Union, Set, Tuple
 
 from mason.engines.scheduler.models.dags.dag_step import DagStep
-
 from mason.engines.scheduler.models.dags.invalid_dag import InvalidDag
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
@@ -9,7 +8,6 @@ from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
 from mason.util.list import flatten, sequence
-
 
 class Dag:
 

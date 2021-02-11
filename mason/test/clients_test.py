@@ -3,6 +3,7 @@ import shutil
 from unittest import mock
 
 from hiyapyco import dump as hdump
+
 from mason.clients.response import Response
 
 from mason.test.support.mocks import mock_execution_engine_client, mock_storage_engine_client, mock_metastore_engine_client, mock_config_schema
@@ -143,7 +144,7 @@ class TestLocal:
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
             assert(isinstance(validated, ValidWorkflow))
-            response = validated.run(env, Response(), False, True)
+            response = validated.execute(env, Response(), False, True)
             info = """
             Registering workflow dag test_workflow_local_scheduler_ea5b602c-261c-4e06-af21-375ea912b6a5 with local.
             Registering DAG in local memory

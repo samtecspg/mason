@@ -7,23 +7,13 @@ from dotenv import load_dotenv
 
 from mason.definitions import from_root
 from mason.state.local import LocalStateStore
-
 from mason.util.printer import banner
 
 class MasonEnvironment:
-    def __init__(self,
-                mason_home: Optional[str] = None,
-             operator_module: Optional[str] = None, #TODO: get rid of these two
-             workflow_module: Optional[str] = None,
-             validation_path: Optional[str] = None
-        ):
+    def __init__(self, mason_home: Optional[str] = None, validation_path: Optional[str] = None):
         self.mason_home = get_mason_home(mason_home)
-        self.operator_module: str = operator_module or "operators"
-        self.workflow_module: str = workflow_module or "workflows"
         self.validation_path: str = validation_path or from_root("/validations/")
-
         self.state_store = LocalStateStore(self.mason_home, get_client_version())
-
         self.load_environment_variables()
 
     def initialize(self) -> 'MasonEnvironment':

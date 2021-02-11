@@ -1,9 +1,9 @@
 from typing import Type
 
 from mason.clients.base import Client
-from mason.validations.config import ConfigProto
+from mason.validations.config import ConfigProto as BaseConfigProto
 
-class TestConfigProto(ConfigProto):
+class ConfigProto(BaseConfigProto):
 
     def supported_client(self, client_name: str) -> Type[Client]:
         if client_name == "test":

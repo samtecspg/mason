@@ -3,11 +3,11 @@ import re
 from dotenv import load_dotenv
 from typing import List, Optional, Union
 
-from mason.workflows import workflows
-from mason.operators import operators
+from typistry.validators.base import sequence
+
+from mason.resources.base import get_operator, get_workflow, get_config 
 from mason.test.support.mocks import get_patches
 from mason.util.logger import logger
-from mason.configurations.configurations import get_all
 from mason.definitions import from_root
 from mason.util.uuid import uuid_regex
 from mason.clients.response import Response
@@ -30,7 +30,7 @@ def clean_string(s1: str):
     f1 = e.sub('', ansi_escape(s1))
     return f1
 
-def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
+def run_tests(namespace: str, command: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
     logger.set_level(log_level)
     env = get_env()
     load_dotenv(from_root("/../.env.example"))
@@ -40,39 +40,42 @@ def run_tests(cmd: str, sub: str, do_mock: bool, log_level: str, configs: List[s
         with contextlib.ExitStack() as stack:
             for p in patches:
                 stack.enter_context(p)
-            run_test(env, cmd, sub, configs, workflow, callable)
+            run_test(env, namespace, command, configs, workflow, callable)
     else:
-        run_test(env, cmd, sub, configs, workflow, callable)
+        run_test(env, namespace, command, configs, workflow, callable)
 
 
-def run_test(env: MasonEnvironment, cmd: str, sub: str, configs: List[str], workflow: bool, callable):
-    pass
+def run_test(env: MasonEnvironment, namespace: str, command: str, configs: List[str], workflow: bool, callable):
+    return Response()
     # response = Response()
     # op: Union[Optional[Operator], Optional[Workflow]] = None
     # 
     # if workflow:
-    #     op = workflows.get_workflow(env, cmd, sub)
+    #     op = get_workflow(env, namespace, command)
     #     types = "Workflow"
     # else:
-    #     op = operators.get_operator(env, cmd, sub)
+    #     op = get_operator(env, namespace, command)
     #     types = "Operator"
     # if op:
     #     for config in configs:
-    #         conf = get_config(from_root("/examples/operators/table/test_configs/") + config + ".yaml")
+    #         configs, invalid = sequence(get_configs(env), Config)
+    #         for inv in invalid:
+    #             print(f"Invalid Config: {inv.message}")
+    #         conf: Optional[Config] = get_config_by_id(env, config)
     #         if isinstance(conf, Config):
     #             callable(env, conf, op)
     #         else:
-    #             raise Exception(f"No matching valid configuration found for {op.namespace}:{op.command}. Reason: {conf.reason}")
+    #             raise Exception(f"No matching valid configuration found for {op.namespace}:{op.command}.")
     # 
     # else:
-    #     raise Exception(f"{types} not found {cmd} {sub}")
+    #     raise Exception(f"{types} not found {namespace} {command}")
 
 def set_log_level(level: str = None):
     logger.set_level(level or "fatal", False)
 
-def get_env(operator_home: str = "/examples/operators", config_home = "/examples/operators/table/test_configs/", operator_module: str = "mason.examples.operators", workflow_home: str = "/examples/workflows", workflow_module="examples.workflows"):
-    return MasonEnvironment(operator_home=from_root(operator_home), config_home=from_root(config_home), operator_module=operator_module, workflow_home=from_root(workflow_home), workflow_module=workflow_module)
+def get_env(home: Optional[str] = None, validations: Optional[str] = None):
+    return MasonEnvironment(from_root(home or "/examples/"), from_root(validations or "/validations/"))
 
-def get_configs(env: MasonEnvironment):
-    valid, invalid = get_all(env)
-    return list(valid.values())
+# def get_configs(env: MasonEnvironment):
+#     valid, invalid = get_all(env)
+#     return list(valid.values())

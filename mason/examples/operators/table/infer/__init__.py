@@ -1,10 +1,9 @@
 from typing import Optional, Union
 
+from mason.configurations.config import Config
 from mason.util.result import compute
 
 from mason.clients.response import Response
-from mason.configurations.valid_config import ValidConfig
-from mason.api import operator_api as OperatorApi
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 from mason.engines.metastore.models.database import Database
 from mason.engines.metastore.models.ddl import DDLStatement
@@ -14,10 +13,8 @@ from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
-def api(*args, **kwargs): return OperatorApi.get("table", "infer", *args, **kwargs)
-
 class TableInfer(OperatorDefinition):
-    def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
+    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
         database_name: str = parameters.get_required("database_name")
         storage_path: str = parameters.get_required("storage_path")
         table_name: Optional[str] = parameters.get_optional("table_name")

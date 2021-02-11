@@ -9,7 +9,7 @@ from mason.engines.storage.models.path import Path
 class S3StorageClient(StorageClient):
 
     def __init__(self, client: S3Client):
-        self.client = client 
+        self.client: S3Client = client 
 
     def path(self, path: str) -> Path:
         return self.client.path(path)

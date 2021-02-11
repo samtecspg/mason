@@ -7,10 +7,10 @@ from mason.clients.response import Response
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
 class DaskClient(Client):
-    def __init__(self, dask_config: dict):
-        self.runner_config = dask_config.get("runner", {})
-        self.runner_type = self.runner_config.get("type")
-
+    def __init__(self, runner: dict, type: str):
+        self.runner_config = runner 
+        self.runner_type = type 
+        
     def client(self):
         return self.get_runner(self.runner_type, self.runner_config)
 

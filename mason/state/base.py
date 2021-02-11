@@ -16,16 +16,13 @@ class MasonStateStore:
 
     @abstractmethod
     def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False):
-        raise Exception("Config save not configured")
+        raise Exception("Config cp_source not configured")
 
-    # @abstractmethod
-    # def get_config(self, config_id: str):
-    #     raise Exception("Config save not configured")
-    #
-    # @abstractmethod
-    # def get_operator(self, namespace: str, operator: str):
-    #     raise Exception("get_operator not configured for state store")
-    #
-    # @abstractmethod
-    # def get_workflow(self, namespace: str, workflow: str):
-    #     raise Exception("get_workflow not configured for state store")
+    @abstractmethod
+    def set_session_config(self, config_id: str):
+        raise Exception("Config set_session_config not configured")
+
+    @abstractmethod
+    def get_session_config(self) -> Optional[str]:
+        raise Exception("Config get_session_config not configured")
+

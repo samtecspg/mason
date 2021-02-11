@@ -1,4 +1,4 @@
-id: 1
+id: "1"
 type: config
 metastore_clients: 
   - glue

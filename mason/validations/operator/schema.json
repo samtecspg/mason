@@ -38,6 +38,6 @@
         }
       }
     }
-  }, "required": ["type", "namespace", "command", "description"]
+  }, "required": ["type", "namespace", "command", "description", "parameters", "supported_configurations"]
 }
 

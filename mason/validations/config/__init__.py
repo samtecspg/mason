@@ -14,6 +14,7 @@ from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.engines.storage import StorageClient
 from mason.configurations.config import Config
 from mason.definitions import from_root
+from mason.engines import safe_interpolate_environment
 from mason.engines.execution.execution_engine import ExecutionEngine
 from mason.engines.metastore.metastore_engine import MetastoreEngine
 from mason.engines.scheduler.scheduler_engine import SchedulerEngine
@@ -73,7 +74,7 @@ class ConfigProto(ProtoObject):
             # TODO: Clean this up
             if isinstance(cl, dict):
                 for client_name, configuration in cl.items():
-                    configuration = configuration.get("configuration")
+                    configuration = safe_interpolate_environment(configuration.get("configuration"))
                     if isinstance(configuration, dict):
                         client_class = self.supported_client(client_name)
                         if not client_class is None:
@@ -103,5 +104,6 @@ class ConfigProto(ProtoObject):
             return Config(id, clients, invalid, metastore_clients, execution_clients, storage_clients, scheduler_clients, source_path)
         else:
             return InvalidObject("Id not provided for config object", attributes)
+
 
 

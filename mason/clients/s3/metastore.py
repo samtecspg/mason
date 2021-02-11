@@ -17,7 +17,7 @@ from mason.engines.storage.models.path import Path
 class S3MetastoreClient(MetastoreClient):
 
     def __init__(self, client: S3Client):
-        self.client = client 
+        self.client: S3Client = client 
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         tables, response =  self.list_tables(database_name, response or Response())

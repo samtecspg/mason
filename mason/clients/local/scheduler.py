@@ -12,7 +12,7 @@ class LocalSchedulerClient(SchedulerClient):
     
     #  This is a local synchronous scheduler.   For asynchronous see AsyncLocal (WIP)
     def __init__(self, client: LocalClient):
-        self.client = client
+        self.client: LocalClient = client
         self.dag: Optional[ValidDag] = None
     
     def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response) -> Tuple[str, Response, Optional[ClientDag]]:

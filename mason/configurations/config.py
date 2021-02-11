@@ -6,13 +6,15 @@ from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.engines.storage import StorageClient
-from mason.configurations import REDACTED_KEYS
+from mason.clients.response import Response
+from mason.resources.resource import Resource
 from mason.resources.saveable import Saveable
 from mason.state.base import MasonStateStore
-from mason.util.dict import sanitize
+# from mason.configurations import REDACTED_KEYS
+# from mason.util.dict import sanitize
+from mason.util.exception import message
 
-
-class Config(Saveable):
+class Config(Saveable, Resource):
     
     def __init__(self, id: str,
             clients: List[Client],
@@ -33,40 +35,44 @@ class Config(Saveable):
         self.scheduler_clients = scheduler_clients
         self.source_path = source_path
         
-    def metastore(self) -> MetastoreClient:
+    def metastore(self) -> Union[MetastoreClient, InvalidClient]:
         if len(self.metastore_clients) >= 1:
             return self.metastore_clients[0]
         elif len(self.metastore_clients) == 0:
-            raise Exception("No metastores")
+            return InvalidClient("No metastores")
         else:
-            raise Exception("Multiple metastore clients configured. Please specify metastore_client by name")
+            return InvalidClient("Multiple metastore clients configured. Please specify metastore_client by name")
         
-    def execution(self) -> ExecutionClient:
+    def execution(self) -> Union[ExecutionClient, InvalidClient]:
         if len(self.execution_clients) >= 1:
             return self.execution_clients[0]
         elif len(self.execution_clients) == 0:
-            raise Exception("No executions")
+            return InvalidClient("No executions")
         else:
-            raise Exception("Multiple execution clients configured. Please specify metastore_client by name")
+            return InvalidClient("Multiple execution clients configured. Please specify execution_client by name")
 
-    def scheduler(self) -> SchedulerClient:
+    def scheduler(self) -> Union[SchedulerClient, InvalidClient]:
         if len(self.scheduler_clients) >= 1:
             return self.scheduler_clients[0]
         elif len(self.scheduler_clients) == 0:
-            raise Exception("No schedulers")
+            return InvalidClient("No schedulers")
         else:
-            raise Exception("Multiple scheduler clients configured. Please specify metastore_client by name")
+            return InvalidClient("Multiple scheduler clients configured. Please specify scheduler_client by name")
         
-    def storage(self) -> StorageClient:
+    def storage(self) -> Union[StorageClient, InvalidClient]:
         if len(self.storage_clients) >= 1:
             return self.storage_clients[0]
         elif len(self.storage_clients) == 0:
-            raise Exception("Not storages")
+            return InvalidClient("Not storages")
         else:
-            raise Exception("Multiple storage clients configured. Please specify metastore_client by name")
+            return InvalidClient("Multiple storage clients configured. Please specify storage_client by name")
 
-    def save(self, state_store: MasonStateStore, overwrite: bool = False):
-        state_store.cp_source(self.source_path, "config", overwrite=overwrite)
+    def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()):
+        try:
+            state_store.cp_source(self.source_path, "config", overwrite=overwrite)
+            response.add_info(f"Successfully saved config: {self.id}")
+        except Exception as e:
+            response.add_error(f"Error copying source: {message(e)}")
 
     def extended_info(self, current_id: Optional[str] = None) -> List[str]:
         execution_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.execution_clients)))

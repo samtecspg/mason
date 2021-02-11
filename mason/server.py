@@ -47,5 +47,5 @@ class MasonServer:
                 app.run(host='0.0.0.0', port=5000, debug=True)
 
         except ModuleNotFoundError as e:
-            logger.error("Mason not configured with registered_operators.  Please run 'mason config' and 'mason register' first.")
+            logger.error("Mason not configured with registered_operators.  Please run 'mason apply' first")
             logger.error(str(e))

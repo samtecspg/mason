@@ -40,7 +40,7 @@ class WorkflowRun:
         return response
         
     def step(self, env: MasonEnvironment):
-        executed_steps = list(map(lambda s: ExecutedDagStep(s, s.run(env)), self.next_steps))
+        executed_steps = list(map(lambda s: ExecutedDagStep(s, s.execute(env)), self.next_steps))
         self.executed_steps += list(set(executed_steps))
         next_steps: List[Union[ValidDagStep, InvalidDagStep, ExecutedDagStep]] = flatten_array(list(map(lambda e: self.get_next_steps(e, env), executed_steps)))
 

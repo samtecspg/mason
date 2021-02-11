@@ -1,4 +1,4 @@
-id: 3
+id: "3"
 metastore_clients: 
   - athena
 storage_clients: 

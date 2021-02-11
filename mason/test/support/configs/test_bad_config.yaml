@@ -1,5 +1,5 @@
 type: config
-id: 2
+id: "2"
 metastore_clients: 
   - "test"
 bad_engine: test

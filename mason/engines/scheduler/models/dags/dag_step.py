@@ -1,11 +1,11 @@
 from typing import Union, List, Optional
 
-from mason.configurations.configurations import get_config_by_id
+from mason.configurations.config import Config
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
-from mason.operators.operators import get_operator
+from mason.operators.operator import Operator
 from mason.operators.valid_operator import ValidOperator
-from mason.parameters.input_parameters import InputParameters
+from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
 
@@ -24,10 +24,12 @@ class DagStep:
         if len(diff) == 0:
             wfp = parameters.get(self.id)
             if wfp:
-                config = get_config_by_id(env, wfp.config_id)
+                # config = get_config_by_id(env, wfp.config_id)
+                config: Optional[Config] = None
                 if config:
-                    operator_params: InputParameters = wfp.parameters
-                    operator = get_operator(env, self.namespace or "", self.command or "")
+                    operator_params: OperatorParameters = wfp.parameters
+                    # operator = get_operator(env, self.namespace or "", self.command or "")
+                    operator: Optional[Operator] = None
                     if operator:
                         valid = operator.validate(config, operator_params)
                         if isinstance(valid, ValidOperator):

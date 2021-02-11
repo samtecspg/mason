@@ -1,5 +1,5 @@
 
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 
 from mason.clients.base import Client
 from mason.clients.engines.invalid_client import InvalidClient
@@ -25,8 +25,8 @@ class SupportedEngineSet:
 
     def validate_coverage(self, config: Config):
         for engine_type, supported_engine in self.all.items():
-            clients: List[Client, InvalidClient] = config.__getattribute__(f"{engine_type}_clients")
-            client_names = list(map(lambda c: c.client_name, clients))
+            clients: List[Union[Client, InvalidClient]] = config.__getattribute__(f"{engine_type}_clients")
+            client_names = list(map(lambda c: c.client.name(), clients))
             if supported_engine in client_names:
                 return True
             else:

@@ -1,17 +1,16 @@
 import re
 from typing import Optional, List, Tuple, Dict, Any, Union
 
-from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
-
 from mason.definitions import from_root
-from mason.parameters.input_parameters import InputParameters
+from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.invalid_parameter import InvalidParameter
+from mason.parameters.parameters import Parameters
 from mason.parameters.util import parse_dict
 from mason.parameters.workflow_parameter import WorkflowParameter
 from mason.util.json_schema import object_from_json_schema
 from mason.util.yaml import parse_yaml_invalid
 
-class WorkflowParameters:
+class WorkflowParameters(Parameters):
     def __init__(self, parameter_path: Optional[str] = None, parameter_dict: Optional[dict] = None):
         parameters: List[WorkflowParameter] = []
 
@@ -44,7 +43,7 @@ class WorkflowParameters:
                         config_id: str = str(value["config_id"])
                         parameters: Dict[str,Dict[str, Any]] = value["parameters"]
                         valid_step, invalid_step = parse_dict(parameters, from_root("/parameters/schema.json"))
-                        ip = InputParameters()
+                        ip = OperatorParameters()
                         ip.parameters = valid_step
                         ip.invalid = invalid_step
                         valid.append(WorkflowParameter(key, config_id, ip))

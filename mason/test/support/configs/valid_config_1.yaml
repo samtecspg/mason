@@ -1,5 +1,5 @@
 type: config
-id: 6
+id: "6"
 storage_clients: 
   - "s3"
 clients:

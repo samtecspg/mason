@@ -1,5 +1,6 @@
 from typing import Optional, Union
 
+from mason.clients.engines.storage import StorageClient
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.environment import MasonEnvironment
@@ -13,7 +14,7 @@ from mason.engines.storage.models.path import Path
 class GlueSchedulerClient(SchedulerClient):
 
     def __init__(self, client: GlueClient):
-        self.client = client
+        self.client: GlueClient = client
 
     def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response):
         #  Short-circuit for glue crawler definition since glue as a scheduler is only well defined for Table Infer Operator
@@ -22,7 +23,11 @@ class GlueSchedulerClient(SchedulerClient):
             params = valid_dag.valid_steps[0].operator.parameters
             db_name = params.get_required("database_name")
 
-            storage_path = op.config.storage.client.path(params.get_required("storage_path"))
+            storage_engine = op.config.storage()
+            if isinstance(storage_engine, StorageClient):
+                storage_path = storage_engine.path(params.get_required("storage_path"))
+            else:
+                response = response.add_error(f"Attempted to register_dag for invalid client: {storage_engine.reason}")
             response = self.register_schedule(db_name, storage_path, schedule_name, schedule, response)
         else:
             response.add_error("Glue Scheduler only defined for TableInfer type which registers a glue crawler")

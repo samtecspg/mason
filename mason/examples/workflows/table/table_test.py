@@ -17,12 +17,12 @@ def test_post():
     def tests(env: MasonEnvironment, config: ValidConfig, wf: Workflow):
         # DNE
         params = WorkflowParameters(parameter_path=from_root("/test/support/parameters/table_infer_parameters_1.yaml"))
-        dne = wf.validate(env, config, params).run(env, Response(), False, True, "test_crawler_new")
+        dne = wf.validate(env, config, params).execute(env, Response(), False, True, "test_crawler_new")
         assert(dne.with_status() == expects.post(False))
 
         # Exists
         params = WorkflowParameters(parameter_path=from_root("/test/support/parameters/table_infer_parameters_2.yaml"))
-        exists = wf.validate(env, config, params).run(env, Response(), False, True, "test_crawler")
+        exists = wf.validate(env, config, params).execute(env, Response(), False, True, "test_crawler")
         assert(exists.with_status() == expects.post(True))
 
         # API

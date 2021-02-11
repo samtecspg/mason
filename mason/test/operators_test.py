@@ -1,114 +1,117 @@
+from os import path, mkdir
+import shutil
 
-from mason.clients.response import Response
-from mason.configurations.invalid_config import InvalidConfig
-from mason.operators.operator import emptyOperator
+import pytest
+
+from mason.api.apply import apply
+from mason.api.get import get
+from mason.api.validate import validate
+from mason.api.run import run
+from mason.definitions import from_root
 from mason.test.support import testing_base as base
-from mason.util.list import flatten_array
-from mason.operators import operators, namespaces
-
-
-class TestRegisterOperator:
-
-    def test_register_to(self):
-        pass
-        # base.set_log_level("fatal")
-        # mason_home = from_root("/.tmp/")
-        # if os.path.exists(mason_home):
-        #     shutil.rmtree(mason_home)
-        # 
-        # env = base.get_env("/.tmp/operators/")
-        # 
-        # ops, errors = operators.list_operators(from_root("/test/support/operators"))
-        # for operator in ops:
-        #     operator.register_to(env.operator_home)
-        # 
-        # ns, invalid = operators.list_namespaces(env)
-        # 
-        # result = sorted(list(map(lambda n: n.to_dict_brief(), ns)), key=lambda s: list(s.keys())[0])
-        # expect = [{'namespace1': ['operator1', 'operator2']}, {'namespace2': ['operator3', 'operator4', 'operator5', 'operator6']}]
-        # 
-        # assert(result == expect)
-        # 
-        # if os.path.exists(mason_home):
-        #     shutil.rmtree(mason_home)
 
 class TestGetOperator:
 
     def test_command_exists(self):
-        base.set_log_level("trace")
-        env = base.get_env("/test/support/operators/")
-        op = (operators.get_operator(env, "namespace1", "operator1") or emptyOperator())
-        expects = {'command': 'operator1', 'description': 'Test Operator', 'namespace': 'namespace1', 'parameters': {'optional': [], 'required': ['test_param']}, 'supported_configurations': [{'execution': None, 'metastore': 'test', 'scheduler': None, 'storage': None}]}
-        assert(op.to_dict()==expects)
+        env = base.get_env("/test/support/")
+        response, status = get("operator", "namespace1", "operator1", env=env) 
+        expects = {'Operators': [{'command': 'operator1', 'description': 'Test Operator', 'namespace': 'namespace1', 'parameters': {'optional': [], 'required': ['test_param']}, 'supported_configurations': [{'execution': None, 'metastore': 'test', 'scheduler': None, 'storage': None}]}]}
+        assert(response == expects)
+        assert(status == 200)
 
     def test_namespace_dne(self):
-        base.set_log_level("fatal")
-        env = base.get_env("/test/support/operators/")
-        op = operators.get_operator(env, "namespace_dne", "operator")
-        assert(op == None)
+        env = base.get_env("/test/support/")
+        response, status = get("operator", "namespace_dne", "bad_command", "fatal", env) 
+        expects = {'Errors': ['No operator matching namespace_dne:bad_command. Register new resources with \'mason apply\'']}
+        assert(response == expects)
+        assert(status == 404)
 
     def test_command_dne(self):
-        base.set_log_level("fatal")
-        env = base.get_env("/test/support/operators/")
-        op = operators.get_operator(env, "namespace1", "operator")
-        assert(op == None)
-
-
-class TestListOperators:
-
-    def test_namespace_exists(self):
-        base.set_log_level("fatal")
-        env = base.get_env("/test/support/operators/")
-        l = operators.list_namespaces(env, "namespace1")[0]
-        dicts = flatten_array(list(map(lambda x: x.to_dict(), l)))
-        expects = [{'namespace': 'namespace1',
-          'description': 'Test Operator',
+        env = base.get_env("/test/support/")
+        response, status = get("operator", "namespace1", "bad_command", "fatal", env)
+        expects = {'Errors': ['No operator matching namespace1:bad_command. Register new resources with \'mason apply\'']}
+        assert(response == expects)
+        assert(status == 404)
+        
+    def test_namespace(self):
+        env = base.get_env("/test/support/")
+        response, status = get("operator", "namespace1", env=env, log_level="fatal")
+        operators = [{'namespace': 'namespace1', 'command': 'operator1', 'description': 'Test Operator',
           'parameters': {'required': ['test_param'], 'optional': []},
-          'command': 'operator1',
-          'supported_configurations': [{'execution': None,
-                                        'metastore': 'test',
-                                        'scheduler': None,
-                                        'storage': None}]},
-         {'namespace': 'namespace1',
-          'description': 'Test Operator',
+          'supported_configurations': [{'metastore': 'test', 'scheduler': None, 'execution': None, 'storage': None}]},
+         {'namespace': 'namespace1', 'command': 'operator2', 'description': 'Test Operator',
           'parameters': {'required': ['test_param'], 'optional': []},
-          'command': 'operator2',
-          'supported_configurations': [{'execution': None,
-                                        'metastore': 'test',
-                                        'scheduler': None,
-                                        'storage': None}]}]
-        d = sorted(dicts, key=lambda i: i['command']) # type: ignore
-        e = sorted(expects, key=lambda e: e['command']) # type: ignore 
-        assert(d == e)
-
-    def test_namespace_dne(self):
-        base.set_log_level("fatal")
-        env = base.get_env("/test/support/operators/")
-        l = namespaces.get(operators.list_namespaces(env, "namespace_dne")[0], "namespace_dne", "cmd")
-
-        assert(l == None)
-
-    def test_client_not_supported(self):
-        response = Response()
-        base.set_log_level("fatal")
-        env = base.get_env("/test/support/operators/")
-        config = base.get_configs(env)[0]
-        op = operators.get_operator(env, "namespace1", "operator2") or emptyOperator()
-        if op:
-            valid = op.validate_config(config)
-            if isinstance(valid, InvalidConfig):
-                expects = 'Configuration 1 not supported by configured engines for operator namespace1:operator2.  Check operator.yaml for supported engine configurations.'
-                assert(valid.reason == expects)
-            else:
-                raise Exception("BadTest")
+          'supported_configurations': [{'metastore': 'test', 'scheduler': None, 'execution': None, 'storage': None}]}]
+        expects = {'Operators': operators}
+        assert(response == expects)
+        assert(status == 200)
 
 class TestValidateOperator:
+    
+    def test_valid(self):
+        env = base.get_env("/test/support/", "/test/support/validations/")
+        response, status = validate("operator", "namespace1", "operator1", "test_param:test", None, "3", log_level="fatal", env=env)
+        expects = {'Info': ['Valid Operator: namespace1:operator1 with specified parameters.']}
+        assert(response == expects)
+        assert(status == 200)
 
-    def test_bad_operator_pat(self):
+    def test_invalid_parameters(self):
+        env = base.get_env("/test/support/", "/test/support/validations/")
+        response, status = validate("operator", "namespace1", "operator1", "asdfalskdjf", None, "3", log_level="fatal", env=env)
+        expects = {'Errors': ['Invalid Resource: Invalid parameters.  Warning:  Parameter string does not conform to needed pattern: <param1>:<value1>,<param2>:<value2>, Required parameter not specified: test_param']}
+        assert(response == expects)
+        assert(status == 400)
+
+    def test_bad_parameters(self):
+        env = base.get_env("/test/support/", "/test/support/validations/")
+        response, status = validate("operator", "namespace1", "operator1", "test_bad_param:test", None, "3", log_level="fatal", env=env)
+        expects = {'Errors': ['Invalid Resource: Invalid parameters.  Required parameter not specified: test_param']}
+        assert(response == expects)
+        assert(status == 400)
+    
+    def test_invalid_config(self):
+        env = base.get_env("/test/support/", "/test/support/validations/")
+        response, status = validate("operator", "namespace1", "operator1", "test_param:test", None, "4", log_level="fatal", env=env)
+        expects = {'Errors': ['Invalid Resource: Invalid config: Configuration 4 not supported by configured engines for operator namespace1:operator1.  Check operator.yaml for supported engine configurations.']}
+        assert(response == expects)
+        assert(status == 400)
+
+    def test_config_not_supported(self):
         pass
 
-    def test_invalid_operator_definitions(self):
-        pass
+class TestApplyOperator:
 
-    def test_valid_operator_definition(self):
+    @pytest.fixture(autouse=True)
+    def run_around_tests(self):
+        tmp_folder = from_root("/.tmp/")
+        if not path.exists(tmp_folder):
+            mkdir(tmp_folder)
+        yield
+        if path.exists(tmp_folder):
+            shutil.rmtree(tmp_folder)
+
+    def test_good_operators(self):
+        env = base.get_env("/.tmp/", "/test/support/validations/")
+        response, status = apply(from_root("/test/support/"), env=env, log_level="fatal")
+        assert(len(response["Info"]) == 10)
+        assert(len(response["Errors"]) == 7)
+        assert(status == 200)
+
+        response, status = get("operator", env=env, log_level="fatal")
+        assert(len(response["Operators"]) == 6)
+        operators = sorted(list(map(lambda o: o["command"], response["Operators"])))
+        assert(operators == ["operator1", "operator2", "operator3", "operator4", "operator5", "operator6"])
+        
+    def test_overwrite(self):
         pass
+        
+
+class TestRunOperator:
+
+    def test_valid(self):
+        env = base.get_env("/test/support/", "/test/support/validations/")
+        response, status = run("operator", "namespace1", "operator1", "test_param:test", None, "3", log_level="fatal", env=env)
+        expects = {'Info': ['Valid Operator: namespace1:operator1 with specified parameters.']}
+        assert(response == expects)
+        assert(status == 200)
+

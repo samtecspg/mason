@@ -1,14 +1,25 @@
-from dataclasses import dataclass
+from abc import abstractmethod
 
-from typistry.protos.invalid_object import InvalidObject
+from mason.clients.response import Response
+from mason.util.environment import MasonEnvironment
 
-from mason.resources.saveable import Saveable
-from mason.state.base import MasonStateStore
-from mason.util.logger import logger
+class InvalidResource:
 
-@dataclass
-class InvalidResource(Saveable):
-    invalid_obj: InvalidObject
+    @abstractmethod
+    def __init__(self, reason: str):
+        self.reason = reason
 
-    def save(self, state_store: MasonStateStore, overwrite: bool = False):
-        logger.error(f"Invalid resource: {self.invalid_obj.message}: {self.invalid_obj.reference}")
+    def run(self, env: MasonEnvironment, response: Response = Response()) -> Response:
+        response.add_error("Invalid Resource: " + self.reason)
+        response.set_status(400)
+        return response
+
+    def dry_run(self, env: MasonEnvironment, response: Response = Response()) -> Response:
+        response.add_error("Invalid Resource: " + self.reason)
+        response.set_status(400)
+        return response
+        
+class GenericInvalidResource(InvalidResource):
+    
+    def __init__(self, reason: str):
+        super().__init__(reason)

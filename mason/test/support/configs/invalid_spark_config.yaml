@@ -1,5 +1,5 @@
 type: config
-id: 0
+id: "0"
 execution_clients: 
   - "spark"
 clients:

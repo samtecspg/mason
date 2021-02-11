@@ -30,17 +30,19 @@ class LocalStateStore(MasonStateStore):
                 shutil.rmtree(full_path)
                 shutil.copy(source, full_path + f"{type}.yaml")
                 shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
-                logger.info(f"Valid {type}.  Saved {source} to {destination}")
             else:
                 logger.error(f"Definition already exists for {type}:{destination}:{command}")
         else:
             os.makedirs(full_path)
             shutil.copy(source, full_path + f"{type}.yaml")
             shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
-            logger.info(f"Valid {type}.  Saved {source} to {destination}")
 
     def write_config(self, source, destination: str, overwrite: bool = False):
         config_name = path.basename(source)
+
+        if not path.exists(destination):
+            os.makedirs(destination)
+
         config_destination = destination + config_name
         if path.exists(config_destination):
             if overwrite:
@@ -55,19 +57,26 @@ class LocalStateStore(MasonStateStore):
 
     # TODO: Copy to tmp instead of tracking source, and copy from tmp
     # TODO: Clean up type switches, serialize internal representation
-    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False):
+    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False) -> Optional[str]:
         if source:
             home = self.get_home(type)
             if home:
                 if type == "config":
                     self.write_config(source, home, overwrite)
                 elif type in ["operator", "workflow"]:
-                    tree_path = home + "/" + f"{namespace}/"
-                    self.write_operator_type(source, type, tree_path, command, overwrite)
+                    tree_path = home + f"{namespace}/"
+                    if command:
+                        self.write_operator_type(source, type, tree_path, command, overwrite)
+                        return f"Successfully copied {source} to {tree_path}"
+                    else:
+                        logger.error(f"No command provided for {source}")
                 else:
                     logger.error(f"Type not supported: {type}")
+            else:
+                logger.error(f"Unsupported type: {type}")
         else:
             logger.error(f"Source path not found for {type}:{namespace}:{command}")
+        return None
 
     def initialize(self) -> str:
         if not path.exists(self.home):
@@ -87,12 +96,16 @@ class LocalStateStore(MasonStateStore):
 
         return "Succesfully initialized"
 
-    def get_config(self, config_id: str):
-            pass
+    def set_session_config(self, config_id: str):
+        with open(self.config_home + "CURRENT_CONFIG", 'w+') as f:
+            f.write(str(config_id))
 
-    def get_operator(self, namespace: str, operator: str):
-        pass
+    def get_session_config(self) -> Optional[str]:
+        try:
+            with open(self.config_home + "CURRENT_CONFIG", 'r') as f:
+                return str(f.read())
+        except FileNotFoundError as e:
+            logger.warning("Current Mason config not set.  Run \"mason run config <ID>\" to set session config.")
+        return None
 
-    def get_workflow(self, namespace: str, workflow: str):
-        pass
 

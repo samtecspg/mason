@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "MasonConfiguration",
   "properties": {
-    "id": { "type": ["string", "integer"]},
+    "id": { "type": ["string"]},
     "source": {"type": "string" },
     "type": {
       "type": "string",

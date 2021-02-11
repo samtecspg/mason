@@ -9,7 +9,7 @@ from mason.engines.execution.models.jobs import ExecutedJob, Job, InvalidJob
 
 class SparkClient(Client):
     def __init__(self, runner: dict):
-        self.runner_type = runner.get("type", "")
+        self.runner_type = runner["type"]
         self.config = SparkConfig(runner)
 
     def client(self):

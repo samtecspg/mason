@@ -10,7 +10,7 @@ from mason.configurations.valid_config import ValidConfig
 from mason.definitions import from_root
 from mason.operators.namespaces import to_ops
 from mason.operators.operator import Operator
-from mason.parameters.input_parameters import InputParameters
+from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
 from mason.operators.operators import get_operator, list_namespaces, tabulate_operators
@@ -60,7 +60,7 @@ class NotebookEnvironment:
         response = Response()
         operator = self.operator(namespace, command)
         config = self.config(config_id)
-        input_parameters = InputParameters(parameter_string=parameters)
+        input_parameters = OperatorParameters(parameter_string=parameters)
         if operator:
             if config:
                 validated = operator.validate(config, input_parameters)
@@ -80,7 +80,7 @@ class NotebookEnvironment:
         workflow_parameters = WorkflowParameters(parameter_dict=parameters)
         if workflow:
             if config:
-                workflow.validate(self.env, config, workflow_parameters).run(self.env, response, not deploy, run_now, schedule_name)
+                workflow.validate(self.env, config, workflow_parameters).execute(self.env, response, not deploy, run_now, schedule_name)
                 
             else:
                 response.add_error(f"Config {config_id} not found.  Valid config_id's: {', '.join(list(self.configs.keys()))}")

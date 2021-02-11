@@ -41,7 +41,7 @@ class TestMetastoreEngine:
         base.set_log_level("fatal")
         config_home = from_root(config)
         env = MasonEnvironment(mason_home="/test/support/")
-        yaml_config_doc = parse_yaml(env.config_home + config)
+        yaml_config_doc = parse_yaml(env.state_store.config_home + config)
         me = MetastoreEngine(yaml_config_doc)
         return me
 
