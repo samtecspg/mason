@@ -58,7 +58,8 @@
           "type": "object",
           "properties": {
             "configuration": {"type":  "object"}
-          }
+          }, 
+          "required": ["configuration"]
         }
       }
     }

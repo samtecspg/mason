@@ -8,7 +8,6 @@ from typistry.protos.proto_object import ProtoObject
 
 from mason.clients.base import Client
 from mason.clients.engines.execution import ExecutionClient
-from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.scheduler import SchedulerClient
 from mason.clients.engines.storage import StorageClient
@@ -19,6 +18,7 @@ from mason.engines.execution.execution_engine import ExecutionEngine
 from mason.engines.metastore.metastore_engine import MetastoreEngine
 from mason.engines.scheduler.scheduler_engine import SchedulerEngine
 from mason.engines.storage.storage_engine import StorageEngine
+from mason.clients.engines.invalid_client import InvalidClient
 
 class ConfigProto(ProtoObject):
     
@@ -43,7 +43,7 @@ class ConfigProto(ProtoObject):
             from mason.clients.local.local_client import LocalClient
             return LocalClient
         else:
-            return None
+            return InvalidClient
 
     def client_path(self) -> str:
         return "/clients/"
@@ -74,8 +74,9 @@ class ConfigProto(ProtoObject):
             # TODO: Clean this up
             if isinstance(cl, dict):
                 for client_name, configuration in cl.items():
-                    configuration = safe_interpolate_environment(configuration.get("configuration"))
+                    configuration = configuration.get("configuration")
                     if isinstance(configuration, dict):
+                        configuration = safe_interpolate_environment(configuration)
                         client_class = self.supported_client(client_name)
                         if not client_class is None:
                             tdict = TypedDict(configuration, client_name)

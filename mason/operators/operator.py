@@ -28,7 +28,6 @@ class Operator(Saveable, Resource):
         self.supported_configurations: List[SupportedEngineSet] = from_array(supported_configurations)
         self.source_path = source
 
-    @safe
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
             state_store.cp_source(self.source_path, "operator", self.namespace, self.command, overwrite)
@@ -52,15 +51,16 @@ class Operator(Saveable, Resource):
 
     def validate_config(self, config: Config) -> Union[Config, InvalidConfig]:
         test = False
+        message = ""
         for ses in self.supported_configurations:
-            test = ses.validate_coverage(config)
+            test, message = ses.validate_coverage(config)
             if test:
                 break
 
         if test:
             return config
         else:
-            return InvalidConfig(f"Configuration {config.id} not supported by configured engines for operator {self.namespace}:{self.command}.  Check operator.yaml for supported engine configurations.", config)
+            return InvalidConfig(f"Configuration {config.id} not supported by configured engines for operator {self.namespace}:{self.command}.  {message}. Check operator.yaml for supported engine configurations.", config)
 
     def to_dict(self):
         return {

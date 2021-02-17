@@ -32,14 +32,13 @@ class ValidOperator(ValidResource):
         return f"{self.namespace}:{self.command}"
 
     def module(self, env: MasonEnvironment) -> Union[OperatorDefinition, InvalidOperator]:
-        # sys_path.append(env.operator_home)
         operator_path = env.state_store.operator_home + self.namespace + "/" + self.command + "/"
         classname = to_class_case(f"{self.namespace}_{self.command}")
         try:
-            spec = importlib.util.spec_from_file_location(f"mason.operator.{self.namespace}.{self.command}", operator_path + "__init__.py")
-            mod = importlib.util.module_from_spec(spec)
+            spec = importlib.util.spec_from_file_location(f"mason.operator.{self.namespace}.{self.command}", operator_path + "__init__.py") # type: ignore
+            mod = importlib.util.module_from_spec(spec) # type: ignore
             if spec:
-                spec.loader.exec_module(mod)
+                spec.loader.exec_module(mod) #type: ignore
                 operator_class = getattr(mod, classname)()
                 if isinstance(operator_class, OperatorDefinition):
                     return operator_class
@@ -70,11 +69,11 @@ class ValidOperator(ValidResource):
 
         return operator_response
 
-    def run(self, env: MasonEnvironment, response: Response=Response()) -> Response:
-        return self.execute(env, response, False).to_response(response)
+    def run(self, env: MasonEnvironment, response: Response=Response()) -> OperatorResponse:
+        return self.execute(env, response, False)
 
-    def dry_run(self, env: MasonEnvironment, response: Response = Response()) -> Response:
-        return self.execute(env, response).to_response(response)
+    def dry_run(self, env: MasonEnvironment, response: Response = Response()) -> OperatorResponse:
+        return self.execute(env, response)
 
     def to_dict(self):
         return {

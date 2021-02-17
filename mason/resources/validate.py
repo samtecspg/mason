@@ -1,9 +1,7 @@
 from typing import Union
 
 from mason.configurations.config import Config
-from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.operator import Operator
-from mason.operators.valid_operator import ValidOperator
 from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.parameters import Parameters
 from mason.parameters.workflow_parameters import WorkflowParameters
@@ -20,7 +18,6 @@ def validate_resource(resource: Resource, config: Config, parameters: Parameters
         return resource.validate(env, config, parameters)
     elif isinstance(resource, Config):
         return GenericInvalidResource(f"Validate undefined for config")
+    else:
+        return GenericInvalidResource(f"Validate undefined for {resource}")
         
-def validate_operator(operator: Operator, config: Config, parameters: OperatorParameters) -> Union[ValidOperator, InvalidOperator]:
-    return operator.validate(config, parameters)
-    

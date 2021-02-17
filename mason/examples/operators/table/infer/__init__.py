@@ -19,19 +19,19 @@ class TableInfer(OperatorDefinition):
         storage_path: str = parameters.get_required("storage_path")
         table_name: Optional[str] = parameters.get_optional("table_name")
 
-        table, response = config.storage.client.infer_table(storage_path, table_name, response=response)
+        table, response = config.storage().infer_table(storage_path, table_name, response=response)
         job = Job("query")
         final: Union[ExecutedJob, InvalidJob]
 
         if isinstance(table, Table):
             response.add_info(f"Table inferred: {table.name}")
-            database, response = config.metastore.client.get_database(database_name, response)
+            database, response = config.metastore().get_database(database_name, response)
             db = compute(database)
             if isinstance(db, Database):
-                path = config.storage.client.path(storage_path)
-                ddl = config.metastore.client.generate_table_ddl(table, path, db)
+                path = config.storage().path(storage_path)
+                ddl = config.metastore().generate_table_ddl(table, path, db)
                 if isinstance(ddl, DDLStatement):
-                    final, response = config.metastore.client.execute_ddl(ddl, db, response)
+                    final, response = config.metastore().execute_ddl(ddl, db, response)
                 else:
                     final = job.errored(f"Invalid DDL generated: {ddl.reason}")
             else:

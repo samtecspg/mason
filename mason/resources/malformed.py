@@ -6,7 +6,6 @@ from typistry.protos.invalid_object import InvalidObject
 from mason.clients.response import Response
 from mason.resources.saveable import Saveable
 from mason.state.base import MasonStateStore
-from mason.util.logger import logger
 
 @dataclass
 class MalformedResource(Saveable):
@@ -24,7 +23,8 @@ class MalformedResource(Saveable):
     def ignorable(self) -> bool:
         return (self.get_message() == None)
     
-    def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()):
+    def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         message = self.get_message()
         if message:
             response.add_error(message)
+        return response

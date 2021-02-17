@@ -1,4 +1,5 @@
 id: "3"
+type: "config"
 metastore_clients: 
   - athena
 storage_clients: 

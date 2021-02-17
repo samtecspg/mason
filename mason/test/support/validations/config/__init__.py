@@ -12,8 +12,12 @@ class ConfigProto(BaseConfigProto):
         elif client_name == "test2":
             from mason.test.support.clients.test2 import Test2Client
             return Test2Client
+        elif client_name == "local":
+            from mason.clients.local.local_client import LocalClient
+            return LocalClient
         else:
-            return None
+            from mason.clients.engines.invalid_client import InvalidClient
+            return InvalidClient
 
     def client_path(self) -> str:
         return "/test/support/clients/"

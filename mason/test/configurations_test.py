@@ -1,29 +1,58 @@
-from mason.configurations.config import Config
-from mason.resources.base import get_config_by_id
+import shutil
+
+import pytest
+
+from mason.api.get import get
+from mason.api.apply import apply
+from mason.definitions import from_root
 from mason.test.support import testing_base as base
+from os import path, mkdir
 
+class TestGetConfiguration:
 
-def empty_config():
-    return {
-        'execution': {'client_name': '', 'configuration': {}},
-        'metastore': {'client_name': '', 'configuration': {}},
-        'scheduler': {'client_name': '', 'configuration': {}},
-        'storage': {'client_name': '', 'configuration': {}}
-    }
-
-class TestConfiguration:
-        
-    def test_get_config_by_id(self):
+    def test_config_exists(self):
         env = base.get_env("/test/support/", "/test/support/validations/")
-        config = get_config_by_id(env, "3")
-        assert(isinstance(config, Config))
-        assert(config.id == "3")
-        assert(config.execution().client.name() == "test2")
-        assert(config.metastore().client.name() == "test")
-        assert(config.scheduler().client.name() == "test2")
-        assert(config.storage().client.name() == "test")
+        response, status = get("config", '5', env=env) 
+        expects = [{'clients': ['test', 'test2'], 'id': '5', 'execution_clients': '', 'metastore_clients': 'test', 'storage_clients': '', 'scheduler_clients': ''}]
+        assert(response['Configs'] == expects)
+        assert(status == 200)
 
-    def test_configuration_invalid_yaml(self):
+    def test_config_malformed(self):
         env = base.get_env("/test/support/", "/test/support/validations/")
-        assert(isinstance(conf, InvalidConfig))
-        assert("Invalid config schema. Reason: Schema error " in conf.reason)
+        base.set_log_level()
+        response, status = get("config", "0", log_level="fatal", env=env)
+        assert(response['Errors'][0][0:18] == "Malformed resource")
+        assert(status == 400)
+
+    def test_config_dne(self):
+        env = base.get_env("/test/support/", "/test/support/validations/")
+        base.set_log_level()
+        response, status = get("config", 'monkeys', log_level="fatal", env=env)
+        expects = {'Errors': ['No config matching monkeys. Register new resources with \'mason apply\'']}
+        assert(response == expects)
+        assert(status == 404)
+
+class TestApplyConfig:
+
+    @pytest.fixture(autouse=True)
+    def run_around_tests(self):
+        tmp_folder = from_root("/.tmp/")
+        if not path.exists(tmp_folder):
+            mkdir(tmp_folder)
+        yield
+        if path.exists(tmp_folder):
+            shutil.rmtree(tmp_folder)
+
+    def test_good_configs(self):
+        env = base.get_env("/.tmp/", "/test/support/validations/")
+        response, status = apply(from_root("/test/support/"), env=env, log_level="fatal")
+        assert(len(response["Info"]) == 20)
+        assert(len(response["Errors"]) == 12) # TODO: fix duplicate malformed objects
+        assert(status == 200)
+
+        response, status = get("config", env=env, log_level="fatal")
+        assert(len(response["Configs"]) == 4)
+
+    def test_overwrite(self):
+        pass
+

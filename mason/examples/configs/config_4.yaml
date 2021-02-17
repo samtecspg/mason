@@ -1,4 +1,5 @@
 id: "4"
+type: "config"
 metastore_clients: 
   - s3
 storage_clients: 

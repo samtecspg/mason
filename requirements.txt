@@ -37,5 +37,5 @@ lambdas==0.1.0
 returns==0.15.0
 partd>=0.3.10
 asciidag==0.1.0
-file:///Users/kyle/dev/typistry#egg=typistry==0.0.7 --no-index
+file:///Users/kyle/dev/typistry#egg=typistry==0.0.9 --no-index
 

@@ -67,12 +67,13 @@ class Config(Saveable, Resource):
         else:
             return InvalidClient("Multiple storage clients configured. Please specify storage_client by name")
 
-    def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()):
+    def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
             state_store.cp_source(self.source_path, "config", overwrite=overwrite)
             response.add_info(f"Successfully saved config: {self.id}")
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
+        return response
 
     def extended_info(self, current_id: Optional[str] = None) -> List[str]:
         execution_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.execution_clients)))
@@ -80,5 +81,15 @@ class Config(Saveable, Resource):
         scheduler_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.scheduler_clients)))
         metastore_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.metastore_clients)))
         return [self.id, execution_clients, metastore_clients, storage_clients, scheduler_clients]
+    
+    def to_dict(self) -> dict:
+        clients = list(map(lambda c: c.name(), self.clients))
+        extra_info = self.extended_info()
+        id = extra_info[0]
+        execution = extra_info[1]
+        metastore = extra_info[2]
+        storage = extra_info[3]
+        scheduler = extra_info[4]
+        return {'clients': clients, 'id': id, 'execution_clients': execution, 'metastore_clients': metastore, 'storage_clients': storage, 'scheduler_clients': scheduler}
 
 

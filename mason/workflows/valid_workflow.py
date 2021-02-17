@@ -6,6 +6,7 @@ from mason.clients.local.scheduler import LocalSchedulerClient
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.engines.scheduler.models.schedule import Schedule
+from mason.operators.operator_response import OperatorResponse
 from mason.resources.valid import ValidResource
 
 from mason.util.environment import MasonEnvironment
@@ -19,15 +20,7 @@ class ValidWorkflow(ValidResource):
         self.dag = dag
         self.config = config
 
-    def execute(self, env: MasonEnvironment, response: Response, dry_run: bool = True, run_now: bool = False, schedule_name: Optional[str] = None, output_path: Optional[str] = None) -> Response:
-        if dry_run:
-            response = self.dry_run(env, response)
-        else:
-            response = self.run(env, response, run_now, schedule_name, output_path)
-
-        return response
-
-    def dry_run(self, env: MasonEnvironment, response: Response = Response()) -> Response:
+    def dry_run(self, env: MasonEnvironment, response: Response = Response()) -> OperatorResponse:
         response.add_info(f"Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag")
         response.add_info("")
         response.add_info(f"Valid Workflow DAG Definition:")
@@ -36,16 +29,16 @@ class ValidWorkflow(ValidResource):
         response.add_info("")
         for r in list(map(lambda s: s.reason, self.dag.invalid_steps)):
             response.add_warning(r)
-        return response
+        return OperatorResponse(response)
 
-    def run(self, env: MasonEnvironment, response: Response, run_now: bool, schedule_name: Optional[str] = None, output_path: Optional[str] = None) -> Response:
+    def run(self, env: MasonEnvironment, response: Response = Response()) -> OperatorResponse:
         scheduler = self.config.scheduler()
-        if isinstance(scheduler.client, SchedulerClient):
-            name = schedule_name or self.name
-            response.add_info(f"Registering workflow dag {name} with {scheduler.client}.")
-            schedule_id, response, client_dag = scheduler.client.register_dag(name, self.dag, self.schedule, response)
+        if isinstance(scheduler, SchedulerClient):
+            response.add_info(f"Registering workflow dag {self.name} with {scheduler.client.name()}.")
+            schedule_id, response, client_dag = scheduler.register_dag(self.name, self.dag, self.schedule, response)
             if not response.errored():
                 response.add_info(f"Registered schedule {schedule_id}")
+            # TODO: FIX
             # if client_dag and output_path:
             #     with tempfile.NamedTemporaryFile("w", delete=False) as f:
             #         json = client_dag.to_json()
@@ -53,18 +46,14 @@ class ValidWorkflow(ValidResource):
             #         f.write(json)
             #         f.close()
             #         response = self.config.storage.client.save_to(f.name, output_path, response)
-            if run_now:
-                if self.schedule:
-                    response.add_warning(f"Triggering workflow off schedule: {self.schedule.definition}")
-                    
-                response.add_info(f"Triggering schedule: {schedule_id}")
-                response = scheduler.client.trigger_schedule(schedule_id, response, env)
-            else:
-                if isinstance(scheduler.client, LocalSchedulerClient):
-                    response.add_warning("Registering DAG to Local memory will have no effect without running now.   Pass -r flag to run now.")
+            if self.schedule:
+                response.add_warning(f"Triggering workflow off schedule: {self.schedule.definition}")
+                
+            response.add_info(f"Triggering schedule: {schedule_id}")
+            response = scheduler.trigger_schedule(schedule_id, response, env)
         else:
             response.add_error("Scheduler client not defined")
 
-        return response
+        return OperatorResponse(response)
 
 

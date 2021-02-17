@@ -11,8 +11,8 @@ from mason.workflows.workflow_run import WorkflowRun
 
 class LocalClient(Client):
 
-    def __init__(self, config: dict):
-        self.threads = config.get("threads")
+    def __init__(self, threads: int = 1):
+        self.threads = threads 
 
     def client(self) -> BaseClient:
         pass

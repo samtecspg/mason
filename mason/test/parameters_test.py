@@ -67,7 +67,7 @@ class TestValidation:
         }
         for param_string, results in tests.items():
             input_param = OperatorParameters(param_string)
-            op = Operator("cmd", "subcmd", "", {"required": results[0], "optional": results[1]}, [])
+            op = Operator("cmd", "subcmd", {"required": results[0], "optional": results[1]}, [])
             validated = op.parameters.validate(input_param)
             assert(isinstance(validated, ValidatedParameters))
             assert(list(map(lambda v: v.value, validated.validated_parameters)) == results[2])

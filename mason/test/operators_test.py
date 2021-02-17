@@ -19,17 +19,23 @@ class TestGetOperator:
         assert(response == expects)
         assert(status == 200)
 
+    def test_command_malformed(self):
+        env = base.get_env("/test/support/")
+        response, status = get("operator", "namespace1", "operator3", env=env)
+        assert(response['Errors'][0][0:18] == "Malformed resource")
+        assert(status == 400)
+
     def test_namespace_dne(self):
         env = base.get_env("/test/support/")
-        response, status = get("operator", "namespace_dne", "bad_command", "fatal", env) 
-        expects = {'Errors': ['No operator matching namespace_dne:bad_command. Register new resources with \'mason apply\'']}
+        response, status = get("operator", "namespace_dne", "bad_command", "fatal", env)
+        expects = {'Errors' : ['No operator matching namespace_dne:bad_command. Register new resources with \'mason apply\'']}
         assert(response == expects)
         assert(status == 404)
 
     def test_command_dne(self):
         env = base.get_env("/test/support/")
         response, status = get("operator", "namespace1", "bad_command", "fatal", env)
-        expects = {'Errors': ['No operator matching namespace1:bad_command. Register new resources with \'mason apply\'']}
+        expects = {'Errors' : ['No operator matching namespace1:bad_command. Register new resources with \'mason apply\'']}
         assert(response == expects)
         assert(status == 404)
         
@@ -42,8 +48,7 @@ class TestGetOperator:
          {'namespace': 'namespace1', 'command': 'operator2', 'description': 'Test Operator',
           'parameters': {'required': ['test_param'], 'optional': []},
           'supported_configurations': [{'metastore': 'test', 'scheduler': None, 'execution': None, 'storage': None}]}]
-        expects = {'Operators': operators}
-        assert(response == expects)
+        assert(response['Operators'] == operators)
         assert(status == 200)
 
 class TestValidateOperator:
@@ -72,7 +77,7 @@ class TestValidateOperator:
     def test_invalid_config(self):
         env = base.get_env("/test/support/", "/test/support/validations/")
         response, status = validate("operator", "namespace1", "operator1", "test_param:test", None, "4", log_level="fatal", env=env)
-        expects = {'Errors': ['Invalid Resource: Invalid config: Configuration 4 not supported by configured engines for operator namespace1:operator1.  Check operator.yaml for supported engine configurations.']}
+        expects = {'Errors': ['Invalid Resource: Invalid config: Configuration 4 not supported by configured engines for operator namespace1:operator1.  Clients [] do not include supported client test for metastore. Check operator.yaml for supported engine configurations.']}
         assert(response == expects)
         assert(status == 400)
 
@@ -93,8 +98,8 @@ class TestApplyOperator:
     def test_good_operators(self):
         env = base.get_env("/.tmp/", "/test/support/validations/")
         response, status = apply(from_root("/test/support/"), env=env, log_level="fatal")
-        assert(len(response["Info"]) == 10)
-        assert(len(response["Errors"]) == 7)
+        assert(len(response["Info"]) == 20)
+        assert(len(response["Errors"]) == 12)
         assert(status == 200)
 
         response, status = get("operator", env=env, log_level="fatal")
@@ -111,7 +116,7 @@ class TestRunOperator:
     def test_valid(self):
         env = base.get_env("/test/support/", "/test/support/validations/")
         response, status = run("operator", "namespace1", "operator1", "test_param:test", None, "3", log_level="fatal", env=env)
-        expects = {'Info': ['Valid Operator: namespace1:operator1 with specified parameters.']}
-        assert(response == expects)
+        expects = [{'Name': 'test_table', 'CreatedAt': '', 'CreatedBy': '', 'Schema': {}}] 
+        assert(response['Data'] == expects)
         assert(status == 200)
 

@@ -7,8 +7,9 @@ from botocore.exceptions import ConfigNotFound
 
 from mason.util.logger import logger
 
-def safe_interpolate_environment(config_doc: dict, credential_file:str = "~/.aws/credentials"):
+def safe_interpolate_environment(config_doc: dict, credential_file:str = "~/.aws/credentials") -> Optional[dict]:
     aws_profile = environ.get('AWS_PROFILE') or "default"
+
     try:
         config = raw_config_parse(credential_file).get(aws_profile)
     except ConfigNotFound as e:
@@ -35,7 +36,7 @@ def interpolate_value(value: Union[str, dict], credentials: Optional[dict]) -> O
 
     r = re.compile(r'^\{\{[A-Z0-9_]+\}\}$')
     interpolated: Optional[Union[str, dict]]
-    if isinstance(value, str): 
+    if isinstance(value, str):
         # TODO: Fix type
         if r.match(value):
             key = value.replace("{{", "").replace("}}", "")
@@ -52,15 +53,17 @@ def interpolate_value(value: Union[str, dict], credentials: Optional[dict]) -> O
                 interpolated = sub or environ.get(key)
                 
                 if interpolated is None:
-                    logger.error(
+                    logger.warning(
                         f"Undefined environment interpolation for key {{{key}}}.  Check that {key} is defined in your .env")
             else:
                 logger.error(f"Unpermitted Interpolation for key {{{key}}}.  Must be one of {','.join(SAFE_KEYS)}")
                 interpolated = None
         else:
             interpolated = value
-    else:
+    elif isinstance(value, dict):
         interpolated = {k: interpolate_value(v, credentials) for (k, v) in value.items()}
+    else:
+        interpolated = value
 
     return interpolated
 

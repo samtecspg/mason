@@ -12,5 +12,6 @@ def apply(file: str, overwrite: bool = False, log_level: Optional[str] = None, e
     
     all = get_all(environment, file)
     for r in all:
-        r.save(environment.state_store, overwrite, response)
+        new_response = r.save(environment.state_store, overwrite, response)
+        response = new_response
     return response.with_status()

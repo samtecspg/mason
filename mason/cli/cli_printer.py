@@ -21,11 +21,12 @@ class CliPrinter(Printer):
             logger.error(self.none_message(type, namespace, command))
         else:
             operators, workflows, configs, bad = sequence_4(resources, Operator, Workflow, Config, MalformedResource)
-            if type_operator(type):
+            type_name = type or "all"
+            if type_operator(type_name):
                 self.print_operators(operators)
-            if type_workflow(type):
+            if type_workflow(type_name):
                 self.print_workflows(workflows)
-            if type_config(type):
+            if type_config(type_name):
                 self.print_configs(configs)
                 
         return Response()

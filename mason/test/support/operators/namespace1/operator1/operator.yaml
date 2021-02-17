@@ -1,4 +1,4 @@
-type: "Operator"
+type: "operator"
 namespace: "namespace1"
 command: "operator1"
 description:  "Test Operator"

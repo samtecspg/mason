@@ -1,7 +1,11 @@
 id: "5"
-metastore_clients: s3
-storage_clients: s3
-execution_clients: local
+type: "config"
+metastore_clients: 
+  - s3
+storage_clients: 
+  - s3
+execution_clients: 
+  - local
 clients:
   s3:
     configuration:

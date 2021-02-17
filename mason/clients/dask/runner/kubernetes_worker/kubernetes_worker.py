@@ -14,7 +14,6 @@ from typing import Union
 
 from mason.util.result import compute
 
-
 class KubernetesWorker(DaskRunner):
 
     def __init__(self, config: dict):

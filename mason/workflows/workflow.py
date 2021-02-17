@@ -57,7 +57,7 @@ class Workflow(Saveable, Resource):
                 if isinstance(schedule, InvalidSchedule):
                     return InvalidWorkflow(f"Invalid Workflow - Bad Schedule: {schedule.reason}")
                 else:
-                    return ValidWorkflow(self.name, validated_dag, config, schedule)
+                    return ValidWorkflow(parameters.schedule_name or self.name, validated_dag, config, schedule)
             else:
                 return InvalidWorkflow(f"Invalid DAG definition: {validated_dag.reason}")
         else:
@@ -71,3 +71,6 @@ class Workflow(Saveable, Resource):
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
         return response
+
+    def to_dict(self) -> dict:
+        return {}

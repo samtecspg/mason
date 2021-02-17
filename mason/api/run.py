@@ -15,15 +15,15 @@ def run(resource_type: str, namespace: str, command: str, parameters: Optional[s
     environment: MasonEnvironment = env or MasonEnvironment().initialize()
     logger.set_level(log_level)
 
-    resource: Union[Resource, MalformedResource] = get_resource(resource_type, environment, namespace, command)
-    config: Union[Config, MalformedResource] = get_best_config(environment, config_id)
+    resource: Union[Resource, MalformedResource, None] = get_resource(resource_type, environment, namespace, command)
+    config: Union[Config, MalformedResource, None] = get_best_config(environment, config_id)
     params: Union[Parameters, MalformedResource] = get_parameters(resource_type, parameters, param_file)
 
     if isinstance(resource, Resource) and isinstance(config, Config) and isinstance(params, Parameters):
         if dry_run:
-            response = validate_resource(resource, config, params, environment).dry_run(environment, response)
+            response = validate_resource(resource, config, params, environment).dry_run(environment, response).to_response(response)
         else:
-            response = validate_resource(resource, config, params, environment).run(environment, response)
+            response = validate_resource(resource, config, params, environment).run(environment, response).to_response(response)
     else:
         if isinstance(resource, MalformedResource):
             response.add_error(f"Malformed Resource: {resource.get_message()}")

@@ -13,5 +13,5 @@ class Saveable:
         self.source_path = source_path
 
     @abstractmethod
-    def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> ResultE[Response]:
+    def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         raise Exception("Save not implemented")

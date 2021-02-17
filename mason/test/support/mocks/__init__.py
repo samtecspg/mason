@@ -1,11 +1,6 @@
 from unittest.mock import patch, MagicMock
 
-from mason.clients.engines.invalid_client import InvalidClient
-from mason.definitions import from_root
-from mason.test.support.clients.test import TestClient
-from mason.test.support.clients.test2 import Test2Client
 from mason.test.support.mocks import clients as mock_clients
-
 from mason.util.string import to_class_case
 from mason.util.logger import logger
 
@@ -28,43 +23,3 @@ def get_magic_mock(mock_name: str):
     logger.debug(f"Mocking {mock_name} client")
     return MagicMock(return_value=eval(f"mock_clients.{to_class_case(mock_name)}Mock()"))
 
-
-def mock_metastore_engine_client(self):
-    return mock_engine_client("metastore", self)
-
-def mock_scheduler_engine_client(self):
-    return mock_engine_client("scheduler", self)
-
-def mock_execution_engine_client(self):
-    return mock_engine_client("execution", self)
-
-def mock_storage_engine_client(self):
-    return mock_engine_client("storage", self)
-
-def mock_engine_client(engine_type: str, self):
-    pass
-    # if engine_type == "metastore":
-    #     if self.client_name:
-    #         return InvalidClient(f"Client type not supported: {self.client_name}")
-    #     else:
-    #         return EmptyClient()
-    # elif engine_type == "execution":
-    #     if self.client_name:
-    #         return InvalidClient(f"Client type not supported: {self.client_name}")
-    #     else:
-    #         return EmptyClient()
-    # elif engine_type == "scheduler":
-    #     if self.client_name:
-    #         return InvalidClient(f"Client type not supported: {self.client_name}")
-    #     else:
-    #         return EmptyClient()
-    # elif engine_type == "storage":
-    #     if self.client_name:
-    #         return InvalidClient(f"Client type not supported: {self.client_name}")
-    #     else:
-    #         return EmptyClient()
-    # else:
-    #     return InvalidClient("Unsupported Engine")
-    
-def mock_config_schema(self):
-    return from_root("/test/support/configs/schema.json")

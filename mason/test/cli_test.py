@@ -27,9 +27,13 @@ class TestGet:
     @pytest.fixture(autouse=True)
     def run_around_tests(self):
         os.environ["MASON_HOME"] = ".tmp/"
+        if path.exists(".tmp/"):
+            shutil.rmtree(".tmp/")
+            os.mkdir(".tmp/")
         yield
         if path.exists(".tmp/"):
             shutil.rmtree(".tmp/")
+        load_dotenv(from_root('/.env.example'))
             
     def initialize(self) -> str:
         return """
@@ -80,43 +84,3 @@ class TestRun:
 
 class TestValidate:
     pass
-
-
-# class TestCLI:
-#     
-#     @pytest.fixture(autouse=True)
-#     def run_around_tests(self):
-#         os.environ["MASON_HOME"] = ".tmp/"
-#         yield
-#         if path.exists(".tmp/"):
-#             shutil.rmtree(".tmp/")
-# 
-#     def test_apply(self):
-#         load_dotenv(from_root("/../.env"), override=True)
-#         runner = CliRunner()
-#         print_result(runner.invoke(apply, [from_root('/examples/')]))
-#         
-#         env = MasonEnvironment()
-#         workflows, invalid = sequence(get_workflows(env), Workflow, InvalidObject)
-#         configs, invalid = sequence(get_configs(env), Config, InvalidObject)
-#         operators, invalid = sequence(get_operators(env), Operator, InvalidObject)
-#         assert(len(operators) == 11)
-#         assert(len(configs) == 2)
-#         assert(len(workflows) == 3)
-
-
-    def test_get(self):
-        load_dotenv(from_root("/../.env"), override=True)
-        runner = CliRunner()
-        print_result(runner.invoke(apply, [from_root('/examples/')]))
-        print_result(runner.invoke(get, ["all"]))
-
-    def test_validate(self):
-        load_dotenv(from_root("/../.env"), override=True)
-        runner = CliRunner()
-        print_result(runner.invoke(apply, [from_root('/examples/')]))
-        print_result(runner.invoke(get, ["all"]))
-        # print_result(runner.invoke(validate, ["operator", "table", "get", "-p", "database_name:test_db,table_name:test_table"], catch_exceptions=False))
-        # print_result(runner.invoke(validate, ["operator", "table", "delete", "-p", "table_name:test,database_name:test"], catch_exceptions=False))
-        # print_result(runner.invoke(run, ["operator", "table", "list", "-p", "database_name:test"], catch_exceptions=False))
-

@@ -7,6 +7,8 @@ from mason.operators.operator import Operator
 from mason.operators.valid_operator import ValidOperator
 from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
+from mason.resources import base
+from mason.resources.malformed import MalformedResource
 from mason.util.environment import MasonEnvironment
 
 
@@ -24,22 +26,26 @@ class DagStep:
         if len(diff) == 0:
             wfp = parameters.get(self.id)
             if wfp:
-                # config = get_config_by_id(env, wfp.config_id)
-                config: Optional[Config] = None
-                if config:
+                config: Union[Config, MalformedResource, None] = base.get_config(env, wfp.config_id)
+                if isinstance(config, Config):
                     operator_params: OperatorParameters = wfp.parameters
-                    # operator = get_operator(env, self.namespace or "", self.command or "")
-                    operator: Optional[Operator] = None
-                    if operator:
+                    operator = base.get_operator(env, self.namespace or "", self.command or "")
+                    if isinstance(operator, Operator):
                         valid = operator.validate(config, operator_params)
                         if isinstance(valid, ValidOperator):
                             return ValidDagStep(self.id, valid, self.dependencies, self.retry_method, self.retry_max)
                         else:
                             return InvalidDagStep(f"Invalid Dag Step {self.id}: Invalid Operator Definition: {valid.reason}")
                     else:
-                        return InvalidDagStep(f"Invalid Dag Step {self.id}: Operator not found {self.namespace}:{self.command}")
+                        if operator:
+                            return InvalidDagStep(f"Invalid Dag Step {self.id}: {operator.get_message()}")
+                        else:
+                            return InvalidDagStep(f"Could not find operator: {self.namespace}:{self.command}")
                 else:
-                    return InvalidDagStep(f"Invalid Dag Step {self.id}: Config not found with id {wfp.config_id}")
+                    if config:
+                        return InvalidDagStep(f"Invalid Dag Step {self.id}: {config.get_message()}")
+                    else:
+                        return InvalidDagStep(f"Could not find config: {wfp.config_id}")
             else:
                 messages = ", ".join(list(map(lambda p: p.reason, parameters.invalid)))
                 return InvalidDagStep(f"Workflow Parameters for step:{self.id} not specified. Invalid Parameters: {messages}")

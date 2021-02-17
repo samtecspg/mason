@@ -25,7 +25,9 @@ class ApiPrinter(Printer):
             if len(workflows) > 0:
                 response.add("Workflows", list(map(lambda w: w.to_dict(), workflows)))
             if len(bad) > 0:
-                response.add("Errors", list(map(lambda w: w.to_dict(), workflows)))
+                response.add("Errors", list(map(lambda b: b.get_message(), bad)))
+                if len(operators + configs + workflows) == 0: # type: ignore
+                    response.set_status(400)
 
 
         return response

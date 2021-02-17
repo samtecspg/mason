@@ -17,3 +17,6 @@ clients:
     configuration:
       test_param_3: test2
       test_param_4: test2
+  local:
+    configuration:
+      threads: 4

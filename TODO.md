@@ -28,7 +28,7 @@ Legend
     - [ ] Cli (started, progress made)
 - [x] :arrow_up: Clean up rest api implementation C:03/13/2020
 - [x] create "mason run" cli command C: 03/09/2020
-- [ ] ~~Pull rest api responses through to swagger spec (200 status example)~~
+- [x] ~~Pull rest api responses through to swagger spec (200 status example)~~ Redid rest api interface to not need this
 - [x] :arrow_up: Advanced Operator Registration Documentation 
 - [x] :arrow_up: New Client Documentation 
 - [ ] :arrow_down: New Engine Documentation 
@@ -49,7 +49,7 @@ Legend
 - [ ] Consolidate all AWS response error parsing methods.
 - [x] Improve performance by moving around imports. C: 06/15/2020
 - [x] Version checking in installed operators
-- [ ] Replace operator installation method with something more robust
+- [x] Replace operator installation method with something more robust (Done, kind of)
 - [ ] Parameter type inference and checking
 - [ ] Parameter aliases:   ex: database_name -> bucket_name
 
@@ -60,7 +60,7 @@ Legend
 - [x] Better errors around Permission errors C: 03/13/2020
 
 ## Execution Engine
-- [ ] Look into using calcite or coral to extend spark operators to presto and hive
+- [ ] Look into using calcite or coral to extend spark operators to presto and hive (***)
 - [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Workflows
