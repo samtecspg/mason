@@ -1,23 +1,23 @@
 from typing import Optional, Union
-
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.parameters.parameters import Parameters
-from mason.resources.base import get_parameters, get_resource, get_best_config
 from mason.resources.resource import Resource
 from mason.resources.malformed import MalformedResource
 from mason.resources.validate import validate_resource
 from mason.util.environment import MasonEnvironment
 from mason.util.logger import logger
+from mason.resources import base
 
 def run(resource_type: str, namespace: str, command: str, parameters: Optional[str] = None, param_file: Optional[str] = None, config_id: Optional[str] = None, log_level: Optional[str] = None, env: Optional[MasonEnvironment] = None, dry_run: bool = False):
     response: Response = Response()
     environment: MasonEnvironment = env or MasonEnvironment().initialize()
     logger.set_level(log_level)
+    res = base.Resources(environment)
 
-    resource: Union[Resource, MalformedResource, None] = get_resource(resource_type, environment, namespace, command)
-    config: Union[Config, MalformedResource, None] = get_best_config(environment, config_id)
-    params: Union[Parameters, MalformedResource] = get_parameters(resource_type, parameters, param_file)
+    resource: Union[Resource, MalformedResource] = res.get_resource(resource_type, namespace, command)
+    config: Union[Config, MalformedResource] = res.get_best_config(config_id)
+    params: Union[Parameters, MalformedResource] = res.get_parameters(resource_type, parameters, param_file)
 
     if isinstance(resource, Resource) and isinstance(config, Config) and isinstance(params, Parameters):
         if dry_run:

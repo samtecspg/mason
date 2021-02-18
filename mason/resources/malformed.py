@@ -4,11 +4,12 @@ from typing import Optional
 from typistry.protos.invalid_object import InvalidObject
 
 from mason.clients.response import Response
+from mason.resources.resource import Resource
 from mason.resources.saveable import Saveable
 from mason.state.base import MasonStateStore
 
 @dataclass
-class MalformedResource(Saveable):
+class MalformedResource(Saveable, Resource):
     invalid_obj: Optional[InvalidObject] = None
     message: Optional[str] = None
     

@@ -1,7 +1,7 @@
 from hiyapyco import dump as hdump
 from mason.clients.response import Response
-from mason.resources.base import get_config, get_workflow
 from mason.resources.malformed import MalformedResource
+from mason.resources.base import Resources
 
 from mason.util.environment import MasonEnvironment
 from mason.workflows.valid_workflow import ValidWorkflow
@@ -95,12 +95,12 @@ class TestLocal:
         return base.get_env("/test/support/", "/test/support/validations/")
     
     def get_workflow(self, env: MasonEnvironment, command: str):
-        return get_workflow(env, "testing_namespace", command)
+        return Resources(env).get_workflow("testing_namespace", command)
 
     def test_local_client(self):
         base.set_log_level()
         env = self.before()
-        config = get_config(env, "8") 
+        config = Resources(env).get_config("8") 
 
         # DAG has cycle
         step_params = {

@@ -3,19 +3,20 @@ from typing import Union
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.parameters.workflow_parameters import WorkflowParameters
-from mason.resources.base import get_workflow, get_config
 from mason.test.support.testing_base import get_env, clean_string
 from mason.util.environment import MasonEnvironment
 from mason.util.logger import logger
 from mason.workflows.invalid_workflow import InvalidWorkflow
 from mason.workflows.valid_workflow import ValidWorkflow
 from mason.workflows.workflow import Workflow
+from mason.resources import base
 
 class TestWorkflows:
     def validate_workflow(self, env: MasonEnvironment, command: str, config_id: str, params: dict, strict: bool = True) -> Union[ValidWorkflow, InvalidWorkflow]:
         logger.set_level("fatal")
-        wf = get_workflow(env, "testing_namespace", command)
-        config = get_config(env, config_id)
+        res = base.Resources(env)
+        wf = res.get_workflow("testing_namespace", command)
+        config = res.get_config(config_id)
         if wf and config and isinstance(wf, Workflow) and isinstance(config, Config):
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters, strict)
@@ -46,7 +47,6 @@ class TestWorkflows:
         ]
         
         validated = self.validate_workflow(env, "workflow_basic", '3', params)
-        print("HERE")
         run = validated.dry_run(env, Response())
         assert(run.response.info == expects)
 
@@ -279,8 +279,5 @@ class TestWorkflows:
         | * step_3
         * step_5
         """
-
-        print(validated.dag.display())
-
         assert(clean_string(validated.dag.display()) == clean_string(display))
         assert(len(validated.dag.valid_steps) == 5)

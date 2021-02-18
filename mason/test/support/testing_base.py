@@ -5,15 +5,13 @@ from typing import List, Optional, Union
 
 from mason.configurations.config import Config
 from mason.operators.operator import Operator
-from mason.resources.base import get_workflow, get_operator, get_config
+from mason.resources import base 
 from mason.resources.malformed import MalformedResource
 from mason.test.support.mocks import get_patches
-from mason.util.list import sequence
 from mason.util.logger import logger
 from mason.definitions import from_root
 from mason.util.uuid import uuid_regex
 from mason.util.environment import MasonEnvironment
-from mason.resources.base import get_configs
 from mason.workflows.workflow import Workflow
 
 load_dotenv(from_root('/.env.example'))
@@ -46,19 +44,21 @@ def run_tests(namespace: str, command: str, do_mock: bool, log_level: str, confi
 
 
 def run_test(env: MasonEnvironment, namespace: str, command: str, configs: List[str], workflow: bool, callable):
-    op: Union[Operator, Workflow, MalformedResource, None]
+    op: Union[Operator, Workflow, MalformedResource]
+    res = base.Resources(env)
     
     if workflow:
-        op = get_workflow(env, namespace, command)
+        op = res.get_workflow(namespace, command)
     else:
-        op = get_operator(env, namespace, command)
+        op = res.get_operator(namespace, command)
         
     if not isinstance(op, MalformedResource) and (op != None):
         for config in configs:
-            configs, invalid = sequence(get_configs(env), Config, MalformedResource) #type: ignore
+            conf = res.get_config(config)
+            # invalid = res.get_bad()
             # for inv in invalid:
             #     print(f"Invalid Config: {inv.get_message()}")
-            conf = get_config(env, config)
+            # conf = get_config(env, config)
             if isinstance(conf, Config):
                 callable(env, conf, op)
             else:

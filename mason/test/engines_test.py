@@ -1,13 +1,14 @@
 from mason.configurations.config import Config
-from mason.resources.base import get_config
 from mason.test.support.testing_base import get_env
+from mason.resources import base
 
 
 class TestEngines:
 
     def test_all(self):
         env = get_env("/test/support/", "/test/support/validations/")
-        config = get_config(env, '3') 
+        res = base.Resources(env)
+        config = res.get_config('3') 
         assert(isinstance(config, Config))
         execution_clients = list(map(lambda e: e.client.name(), config.execution_clients))
         scheduler_clients = list(map(lambda e: e.client.name(), config.scheduler_clients))

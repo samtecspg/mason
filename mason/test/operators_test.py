@@ -99,7 +99,7 @@ class TestApplyOperator:
         env = base.get_env("/.tmp/", "/test/support/validations/")
         response, status = apply(from_root("/test/support/"), env=env, log_level="fatal")
         assert(len(response["Info"]) == 20)
-        assert(len(response["Errors"]) == 12)
+        assert(len(response["Errors"]) == 8)
         assert(status == 200)
 
         response, status = get("operator", env=env, log_level="fatal")

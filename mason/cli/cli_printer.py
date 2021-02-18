@@ -6,13 +6,12 @@ from typistry.protos.invalid_object import InvalidObject
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.operators.operator import Operator
-from mason.resources.base import type_operator, type_workflow, type_config
 from mason.resources.malformed import MalformedResource
+from mason.workflows.workflow import Workflow
 from mason.resources.printer import Printer
 from mason.util.list import sequence_4
 from mason.util.logger import logger
 from mason.util.printer import banner
-from mason.workflows.workflow import Workflow
 
 class CliPrinter(Printer):
 
@@ -22,47 +21,42 @@ class CliPrinter(Printer):
         else:
             operators, workflows, configs, bad = sequence_4(resources, Operator, Workflow, Config, MalformedResource)
             type_name = type or "all"
-            if type_operator(type_name):
-                self.print_operators(operators)
-            if type_workflow(type_name):
-                self.print_workflows(workflows)
-            if type_config(type_name):
+            # TODO: dry up with resources
+            if type in ["all", "operator", "operators"]:
+                self.print_operators(operators, namespace, command)
+            if type in ["all", "workflow", "workflows"]:
+                self.print_workflows(workflows, namespace, command)
+            if type in ["all", "config", "configs"]:
                 self.print_configs(configs)
                 
         return Response()
 
-    def print_operators(self, operators: List[Operator]):
+    def print_operators(self, operators: List[Operator], namespace: Optional[str] = None, command: Optional[str] = None):
         operators.sort(key=lambda o: o.namespace)
         
         if len(operators) > 0:
-            to_values = list(
-                map(lambda op: [op.namespace, op.command, op.description], operators))
-            namespaces = list(set(map(lambda op: op.namespace, operators)))
+            to_values = list(map(lambda op: [op.namespace, op.command, op.description], operators))
+            namesp = f"Operator "
+            if namespace:
+                namesp += f"{namespace}"
 
-            if len(namespaces) > 1:
-                namespace = "Operator"
-            else:
-                namespace = namespaces[0]
-
-            banner(f"Available {namespace} Methods")
+            banner(f"Available {namesp} Methods")
             logger.info()
             logger.info(tabulate(to_values, headers=["namespace", "command", "description"]))
             logger.info()
         else:
             logger.error("No operators registered.  Register operators by running \"mason apply\"")
 
-    def print_workflows(self, workflows: List[Workflow]):
+    def print_workflows(self, workflows: List[Workflow], namespace: Optional[str] = None, command: Optional[str] = None):
         workflows.sort(key=lambda o: o.namespace)
         
         if len(workflows) > 0:
             to_values = list(map(lambda wf: [wf.namespace, wf.command, wf.description], workflows))
-            namespaces = list(set(map(lambda wf: wf.namespace, workflows)))
-            if len(namespaces) > 1:
-                namespace = "Workflow"
-            else:
-                namespace = namespaces[0]
-                
-            banner(f"Available {namespace} Methods")
+            namesp = f"Workflow "
+            if namespace:
+                namesp += f"{namespace}"
+
+            banner(f"Available {namesp} Methods")
             logger.info()
             logger.info(tabulate(to_values, headers=["namespace", "command", "description"]))
             logger.info()

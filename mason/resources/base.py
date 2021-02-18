@@ -1,28 +1,27 @@
-from typing import Optional, List, Union, TypeVar, Any, Type
+from functools import lru_cache
+from typing import Optional, List, Union, TypeVar, Any, Type, Tuple
 
 from typistry.protos.invalid_object import InvalidObject
 from typistry.validators.base import validate_files
 
 from mason.configurations.config import Config
 from mason.operators.operator import Operator
-from mason.parameters.parameters import Parameters
-from mason.workflows.workflow import Workflow
 from mason.parameters.operator_parameters import OperatorParameters
+from mason.parameters.parameters import Parameters
 from mason.parameters.workflow_parameters import WorkflowParameters
+from mason.util.list import sequence_4
 from mason.resources.malformed import MalformedResource
 from mason.util.environment import MasonEnvironment
-from mason.util.list import sequence, sequence_4
-from mason.util.logger import logger
+from mason.workflows.workflow import Workflow
 from mason.resources.resource import Resource
 
 class Resources:
+
     def __init__(self, env: MasonEnvironment):
         self.env = env
-        self.operators: List[Operator] = []
-        self.workflows: List[Config] = []
-        self.configs: List[Workflow] = []
-        self.bad: List[MalformedResource] = []
 
+    def type_any(self, type: str) -> bool:
+        return self.type_operator(type) or self.type_workflow(type) or self.type_config(type) or self.type_bad(type)
     def type_operator(self, type: str) -> bool:
         return type.lower() in ["all", "operator", "operators"]
     def type_workflow(self, type: str) -> bool:
@@ -32,238 +31,215 @@ class Resources:
     def type_bad(self, type: str) -> bool:
         return type.lower() in ["bad", "invalid", "malformed"]
 
-    T = TypeVar("T", bound="Resource")
-    def get_resources(self, cls: Type[T], file: Optional[str] = None) -> List[Union[T, MalformedResource]]:
-        path = file or self.env.state_store.operator_home
-        all = validate_files(path, self.env.validation_path, include_source=True)
-        resources = [self.to_resource(cls, a) for a in all if not (isinstance(a, MalformedResource) and a.ignorable())]
-        if cls == Operator:
-            self.operators = resources
-        elif cls == Workflow:
-            self.workflows = resources
-
-        return resources
+    @lru_cache
+    def get_all(self, file: Optional[str] = None) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
+        path = file or self.env.mason_home
+        validated = validate_files(path, self.env.validation_path, include_source=True)
+        return self.to_resources(validated)
     
-    def get_resource(self, cls: Type[T], namespace: Optional[str] = None, command: Optional[str] = None) -> Union[T, MalformedResource]:
-        pass
+    def get_resources(self, type: str, namespace: Optional[str], command: Optional[str]) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
+        all: List[Union[Operator, Workflow, Config, MalformedResource]] = []
+        if self.type_any(type):
+            if self.type_operator(type):
+                if namespace and command:
+                    all += [self.get_operator(namespace, command)]
+                else:
+                    all += self.get_operators(namespace, command)
+                    all += self.get_bad()
+            if self.type_workflow(type):
+                if namespace and command:
+                    all += [self.get_workflow(namespace, command)]
+                else:
+                    all += self.get_workflows(namespace, command)
+                    all += self.get_bad()
+            if self.type_config(type):
+                if namespace:
+                    all += [self.get_config(namespace)]
+                else:
+                    all += self.get_configs(namespace)
+                    all += self.get_bad()
+        else:
+            all += [MalformedResource(message=f"Unsupported type: {type}")]
+        relevant = [a for a in all if not(isinstance(a, MalformedResource) and a.ignorable())]
+        return relevant
         
-    def to_resource(self, cls: Type[T], obj: Union[Any, InvalidObject]):
-        if isinstance(obj, cls):
-            return obj
-        elif isinstance(obj, InvalidObject):
-            return MalformedResource(obj)
+    def get_operators(self, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Operator]:
+        ops, bad = self.filter_resource(Operator, namespace, command)
+        return ops
+    
+    def get_operator(self, namespace: str, command: str) -> Union[Operator, MalformedResource]:
+        op = self.get_resource("operator", namespace, command)
+        if isinstance(op, Operator) or isinstance(op, MalformedResource):
+            return op
+        else:
+            return MalformedResource(message="Bad type cast")
+
+    def get_workflows(self, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Workflow]:
+        workflows, bad = self.filter_resource(Workflow, namespace, command)
+        return workflows
+
+    def get_workflow(self, namespace: str, command: str) -> Union[Workflow, MalformedResource]:
+        op = self.get_resource("workflow", namespace, command)
+        if isinstance(op, Workflow) or isinstance(op, MalformedResource):
+            return op
+        else:
+            return MalformedResource(message="Bad type cast")
+
+    def get_configs(self, config_id: Optional[str] = None) -> List[Config]:
+        configs, bad = self.filter_resource(Config, config_id)
+        return configs
+
+    def get_config(self, config_id: str) -> Union[Config, MalformedResource]:
+        conf: Union[Operator, Config, Workflow, MalformedResource] = self.get_resource("config", config_id)
+        if isinstance(conf, Config) or isinstance(conf, MalformedResource):
+            return conf
+        else:
+            return MalformedResource(message="Bad type cast")
+        
+    def get_best_config(self, config_id: Optional[str] = None) -> Union[Config, MalformedResource]:
+        by_id: Union[Config, MalformedResource, None] = None
+        if config_id:
+            by_id = self.get_config(config_id)
+            if isinstance(by_id, MalformedResource) and by_id.ignorable():
+                by_id = None
+        best_config: Union[Config, MalformedResource] = by_id or self.get_session_config() or self.get_first_config()
+        return best_config
+    
+    def get_session_config(self) -> Union[Config, MalformedResource, None]:
+        config_id = self.env.state_store.get_session_config()
+        if config_id:
+            session_config = self.get_config(config_id)
+            if isinstance(session_config, MalformedResource) and session_config.ignorable():
+                return None
+            else:
+                return session_config
+        else:
+            return None
+
+    def get_first_config(self) -> Union[Config, MalformedResource]:
+        configs: List[Config] = self.get_configs()
+        configs.sort(key=lambda c: c.id)
+        if len(configs) > 0:
+            return configs[0]
         else:
             return MalformedResource()
 
-    # def get_all(self, file: Optional[str] = None):
-    #     self.get_resources("all", file)
-    # 
-    # def get_resources(self, type: str, file: Optional[str] = None): 
-    #     pass
+    def set_session_config(self, config_id: str) -> Union[Config, str]:
+        config = self.get_config(config_id)
+        if config:
+            return self.env.state_store.set_session_config(config_id)
+        else:
+            return f"Config does not exist: {config_id}"
 
-def type_operator(type: str) -> bool:
-    return type.lower() in ["all", "operator", "operators"]
+    def matches(self, resource: Union[Operator, Workflow, Config], namespace: Optional[str] = None, command: Optional[str] = None) -> bool:
+        matches = False
+        if isinstance(resource, Operator):
+            if (namespace == None) or (resource.namespace == namespace):
+                if (command == None) or (resource.command == command):
+                    matches = True
+        elif isinstance(resource, Workflow):
+            if (namespace == None) or (resource.namespace == namespace):
+                if (command == None) or (resource.command == command):
+                    matches = True
+        else:
+            if (namespace == None) or (resource.id == namespace):
+                matches = True
+        return matches
+                
+    def to_resources(self, resources: List[Union[InvalidObject, Any]]) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
+        return [self.to_resource(r) for r in resources]
 
-def type_workflow(type: str) -> bool:
-    return type.lower() in ["all", "workflow", "workflows"]
-
-def type_config(type: str) -> bool:
-    return type.lower() in ["all", "config", "configs"]
-
-def type_bad(type: str) -> bool:
-    return type.lower() in ["bad", "invalid", "malformed"]
-
-def type_any(type: str) -> bool:
-    return type_config(type) or type_workflow(type) or type_operator(type)
-
-def get_all(env: MasonEnvironment, file: Optional[str] = None) -> List[Union[Operator, Workflow, Config, MalformedResource]]:  
-    return get_resources_type("all", env, file)
-
-def get_resources_type(type: str, env: MasonEnvironment, file: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
-    all: List[Union[Operator, Workflow, Config, MalformedResource]] = []
-    if type_operator(type):
-        all += get_operators(env, file, namespace, command)
-    if type_workflow(type):
-        all += get_workflows(env, file, namespace, command)
-    if type_config(type):
-        all += get_configs(env, file, namespace)
-
-    relevant = [a for a in all if not (isinstance(a, MalformedResource) and a.ignorable())]
-    return relevant
-
-def get_resources(type: str, env: MasonEnvironment, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
-    resources = []
-    if (type_operator(type) or type_workflow(type)) and namespace and command:
-        resource = get_resource(type, env, namespace, command)
-        if resource:
-            resources.append(resource)
-    elif type_config(type) and namespace:
-        resource = get_resource(type, env, namespace)
-        if resource:
-            resources.append(resource)
-    else:
-        resources = get_resources_type(type, env, None, namespace, command)
-    return resources
-        
-
-def get_resource(type: str, env: MasonEnvironment, namespace: str, command: Optional[str] = None, all: Optional[List[Union[Operator, Workflow, Config, MalformedResource]]] = None) -> Union[Operator, Workflow, Config, MalformedResource, None]:
-    resources: List[Union[Operator, Workflow, Config, MalformedResource]] = all or get_resources_type(type, env, None, namespace, command)
-    operators, workflows, configs, bad = sequence_4(resources, Operator, Workflow, Config, MalformedResource)
-    relevant: List[Union[Operator, Workflow, Config, MalformedResource]] = []
-    relevant_malformed: List[MalformedResource] = []
-
-    if type_operator(type) or type_workflow(type):
-        for b in bad:
-            try:
-                obj = b.invalid_obj
-                if obj:
-                    if obj.reference.attributes().get("namespace") == namespace and obj.reference.attributes().get("command") == command:
-                        relevant_malformed.append(b)
-            except Exception as e:
-                pass
+    def to_resource(self, resource: Union[InvalidObject, Any]) -> Union[Operator, Workflow, Config, MalformedResource]:
+        if isinstance(resource, InvalidObject):
+            return MalformedResource(resource)
+        elif isinstance(resource, Operator) or isinstance(resource, Workflow) or isinstance(resource, Config):
+            return resource
+        else:
+            return MalformedResource(message=f"Not a valid resource type: {resource.__class__.__name__}")
+    
+    def get_resource(self, type: str, namespace: Optional[str] = None, command: Optional[str] = None) -> Union[Operator, Workflow, Config, MalformedResource]:
+        resources: List[Union[Operator, Workflow, Config]] = []
+        bad: List[MalformedResource] = []
+        if self.type_operator(type):
+            resources, bad = self.filter_resource(Operator, namespace, command)
+        elif self.type_workflow(type):
+            resources, bad = self.filter_resource(Workflow, namespace, command)
+        elif self.type_config(type):
+            resources, bad = self.filter_resource(Config, namespace, command)
+        else:
+            bad = [MalformedResource(message=f"Unsupported resource type: {type}")]
             
-    elif type_config(type):
-        for b in bad:
-            try:
-                obj = b.invalid_obj
-                if obj:
-                    if obj.reference.attributes().get("id") == namespace:
-                        relevant_malformed.append(b)
-            except Exception as e:
-                pass
-
-    if type_operator(type):
-        relevant += operators
-    elif type_workflow(type):
-        relevant += workflows
-    elif type_config(type):
-        relevant += configs
-    elif type_any(type):
-        relevant = resources
-    
-    if len(relevant + relevant_malformed) > 1:
-        message = f"Multiple {type} resources matching {namespace}"
-        if command:
-            message += f":{command}"
-        return MalformedResource(message=message)
-    elif len(relevant) == 1:
-        return relevant[0]
-    elif len(relevant_malformed) == 1:
-        rm = relevant_malformed[0]
-        return MalformedResource(rm.invalid_obj, f"Resource malformed: {rm.get_message()}")
-    else:
-        return None
-
-def get_operators(env: MasonEnvironment, file: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Union[Operator, MalformedResource]]:
-    path = file or env.state_store.operator_home
-    operators: List[Union[Operator, InvalidObject]] = validate_files(path, env.validation_path, include_source=True, filter_type="operator")
-    return list(map(lambda r: filter_operator(r, namespace, command), operators))
-
-def get_operator(env: MasonEnvironment, namespace: str, command: str) -> Union[Operator, MalformedResource, None]:
-    operator = get_resource("operator", env, namespace, command)
-    if (operator == None) or isinstance(operator, Operator) or isinstance(operator, MalformedResource):
-        return operator
-    else:
-        return MalformedResource(message="Bad type cast")
-
-def filter_operator(operator: Union[Operator, InvalidObject], namespace: Optional[str] = None, command: Optional[str] = None) -> Union[Operator, MalformedResource]:
-    if isinstance(operator, InvalidObject):
-        return MalformedResource(operator)
-    else:
-        if (namespace == None) or (operator.namespace == namespace):
-            if (command == None) or (operator.command == command):
-                return operator
+        if len(resources) > 1:
+            message = f"Multiple {type} resources matching {namespace}"
+            if command:
+                message += f":{command}"
+            return MalformedResource(message=message)
+        elif len(resources) == 0:
+            matching_bad = self.get_matching_bad_resource(type, bad, namespace, command)
+            if isinstance(matching_bad, MalformedResource):
+                return matching_bad
             else:
                 return MalformedResource()
         else:
-            return MalformedResource()
+            return resources[0]
+        
+    def get_bad(self) -> List[MalformedResource]:
+        blank, bad = self.filter_resource(MalformedResource)
+        return bad
 
-def get_workflows(env: MasonEnvironment, file: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Union[Workflow, MalformedResource]]:
-    path = file or env.state_store.workflow_home
-    workflows: List[Union[Workflow, InvalidObject]] = validate_files(path, env.validation_path, include_source=True, filter_type="workflow")
-    return list(map(lambda r: filter_workflow(r, namespace, command), workflows))
+    def get_matching_bad_resource(self, type: str, bad: List[MalformedResource], namespace: Optional[str] = None, command: Optional[str] = None) -> Optional[MalformedResource]:
+        relevant_bad = None
+        if self.type_operator(type) or self.type_workflow(type):
+            if namespace and command:
+                for b in bad:
+                    try:
+                        obj = b.invalid_obj
+                        if obj:
+                            if obj.reference.attributes().get("namespace") == namespace and obj.reference.attributes().get("command") == command:
+                                relevant_bad = b
+                    except Exception as e:
+                        pass
 
-def get_workflow(env: MasonEnvironment, namespace: str, command: str) -> Union[Workflow, MalformedResource, None]:
-    workflow = get_resource("workflow", env, namespace, command)
-    if (workflow == None) or isinstance(workflow, Workflow) or isinstance(workflow, MalformedResource):
-        return workflow 
-    else:
-        return MalformedResource(message="Bad type cast")
+        elif self.type_config(type):
+            if namespace:
+                for b in bad:
+                    try:
+                        obj = b.invalid_obj
+                        if obj:
+                            if obj.reference.attributes().get("id") == namespace:
+                                relevant_bad = b
+                    except Exception as e:
+                        pass 
+                
+        return relevant_bad
 
-def filter_workflow(workflow: Union[Workflow, InvalidObject], namespace: Optional[str] = None, command: Optional[str] = None) -> Union[Workflow, MalformedResource]:
-    if isinstance(workflow, InvalidObject):
-        return MalformedResource(workflow)
-    else:
-        if (namespace == None) or (workflow.namespace == namespace):
-            if (command == None) or (workflow.command == command):
-                return workflow
-            else:
-                return MalformedResource()
+    T = TypeVar("T", bound="Resource")
+    def filter_resource(self, cls: Type[T], namespace: Optional[str] = None, command: Optional[str] = None) -> Tuple[List[T], List[MalformedResource]]:
+        all = self.get_all()
+        operators, workflows, configs, malformed = sequence_4(all, Operator, Workflow, Config, MalformedResource)
+        if cls == Operator:
+            ops = [o for o in operators if self.matches(o, namespace, command)]
+            return ops, malformed # type: ignore
+        elif cls == Workflow:
+            wfs = [w for w in workflows if self.matches(w, namespace, command)]
+            return wfs, malformed # type: ignore
+        elif cls == Config:
+            cfg = [c for c in configs if self.matches(c, namespace, command)]
+            return cfg, malformed # type: ignore
+        elif cls == MalformedResource:
+            return [], malformed
         else:
-            return MalformedResource()
+            return [], [MalformedResource(message=f"Undefined resource: {cls}")]
 
-def get_configs(env: MasonEnvironment, file: Optional[str] = None, config_id: Optional[str] = None) -> List[Union[Config, MalformedResource]]:
-    path = file or env.state_store.config_home
-
-    configs: List[Union[Config, InvalidObject]] = validate_files(path, env.validation_path, include_source=True, filter_type="config")
-    return list(map(lambda r: filter_config(r, config_id), configs))
-
-def get_config(env: MasonEnvironment, config_id: str, all: Optional[list] = None) -> Union[Config, MalformedResource, None]:
-    config = get_resource("config", env, config_id, all=all)
-    if (config == None) or isinstance(config, Config) or isinstance(config, MalformedResource):
-        return config 
-    else:
-        return MalformedResource(message="Bad type cast")
-
-def filter_config(config: Union[Config, InvalidObject], namespace: Optional[str] = None, command: Optional[str] = None) -> Union[Config, MalformedResource]:
-    if isinstance(config, InvalidObject):
-        return MalformedResource(config)
-    else:
-        if (namespace == None) or (config.id == namespace):
-            return config
-        else:
-            return MalformedResource()
-
-def set_session_config(env: MasonEnvironment, config_id: str) -> Optional[Config]:
-    all_configs = get_configs(env)
-    config = get_config(env, config_id, all_configs)
-    if config:
-        return env.state_store.set_session_config(config_id)
-    else:
-        logger.error(f"Config does not exist: {config_id}")
-        return None
-
-def get_session_config(env: MasonEnvironment) -> Union[Config, MalformedResource, None]:
-    config_id = env.state_store.get_session_config()
-    if config_id:
-        return get_config(env, config_id)
-    else:
-        return None
-
-def get_first_config(configs: List[Union[Config, MalformedResource, None]]) -> Union[Config, MalformedResource]:
-    valid, invalid = sequence(configs, Config, MalformedResource)
-    valid.sort(key=lambda c: c.id)
-    if len(valid) > 0:
-        return valid[0]
-    else:
-        return MalformedResource(message="No Valid Configs")
-
-def get_best_config(env: MasonEnvironment, config_id: Optional[str] = None) -> Union[Config, MalformedResource, None]:
-    all_configs: List[Union[Config, MalformedResource, None]] = get_resources_type("config", env, namespace=config_id) # type: ignore
-    config: Union[Config, MalformedResource, None] = None
-    if config_id:
-        config = get_config(env, config_id, all_configs)
-    return config or get_session_config(env) or get_first_config(all_configs)
-
-def get_parameters(type: str, parameter_string: Optional[str], parameter_path: Optional[str]) -> Union[Parameters, MalformedResource]:
-    parameters: Union[Parameters, MalformedResource] = MalformedResource(message=f"Type not supported: {type}")
-    if type_any(type):
-        if type_workflow(type):
+    def get_parameters(self, type: str, parameter_string: Optional[str], parameter_path: Optional[str]) -> Union[Parameters, MalformedResource]:
+        parameters: Union[Parameters, MalformedResource]
+        if self.type_workflow(type):
             parameters = WorkflowParameters(parameter_path)
-        elif type_operator(type):
+        elif self.type_operator(type):
             parameters = OperatorParameters(parameter_string, parameter_path)
-        elif type_config(type):
+        elif self.type_config(type):
             parameters = MalformedResource(message=f"Config type not supported: {type}")
-        
-    return parameters
-        
+        else:
+            parameters = MalformedResource(message=f"Type not supported: {type}")
+
+        return parameters
