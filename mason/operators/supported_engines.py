@@ -19,13 +19,18 @@ class SupportedEngineSet:
         self.scheduler = scheduler
         self.execution = execution
         self.storage = storage
+        
+        all = {}
+        if self.metastore:
+            all['metastore'] = self.metastore
+        if self.scheduler:
+            all['scheduler'] = self.scheduler
+        if self.execution:
+            all['execution'] = self.execution
+        if self.storage:
+            all['storage'] = self.storage
 
-        self.all = {
-            'metastore': self.metastore,
-            'scheduler': self.scheduler,
-            'execution': self.execution,
-            'storage': self.storage
-        }
+        self.all = all
 
     def validate_coverage(self, config: Config) -> Tuple[bool, str]:
         test = True

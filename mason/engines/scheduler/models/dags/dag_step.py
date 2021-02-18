@@ -45,3 +45,13 @@ class DagStep:
                 return InvalidDagStep(f"Workflow Parameters for step:{self.id} not specified. Invalid Parameters: {messages}")
         else:
             return InvalidDagStep(f"Undefined dependent steps: {diff}")
+        
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'namespace': self.namespace,
+            'command': self.command,
+            'dependencies': self.dependencies,
+            'retry_method': self.retry_method,
+            'retry_max': self.retry_max,
+        }

@@ -21,7 +21,7 @@ class ValidWorkflow(ValidResource):
         self.config = config
 
     def dry_run(self, env: MasonEnvironment, response: Response = Response()) -> OperatorResponse:
-        response.add_info(f"Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag")
+        response.add_info(f"Performing Dry Run for Workflow")
         response.add_info("")
         response.add_info(f"Valid Workflow DAG Definition:")
         response.add_info(f"-" * 80)

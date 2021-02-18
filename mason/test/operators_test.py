@@ -15,7 +15,7 @@ class TestGetOperator:
     def test_command_exists(self):
         env = base.get_env("/test/support/")
         response, status = get("operator", "namespace1", "operator1", env=env) 
-        expects = {'Operators': [{'command': 'operator1', 'description': 'Test Operator', 'namespace': 'namespace1', 'parameters': {'optional': [], 'required': ['test_param']}, 'supported_configurations': [{'execution': None, 'metastore': 'test', 'scheduler': None, 'storage': None}]}]}
+        expects = {'Operators': [{'command': 'operator1', 'description': 'Test Operator', 'namespace': 'namespace1', 'parameters': {'optional': [], 'required': ['test_param']}, 'supported_configurations': [{'metastore': 'test'}]}]}
         assert(response == expects)
         assert(status == 200)
 
@@ -44,10 +44,10 @@ class TestGetOperator:
         response, status = get("operator", "namespace1", env=env, log_level="fatal")
         operators = [{'namespace': 'namespace1', 'command': 'operator1', 'description': 'Test Operator',
           'parameters': {'required': ['test_param'], 'optional': []},
-          'supported_configurations': [{'metastore': 'test', 'scheduler': None, 'execution': None, 'storage': None}]},
+          'supported_configurations': [{'metastore': 'test'}]},
          {'namespace': 'namespace1', 'command': 'operator2', 'description': 'Test Operator',
           'parameters': {'required': ['test_param'], 'optional': []},
-          'supported_configurations': [{'metastore': 'test', 'scheduler': None, 'execution': None, 'storage': None}]}]
+          'supported_configurations': [{'metastore': 'test'}]}]
         assert(response['Operators'] == operators)
         assert(status == 200)
 

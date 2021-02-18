@@ -4,6 +4,7 @@
   "type": "object",
   "patternProperties": {
     "schedule_name": {"type":  "string"},
+    "strict": {"type":  "boolean"},
     "schedule": {"type":  "string"},
     "^step_.*": {
       "type": "object",

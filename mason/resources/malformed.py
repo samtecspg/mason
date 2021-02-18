@@ -12,6 +12,7 @@ from mason.state.base import MasonStateStore
 class MalformedResource(Saveable, Resource):
     invalid_obj: Optional[InvalidObject] = None
     message: Optional[str] = None
+    not_found: Optional[str] = None
     
     def get_message(self) -> Optional[str]:
         if self.invalid_obj:
@@ -19,10 +20,10 @@ class MalformedResource(Saveable, Resource):
         elif self.message:
             return self.message
         else:
-            return None 
+            return f"Resource not found: {self.not_found}" 
 
     def ignorable(self) -> bool:
-        return (self.get_message() == None)
+        return (self.not_found != None)
     
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         message = self.get_message()

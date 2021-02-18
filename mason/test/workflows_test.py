@@ -12,14 +12,15 @@ from mason.workflows.workflow import Workflow
 from mason.resources import base
 
 class TestWorkflows:
-    def validate_workflow(self, env: MasonEnvironment, command: str, config_id: str, params: dict, strict: bool = True) -> Union[ValidWorkflow, InvalidWorkflow]:
+    def validate_workflow(self, env: MasonEnvironment, command: str, config_id: str, params: dict) -> Union[ValidWorkflow, InvalidWorkflow]:
         logger.set_level("fatal")
         res = base.Resources(env)
         wf = res.get_workflow("testing_namespace", command)
         config = res.get_config(config_id)
         if wf and config and isinstance(wf, Workflow) and isinstance(config, Config):
+            print("HERE")
             parameters = WorkflowParameters(parameter_dict=params)
-            validated = wf.validate(env, config, parameters, strict)
+            validated = wf.validate(env, config, parameters)
             return validated
         else:
             raise Exception("Invalid workflow or config")
@@ -39,7 +40,7 @@ class TestWorkflows:
             "step_3": step_params
         }
         expects = [
-            'Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag',
+            'Performing Dry Run for Workflow',
             '', 
             'Valid Workflow DAG Definition:',
             '--------------------------------------------------------------------------------',
@@ -88,6 +89,7 @@ class TestWorkflows:
             }
         }
         params = {
+            "strict": True,
             "step_1": step_params,
             "step_2": step_params,
             "step_3": step_params,
@@ -98,7 +100,8 @@ class TestWorkflows:
         assert(isinstance(validated, InvalidWorkflow))
         assert("Invalid DAG definition: Invalid DAG, contains invalid steps." in validated.reason)
 
-        validated = self.validate_workflow(env, 'workflow_nonexistent_step_and_cycle', '3', params, False)
+        params["strict"] = False
+        validated = self.validate_workflow(env, 'workflow_nonexistent_step_and_cycle', '3', params)
         assert(isinstance(validated, InvalidWorkflow))
         assert("Invalid DAG definition: Invalid Dag: Unreachable steps: [\'step_4\'] Invalid Dag Steps: Undefined dependent steps:" in validated.reason)
 

@@ -9,9 +9,9 @@ produces:
 - application/json
 swagger: '2.0'
 paths:
-  /get:
+  /get/{resource_type}:
     get:
-      operationId: "mason.api.base.get"
+      operationId: "mason.api.get.get"
       tags:
         - "Get"
       summary: "Get mason resource"
@@ -20,7 +20,7 @@ paths:
         - "application/json"
       parameters:
         - name: resource_type
-          in: query
+          in: path
           required: true
           type: string
           enum:
@@ -48,3 +48,102 @@ paths:
             - fatal
           required: false
           type: string
+      responses:
+        200:
+          description: "Successful list"
+  /run/{resource_type}:
+    post:
+      operationId: "mason.api.run.run"
+      tags:
+        - "Run"
+      summary: "Run mason resource"
+      description: "Run mason resource"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: resource_type
+          in: path
+          required: true
+          type: string
+          enum:
+            - operator
+            - workflow
+        - name: namespace
+          in: query
+          required: true
+          type: string
+        - name: command
+          in: query
+          required: true
+          type: string
+        - name: log_level
+          in: query
+          default: info
+          enum:
+            - info
+            - warning
+            - error
+            - debug
+            - trace
+            - fatal
+          required: false
+          type: string
+        - name: config_id
+          in: query
+          type: string
+          required: false
+        - name: parameters
+          in: body
+          schema:
+            type: object
+      responses:
+        200:
+          description: "Successful Run"
+  /validate/{resource_type}:
+    post:
+      operationId: "mason.api.validate.validate"
+      tags:
+        - "Validate"
+      summary: "Validate mason resource"
+      description: "Validate mason resource and perform a dry run"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: resource_type
+          in: path
+          required: true
+          type: string
+          enum:
+            - operator
+            - workflow
+        - name: namespace
+          in: query
+          required: true
+          type: string
+        - name: command
+          in: query
+          required: true
+          type: string
+        - name: log_level
+          in: query
+          default: info
+          enum:
+            - info
+            - warning
+            - error
+            - debug
+            - trace
+            - fatal
+          required: false
+          type: string
+        - name: config_id
+          in: query
+          type: string
+          required: false
+        - name: parameters
+          in: body
+          schema:
+            type: object
+      responses:
+        200:
+          description: "Successful Validate"

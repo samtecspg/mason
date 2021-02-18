@@ -90,6 +90,6 @@ class Config(Saveable, Resource):
         metastore = extra_info[2]
         storage = extra_info[3]
         scheduler = extra_info[4]
-        return {'clients': clients, 'id': id, 'execution_clients': execution, 'metastore_clients': metastore, 'storage_clients': storage, 'scheduler_clients': scheduler}
+        return {'clients': clients, 'id': id, 'execution_client': execution, 'metastore_client': metastore, 'storage_client': storage, 'scheduler_client': scheduler}
 
 

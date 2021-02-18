@@ -5,7 +5,7 @@ from mason.definitions import from_root
 from mason.parameters.invalid_parameter import InvalidParameter
 from mason.parameters.optional_parameter import OptionalParameter
 from mason.parameters.parameters import Parameters
-from mason.parameters.util import parse_dict
+from mason.parameters.util import parse_dict as parse_dict
 from mason.parameters.validated_parameter import ValidatedParameter
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.parameters.parameter import Parameter
@@ -13,7 +13,7 @@ from mason.util.list import dedupe, get
 from mason.util.yaml import parse_yaml_invalid
 
 class OperatorParameters(Parameters):
-    def __init__(self, parameter_string: Optional[str] = None, parameter_path: Optional[str] = None):
+    def __init__(self, parameter_string: Optional[str] = None, parameter_path: Optional[str] = None, parameter_dict: Optional[dict] = None):
         self.parameter_string = parameter_string
         self.parameter_path = parameter_path
 
@@ -21,6 +21,8 @@ class OperatorParameters(Parameters):
             parameters, invalid = self.parse_string(parameter_string)
         elif parameter_path:
             parameters, invalid = self.parse_path(parameter_path)
+        elif parameter_dict:     
+            parameters, invalid = parse_dict(parameter_dict, from_root("/parameters/schema.json"))
         else:
             parameters, invalid = ([], [])
 

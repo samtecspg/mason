@@ -48,10 +48,10 @@ class Workflow(Saveable, Resource):
         else:
             return InvalidWorkflow(f"Source path not found for workflow: {self.namespace}:{self.command}")
 
-    def validate(self, env: MasonEnvironment, config: Config, parameters: WorkflowParameters, strict: bool = True) -> Union[ValidWorkflow, InvalidWorkflow]:
+    def validate(self, env: MasonEnvironment, config: Config, parameters: WorkflowParameters) -> Union[ValidWorkflow, InvalidWorkflow]:
         scheduler_client = config.scheduler().client.name()
         if scheduler_client in self.supported_schedulers:
-            validated_dag = self.dag.validate(env, parameters, strict)
+            validated_dag = self.dag.validate(env, parameters)
             if isinstance(validated_dag, ValidDag):
                 schedule = config.scheduler().validate_schedule(parameters.schedule)
                 if isinstance(schedule, InvalidSchedule):
@@ -73,4 +73,9 @@ class Workflow(Saveable, Resource):
         return response
 
     def to_dict(self) -> dict:
-        return {}
+        return {
+            'namespace': self.namespace,
+            'command': self.command,
+            'description': self.description,
+            'dag': self.dag.to_dict()
+         }

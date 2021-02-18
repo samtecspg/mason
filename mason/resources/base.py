@@ -179,7 +179,12 @@ class Resources:
             if isinstance(matching_bad, MalformedResource):
                 return matching_bad
             else:
-                return MalformedResource()
+                not_found = f"{type}"
+                if namespace:
+                    not_found += f":{namespace}"
+                if command:
+                    not_found += f":{command}"
+                return MalformedResource(not_found=not_found)
         else:
             return resources[0]
         
@@ -231,12 +236,12 @@ class Resources:
         else:
             return [], [MalformedResource(message=f"Undefined resource: {cls}")]
 
-    def get_parameters(self, type: str, parameter_string: Optional[str], parameter_path: Optional[str]) -> Union[Parameters, MalformedResource]:
+    def get_parameters(self, type: str, parameter_string: Optional[str], parameter_path: Optional[str], parameter_dict: Optional[dict]) -> Union[Parameters, MalformedResource]:
         parameters: Union[Parameters, MalformedResource]
         if self.type_workflow(type):
-            parameters = WorkflowParameters(parameter_path)
+            parameters = WorkflowParameters(parameter_path, parameter_dict)
         elif self.type_operator(type):
-            parameters = OperatorParameters(parameter_string, parameter_path)
+            parameters = OperatorParameters(parameter_string, parameter_path, parameter_dict)
         elif self.type_config(type):
             parameters = MalformedResource(message=f"Config type not supported: {type}")
         else:
