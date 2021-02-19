@@ -37,7 +37,7 @@ class Resources:
         validated = validate_files(path, self.env.validation_path, include_source=True)
         return self.to_resources(validated)
     
-    def get_resources(self, type: str, namespace: Optional[str], command: Optional[str]) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
+    def get_resources(self, type: str, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
         all: List[Union[Operator, Workflow, Config, MalformedResource]] = []
         if self.type_any(type):
             if self.type_operator(type):
