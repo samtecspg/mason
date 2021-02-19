@@ -2,3 +2,4 @@ mypy==0.800
 mypy-extensions==0.4.3
 pytest-spec==2.0.0
 pytest>=6.0.1
+returns==0.15.0
