@@ -1,8 +1,6 @@
 from typing import Union, Tuple, Optional
 
 from mason.clients.base import Client
-from mason.clients.dask.runner.dask_runner import EmptyDaskRunner
-from mason.clients.dask.runner.kubernetes_worker.kubernetes_worker import KubernetesWorker
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
@@ -22,7 +20,9 @@ class DaskClient(Client):
 
     def get_runner(self, runner: str, config: dict):
         if runner == "kubernetes_worker":
+            from mason.clients.dask.runner.kubernetes_worker.kubernetes_worker import KubernetesWorker
             return KubernetesWorker(config)
         else:
+            from mason.clients.dask.runner.dask_runner import EmptyDaskRunner
             return EmptyDaskRunner()
         

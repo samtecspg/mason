@@ -66,7 +66,9 @@ class CliPrinter(Printer):
     def print_configs(self, configs: List[Config]):
         configs.sort(key=lambda o: o.id)
         
-        if len(configs) > 0:
+        if len(configs) == 1:
+            print("HERE")
+        elif len(configs) > 0:
             to_values = list(map(lambda c: c.extended_info(), configs))
             banner(f"Available Configs")
             logger.info()

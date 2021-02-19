@@ -10,7 +10,6 @@ from mason.cli.config import config
 
 @click.group()
 @click.version_option(prog_name="Mason", message='%(prog)s -v %(version)s')
-
 def cli():
     """
     \b
@@ -31,6 +30,6 @@ cli.add_command(run)
 cli.add_command(validate)
 cli.add_command(config)
 
-if __name__ == "__cli__":
+if (__name__ == "__cli__") or (__name__ == "__main__"):
     cli()
 

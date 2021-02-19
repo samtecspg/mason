@@ -18,7 +18,6 @@ class TestWorkflows:
         wf = res.get_workflow("testing_namespace", command)
         config = res.get_config(config_id)
         if wf and config and isinstance(wf, Workflow) and isinstance(config, Config):
-            print("HERE")
             parameters = WorkflowParameters(parameter_dict=params)
             validated = wf.validate(env, config, parameters)
             return validated
