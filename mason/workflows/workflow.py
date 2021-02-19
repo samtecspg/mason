@@ -67,7 +67,6 @@ class Workflow(Saveable, Resource):
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()):
         try:
             state_store.cp_source(self.source_path, "workflow", self.namespace, self.command, overwrite)
-            response.add_info(f"Successfully saved workflow {self.namespace}:{self.command}")
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
         return response

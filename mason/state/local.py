@@ -28,14 +28,17 @@ class LocalStateStore(MasonStateStore):
         if path.exists(full_path):
             if overwrite:
                 shutil.rmtree(full_path)
+                os.makedirs(full_path)
                 shutil.copy(source, full_path + f"{type}.yaml")
                 shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
+                logger.info(f"Overwrote definition for {type}: {destination}{command}")
             else:
-                logger.error(f"Definition already exists for {type}:{destination}:{command}")
+                logger.error(f"Definition already exists for {type}: {destination}{command}")
         else:
             os.makedirs(full_path)
             shutil.copy(source, full_path + f"{type}.yaml")
             shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
+            logger.info(f"Successfully saved {type}: {destination}{command}")
 
     def write_config(self, source, destination: str, overwrite: bool = False):
         config_name = path.basename(source)
@@ -46,14 +49,14 @@ class LocalStateStore(MasonStateStore):
         config_destination = destination + config_name
         if path.exists(config_destination):
             if overwrite:
-                shutil.rmtree(config_destination)
+                os.remove(config_destination)
                 shutil.copy(source, destination + config_name)
-                logger.info(f"Valid config.  Saved {source} to {destination}")
+                logger.info(f"Overwrote definition for config:{destination}")
             else:
                 logger.error(f"Config {config_name} already exists.")
         else:
             shutil.copy(source, destination + config_name)
-            logger.info(f"Valid config.  Saved {source} to {destination}")
+            logger.info(f"Succesfully saved config:{destination}")
 
     # TODO: Copy to tmp instead of tracking source, and copy from tmp
     # TODO: Clean up type switches, serialize internal representation

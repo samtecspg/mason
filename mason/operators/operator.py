@@ -31,7 +31,6 @@ class Operator(Saveable, Resource):
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
             state_store.cp_source(self.source_path, "operator", self.namespace, self.command, overwrite)
-            response.add_info(f"Successfully saved operator {self.namespace}:{self.command}")
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
             

@@ -70,7 +70,6 @@ class Config(Saveable, Resource):
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
             state_store.cp_source(self.source_path, "config", overwrite=overwrite)
-            response.add_info(f"Successfully saved config: {self.id}")
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
         return response
