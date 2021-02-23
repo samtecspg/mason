@@ -17,6 +17,7 @@ def header_length(file: AbstractBufferedFile):
     return header_length
 
 
+# TODO: Move this into Local execution client, require execution client for S3 metastore since it is not a full metastore
 def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, InvalidSchema]:
     sample_size = 10000
     sample = file.read(sample_size)
@@ -39,7 +40,7 @@ def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, I
     elif file_type == "JSON data":
         return JsonSchema.from_file(path)
     elif file_type in list(supported_text_types.keys()):
-        return TextSchema.from_file(path, file_type, header_length(file), sample, options.get("read_headers"))
+        return TextSchema.from_file(file_type, sample, path, options.get("read_headers"))
     elif file_type == "empty":
         return EmptySchema()
     else:

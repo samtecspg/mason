@@ -9,7 +9,7 @@ from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.schedule import InvalidSchedule
 from mason.resources.resource import Resource
 from mason.resources.saveable import Saveable
-from mason.state.base import MasonStateStore
+from mason.state.base import MasonStateStore, FailedOperation
 from mason.util.environment import MasonEnvironment
 from mason.util.exception import message
 from mason.util.string import to_class_case
@@ -66,7 +66,11 @@ class Workflow(Saveable, Resource):
 
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()):
         try:
-            state_store.cp_source(self.source_path, "workflow", self.namespace, self.command, overwrite)
+            result = state_store.cp_source(self.source_path, "workflow", self.namespace, self.command, overwrite)
+            if isinstance(result, FailedOperation):
+                response.add_error(f"{result.message}")
+            else:
+                response.add_info(result)
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
         return response

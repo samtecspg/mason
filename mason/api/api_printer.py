@@ -10,6 +10,9 @@ from mason.workflows.workflow import Workflow
 
 class ApiPrinter(Printer):
     
+    def print_response(self, response: Response):
+        return response.with_status()
+    
     def print_resources(self, resources: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> Response:
         operators, workflows, configs, bad = sequence_4(resources, Operator, Workflow, Config, MalformedResource)
         response = Response()

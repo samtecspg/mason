@@ -1,3 +1,4 @@
+import json
 from typing import List, Union, Optional
 
 from tabulate import tabulate
@@ -12,8 +13,19 @@ from mason.resources.printer import Printer
 from mason.util.list import sequence_4
 from mason.util.logger import logger
 from mason.util.printer import banner
+from pygments import highlight
+from pygments.lexers import JsonLexer
+from pygments.formatters import TerminalFormatter
+
 
 class CliPrinter(Printer):
+    
+    def print_response(self, response: Response):
+        resp, status = response.with_status()
+        logger.info(f"Response status: {status}")
+        json_object = json.loads('{"foo":"bar"}')
+        str_resp = json.dumps(resp, indent=4, sort_keys=True)
+        logger.info(highlight(str_resp, JsonLexer(), TerminalFormatter()))
 
     def print_resources(self, resources: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> Response:
         if len(resources) == 0:
@@ -65,10 +77,9 @@ class CliPrinter(Printer):
 
     def print_configs(self, configs: List[Config]):
         configs.sort(key=lambda o: o.id)
-        
-        if len(configs) == 1:
-            print("HERE")
-        elif len(configs) > 0:
+        # if len(configs) == 1:
+        #     print("HERE")
+        if len(configs) > 0:
             to_values = list(map(lambda c: c.extended_info(), configs))
             banner(f"Available Configs")
             logger.info()

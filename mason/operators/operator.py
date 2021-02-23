@@ -13,7 +13,7 @@ from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.resources.resource import Resource
 from mason.resources.saveable import Saveable
-from mason.state.base import MasonStateStore
+from mason.state.base import MasonStateStore, FailedOperation
 from mason.util.exception import message
 
 
@@ -30,7 +30,11 @@ class Operator(Saveable, Resource):
 
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
-            state_store.cp_source(self.source_path, "operator", self.namespace, self.command, overwrite)
+            result = state_store.cp_source(self.source_path, "operator", self.namespace, self.command, overwrite)
+            if isinstance(result, FailedOperation):
+                response.add_error(f"{result.message}")
+            else:
+                response.add_info(result)
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
             

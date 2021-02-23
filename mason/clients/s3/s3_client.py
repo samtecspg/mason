@@ -148,7 +148,6 @@ class S3Client(AWSClient):
                 non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
                 validated, paths = CheckSchemas.find_conflicts(non_empty)
                 table = CheckSchemas.get_table(self.get_name(name, path), validated, paths)
-                logger.info(f"Table Inferred: {table.to_response(Response()).formatted()}")
                 invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
                 if isinstance(table, Table):
                     final = table
@@ -166,6 +165,7 @@ class S3Client(AWSClient):
     def list_keys(self, path: str,  response: Optional[Response] = None) -> Tuple[List[Path], Response]:
         resp: Response = response or Response()
         keys = self.client().find(path)
+        resp.add_response({'keys': keys})
         if len(keys) > 0:
             paths = list(map(lambda k: self.get_path(k), keys))
         else:

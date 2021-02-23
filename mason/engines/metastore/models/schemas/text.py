@@ -1,12 +1,10 @@
-from typing import Sequence, Optional, Union, List, Tuple
+from typing import Sequence, Optional, Union, List
 
 from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema, InvalidSchemaElement
 from mason.engines.storage.models.path import Path
-from mason.util.list import sequence
 from mason.util.exception import message
 import pandas as pd
 
-from mason.util.logger import logger
 
 SUPPORTED_TYPES = {
     "CSV text": "csv",
@@ -36,23 +34,22 @@ class TextSchema(Schema):
         self.line_terminator = line_terminator
         super().__init__(columns, SUPPORTED_TYPES.get(type, ""), path)
 
-def from_file(path: Path, type: str, header_length: int, sample, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
+def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
     headers = read_headers or False
     header_list: Union[List[str], bool]
+    
+    header: Optional[int] = None
+    if headers:
+        header = 0
 
     if (SUPPORTED_TYPES.get(type) == "csv-crlf"):
         line_terminator = "\r"
     else:
         line_terminator = "\n"
 
-    header: Optional[int] = None
-    if headers:
-        header = 0
-
-    logger.debug(f"Reading Path: {path.full_path()}")
-    reader = pd.read_csv(path.full_path(), lineterminator=line_terminator, iterator=True, header=header)
-    df = reader.get_chunk(100)
-
+    from io import StringIO
+    df = pd.read_csv(StringIO(sample.decode("utf-8")), lineterminator=line_terminator, header=header)
+    
     try:
 
         fields = [(k, v.name) for k, v in dict(df.dtypes).items()]

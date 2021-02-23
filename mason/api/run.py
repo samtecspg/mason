@@ -1,4 +1,6 @@
 from typing import Optional, Union
+
+from mason.api.api_printer import ApiPrinter
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.parameters.parameters import Parameters
@@ -9,7 +11,7 @@ from mason.util.environment import MasonEnvironment
 from mason.util.logger import logger
 from mason.resources import base
 
-def run(resource_type: str, namespace: str, command: str, parameter_string: Optional[str] = None, param_file: Optional[str] = None, config_id: Optional[str] = None, log_level: Optional[str] = None, env: Optional[MasonEnvironment] = None, dry_run: bool = False, parameters: Optional[dict] = None):
+def run(resource_type: str, namespace: str, command: str, parameter_string: Optional[str] = None, param_file: Optional[str] = None, config_id: Optional[str] = None, log_level: Optional[str] = None, env: Optional[MasonEnvironment] = None, dry_run: bool = False, parameters: Optional[dict] = None, printer = ApiPrinter()):
     response = Response()
     environment: MasonEnvironment = env or MasonEnvironment().initialize()
     logger.set_level(log_level)
@@ -32,4 +34,4 @@ def run(resource_type: str, namespace: str, command: str, parameter_string: Opti
         elif isinstance(params, MalformedResource):
             response.add_error(f"Bad Parameters: {params.get_message()}")
 
-    return response.with_status()
+    return printer.print_response(response) 

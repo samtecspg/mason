@@ -9,7 +9,7 @@ from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
 from mason.resources.resource import Resource
 from mason.resources.saveable import Saveable
-from mason.state.base import MasonStateStore
+from mason.state.base import MasonStateStore, FailedOperation
 # from mason.configurations import REDACTED_KEYS
 # from mason.util.dict import sanitize
 from mason.util.exception import message
@@ -69,7 +69,11 @@ class Config(Saveable, Resource):
 
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
-            state_store.cp_source(self.source_path, "config", overwrite=overwrite)
+            result = state_store.cp_source(self.source_path, "config", overwrite=overwrite)
+            if isinstance(result, FailedOperation):
+                response.add_error(f"{result.message}")
+            else:
+                response.add_info(result)
         except Exception as e:
             response.add_error(f"Error copying source: {message(e)}")
         return response

@@ -15,15 +15,15 @@ Mason interfaces with clients using abstractions called Engines. These Engines b
 Once configured, Mason gives you a declarative ability to perform simple statements like these:
 
 ```
-mason operator table get -p "database_name:<<DATABASE_NAME>>,table_name:<<TABLE_NAME>>"
+mason run operator table get -p "database_name:<<DATABASE_NAME>>,table_name:<<TABLE_NAME>>"
 ```
 
 ```
-mason operator job get -p "job_id:<<JOB_ID>>"
+mason run operator job get -p "job_id:<<JOB_ID>>"
 ```
 
 ```
-mason operator table infer -p "storage_path:<<STORAGE_PATH>>,database_name:<<DATABASE_NAME>>,table_name:<<TABLE_NAME>>"
+mason run operator table infer -p "storage_path:<<STORAGE_PATH>>,database_name:<<DATABASE_NAME>>,table_name:<<TABLE_NAME>>"
 ```
 
 and for the operators to perform sensible actions regardless of the clients used for each engine, be they local file systems, S3, Athena, Spark, Dask, Presto, Glue, etc.
@@ -50,6 +50,8 @@ If you are implementing AWS clients, remember to update `~/.mason/.env` to inclu
 AWS_ACCESS_KEY_ID=<KEY_ID>
 AWS_SECRET_ACCESS_KEY=<SECRET_KEY>
 ```
+
+Note mason also looks at the working directory's `.env`
 These credentials should have the needed permissions for the AWS services you are specifying as engine clients.  You can see all such configurations for various cloud providers in `.env.example`.
 
 If you are using a kubernetes-based execution engine or scheduler, make sure that your kubernetes config is located at `~/.kube/config`.

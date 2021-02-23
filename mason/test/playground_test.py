@@ -1,7 +1,12 @@
 from os import path
 import os
 import pytest  # type: ignore
-import shutil
+from click.testing import CliRunner
+
+from mason.cli import config
+from mason.cli.run import run
+from mason.definitions import from_root
+
 
 def print_result(result):
     print()
@@ -14,13 +19,14 @@ class TestCLI:
 
     @pytest.fixture(autouse=True)
     def run_around_tests(self):
-        os.environ["MASON_HOME"] = ".tmp/"
+        examples = from_root("/examples/")
+        os.environ["MASON_HOME"] = examples
         yield
-        if path.exists(".tmp/"):
-            shutil.rmtree(".tmp/")
+        current_config = examples + "configs/CURRENT_CONFIG"
+        if path.exists(current_config):
+            os.remove(current_config)
 
     def test_play(self):
-        pass
-        # load_dotenv(from_root("/../.env"), override=True)
-        # print_result(runner.invoke(apply, ["-f", from_root('/examples/operators/')]))
-
+        runner = CliRunner()
+        print_result(runner.invoke(config, ["-s", "5"]))
+        print_result(runner.invoke(run, ["operator", "table", "get",  "-p", "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"]))

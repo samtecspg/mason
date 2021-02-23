@@ -12,6 +12,7 @@ from typing import Optional
 @click.option("-l", "--log_level", help="Log level for mason")
 
 def run(resource: str, namespace: str, command: str, parameters: Optional[str] = None, param_file: Optional[str] = None, config_id: Optional[str] = None, log_level: Optional[str] = None):
+    from mason.cli.cli_printer import CliPrinter
     """
     Validates mason workflow or operator with specified configuration and parameters and then runs it 
     Example:
@@ -21,8 +22,4 @@ def run(resource: str, namespace: str, command: str, parameters: Optional[str] =
     [COMMAND] is a command string.  See examples/ for reference implementations.
     """
     from mason.api.run import run as api_run
-    api_run(resource, namespace, command, parameters, param_file, config_id, log_level)
-
-
-
-
+    api_run(resource, namespace, command, parameters, param_file, config_id, log_level, printer=CliPrinter())

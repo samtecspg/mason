@@ -1,5 +1,10 @@
 from abc import abstractmethod
-from typing import Optional
+from dataclasses import dataclass
+from typing import Optional, Union
+
+@dataclass
+class FailedOperation:
+    message: str
 
 class MasonStateStore:
 
@@ -15,7 +20,7 @@ class MasonStateStore:
         self.workflow_home = self.home + "workflows/"
 
     @abstractmethod
-    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False):
+    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False) -> Union[str, FailedOperation]:
         raise Exception("Config cp_source not configured")
 
     @abstractmethod
