@@ -13,7 +13,12 @@ class TestGetConfiguration:
     def test_config_exists(self):
         env = base.get_env("/test/support/", "/test/support/validations/")
         response, status = get("config", '5', env=env) 
-        expects = [{'clients': ['test', 'test2'], 'id': '5', 'execution_client': '', 'metastore_client': 'test', 'storage_client': '', 'scheduler_client': ''}]
+        expects = [{'current': False,
+          'execution_client': [],
+          'id': '5',
+          'metastore_client': [{'name': 'test'}],
+          'scheduler_client': [],
+          'storage_client': []}]
         assert(response['Configs'] == expects)
         assert(status == 200)
 

@@ -43,7 +43,7 @@ class TestWorkflows:
             '', 
             'Valid Workflow DAG Definition:',
             '--------------------------------------------------------------------------------',
-            '* step_1\n* step_2\n* step_3\n', ''
+            '\n* step_1\n* step_2\n* step_3\n', 'Finished'
         ]
         
         validated = self.validate_workflow(env, "workflow_basic", '3', params)

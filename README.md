@@ -151,7 +151,7 @@ Apply applies mason yaml files for resources in mason (operators, workflows and 
 2021-02-23 20:20:23.002971: Succesfully saved Config 
 ```
 
-Note that mason initializes your mason home at `~/.mason` if you haven't previously initialized mason.  Apply verifies that the yaml configuration conforms to the needed format for mason resources and saves the resources to the specified mason home according to mason's specified state store.   See `mason/examples` for example yaml configurations.
+Note that mason initializes your mason home at `~/.mason` if you haven't previously initialized mason.  Apply verifies that the yaml configuration conforms to the needed format for mason resources and saves the resources to the specified mason home according to mason's specified state store.   See `mason/examples/` for example yaml configurations.
 
 You can overwrite a mason resource by passing the `-o` flag:
 
@@ -232,7 +232,7 @@ table        fake       Create fake table data
 table        query      Query metastore tables
 ```
 
-Workflows and operators have `namespaces` which indicate a collection of operators and a `command` which together serve as the unique identifier for an operator.  You can further filter operators and workflows by specifying their namespace or command:
+Workflows and operators have `namespaces` which indicate a collection of operators and a `command` which together serve as the unique identifier for a resource.  You can further filter operators and workflows by specifying their namespace or command:
 
 ```shell
 > mason get operator table
@@ -264,7 +264,7 @@ table        get        Get metastore table contents
 Similarly for configs you can specify a `config_id` which will give you a more detailed readout of the configuration:
 
 ```shell
-mason get config 1
+> mason get config 1
 {
     "current": false,
     "id": "1",
@@ -307,9 +307,75 @@ mason get config 1
 }
 ```
 
+Filtering an operator or workflow down to a specific command will also give you a more detailed readout of the workflow or operator:
+
+```shell
+> mason get workflow table validated_infer
+{
+    "namespace": "table",
+    "command": "validated_infer",
+    "description": "5 step workflow for inferring table and checking if it worked, then cleaning up if it didn't.",
+    "dag": {
+        "steps": [
+            {
+                "id": "step_1",
+                "namespace": "table",
+                "command": "infer",
+                "dependencies": [],
+                "retry_method": null,
+                "retry_max": null
+            },
+            {
+                "id": "step_2",
+                "namespace": "job",
+                "command": "get",
+                "dependencies": [
+                    "step_1"
+                ],
+                "retry_method": "exponential(5)",
+                "retry_max": null
+            },
+            {
+                "id": "step_3",
+                "namespace": "table",
+                "command": "query",
+                "dependencies": [
+                    "step_2"
+                ],
+                "retry_method": null,
+                "retry_max": null
+            },
+            {
+                "id": "step_4",
+                "namespace": "job",
+                "command": "get",
+                "dependencies": [
+                    "step_3"
+                ],
+                "retry_method": "exponential(5)",
+                "retry_max": null
+            },
+            {
+                "id": "step_5",
+                "namespace": "table",
+                "command": "delete",
+                "dependencies": [
+                    "step_4"
+                ],
+                "retry_method": null,
+                "retry_max": null
+            }
+        ]
+    },
+    "supported_schedulers": [
+        "local"
+    ]
+}
+```
+
 ### Config
 
-Mason has an alias for `mason get config` which additionally has a flag `-s` which allows you to set the current config which mason is utilizing:
+Mason has an alias for `mason get config` which adds a flag `-s` which allows you to set the current config which mason is utilizing:
 ```shell
 > mason config
 +--------------------+
@@ -325,7 +391,7 @@ Mason has an alias for `mason get config` which additionally has a flag `-s` whi
    5  local        s3           s3
    
    
-> mason config -s 1
+> mason config -s 3
 2021-02-23 20:45:38.697378: Set session config to 1
 +--------------------+
 | Available Configs  |
@@ -333,9 +399,9 @@ Mason has an alias for `mason get config` which additionally has a flag `-s` whi
 
 id    execution    metastore    storage    scheduler
 ----  -----------  -----------  ---------  -----------
-1 *   athena       glue         s3         glue
+1     athena       glue         s3         glue
 2     spark        s3           s3
-3                  athena       s3         local
+3 *                athena       s3         local
 4     dask         s3           s3
 5     local        s3           s3
 
@@ -350,25 +416,176 @@ Current configuration is based upon mason's specified state store (mason only su
 Validate allows you to validate that an operator or workflows parameters are well specified before running the operator or workflow, and subsequently performs a dry run of the operator or workflow.  It also validates that the specified configuration is compatible with the workflow or operator.
 
 ```shell
-> mason config -s 3
 > mason validate operator table get
 2021-02-23 21:07:05.976986: Invalid Resource: Invalid parameters.  Required parameter not specified: database_name, Required parameter not specified: table_name
 ```
 
-Parameters for mason workflows or operators are specified by either using the `-p` parameter string:
+Parameters for mason workflows or operators are specified by either using the `-p` parameter string or by specifying the json file parameter `-f`:
 ```
 > mason validate operator table get -p "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"
 2021-02-23 21:07:46.776795: Invalid Resource: Invalid config: Configuration 3 not supported by configured engines for operator table:get.  Clients ['athena'] do not include supported client s3 for metastore. Check operator.yaml for supported engine configurations.
 ```
 
-Notice that the error we are getting now is becuase
-mason config -s 5
+Notice that the error we are getting now is the specified configuration is not supported for this operator:
 
+```shell
+> mason config -s 5
+2021-02-24 08:34:35.576019: Set session config to 5
++--------------------+
+| Available Configs  |
++--------------------+
+
+id    execution    metastore    storage    scheduler
+----  -----------  -----------  ---------  -----------
+1     athena       glue         s3         glue
+2     spark        s3           s3
+3                  athena       s3         local
+4     dask         s3           s3
+5 *   local        s3           s3
+
+* Current Session Configuration
+
+> mason validate operator table get -p "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"
+2021-02-24 08:42:44.134259: Valid Operator: table:get with specified parameters.
+```
+
+Using a json file instead:
+
+```shell
+> cat mason/examples/parameters/table_get.yaml
+database_name: "mason-test-data"
+table_name: "/csv/test.csv"
+
+> mason validate operator table get -f mason/examples/parameters/table_get.yaml
+2021-02-24 08:45:25.225492: Valid Operator: table:get with specified parameters.
+```
+
+Validating a workflow performs a dry run of the steps of the workflow.  This validates not only that the scheduler of the workflow is supported by the current configuration but that each step has well specified configurations and parameters:
+
+```shell
+2021-02-24 09:06:08.480020: Set session config to 3
++--------------------+
+| Available Configs  |
++--------------------+
+
+id    execution    metastore    storage    scheduler
+----  -----------  -----------  ---------  -----------
+1     athena       glue         s3         glue
+2     spark        s3           s3
+3 *                athena       s3         local
+4     dask         s3           s3
+5     local        s3           s3
+
+* Current Session Configuration
+
+> cat mason/examples/parameters/validated_infer.yaml
+
+step_1:
+  config_id: 3
+  parameters: { "database_name": "mason-test", "storage_path": "merged/", "table_name": "test_table"}
+step_2:
+  config_id: 1
+  parameters: {"job_id": "<<PULLED FROM step_1>>"}
+step_3:
+  config_id: 1
+  parameters: {"query_string": "SELECT * FROM merged_csv LIMIT 5", database_name: "mason-test"}
+step_4:
+  config_id: 1
+  parameters: {"job_id": "<<PULLED FROM step_4>>"}
+step_5:
+  config_id: 1
+  parameters: {"database_name": "mason-test", "table_name": "test_table"}
+  
+> mason validate workflow table validated_infer -f mason/examples/parameters/validated_infer.yaml
+2021-02-24 09:16:52.537241: Invalid Resource: Invalid DAG definition: Invalid DAG, contains invalid steps.  Specify strict:false to allow more permissive validation.  Invalid Dag Steps: Invalid Dag Step step_3: Invalid Operator Definition: Invalid parameters.  Required parameter not specified: table_name
+```
+Editing `step_3` to include `table_name`:
+```shell
+> cat mason/examples/parameters/validated_infer.yaml
+step_1:
+  config_id: 3
+  parameters: { "database_name": "mason-test", "storage_path": "merged/", "table_name": "test_table"}
+step_2:
+  config_id: 1
+  parameters: {"job_id": "<<PULLED FROM step_1>>"}
+step_3:
+  config_id: 1
+  parameters: {"query_string": "SELECT * FROM merged_csv LIMIT 5", database_name: "mason-test", "table_name": "test_table"}
+step_4:
+  config_id: 1
+  parameters: {"job_id": "<<PULLED FROM step_4>>"}
+step_5:
+  config_id: 1
+  parameters: {"database_name": "mason-test", "table_name": "test_table"}
+
+> mason validate workflow table validated_infer -f mason/examples/parameters/validated_infer.yaml
+2021-02-24 09:21:32.442453: Performing Dry Run for Workflow
+2021-02-24 09:21:32.442484
+2021-02-24 09:21:32.442492: Valid Workflow DAG Definition:
+2021-02-24 09:21:32.442498: --------------------------------------------------------------------------------
+2021-02-24 09:21:32.444686:
+* step_1
+* step_2
+* step_3
+* step_4
+* step_5
 ```
 
 ### Run
 
+Run simply takes validate one step further and runs the operator or workflow.  
+
+```shell
+mason config -s 5
+2021-02-24 09:24:19.340571: Set session config to 5
++--------------------+
+| Available Configs  |
++--------------------+
+
+id    execution    metastore    storage    scheduler
+----  -----------  -----------  ---------  -----------
+1     athena       glue         s3         glue
+2     spark        s3           s3
+3                  athena       s3         local
+4     dask         s3           s3
+5 *   local        s3           s3
+
+> mason run operator table get -p "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"
+Fetching keys at mason-test-data/csv/test.csv
+Response status: 200
+{
+    "Data": [
+        {
+            "CreatedAt": "",
+            "CreatedBy": "mason",
+            "Name": "csv/test.csv",
+            "Schema": {
+                "Columns": [
+                    {
+                        "Name": "test_column_1",
+                        "Type": "object"
+                    },
+                    {
+                        "Name": "test_column_2",
+                        "Type": "int64"
+                    },
+                    {
+                        "Name": " test_column_3",
+                        "Type": "float64"
+                    }
+                ],
+                "SchemaType": "csv"
+            }
+        }
+    ]
+}
+```
+
+For workflows `run` simply registers the associated workflow DAG with the specified scheduler client.   The exception to this is the `Local` scheduler which is meant to be a synchronous scheduler so runs the DAG right now.  Mason plans to add a `LocalAsync` scheduler which will allow you to register a local dag for later execution.
+
 ### Server 
+
+`mason server` runs a mason flask server on `localhost:5000/api/ui/` which exposes the endpoints `get`, `run`, and `validate`.  The internal api leverages the same methods and returns as the CLI.  This server is intended for testing purposes and is not intended to be a production server.   Mason has plans to add a more robust server implementation in the future.
 
 ## Advanced Usage
 

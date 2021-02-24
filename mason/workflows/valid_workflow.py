@@ -25,8 +25,8 @@ class ValidWorkflow(ValidResource):
         response.add_info("")
         response.add_info(f"Valid Workflow DAG Definition:")
         response.add_info(f"-" * 80)
-        response.add_info(f"{self.dag.display()}")
-        response.add_info("")
+        response.add_info(f"\n{self.dag.display()}")
+        response.add_info("Finished")
         for r in list(map(lambda s: s.reason, self.dag.invalid_steps)):
             response.add_warning(r)
         return OperatorResponse(response)

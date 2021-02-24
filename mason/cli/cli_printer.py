@@ -45,8 +45,11 @@ class CliPrinter(Printer):
 
     def print_operators(self, operators: List[Operator], namespace: Optional[str] = None, command: Optional[str] = None):
         operators.sort(key=lambda o: o.namespace)
-        
-        if len(operators) > 0:
+
+        if len(operators) == 1:
+            str_resp = json.dumps(operators[0].to_dict(), indent=4, sort_keys=False)
+            logger.info(highlight(str_resp, JsonLexer(), TerminalFormatter()))
+        elif len(operators) > 0:
             to_values = list(map(lambda op: [op.namespace, op.command, op.description], operators))
             namesp = f"Operator "
             if namespace:
@@ -61,8 +64,10 @@ class CliPrinter(Printer):
 
     def print_workflows(self, workflows: List[Workflow], namespace: Optional[str] = None, command: Optional[str] = None):
         workflows.sort(key=lambda o: o.namespace)
-        
-        if len(workflows) > 0:
+        if len(workflows) == 1:
+            str_resp = json.dumps(workflows[0].to_dict(), indent=4, sort_keys=False)
+            logger.info(highlight(str_resp, JsonLexer(), TerminalFormatter()))
+        elif len(workflows) > 0:
             to_values = list(map(lambda wf: [wf.namespace, wf.command, wf.description], workflows))
             namesp = f"Workflow "
             if namespace:

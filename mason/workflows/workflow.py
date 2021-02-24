@@ -80,5 +80,6 @@ class Workflow(Saveable, Resource):
             'namespace': self.namespace,
             'command': self.command,
             'description': self.description,
-            'dag': self.dag.to_dict()
+            'dag': self.dag.to_dict(),
+            'supported_schedulers': self.supported_schedulers
          }

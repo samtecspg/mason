@@ -25,7 +25,10 @@ class ApiPrinter(Printer):
             if len(operators) > 0:
                 response.add("Operators", list(map(lambda o: o.to_dict(), operators)))
             if len(configs) > 0:
-                response.add("Configs", list(map(lambda c: c.to_dict(), configs)))
+                current_id: Optional[str] = None
+                if environment:
+                    current_id = environment.state_store.get_session_config()
+                response.add("Configs", list(map(lambda c: c.to_dict(current_id), configs)))
             if len(workflows) > 0:
                 response.add("Workflows", list(map(lambda w: w.to_dict(), workflows)))
             if len(bad) > 0:
