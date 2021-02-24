@@ -18,7 +18,7 @@ class LocalStateStore(MasonStateStore):
         }
         return destinations.get(type)
     
-    def write_operator_type(self, source: str, type: str, destination: str, command: str, overwrite: bool = False) -> Union[str, FailedOperation]:
+    def write_operator_type(self, source: str, type: str, destination: str, namespace: str, command: str, overwrite: bool = False) -> Union[str, FailedOperation]:
         if not path.exists(destination):
             os.makedirs(destination)
             Path(destination + "__init__.py").touch()
@@ -31,16 +31,16 @@ class LocalStateStore(MasonStateStore):
                 os.makedirs(full_path)
                 shutil.copy(source, full_path + f"{type}.yaml")
                 shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
-                return f"Overwrote definition for {type}: {destination}{command}"
+                return f"Overwrote definition for {type} {namespace}:{command}"
             else:
-                return FailedOperation(f"Definition already exists for {type}: {destination}{command}")
+                return FailedOperation(f"Definition already exists for {type} {namespace}{command}")
         else:
             os.makedirs(full_path)
             shutil.copy(source, full_path + f"{type}.yaml")
             shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
-            return f"Successfully saved {type}: {destination}{command}"
+            return f"Successfully saved {type.capitalize()} {namespace}:{command}"
 
-    def write_config(self, source, destination: str, overwrite: bool = False) -> Union[str, FailedOperation]:
+    def write_config(self, source, destination: str, config_id: str, overwrite: bool = False) -> Union[str, FailedOperation]:
         config_name = path.basename(source)
 
         if not path.exists(destination):
@@ -51,25 +51,27 @@ class LocalStateStore(MasonStateStore):
             if overwrite:
                 os.remove(config_destination)
                 shutil.copy(source, destination + config_name)
-                return f"Overwrote definition for config:{destination}"
+                return f"Overwrote definition for Config: {config_id}"
             else:
-                return FailedOperation(f"Config {config_name} already exists.")
+                return FailedOperation(f"Config {config_id} already exists.")
         else:
             shutil.copy(source, destination + config_name)
-            return f"Succesfully saved config:{destination}"
+            return f"Succesfully saved Config {config_id}"
 
     # TODO: Copy to tmp instead of tracking source, and copy from tmp
     # TODO: Clean up type switches, serialize internal representation
-    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = "", command: Optional[str] = "", overwrite: bool = False) -> Union[str, FailedOperation]:
+    def cp_source(self, source: Optional[str], type: str, namespace: Optional[str] = None, command: Optional[str] = None, overwrite: bool = False) -> Union[str, FailedOperation]:
+        namespace = namespace or ""
+        command = command or ""
         if source:
             home = self.get_home(type)
             if home:
                 if type == "config":
-                    return self.write_config(source, home, overwrite)
+                    return self.write_config(source, home, namespace, overwrite)
                 elif type in ["operator", "workflow"]:
                     tree_path = home + f"{namespace}/"
                     if command:
-                        return self.write_operator_type(source, type, tree_path, command, overwrite)
+                        return self.write_operator_type(source, type, tree_path, namespace, command, overwrite)
                     else:
                         return FailedOperation(f"No command provided for {source}")
                 else:

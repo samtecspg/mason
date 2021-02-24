@@ -84,14 +84,16 @@ Usage: mason [OPTIONS] COMMAND [ARGS]...
   Mason Data Operator Framework
 
 Options:
-  --help  Show this message and exit.
+  --version  Show the version and exit.
+  --help     Show this message and exit.
 
 Commands:
-  config    Configures mason clients and engines
-  operator  Executes and lists mason operators
-  register  Registers mason operators or workflows
-  run       Runs mason flask server on port 5000
-  workflow  Executes and lists mason workflows 
+  apply     Apply mason yaml file(s)
+  config    Interact with mason configs
+  get       Get mason resource (operator, workflow, config)
+  run       Runs mason workflow or operator
+  server    Runs mason flask server on port 5000
+  validate  Validates and performs a dry run of a mason workflow or operator
 ```
 
 Note that the Dockerfile registers a set of example operators by default.  Comment out these lines and register different operators if you wish to do so during Docker build.
@@ -109,6 +111,11 @@ Mason leverages `mypy` heavily to ensure that function signatures and types are 
 ```
 
 ### Basic Mason Commands
+
+To apply mason objects use `mason apply`:
+
+
+
 
 To configure Mason, run `mason config`.  Configurations are validated for basic structure using json_schema.  See `configurations/schema.json`:
 

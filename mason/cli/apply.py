@@ -1,7 +1,7 @@
 import click
 from typing import Optional
 
-@click.command("apply", short_help="Apply mason yaml file")
+@click.command("apply", short_help="Apply mason yaml file(s)")
 @click.argument('file')
 @click.option("-o", "--overwrite", is_flag=True, help="Overwrite existing resources if already exists")
 @click.option("-l", "--log_level", help="Log level for mason")

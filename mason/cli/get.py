@@ -1,7 +1,7 @@
 import click
 from typing import Optional
 
-@click.command("get", short_help="Get mason resource")
+@click.command("get", short_help="Get mason resource (operator, workflow, config)")
 @click.argument("resource", required=False)
 @click.argument("namespace", required=False)
 @click.argument("command", required=False)
