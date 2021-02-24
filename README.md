@@ -488,7 +488,7 @@ step_2:
   parameters: {"job_id": "<<PULLED FROM step_1>>"}
 step_3:
   config_id: 1
-  parameters: {"query_string": "SELECT * FROM merged_csv LIMIT 5", database_name: "mason-test"}
+  parameters: {"query_string": "SELECT * FROM test_table LIMIT 5", database_name: "mason-test"}
 step_4:
   config_id: 1
   parameters: {"job_id": "<<PULLED FROM step_4>>"}
@@ -510,7 +510,7 @@ step_2:
   parameters: {"job_id": "<<PULLED FROM step_1>>"}
 step_3:
   config_id: 1
-  parameters: {"query_string": "SELECT * FROM merged_csv LIMIT 5", database_name: "mason-test", "table_name": "test_table"}
+  parameters: {"query_string": "SELECT * FROM test_table LIMIT 5", database_name: "mason-test", "table_name": "test_table"}
 step_4:
   config_id: 1
   parameters: {"job_id": "<<PULLED FROM step_4>>"}
