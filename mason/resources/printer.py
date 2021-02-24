@@ -5,6 +5,7 @@ from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.operators.operator import Operator
 from mason.resources.malformed import MalformedResource
+from mason.util.environment import MasonEnvironment
 from mason.workflows.workflow import Workflow
 
 class Printer:
@@ -22,5 +23,5 @@ class Printer:
         return message
     
     @abstractmethod
-    def print_resources(self, operators: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> Response:
+    def print_resources(self, operators: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None, environment: Optional[MasonEnvironment] = None) -> Response:
         raise Exception("print_resources undefined for Printer")

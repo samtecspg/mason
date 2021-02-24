@@ -8,7 +8,12 @@ class DaskClient(Client):
     def __init__(self, runner: dict):
         self.runner_config = runner 
         self.runner_type = runner.get("type") or ""
-        
+
+    def to_dict(self) -> dict:
+        return {
+            'client_name': super().name()
+        }
+
     def client(self):
         return self.get_runner(self.runner_type, self.runner_config)
 

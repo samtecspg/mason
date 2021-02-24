@@ -14,6 +14,6 @@ def get(resource_type: Optional[str], namespace: Optional[str] = None, command: 
     res = base.Resources(environment)
     
     all = res.get_resources(resource_type, namespace, command)
-    response = printer.print_resources(all, resource_type, namespace, command)
+    response = printer.print_resources(all, resource_type, namespace, command, environment=environment)
     
     return response.with_status() 

@@ -110,210 +110,265 @@ Mason leverages `mypy` heavily to ensure that function signatures and types are 
 ./scripts/test.sh
 ```
 
-### Basic Mason Commands
+## Basic Mason Commands
 
-To apply mason objects use `mason apply`:
+### Apply
 
+Apply applies mason yaml files for resources in mason (operators, workflows and configs):
 
-
-
-To configure Mason, run `mason config`.  Configurations are validated for basic structure using json_schema.  See `configurations/schema.json`:
-
-```
->> mason config mason/examples/configs/
-+-------------------------------------+
-| Creating MASON_HOME at   ~/.mason/  |
-+-------------------------------------+
-+------------------------------------------------------------+
-| Creating OPERATOR_HOME at  ~/.mason/registered_operators/  |
-+------------------------------------------------------------+
-+------------------------------------------------------------+
-| Creating WORKFLOW_HOME at  ~/.mason/registered_workflows/  |
-+------------------------------------------------------------+
-+----------------------------------------------------+
-| Creating CONFIG_HOME at  ~/.mason/configurations/  |
-+----------------------------------------------------+
-2020-06-22 13:34:32.363062: Setting current config to 1
-+-----------------+
-| Configurations  |
-+-----------------+
-Config ID    Engine     Client    Configuration
------------  ---------  --------  -----------------------------------------------------------------------------------------------------------
-*  1         metastore  glue      {'aws_region': 'us-east-1', 'aws_role_arn': 'REDACTED', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             scheduler  glue      {'aws_region': 'us-east-1', 'aws_role_arn': 'REDACTED', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             storage    s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             execution  athena    {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-.  2         metastore  s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
-.  3         metastore  athena    {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             scheduler  local     {}
-             storage    s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-
-* = Current Configuration
-2020-06-22 13:34:32.365738: Valid Configuration. Saving config 1 at mason/examples/configs/config_1.yaml to ~/.mason/configurations/
-2020-06-22 13:34:32.365975: Valid Configuration. Saving config 2 at mason/examples/configs/config_2.yaml to ~/.mason/configurations/
-2020-06-22 13:34:32.366186: Valid Configuration. Saving config 3 at mason/examples/configs/config_3.yaml to ~/.mason/configurations/
+```shell
+> mason apply mason/examples/
++---------------------------------------------+
+| Creating MASON_HOME at /Users/kyle/.mason/  |
++---------------------------------------------+
++----------------------------------------------------------+
+| Creating OPERATOR_HOME at /Users/kyle/.mason/operators/  |
++----------------------------------------------------------+
++----------------------------------------------------------+
+| Creating WORKFLOW_HOME at /Users/kyle/.mason/workflows/  |
++----------------------------------------------------------+
++------------------------------------------------------+
+| Creating CONFIG_HOME at /Users/kyle/.mason/configs/  |
++------------------------------------------------------+
+2021-02-23 20:20:22.989394: Successfully saved Operator schedule:delete
+2021-02-23 20:20:22.990765: Successfully saved Operator table:delete
+2021-02-23 20:20:22.991810: Successfully saved Operator table:merge
+2021-02-23 20:20:22.992958: Successfully saved Operator table:refresh
+2021-02-23 20:20:22.994201: Successfully saved Operator table:get
+2021-02-23 20:20:22.995193: Successfully saved Operator table:list
+2021-02-23 20:20:22.995998: Successfully saved Operator table:format
+2021-02-23 20:20:22.996749: Successfully saved Operator table:infer
+2021-02-23 20:20:22.997471: Successfully saved Operator table:fake
+2021-02-23 20:20:22.998230: Successfully saved Operator table:query
+2021-02-23 20:20:22.999078: Successfully saved Operator job:get
+2021-02-23 20:20:22.999957: Successfully saved Workflow table:validated_infer
+2021-02-23 20:20:23.000717: Successfully saved Workflow table:infer
+2021-02-23 20:20:23.001528: Successfully saved Workflow table:export
+2021-02-23 20:20:23.001839: Succesfully saved Config 
+2021-02-23 20:20:23.002122: Succesfully saved Config 
+2021-02-23 20:20:23.002415: Succesfully saved Config 
+2021-02-23 20:20:23.002690: Succesfully saved Config 
+2021-02-23 20:20:23.002971: Succesfully saved Config 
 ```
 
-#### Setting Current Configuration
+Note that mason initializes your mason home at `~/.mason` if you haven't previously initialized mason.  Apply verifies that the yaml configuration conforms to the needed format for mason resources and saves the resources to the specified mason home according to mason's specified state store.   See `mason/examples` for example yaml configurations.
 
-```
->> mason config -s 3
-2020-06-22 13:37:14.572590: Setting current config to 3
-+-----------------+
-| Configurations  |
-+-----------------+
-Config ID    Engine     Client    Configuration
------------  ---------  --------  -----------------------------------------------------------------------------------------------------------
-.  1         metastore  glue      {'aws_region': 'us-east-1', 'aws_role_arn': 'REDACTED', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             scheduler  glue      {'aws_region': 'us-east-1', 'aws_role_arn': 'REDACTED', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             storage    s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             execution  athena    {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-.  2         metastore  s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             execution  spark     {'runner': {'spark_version': '2.4.5', 'type': 'kubernetes-operator'}}
-*  3         metastore  athena    {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
-             scheduler  local     {}
-             storage    s3        {'aws_region': 'us-east-1', 'access_key': 'REDACTED', 'secret_key': 'REDACTED'}
+You can overwrite a mason resource by passing the `-o` flag:
 
-* = Current Configuration
+```shell
+> mason apply mason/examples/operators/table/get/
+2021-02-23 20:34:17.787621: Definition already exists for Operator table:get
+
+> mason apply mason/examples/operators/table/get/ -o
+2021-02-23 20:34:36.644446: Overwrote definition for Operator table:get
 ```
 
-You will begin without any operators registered by default:
-```
->> mason operator
-No Operators Registered.  Register operators by running "mason register"
-```
-You can register some example operators.  Operators are validated for basic structure using json_schema.  See `/operators/schema.json` for the schema description.
-  
-```
->> mason register mason/examples/operators/
-Valid operator definition.  Registering mason/examples/operators/schedule/delete to  ~/.mason/registered_operators/schedule/delete/
-Valid operator definition.  Registering mason/examples/operators/table/delete to  ~/.mason/registered_operators/table/delete/
-Valid operator definition.  Registering mason/examples/operators/table/merge to  ~/.mason/registered_operators/table/merge/
-Valid operator definition.  Registering mason/examples/operators/table/refresh to  ~/.mason/registered_operators/table/refresh/
-Valid operator definition.  Registering mason/examples/operators/table/get to  ~/.mason/registered_operators/table/get/
-Valid operator definition.  Registering mason/examples/operators/table/list to  ~/.mason/registered_operators/table/list/
-Valid operator definition.  Registering mason/examples/operators/table/infer to  ~/.mason/registered_operators/table/infer/
-Valid operator definition.  Registering mason/examples/operators/table/query to  ~/.mason/registered_operators/table/query/
-Valid operator definition.  Registering mason/examples/operators/job/get to  ~/.mason/registered_operators/job/get/
-```
+### Get
 
-#### Listing Operators
+Once you have applied one or more mason resources, you can fetch registered resources by using `mason get`.  Running `mason get` or `mason get all` lists all mason resources:
 
-```
->> mason operator
-+-------------------------------------------------------------+
-| Available Operator Methods: ~/.mason/registered_operators/  |
-+-------------------------------------------------------------+
+```shell
+> mason get all
++------------------------------+
+| Available Operator  Methods  |
++------------------------------+
 
-namespace    command    description                         parameters
------------  ---------  ----------------------------------  ---------------------------------------------------------------------------------------------------------------
-schedule     delete     Delete schedule                     {'required': ['schedule_name'], 'optional': []}
-table        delete     Delete metastore tables             {'required': ['table_name', 'database_name'], 'optional': []}
-table        merge      Merge metastore tables              {'required': ['output_path', 'input_path'], 'optional': ['extract_paths', 'repartition_keys', 'parse_headers']}
-table        refresh    Refresh metastore tables            {'required': ['database_name', 'table_name'], 'optional': []}
-table        get        Get metastore table contents        {'required': ['database_name', 'table_name'], 'optional': []}
-table        list       Get metastore tables                {'required': ['database_name'], 'optional': []}
-table        infer      Infers schema for metastore tables  {'required': ['database_name', 'storage_path'], 'optional': ['table_name']}
-table        query      Query metastore tables              {'required': ['query_string', 'database_name'], 'optional': []}
-job          get        Get Execution Job Status            {'required': ['job_id'], 'optional': []}
-```
+namespace    command    description
+-----------  ---------  ----------------------------------
+job          get        Get Execution Job Status
+schedule     delete     Delete schedule
+table        delete     Delete metastore tables
+table        merge      Merge metastore tables
+table        refresh    Refresh metastore tables
+table        get        Get metastore table contents
+table        list       Get metastore tables
+table        format     Reformat and partition table data
+table        infer      Infers schema for metastore tables
+table        fake       Create fake table data
+table        query      Query metastore tables
 
-#### Listing Operators for a Particular Namespace
++------------------------------+
+| Available Workflow  Methods  |
++------------------------------+
 
-```
->> mason operator job
-+------------------------------------------------------------------+
-| Available job Methods: ~/.mason/registered_operators/  |
-+------------------------------------------------------------------+
+namespace    command          description
+-----------  ---------------  ---------------------------------------------------------------------------------------------
+table        validated_infer  5 step workflow for inferring table and checking if it worked, then cleaning up if it didn't.
+table        infer            One step workfow for table infer operator
+table        export           Workflow that queries a table and then format and repartitions it
 
-namespace    command    description               parameters
------------  ---------  ------------------------  ----------------------------------------
-job          get        Get Execution Job Status  {'required': ['job_id'], 'optional': []}
-```
-
-#### Running Operator with Parameters Argument
-
-```
->> mason operator table get -p database_name:spg-mason-demo,table_name:merged_csv
-Fetching keys at spg-mason-demo/merged_csv
 +--------------------+
-| Operator Response  |
+| Available Configs  |
 +--------------------+
+
+  id  execution    metastore    storage    scheduler
+----  -----------  -----------  ---------  -----------
+   1  athena       glue         s3         glue
+   2  spark        s3           s3
+   3               athena       s3         local
+   4  dask         s3           s3
+   5  local        s3           s3
+  ```
+
+You can also pass a specific resource to only fetch one mason resource:
+```shell
+ > mason get operator
++------------------------------+
+| Available Operator  Methods  |
++------------------------------+
+
+namespace    command    description
+-----------  ---------  ----------------------------------
+job          get        Get Execution Job Status
+schedule     delete     Delete schedule
+table        delete     Delete metastore tables
+table        merge      Merge metastore tables
+table        refresh    Refresh metastore tables
+table        get        Get metastore table contents
+table        list       Get metastore tables
+table        format     Reformat and partition table data
+table        infer      Infers schema for metastore tables
+table        fake       Create fake table data
+table        query      Query metastore tables
+```
+
+Workflows and operators have `namespaces` which indicate a collection of operators and a `command` which together serve as the unique identifier for an operator.  You can further filter operators and workflows by specifying their namespace or command:
+
+```shell
+> mason get operator table
++-----------------------------------+
+| Available Operator table Methods  |
++-----------------------------------+
+
+namespace    command    description
+-----------  ---------  ----------------------------------
+table        delete     Delete metastore tables
+table        merge      Merge metastore tables
+table        refresh    Refresh metastore tables
+table        get        Get metastore table contents
+table        list       Get metastore tables
+table        format     Reformat and partition table data
+table        infer      Infers schema for metastore tables
+table        fake       Create fake table data
+table        query      Query metastore tables
+
+mason get operator table get
++-----------------------------------+
+| Available Operator table Methods  |
++-----------------------------------+
+
+namespace    command    description
+-----------  ---------  ----------------------------
+table        get        Get metastore table contents
+```
+Similarly for configs you can specify a `config_id` which will give you a more detailed readout of the configuration:
+
+```shell
+mason get config 1
 {
- "Errors": [],
- "Info": [],
- "Warnings": [],
- "Data": [
-  {
-   "Name": "merged_csv",
-   "CreatedAt": "",
-   "CreatedBy": "mason",
-   "Schema": {
-    "SchemaType": "parquet",
-    "Columns": [
-     {
-      "Name": "crane",
-      "Type": "BYTE_ARRAY",
-      "ConvertedType": "UTF8",
-      "RepititionType": "OPTIONAL"
-     },
-     {
-      "Name": "5000.0",
-      "Type": "BYTE_ARRAY",
-      "ConvertedType": "UTF8",
-      "RepititionType": "OPTIONAL"
-     },
-     {
-      "Name": "Case",
-      "Type": "BYTE_ARRAY",
-      "ConvertedType": "UTF8",
-      "RepititionType": "OPTIONAL"
-     },
-     {
-      "Name": "false",
-      "Type": "BYTE_ARRAY",
-      "ConvertedType": "UTF8",
-      "RepititionType": "OPTIONAL"
-     }
+    "current": false,
+    "id": "1",
+    "execution_client": [
+        {
+            "client_name": "athena",
+            "access_key": "REDACTED",
+            "secret_key": "REDACTED",
+            "aws_region": "us-east-1",
+            "aws_role_arn": null
+        }
+    ],
+    "metastore_client": [
+        {
+            "client_name": "glue",
+            "access_key": "REDACTED",
+            "secret_key": "REDACTED",
+            "aws_region": "us-east-1",
+            "aws_role_arn": "test"
+        }
+    ],
+    "storage_client": [
+        {
+            "client_name": "s3",
+            "access_key": "REDACTED",
+            "secret_key": "REDACTED",
+            "aws_region": "us-east-1",
+            "aws_role_arn": null
+        }
+    ],
+    "scheduler_client": [
+        {
+            "client_name": "glue",
+            "access_key": "REDACTED",
+            "secret_key": "REDACTED",
+            "aws_region": "us-east-1",
+            "aws_role_arn": "test"
+        }
     ]
-   }
-  }
- ]
-}
-
-```
-
-#### Running Operator with Config Parameters YAML File
-
-```
->> mason operator table get -f examples/parameters/table_get.yaml 
-+--------------------+
-| Operator Response  |
-+--------------------+
-{
- "Errors": [],
- "Info": [],
- "Warnings": [],
- "Data": [
-  {
-   "Name": "catalog_poc_data",
-   "CreatedAt": "2020-02-26T12:57:31-05:00",
-   "CreatedBy": "crawler:test_crawler",
-   "Schema": {
-    "SchemaType": "glue",
-    "Columns": [...]
-   }
-  }
- ]
 }
 ```
 
+### Config
 
-#### Running Flask Web Server for Registered Operator API Endpoints (port 5000)
+Mason has an alias for `mason get config` which additionally has a flag `-s` which allows you to set the current config which mason is utilizing:
+```shell
+> mason config
++--------------------+
+| Available Configs  |
++--------------------+
+
+  id  execution    metastore    storage    scheduler
+----  -----------  -----------  ---------  -----------
+   1  athena       glue         s3         glue
+   2  spark        s3           s3
+   3               athena       s3         local
+   4  dask         s3           s3
+   5  local        s3           s3
+   
+   
+> mason config -s 1
+2021-02-23 20:45:38.697378: Set session config to 1
++--------------------+
+| Available Configs  |
++--------------------+
+
+id    execution    metastore    storage    scheduler
+----  -----------  -----------  ---------  -----------
+1 *   athena       glue         s3         glue
+2     spark        s3           s3
+3                  athena       s3         local
+4     dask         s3           s3
+5     local        s3           s3
+
+* Current Session Configuration
 ```
-mason run
+
+Current configuration is based upon mason's specified state store (mason only supports Local state store currently but has plans to support distributed state stores.) 
+
+
+### Validate 
+
+Validate allows you to validate that an operator or workflows parameters are well specified before running the operator or workflow, and subsequently performs a dry run of the operator or workflow.  It also validates that the specified configuration is compatible with the workflow or operator.
+
+```shell
+> mason config -s 3
+> mason validate operator table get
+2021-02-23 21:07:05.976986: Invalid Resource: Invalid parameters.  Required parameter not specified: database_name, Required parameter not specified: table_name
 ```
+
+Parameters for mason workflows or operators are specified by either using the `-p` parameter string:
+```
+> mason validate operator table get -p "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"
+2021-02-23 21:07:46.776795: Invalid Resource: Invalid config: Configuration 3 not supported by configured engines for operator table:get.  Clients ['athena'] do not include supported client s3 for metastore. Check operator.yaml for supported engine configurations.
+```
+
+Notice that the error we are getting now is becuase
+mason config -s 5
+
+```
+
+### Run
+
+### Server 
 
 ## Advanced Usage
 
@@ -386,15 +441,9 @@ In other words, Engines define the valid operations which can be performed via t
 Look in `examples/operators/` for example operator definitions.  The general anatomy of an operator (currently) consists of three parts:
 
 1.  An `operator.yaml` definition file. This defines the operator namespace, command name, and any required configurations.  
-2.  An `__init__.py` which defines the work to be done by the operator.  
-3.  An optional `swagger.yaml` file. This exposes the operator in the Mason API, and is rolled up into Mason's main Swagger definition before running the API server. Operators without this file are still accessible via `mason operator cli command`.
-    * If `swagger.yaml` is included, also add the following to `__init__.py`:
+2.  An `__init__.py` which defines the work to be done by the operator.
 
-    ```
-    def api(*args, **kwargs): return OperatorApi.get("<NAMESPACE>", "COMMAND", *args, **kwargs)
-    ```
-
-By convention, an `operator.yaml` file and its `__init__.py` are colocated in a directory for the <COMMAND> name under the namespace directory:
+By convention, an `operator.yaml` file and its `__init__.py` need to be colocated in a directory for the <COMMAND> name under the namespace directory:
 ```
 <NAMESPACE>
 |
@@ -403,19 +452,14 @@ By convention, an `operator.yaml` file and its `__init__.py` are colocated in a 
     |       ----- operator.yaml
     |       |
     |       ----- __init__.py
-    |       |
-    |       ----- swagger.yml
+    |       
     |
     ---<COMMAND 2>
             |
             ----- operator.yaml
             |
             ----- __init__.py
-            |
-            ----- swagger.yml
 ```
-
-However, this is not strictly required.  All that is required is for the necessary files for a single operator definition to be colocated in a folder containing the operator.yaml.
 
 ### Operator Defintions
 
@@ -423,27 +467,25 @@ Here is an example `__init__.py` for the operator `table:get`:
 
 ```
 from mason.clients.response import Response
-from mason.configurations.valid_config import ValidConfig
-from mason.api import operator_api as OperatorApi
+from mason.configurations.config import Config
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
-def api(*args, **kwargs): return OperatorApi.get("table", "get", *args, **kwargs)
-
 class TableGet(OperatorDefinition):
-    def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, resp: Response) -> OperatorResponse:
+    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> OperatorResponse:
         database_name: str = parameters.get_required("database_name")
         table_name: str = parameters.get_required("table_name")
+        read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
 
-        table, response = config.metastore.client.get_table(database_name, table_name, response=resp)
-        return OperatorResponse(response, table)
+        table, response = config.metastore().get_table(database_name, table_name, options={"read_headers": read_headers}, response=resp)
+        oR = OperatorResponse(response, table)
+        return oR 
 ```
 
 
 Notice that it inherits from `OperatorDefintion`, mypy to enforce the operator to be defined consistently.  The class inhereting the definition must also be the camel cased version of the operator namespace and command (`table:get -> TableGet`).  This provides the abstract class from which all operators should be defined, namely, it enforces that operators should have a `run` method which defines the instructions for how the operator should execute on canonical engine model objects.
-
 
 #### Note on operator.yaml
 Supported configurations for an operator are sets of supported engines.  For example an operator with the following operator.yaml:
@@ -493,133 +535,26 @@ would only accept an operator configured with both `metastore: s3` and `executio
 
 Workflows are a new feature that allows you to compose operators in a DAG (Directed Acyclic Graph) definition, validate the Dag in conjunction with specific configurations and parameters, then pass it to a scheduler engine to execute.  Note that Mason does not try to focus on providing a scheduler itself, but instead interfaces with known scheduler engines such as Glue, Airflow, or DigDag, and gives them specificed instructions on how to operate.  Mason does come with a `LocalSchedulerClient` or `local` scheduler which allows you to run a workflow synchronously locally.  `AsyncClient` is planned but preference will be to use more robust async schedulers like Airflow.
 
-### Registering Workflows
-
-```
->> mason register mason/examples/workflows/
-Valid workflow definition.  Registering mason/examples/workflows/table/validated_infer to /Users/kyle/.mason/registered_workflows/table/validated_infer/
-Valid workflow definition.  Registering mason/examples/workflows/table/infer to /Users/kyle/.mason/registered_workflows/table/infer/
-```
-
-### Listing Workflows
-
-```
->>mason workflow
-
-+-------------------------------------------------------------+
-| Available Workflow Methods: ~/.mason/registered_workflows/  |
-+-------------------------------------------------------------+
-
-namespace    command          description
------------  ---------------  ---------------------------------------------------------------------------------------------
-table        validated_infer  5 step workflow for inferring table and checking if it worked, then cleaning up if it didn't.
-table        infer            One step workfow for table infer operator
-
-
-```
-
-Doing a Dry Run for a Workflow (dry-run is set to True by default):
-
-Note that workflows, unlike operators, must be run using `parameter.yaml` files. There is no shorthand syntax for workflow parameters (`-p` flag).  You must use the `-f` flag and provide a parameter yaml file:
-
-```
->> mason workflow table validated_infer -f mason/examples/parameters/validated_infer.yaml 
-2020-06-22 14:16:36.086475: Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag
-2020-06-22 14:16:36.086524
-2020-06-22 14:16:36.086534: Valid Workflow DAG Definition:
-2020-06-22 14:16:36.086541: --------------------------------------------------------------------------------
-2020-06-22 14:16:36.088688: * step_1
-* step_2
-* step_3
-* step_4
-* step_5
-
-2020-06-22 14:16:36.088717
-+--------------------+
-| Workflow Response  |
-+--------------------+
-{
- "Errors": [],
- "Info": [
-  "2020-06-22 14:16:36.086475: Performing Dry Run for Workflow.  To Deploy workflow use --deploy -d flag.  To run now use the --run -r flag",
-  "2020-06-22 14:16:36.086524",
-  "2020-06-22 14:16:36.086534: Valid Workflow DAG Definition:",
-  "2020-06-22 14:16:36.086541: --------------------------------------------------------------------------------",
-  "2020-06-22 14:16:36.088688: * step_1\n* step_2\n* step_3\n* step_4\n* step_5\n",
-  "2020-06-22 14:16:36.088717"
- ],
- "Warnings": []
-}
-```
-
 ### Deploying a Workflow (with `-d` flag)
-
-```
->> mason workflow table infer -f mason/examples/parameters/workflow_table_infer.yaml -d
-Registering workflow dag table_infer with glue.
-Created table crawler table_infer.
-Registered schedule table_infer
-+--------------------+
-| Workflow Response  |
-+--------------------+
-{
- "Errors": [],
- "Info": [
-  "Registering workflow dag table_infer with glue.",
-  "Created table crawler table_infer.",
-  "Registered schedule table_infer"
- ],
- "Warnings": []
-}
-```
-
 ### Running a Workflow Synchronously (with `-r` flag)
-
-```
-Registering workflow dag table_infer with glue.
-Created table crawler table_infer.
-Registered schedule table_infer
-Triggering schedule: table_infer
-Refreshing Table Crawler: table_infer
-+--------------------+
-| Workflow Response  |
-+--------------------+
-{
- "Errors": [],
- "Info": [
-  "Registering workflow dag table_infer with glue.",
-  "Created table crawler table_infer.",
-  "Registered schedule table_infer",
-  "Triggering schedule: table_infer",
-  "Refreshing Table Crawler: table_infer"
- ],
- "Warnings": []
-}
-```
-
-### Creating Workflows
+### Creating new Workflows
 
 Workflows are defined in a similar manner to operators.  Workflows because they are composed of operators do not require a run method but rather may require a "step" method which defines how the workflow is allowed to progress from one step to another.  Here is an example workflow definition:
+
+Here is an example (trivial) one step workflow which runs the `table:infer` operator on a schedule:
 
 ```
 from typing import Union
 
-from mason.engines.metastore.models.table import Table
-
-from mason.engines.scheduler.models.dags.failed_dag_step import FailedDagStep
 from mason.engines.scheduler.models.dags.executed_dag_step import ExecutedDagStep
+from mason.engines.scheduler.models.dags.failed_dag_step import FailedDagStep
+from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 from mason.workflows.workflow_definition import WorkflowDefinition
 
-class Namespace1Workflow5(WorkflowDefinition):
-    def step(self, current: ExecutedDagStep, next: ValidDagStep) -> Union[ValidDagStep, FailedDagStep]:
-        if current.step.id == "step_1":
-            if isinstance(current.operator_response.object, Table):
-                return next
-            else:
-                return current.failed("Table not found in operator_response")
-        else:
-            return next
+class TableInfer(WorkflowDefinition):
+    def step(self, current: ExecutedDagStep, next: ValidDagStep) -> Union[ValidDagStep, InvalidDagStep, FailedDagStep, ExecutedDagStep]:
+        return next
 
 ```
 
@@ -649,7 +584,7 @@ step_1:
   config_id: 1
   parameters:
     database_name: "test-database"
-    storage_path: "spg-mason-demo/part_data_merged/"
+    storage_path: "mason-test-data/merge/"
 ```
 
 The first value in the parameters.yaml file references the step_1 step id.   Notice that the parameters are the same parameters that would be required for running the table infer operator by itself (`database_name` and `storage_path`).  This is validated when the workflow is deployed or run and is inferred from the associated namespace and command in the original workflow dag definition.

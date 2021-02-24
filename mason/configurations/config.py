@@ -79,20 +79,26 @@ class Config(Saveable, Resource):
         return response
 
     def extended_info(self, current_id: Optional[str] = None) -> List[str]:
+        id = self.id
+        if current_id and current_id == id:
+            id += " *"
         execution_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.execution_clients)))
         storage_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.storage_clients)))
         scheduler_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.scheduler_clients)))
         metastore_clients: str = ", ".join(list(map(lambda c: c.client.name(), self.metastore_clients)))
-        return [self.id, execution_clients, metastore_clients, storage_clients, scheduler_clients]
+        return [id, execution_clients, metastore_clients, storage_clients, scheduler_clients]
     
-    def to_dict(self) -> dict:
-        clients = list(map(lambda c: c.name(), self.clients))
-        extra_info = self.extended_info()
-        id = extra_info[0]
-        execution = extra_info[1]
-        metastore = extra_info[2]
-        storage = extra_info[3]
-        scheduler = extra_info[4]
-        return {'clients': clients, 'id': id, 'execution_client': execution, 'metastore_client': metastore, 'storage_client': storage, 'scheduler_client': scheduler}
+    def to_dict(self, current_id: Optional[str]) -> dict:
+        execution_clients = list(map(lambda c: c.client.to_dict(), self.execution_clients))
+        storage_clients = list(map(lambda c: c.client.to_dict(), self.storage_clients))
+        scheduler_clients = list(map(lambda c: c.client.to_dict(), self.scheduler_clients))
+        metastore_clients = list(map(lambda c: c.client.to_dict(), self.metastore_clients))
+        
+        id = self.id
+        if current_id and current_id == id:
+            current = True
+        else:
+            current = False
+        return {'current': current, 'id': id, 'execution_client': execution_clients, 'metastore_client': metastore_clients, 'storage_client': storage_clients, 'scheduler_client': scheduler_clients}
 
 

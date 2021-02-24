@@ -11,6 +11,15 @@ class AWSClient(Client):
         self.secret_key = secret_key
         self.aws_region = aws_region
         self.aws_role_arn = aws_role_arn
+        
+    def to_dict(self) -> dict:
+        return {
+            "client_name": super().name(),
+            "access_key": "REDACTED",
+            "secret_key": "REDACTED",
+            "aws_region": self.aws_region,
+            "aws_role_arn": self.aws_role_arn
+        }
 
     def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
         if self.access_key and self.secret_key:

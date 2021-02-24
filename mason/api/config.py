@@ -16,14 +16,13 @@ def config(config_id: Optional[str], set_current: bool = False, log_level: Optio
         if isinstance(result, str):
             response.add_error(result)
             response.set_status(404)
-            return response.with_status()
         else:
             response.add_info(f"Set session config to {config_id}")
-            return response.with_status()
-    else:
-        res = Resources(environment)
-        configs = res.get_resources("config", config_id)
-        response = printer.print_resources(configs, "config", config_id)
-        return response.with_status() 
+            config_id = None
+        
+    res = Resources(environment)
+    configs = res.get_resources("config", config_id)
+    response = printer.print_resources(configs, "config", config_id, environment=environment)
+    return response.with_status() 
 
 

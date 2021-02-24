@@ -12,7 +12,13 @@ from mason.workflows.workflow_run import WorkflowRun
 class LocalClient(Client):
 
     def __init__(self, threads: int = 1):
-        self.threads = threads 
+        self.threads = threads
+
+    def to_dict(self) -> dict:
+        return {
+            'client_name': super().name(),
+            'threads': self.threads
+        }
 
     def client(self) -> BaseClient:
         pass

@@ -11,7 +11,7 @@ class ExecutionClient:
     @abstractmethod
     def __init__(self, client: Client):
         self.client = client
-
+    
     @abstractmethod
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         raise NotImplementedError("Client not implemented")

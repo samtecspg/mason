@@ -12,6 +12,11 @@ class SparkClient(Client):
         self.runner_type = runner["type"]
         self.config = SparkConfig(runner)
 
+    def to_dict(self) -> dict:
+        return {
+            'client_name': super().name()
+        }
+
     def client(self):
         return self.get_runner(self.runner_type)
 

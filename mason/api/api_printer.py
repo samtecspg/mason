@@ -5,6 +5,7 @@ from mason.configurations.config import Config
 from mason.operators.operator import Operator
 from mason.resources.malformed import MalformedResource
 from mason.resources.printer import Printer
+from mason.util.environment import MasonEnvironment
 from mason.util.list import sequence_4
 from mason.workflows.workflow import Workflow
 
@@ -13,7 +14,7 @@ class ApiPrinter(Printer):
     def print_response(self, response: Response):
         return response.with_status()
     
-    def print_resources(self, resources: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> Response:
+    def print_resources(self, resources: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None, environment: Optional[MasonEnvironment] = None) -> Response:
         operators, workflows, configs, bad = sequence_4(resources, Operator, Workflow, Config, MalformedResource)
         response = Response()
 

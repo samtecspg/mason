@@ -8,6 +8,7 @@ from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.operators.operator import Operator
 from mason.resources.malformed import MalformedResource
+from mason.util.environment import MasonEnvironment
 from mason.workflows.workflow import Workflow
 from mason.resources.printer import Printer
 from mason.util.list import sequence_4
@@ -23,11 +24,10 @@ class CliPrinter(Printer):
     def print_response(self, response: Response):
         resp, status = response.with_status()
         logger.info(f"Response status: {status}")
-        json_object = json.loads('{"foo":"bar"}')
         str_resp = json.dumps(resp, indent=4, sort_keys=True)
         logger.info(highlight(str_resp, JsonLexer(), TerminalFormatter()))
 
-    def print_resources(self, resources: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None) -> Response:
+    def print_resources(self, resources: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None, environment: Optional[MasonEnvironment] = None) -> Response:
         if len(resources) == 0:
             logger.error(self.none_message(type, namespace, command))
         else:
@@ -39,7 +39,7 @@ class CliPrinter(Printer):
             if type in ["all", "workflow", "workflows"]:
                 self.print_workflows(workflows, namespace, command)
             if type in ["all", "config", "configs"]:
-                self.print_configs(configs)
+                self.print_configs(configs, environment)
                 
         return Response()
 
@@ -75,16 +75,22 @@ class CliPrinter(Printer):
         else:
             logger.error("No workflows registered.  Register operators by running \"mason apply\"")
 
-    def print_configs(self, configs: List[Config]):
+    def print_configs(self, configs: List[Config], environment: Optional[MasonEnvironment] = None):
         configs.sort(key=lambda o: o.id)
-        # if len(configs) == 1:
-        #     print("HERE")
-        if len(configs) > 0:
-            to_values = list(map(lambda c: c.extended_info(), configs))
+        current_config: Optional[str] = None
+        if environment:
+            current_config = environment.state_store.get_session_config()
+        if len(configs) == 1:
+            str_resp = json.dumps(configs[0].to_dict(current_config), indent=4, sort_keys=False)
+            logger.info(highlight(str_resp, JsonLexer(), TerminalFormatter()))
+        elif len(configs) > 0:
+            to_values = list(map(lambda c: c.extended_info(current_config), configs))
             banner(f"Available Configs")
             logger.info()
             logger.info(tabulate(to_values, headers=["id", "execution", "metastore", "storage", "scheduler"]))
             logger.info()
+            if current_config:
+                logger.info("* Current Session Configuration")
         else:
             logger.error("No configs.  Register configs by running \"mason apply\"")
 

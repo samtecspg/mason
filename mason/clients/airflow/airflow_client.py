@@ -14,6 +14,14 @@ class AirflowClient(Client):
         self.user = config.get("user")
         self.password = config.get("password")
         
+    def to_dict(self) -> dict:
+        return {
+            'client_name': super().name(),
+            'endpoint': self.endpoint,
+            'user': self.user,
+            'password': "REDACTED"
+        }
+
     def client(self):
         # IMPLEMENT underlying client, likely just requests for API calls: 
         pass

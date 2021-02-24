@@ -31,9 +31,9 @@ class LocalStateStore(MasonStateStore):
                 os.makedirs(full_path)
                 shutil.copy(source, full_path + f"{type}.yaml")
                 shutil.copy(path.dirname(source) + "/__init__.py", full_path + "__init__.py")
-                return f"Overwrote definition for {type} {namespace}:{command}"
+                return f"Overwrote definition for {type.capitalize()} {namespace}:{command}"
             else:
-                return FailedOperation(f"Definition already exists for {type} {namespace}{command}")
+                return FailedOperation(f"Definition already exists for {type.capitalize()} {namespace}:{command}")
         else:
             os.makedirs(full_path)
             shutil.copy(source, full_path + f"{type}.yaml")
