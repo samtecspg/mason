@@ -119,16 +119,16 @@ Apply applies mason yaml files for resources in mason (operators, workflows and 
 ```shell
 > mason apply mason/examples/
 +---------------------------------------------+
-| Creating MASON_HOME at /Users/kyle/.mason/  |
+| Creating MASON_HOME at ~/.mason/            |
 +---------------------------------------------+
 +----------------------------------------------------------+
-| Creating OPERATOR_HOME at /Users/kyle/.mason/operators/  |
+| Creating OPERATOR_HOME at ~/.mason/operators/            |
 +----------------------------------------------------------+
 +----------------------------------------------------------+
-| Creating WORKFLOW_HOME at /Users/kyle/.mason/workflows/  |
+| Creating WORKFLOW_HOME at ~/.mason/workflows/            |
 +----------------------------------------------------------+
 +------------------------------------------------------+
-| Creating CONFIG_HOME at /Users/kyle/.mason/configs/  |
+| Creating CONFIG_HOME at ~/.mason/configs/            |
 +------------------------------------------------------+
 2021-02-23 20:20:22.989394: Successfully saved Operator schedule:delete
 2021-02-23 20:20:22.990765: Successfully saved Operator table:delete
@@ -752,8 +752,6 @@ would only accept an operator configured with both `metastore: s3` and `executio
 
 Workflows are a new feature that allows you to compose operators in a DAG (Directed Acyclic Graph) definition, validate the Dag in conjunction with specific configurations and parameters, then pass it to a scheduler engine to execute.  Note that Mason does not try to focus on providing a scheduler itself, but instead interfaces with known scheduler engines such as Glue, Airflow, or DigDag, and gives them specificed instructions on how to operate.  Mason does come with a `LocalSchedulerClient` or `local` scheduler which allows you to run a workflow synchronously locally.  `AsyncClient` is planned but preference will be to use more robust async schedulers like Airflow.
 
-### Deploying a Workflow (with `-d` flag)
-### Running a Workflow Synchronously (with `-r` flag)
 ### Creating new Workflows
 
 Workflows are defined in a similar manner to operators.  Workflows because they are composed of operators do not require a run method but rather may require a "step" method which defines how the workflow is allowed to progress from one step to another.  Here is an example workflow definition:
