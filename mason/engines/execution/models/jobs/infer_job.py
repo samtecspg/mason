@@ -1,16 +1,20 @@
+from typing import Optional, Union
+
 from mason.engines.execution.models.jobs import Job
-from mason.engines.metastore.models.credentials import MetastoreCredentials
+from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
 from mason.engines.metastore.models.database import Database
 from mason.engines.storage.models.path import Path
 
 class InferJob(Job):
 
-    def __init__(self, database: Database, path: Path, credentials: MetastoreCredentials):
-        self.database = database
+    def __init__(self, path: Path, credentials: Union[MetastoreCredentials, InvalidCredentials], database: Optional[Database] = None):
         self.path = path
         self.credentials = credentials
+        
+        parameters = self.credentials.to_dict()
+        parameters['path'] = path.full_path()
 
-        super().__init__("infer", self.credentials.to_dict())
+        super().__init__("infer", parameters)
 
 
 

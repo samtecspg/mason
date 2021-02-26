@@ -13,10 +13,10 @@ from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
-
 class AthenaMetastoreClient(MetastoreClient):
 
     def __init__(self, client: AthenaClient):
+        super().__init__(client)
         self.client: AthenaClient = client
 
     def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:

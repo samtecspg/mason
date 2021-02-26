@@ -8,6 +8,7 @@ class Response:
         self.responses: List[dict] = []
         self.warnings: List[str] = []
         self.info: List[str] = []
+        self.debug: List[str] = []
         self.errors: List[str] = []
         self.status_code: int = 200
         self.data: List[dict] = []
@@ -17,6 +18,7 @@ class Response:
         self.responses = self.responses + response.responses
         self.warnings = self.warnings + response.warnings
         self.info = self.info + response.info
+        self.debug = self.debug + response.debug
         self.errors = self.errors + response.errors
         self.status_code = response.status_code
         self.data = self.data + response.data
@@ -49,6 +51,12 @@ class Response:
             logger.info(str(info))
         self.info.append(info)
 
+    def add_debug(self, debug: str, log: bool = True):
+        info = self.add_timestamp(debug)
+        if log:
+            logger.debug(str(debug))
+        self.debug.append(debug)
+
     def add_error(self, error: str, log: bool = True):
         error = self.add_timestamp(error)
         if log:
@@ -67,7 +75,7 @@ class Response:
     def add_data(self, data: dict):
         self.data.append(data)
 
-    def formatted(self):
+    def formatted(self) -> dict:
         returns = self.response
         
         if len(self.errors) > 0:

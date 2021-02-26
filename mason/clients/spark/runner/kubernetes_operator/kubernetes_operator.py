@@ -59,7 +59,6 @@ class KubernetesOperator(SparkRunner):
     def run(self, config: SparkConfig, job: Job, resp: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
-        
         response: Response = resp or Response()
 
         job.set_id("mason" + "-" + job.type + "-" + str(uuid4()))
@@ -97,6 +96,7 @@ class KubernetesOperator(SparkRunner):
         if len(stdout) > 0:
             job.add_log(stdout)
             final = job.running(past=True)
+            
         if len(stderr) > 0:
             job.add_log(stderr)
             final = job.errored(f"Kubernetes Error")

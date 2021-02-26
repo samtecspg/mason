@@ -23,8 +23,11 @@ class ExecutionEngine(Engine):
             try:
                 mod = importlib.import_module(f'{client_module}.{name}.execution')
                 class_name = to_class_case(name + "_execution_client")
-                ms_client = getattr(mod, class_name)(client)
-                return ms_client
+                exc_client = getattr(mod, class_name)(client)
+                if isinstance(exc_client, ExecutionClient):
+                    return exc_client
+                else:
+                    return InvalidClient("Could not get execution client")
             except Exception as e:
                 return InvalidClient(f"Could not instantiate execution client for: {name}: {message(e)}")
         else:

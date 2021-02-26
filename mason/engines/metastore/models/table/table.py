@@ -1,22 +1,19 @@
 from datetime import datetime
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 import pandas as pd
-from mason.engines.metastore.models.schemas.text import TextSchema
 
+from mason.engines.metastore.models.schemas.text import TextSchema
 from mason.clients.responsable import Responsable
 from mason.clients.response import Response
 from mason.engines.metastore.models.schemas.schema import Schema
+from mason.engines.storage.models.path import Path
 
 from dask.dataframe.core import DataFrame as DDataFrame
 from pandas import DataFrame as PDataFrame
 
-from mason.engines.storage.models.path import Path
-
-
 class Table(Responsable):
 
-    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None,
-                 created_by: Optional[str] = None, database_name: Optional[str] = None, paths: List[Path] = []):
+    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None, paths: List[Path] = []):
         self.name = name
         self.database_name = database_name
         self.schema = schema
@@ -42,7 +39,7 @@ class Table(Responsable):
         import dask.dataframe as dd
         return dd.from_pandas(self.as_df(), npartitions=8)
 
-    def to_dict(self):
+    def to_dict(self) -> Dict[str, Union[str, datetime, dict]]:
         return {
             "Name": self.name,
             "CreatedAt": self.created_at or "",
@@ -54,7 +51,6 @@ class Table(Responsable):
         response.add_data(self.to_dict())
         return response
 
-
 class TableList(Responsable):
     
     def __init__(self, tables: List[Table]):
@@ -65,6 +61,4 @@ class TableList(Responsable):
         response.add_data(data)
         return response
             
-            
-    
 

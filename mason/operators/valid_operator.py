@@ -61,7 +61,7 @@ class ValidOperator(ValidResource):
                 else:
                     operator_response: OperatorResponse = module.run(env, self.config, self.parameters, response)
             else:
-                response.add_error(f"Module does not contain a valid OperatorDefinition. See /examples for sample operator implementations. \nMessage: {module.reason}")
+                response.add_error(f"Module does not contain a valid OperatorDefinition. See /examples for sample operator implementations. \n Message: {module.reason}")
                 operator_response = OperatorResponse(response)
         except ModuleNotFoundError as e:
             response.add_error(f"Module Not Found: {e}")

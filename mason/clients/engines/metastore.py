@@ -11,17 +11,18 @@ from mason.engines.metastore.models.credentials import MetastoreCredentials, Inv
 from mason.engines.metastore.models.database import InvalidDatabase, Database
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
+from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.storage.models.path import Path
 
 class MetastoreClient:
-
+    
     @abstractmethod
     def __init__(self, client: Client):
         self.client = client
 
     @abstractmethod
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
-        raise NotImplementedError("Client get_database not implemented")
+        raise NotImplementedError
 
     @abstractmethod
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]: 
@@ -30,6 +31,10 @@ class MetastoreClient:
     @abstractmethod
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         raise NotImplementedError("Client get_table not implemented")
+
+    @abstractmethod
+    def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+        raise NotImplementedError("Client summarize_table not implemented")
 
     @abstractmethod
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:

@@ -31,7 +31,7 @@ class Parameter:
     def __eq__(self, other):
         return self.key == other.key
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return { self.key: self.value }
 
     def optional(self) -> 'OptionalParameter':

@@ -23,8 +23,11 @@ class StorageEngine(Engine):
             try:
                 mod = importlib.import_module(f'{client_module}.{name}.storage')
                 class_name = to_class_case(name + "_storage_client")
-                ms_client = getattr(mod, class_name)(client)
-                return ms_client
+                storage_client = getattr(mod, class_name)(client)
+                if isinstance(storage_client, StorageClient):
+                    return storage_client
+                else:
+                    return InvalidClient("Could not fetch storage client")
             except Exception as e:
                 return InvalidClient(f"Could not instantiate storage client for: {name}: {message(e)}")
         else:

@@ -19,19 +19,16 @@ class S3MetastoreClient(MetastoreClient):
     def __init__(self, client: S3Client):
         self.client: S3Client = client 
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
-        tables, response =  self.list_tables(database_name, response or Response())
-        database = tables.map(lambda a: Database("s3_table", a)).alt(lambda b: InvalidDatabase(b.error or b.message()))
-        return database, response
+    # def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
+    #     tables, response =  self.list_tables(database_name, response or Response())
+    #     database = tables.map(lambda a: Database("s3_table", a)).alt(lambda b: InvalidDatabase(b.error or b.message()))
+    #     return database, response
 
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         return self.client.list_tables(database_name, response)
 
     def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         return self.client.get_table(database_name, table_name, options, response)
-
-    def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
-        raise NotImplementedError("s3 client delete_table not implemented")
 
     def full_path(self, path: str) -> str:
         return "s3a://" + path

@@ -1,15 +1,12 @@
 type: "operator"
 namespace: "table"
-command: "get"
-description:  "Get metastore table contents"
+command: "summarize"
+description:  "Provide summary statistics for a table"
 parameters:
   required:
     - "database_name"
     - "table_name"
-  optional:
-    - "read_headers"
 supported_configurations:
-  - metastore: "glue"
   - metastore: "s3"
     execution: "local"
   - metastore: "s3"

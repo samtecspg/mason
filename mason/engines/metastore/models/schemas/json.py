@@ -10,7 +10,14 @@ from mason.engines.metastore.models.schemas.schema import SchemaElement
 from mason.engines.storage.models.path import Path
 from mason.util.exception import message
 
-def from_file(path: Path):
+class JsonSchema(Schema):
+
+    def __init__(self, schema: dict, path: Path, type: str = "json"):
+        self.schema = schema
+        columns: List[SchemaElement] =  [] # TODO:  Treating json data as non tabular for now.   Surface main columns and nested attributes
+        super().__init__(columns, type, path)
+
+def from_file(path: Path) -> Union[JsonSchema, InvalidSchema]:
     
     # TODO: This code does not scale for large single json file (not jsonl)
     try:
@@ -30,13 +37,6 @@ def from_file(path: Path):
             return JsonSchema(schema, path, json_type)
     except Exception as e:
         return InvalidSchema(f"File not found {path.full_path()}")
-
-class JsonSchema(Schema):
-
-    def __init__(self, schema: dict, path: Path, type: str = "json"):
-        self.schema = schema
-        columns: List[SchemaElement] =  [] # TODO:  Treating json data as non tabular for now.   Surface main columns and nested attributes
-        super().__init__(columns, type, path)
 
 def merge_json_schemas(schemas: List[Schema]) -> Union[JsonSchema, InvalidSchema]:
     try:
