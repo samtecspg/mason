@@ -31,11 +31,11 @@ class MetastoreClient:
         raise NotImplementedError("Client list_tables not implemented")
 
     @abstractmethod
-    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
+    def get_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
         raise NotImplementedError("Client get_table not implemented")
 
     @abstractmethod
-    def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+    def summarize_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
         raise NotImplementedError("Client summarize_table not implemented")
 
     @abstractmethod

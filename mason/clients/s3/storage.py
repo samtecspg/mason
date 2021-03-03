@@ -6,7 +6,8 @@ from mason.clients.local.execution import LocalExecutionClient
 from mason.clients.response import Response
 from mason.clients.s3.s3_client import S3Client
 from mason.engines.metastore.models.table import Table, InvalidTables
-from mason.engines.storage.models.path import Path
+from mason.engines.storage.models.path import Path, construct
+
 
 class S3StorageClient(StorageClient):
 
@@ -14,10 +15,10 @@ class S3StorageClient(StorageClient):
         self.client: S3Client = client 
 
     def path(self, path: str) -> Path:
-        return self.client.path(path)
+        return construct([path], "s3") 
 
-    # def infer_table(self, path: str,  name: Optional[str] = None, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
-    #     return self.client.infer_table((self.path(path) or Path("", "s3")).path_str, name, options, response)
+    def infer_table(self, path: str,  name: Optional[str] = None, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
+        return self.client.get_table((self.path(path) or Path("", "s3")).path_str, name, options, response)
 
     def save_to(self, inpath: str, outpath: str, response: Response) -> Response:
         inp: Path = Path(inpath) # TODO:  allow saving between paths of different storage clients

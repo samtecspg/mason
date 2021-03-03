@@ -129,11 +129,12 @@ class S3Client(AWSClient):
 
         return paths, response
 
-    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+    def get_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
         path = construct([database_name, table_name], "s3")
         execution = options.get("execution")
         paths, response = self.expand_path(path, execution, (response or Response()))
         response.add_debug(f"{len(paths)} sub paths at {path}")
+        final: Union[Table, InvalidTables]
         
         if isinstance(execution, LocalExecutionClient):
             #  TODO: Check limits on sample_size for local client
@@ -168,29 +169,15 @@ class S3Client(AWSClient):
             else:
                 response.set_status(404)
                 final = InvalidTables([TableNotFound(f"No keys at {path}")])
+        elif execution:
+            final, response = DeferredTable(table_name, path, self.credentials()).run(execution, response)
         else:
-            final = InvalidTables([], "Only local execution client supported currently for s3 metastore")
+            final = InvalidTables([], "S3Client is not a full metastore.  Requires an execution client to infer tables.")
+            
         return final, response
     
-    def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
-        pass
-        # execution: Optional[Any] = None
-        # path = database_name + "/" + table_name
-        # path_obj = self.get_path(path)
-        # final: Union[TableSummary, InvalidTables]
-        # 
-        # if options:
-        #     execution = options.get("execution")
-        # table_name = self.get_name(table_name, path)
-        # 
-        # if execution and isinstance(execution, LocalExecutionClient):
-        #     final, response = self.summarize_local_table(path, table_name, options, response)
-        # elif execution: 
-        #     final, response = DeferredTableSummary(table_name, path_obj, self.credentials()).run(execution, response)
-        # else:
-        #     final = InvalidTables([], "S3Client is not a full metastore.  Requires an execution client to infer tables.")
-        # 
-        # return final, response
+    # def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+    #     pass
         
     def get_name(self, name: Optional[str], path: str) -> str:
         if not name or name == "":

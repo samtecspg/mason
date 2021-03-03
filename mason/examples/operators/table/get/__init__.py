@@ -12,7 +12,10 @@ class TableGet(OperatorDefinition):
         table_name: str = parameters.get_required("table_name")
         read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
 
-        table, response = config.metastore().get_table(database_name, table_name, options={"read_headers": read_headers, "execution": config.execution()}, response=resp)
-        oR = OperatorResponse(response, table)
-        return oR 
+
+        table, response = config.metastore().get_table(database_name, table_name, options={"read_headers": read_headers}, response=resp)
+        
+        # table, response = config.metastore().get_table(database_name, table_name, options={"read_headers": read_headers, "execution": config.execution()}, response=resp)
+        # oR = OperatorResponse(response, table)
+        # return oR 
 

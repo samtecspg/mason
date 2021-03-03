@@ -35,7 +35,7 @@ class S3MetastoreClient(MetastoreClient):
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         return self.client.list_tables(database_name, response)
 
-    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
+    def get_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
         return self.client.get_table(database_name, table_name, options, response)
 
     def full_path(self, path: str) -> str:

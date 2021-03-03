@@ -25,7 +25,7 @@ class TableMerge(OperatorDefinition):
         output_path = parameters.get_required("output_path")
         parse_headers = parameters.get_optional("parse_headers")
 
-        table, response  = config.storage().infer_table(input_path, "input_table", {"read_headers": parse_headers}, response)
+        table, response = config.storage().infer_table(input_path, "input_table", {"read_headers": parse_headers}, response)
         final: Union[ExecutedJob, InvalidJob]
 
         if isinstance(table, Table):
