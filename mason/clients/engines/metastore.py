@@ -1,7 +1,8 @@
 
 from abc import abstractmethod
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, List
 
+from fsspec.spec import AbstractBufferedFile
 from returns.result import Result
 
 from mason.clients.base import Client
@@ -10,6 +11,7 @@ from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
 from mason.engines.metastore.models.database import InvalidDatabase, Database
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
+from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.storage.models.path import Path

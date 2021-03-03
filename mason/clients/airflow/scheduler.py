@@ -11,8 +11,8 @@ from mason.util.environment import MasonEnvironment
 
 class AirflowSchedulerClient(SchedulerClient):
 
-    def __init__(self, config: dict):
-        self.client: AirflowClient = AirflowClient(config)
+    def __init__(self, client: AirflowClient):
+        self.client: AirflowClient = client
         self.dag: Optional[ValidDag] = None
 
     def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response) -> Tuple[str, Response, Optional[AirflowDag]]:

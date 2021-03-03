@@ -1,4 +1,5 @@
 import re
+from typing import List, Optional
 
 
 class Path:
@@ -15,3 +16,9 @@ class Path:
             return "://".join([self.protocal, self.path_str])
         else:
             return self.path_str
+        
+
+def construct(parts: List[str], protocal: Optional[str] = None) -> Path:
+    strp = list(map(lambda p: p.strip("/"), parts))
+    return Path("/".join(strp), protocal or "file")
+    

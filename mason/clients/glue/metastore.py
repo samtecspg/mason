@@ -11,6 +11,7 @@ from mason.engines.metastore.models.credentials.aws import AWSCredentials
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
+from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.storage.models.path import Path
 
 class GlueMetastoreClient(MetastoreClient):
@@ -20,6 +21,10 @@ class GlueMetastoreClient(MetastoreClient):
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         return self.client.get_database(database_name, response)
+    
+    def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+        response.add_error("Client summarize_table not implemented")
+        return InvalidTables([]), response
 
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
         return self.client.delete_table(database_name, table_name, response)

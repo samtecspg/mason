@@ -16,8 +16,6 @@ def header_length(file: AbstractBufferedFile):
     header_length = max(list(map(lambda l: len(l.split(",")), head)))
     return header_length
 
-
-# TODO: Move this into Local execution client, require execution client for S3 metastore since it is not a full metastore
 def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, InvalidSchema]:
     sample_size = 10000
     sample = file.read(sample_size)

@@ -7,13 +7,12 @@ from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableGet(OperatorDefinition):
-    pass
-    # def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> OperatorResponse:
-    #     database_name: str = parameters.get_required("database_name")
-    #     table_name: str = parameters.get_required("table_name")
-    #     read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
-    # 
-    #     table, response = config.metastore().get_table(database_name, table_name, options={"read_headers": read_headers, "execution": config.execution()}, response=resp)
-    #     oR = OperatorResponse(response, table)
-    #     return oR 
-    # 
+    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> OperatorResponse:
+        database_name: str = parameters.get_required("database_name")
+        table_name: str = parameters.get_required("table_name")
+        read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
+
+        table, response = config.metastore().get_table(database_name, table_name, options={"read_headers": read_headers, "execution": config.execution()}, response=resp)
+        oR = OperatorResponse(response, table)
+        return oR 
+

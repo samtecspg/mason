@@ -12,17 +12,25 @@ from mason.engines.metastore.models.credentials.aws import AWSCredentials
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
+from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.storage.models.path import Path
 
 class S3MetastoreClient(MetastoreClient):
 
     def __init__(self, client: S3Client):
-        self.client: S3Client = client 
+        self.client: S3Client = client
 
-    # def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
-    #     tables, response =  self.list_tables(database_name, response or Response())
-    #     database = tables.map(lambda a: Database("s3_table", a)).alt(lambda b: InvalidDatabase(b.error or b.message()))
-    #     return database, response
+    def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+        return self.client.summarize_table(database_name, table_name, options, response)
+
+    def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
+        resp = (response or Response()).add_error("Client delete_table not implemented")
+        return resp
+
+    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
+        tables, response =  self.list_tables(database_name, response or Response())
+        database = tables.map(lambda a: Database("s3_table", a)).alt(lambda b: InvalidDatabase(b.error or b.message()))
+        return database, response
 
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         return self.client.list_tables(database_name, response)

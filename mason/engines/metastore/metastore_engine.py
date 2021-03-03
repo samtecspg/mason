@@ -4,11 +4,9 @@ from typing import Union, List, Optional
 from mason.clients.base import Client
 from mason.clients.engines.invalid_client import InvalidClient
 from mason.clients.engines.metastore import MetastoreClient
-from mason.clients.s3.metastore import S3MetastoreClient
 from mason.engines.engine import Engine
 from mason.util.string import to_class_case
 from mason.util.exception import message
-
 
 class MetastoreEngine(Engine):
     

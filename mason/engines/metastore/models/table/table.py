@@ -57,7 +57,7 @@ class TableList(Responsable):
         self.tables = tables
         
     def to_response(self, response: Response):
-        data = {'Tables': list(map(lambda t: t.to_dict(), self.tables)) }
+        data = {'Tables': list(map(lambda t: t.to_dict(), self.tables))}
         response.add_data(data)
         return response
             
