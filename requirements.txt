@@ -35,4 +35,4 @@ lambdas==0.1.0
 returns==0.15.0
 partd>=0.3.10
 asciidag==0.1.0
-typistry==0.0.9
+typistry==0.0.10
