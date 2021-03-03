@@ -80,7 +80,7 @@ class ConfigProto(ProtoObject):
                         client_class = self.supported_client(client_name)
                         if not client_class is None:
                             tdict = TypedDict(configuration, client_name)
-                            valid: Union[ValidDict, InvalidObject] = validate_dict(tdict, from_root(self.client_path()), True)._inner_value
+                            valid: Union[ValidDict, InvalidObject] = validate_dict(tdict, from_root(self.client_path()))._inner_value
                             if isinstance(valid, ValidDict):
                                 valid.typed_dict.type = valid.type() + "_client"
                                 value: Union[Client, InvalidObject] = build_object(valid, to_class=client_class)._inner_value
