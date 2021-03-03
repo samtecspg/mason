@@ -32,4 +32,4 @@ class TestCLI:
         # print_result(runner.invoke(run, ["operator", "table", "get",  "-p", "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"], catch_exceptions=False))
         # print_result(runner.invoke(get, ["operator"], catch_exceptions=False))
         print_result(runner.invoke(config, ["-s", "5"]))
-        print_result(runner.invoke(run, ["operator", "table", "summarize", "-p", "database_name:mason-test-data,table_name:csv/test.csv"], catch_exceptions=False))
+        print_result(runner.invoke(run, ["operator", "table", "get", "-p", "database_name:mason-test-data,table_name:csv/test.csv"], catch_exceptions=False))

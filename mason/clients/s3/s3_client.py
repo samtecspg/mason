@@ -117,7 +117,7 @@ class S3Client(AWSClient):
         if execution and isinstance(execution, LocalExecutionClient):
             full_path = path.full_path()
             response.add_info(f"Fetching keys at {full_path}")
-            keys = self.client.client().find(full_path)
+            keys = self.client().find(full_path)
             response.add_response({'keys': keys})
 
             if len(keys) > 0:
@@ -172,19 +172,6 @@ class S3Client(AWSClient):
             final = InvalidTables([], "Only local execution client supported currently for s3 metastore")
         return final, response
     
-    def populate_table(self):
-            
-
-    # def summarize_local_table(self, path: str, name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
-    #     table, response = self.infer_table(path, name, options, response)
-    #     if isinstance(table, Table):
-    #         df = table.as_df()
-    #         import pdb; pdb.set_trace()
-    #         report: ProfileReport = ProfileReport(df, True, title="Profiling Report", lazy=False)
-    #         return TableSummary(), response
-    #     else:
-    #         return table, response
-        
     def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
         pass
         # execution: Optional[Any] = None
@@ -210,8 +197,6 @@ class S3Client(AWSClient):
             return path.rstrip("/").split("/")[-1]
         else:
             return name
-
-    def infer_table(self, path_str: str, name: Optional[str], options: Optional[dict] = None, resp: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
         # execution: Optional[Any] = None
         # path_obj = self.get_path(path)
         # response: Response = resp or Response()
@@ -268,28 +253,28 @@ class S3Client(AWSClient):
         #     final = InvalidTables([], "S3Client is not a full metastore.  Requires an execution client to infer tables.")
         #     
         # return final, resp or Response()
-    
-    # def list_keys(self, path: str,  response: Optional[Response] = None) -> Tuple[List[Path], Response]:
-    #     resp: Response = response or Response()
-    #     keys = self.client().find(path)
-    #     resp.add_response({'keys': keys})
-    #     if len(keys) > 0:
-    #         paths = list(map(lambda k: self.get_path(k), keys))
-    #     else:
-    #         paths = []
-    #     
-    #     return paths, resp
+        
+        # def list_keys(self, path: str,  response: Optional[Response] = None) -> Tuple[List[Path], Response]:
+        #     resp: Response = response or Response()
+        #     keys = self.client().find(path)
+        #     resp.add_response({'keys': keys})
+        #     if len(keys) > 0:
+        #         paths = list(map(lambda k: self.get_path(k), keys))
+        #     else:
+        #         paths = []
+        #     
+        #     return paths, resp
 
-    # def path(self, path: str):
-    #     return Path(path.replace("s3://", ""), "s3")
+        # def path(self, path: str):
+        #     return Path(path.replace("s3://", ""), "s3")
 
     def save_to(self, inpath: Path, outpath: Path, response: Response):
-            try:
-                self.client().upload(inpath.path_str, outpath.path_str)
-            except Exception as e:
-                response.add_error(f"Error saving {inpath} to {outpath.path_str}")
-                response.add_error(message(e))
-                
-            return response
+        try:
+            self.client().upload(inpath.path_str, outpath.path_str)
+        except Exception as e:
+            response.add_error(f"Error saving {inpath} to {outpath.path_str}")
+            response.add_error(message(e))
+            
+        return response
             
             
