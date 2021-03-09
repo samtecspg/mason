@@ -2,11 +2,12 @@
 
 # Mason Data Operator Framework 
 
-What is Mason?  In short, Mason is the connecting tissue for your data projects.  
-1.  It creates a data-aware alternative to Airflow operators that depends less heavily on Python scripting.
+What is Mason?  Mason is a federated data pipeline tool that serves as the connecting tissue for your data projects.  
+1.  It creates a configuration driven data-aware alternative to Airflow operators that depends less heavily on Python scripting.
 2.  It's like react components, but for data pipelines.
 3.  It's an open source answer to Glue.
 4.  It gives you self-contained, composable, parameterized, and functional data operators.
+5.  It bridges between various concenrs in data pipelines such as between federated metadata introspection and federated query execution.
 
 Mason is a curated library of data pipeline components with abstracted backend implementations for various big data clients.
 
@@ -195,7 +196,7 @@ namespace    command          description
 -----------  ---------------  ---------------------------------------------------------------------------------------------
 table        validated_infer  5 step workflow for inferring table and checking if it worked, then cleaning up if it didn't.
 table        infer            One step workfow for table infer operator
-table        export           Workflow that queries a table and then format and repartitions it
+table        export           Workflow that queries a table and then formats and repartitions it
 
 +--------------------+
 | Available Configs  |
