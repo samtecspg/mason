@@ -48,7 +48,7 @@ class TestGetOperator:
          {'namespace': 'namespace1', 'command': 'operator2', 'description': 'Test Operator',
           'parameters': {'required': ['test_param'], 'optional': []},
           'supported_configurations': [{'metastore': 'test'}]}]
-        assert(response['Operators'] == sorted(operators, key=lambda o: o['command']))
+        assert(response['Operators'] == sorted(operators, key=lambda o: o['command'])) # type: ignore
         assert(status == 200)
 
 class TestValidateOperator:
