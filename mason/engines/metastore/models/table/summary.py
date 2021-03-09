@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 from mason.clients.responsable import Responsable
 from mason.clients.response import Response
 from mason.engines.metastore.models.schemas.schema import Schema
@@ -8,8 +10,11 @@ class TableSummary(Responsable):
         pass
     
     def to_response(self, response: Response):
-        response.add_data({})
+        response.add_data()
         return response
+    
+def from_df(dataframe: DataFrame) -> TableSummary:
+    return TableSummary()
 
 class NullCounts:
     

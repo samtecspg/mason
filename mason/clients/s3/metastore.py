@@ -20,8 +20,8 @@ class S3MetastoreClient(MetastoreClient):
     def __init__(self, client: S3Client):
         self.client: S3Client = client
 
-    def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
-        return self.client.summarize_table(database_name, table_name, options, response)
+    def summarize_table(self, table: Table, path: Path, options = {}, response=Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+        return self.client.summarize_table(table, path, options, response)
 
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
         resp = (response or Response()).add_error("Client delete_table not implemented")

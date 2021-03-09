@@ -6,6 +6,8 @@ parameters:
   required:
     - "database_name"
     - "table_name"
+  optional:
+    - "read_headers"
 supported_configurations:
   - metastore: "s3"
     execution: "local"

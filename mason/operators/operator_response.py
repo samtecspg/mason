@@ -11,8 +11,8 @@ class OperatorResponse:
 
     def to_response(self, response: Response, object: Optional[Responsable] = None) -> Response:
         if object:
-            response = object.to_response(response)
-        return response
+            self.response = object.to_response(response)
+        return self.response
 
     def formatted(self) -> dict:
         return self.response.formatted()

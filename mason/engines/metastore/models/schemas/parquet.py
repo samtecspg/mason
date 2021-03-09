@@ -4,6 +4,7 @@ from fsspec.implementations.local import LocalFileOpener
 
 from fastparquet import ParquetFile
 from fastparquet.schema import SchemaHelper
+from pandas import DataFrame
 
 from mason.engines.metastore.models.schemas.schema import SchemaElement, InvalidSchema, Schema
 from mason.engines.storage.models.path import Path

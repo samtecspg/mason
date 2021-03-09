@@ -1,5 +1,6 @@
 from typing import Optional, List, Union
 
+from mason.clients.responsable import Responsable
 from mason.engines.execution.models.jobs.executed_job import ExecutedJob
 from mason.engines.execution.models.jobs.invalid_job import InvalidJob, RetryableJob, FailedJob
 from mason.util.uuid import uuid4
@@ -22,10 +23,10 @@ class Job:
         else:
             return FailedJob(error)
 
-    def running(self, message: Optional[str] = None, past=False) -> ExecutedJob:
+    def running(self, message: Optional[str] = None, past=False, object: Optional[Responsable] = None) -> ExecutedJob:
         if not past:
             self.add_log(f"Running job id={self.id}")
-        return ExecutedJob(self.id, message, self.logs)
+        return ExecutedJob(self.id, message, self.logs, object)
 
     def set_id(self, id: Optional[str] = None):
         self.id = id or str(uuid4())

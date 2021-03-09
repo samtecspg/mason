@@ -11,7 +11,6 @@ from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
 from mason.engines.metastore.models.database import InvalidDatabase, Database
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.storage.models.path import Path
@@ -35,7 +34,7 @@ class MetastoreClient:
         raise NotImplementedError("Client get_table not implemented")
 
     @abstractmethod
-    def summarize_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+    def summarize_table(self, table: Table, path: Path, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
         raise NotImplementedError("Client summarize_table not implemented")
 
     @abstractmethod

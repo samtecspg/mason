@@ -1,8 +1,11 @@
-from typing import Sequence, Optional, Union, List
+from typing import Sequence, Optional, Union, List, Tuple
+
+from pandas import DataFrame
 
 from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema, InvalidSchemaElement
 from mason.engines.storage.models.path import Path
 from mason.util.exception import message
+from io import StringIO
 import pandas as pd
 
 
@@ -34,10 +37,8 @@ class TextSchema(Schema):
         self.line_terminator = line_terminator
         super().__init__(columns, SUPPORTED_TYPES.get(type, ""), path)
 
-def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
+def df_from(text: StringIO, type: str, read_headers: Optional[bool]) -> Tuple[DataFrame, str]:
     headers = read_headers or False
-    header_list: Union[List[str], bool]
-    
     header: Optional[int] = None
     if headers:
         header = 0
@@ -47,8 +48,11 @@ def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]
     else:
         line_terminator = "\n"
 
-    from io import StringIO
-    df = pd.read_csv(StringIO(sample.decode("utf-8")), lineterminator=line_terminator, header=header)
+    return pd.read_csv(text, lineterminator=line_terminator, header=header), line_terminator
+
+def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
+    text = StringIO(sample.decode("utf-8"))
+    df, line_terminator = df_from(text, type, read_headers)
     
     try:
 

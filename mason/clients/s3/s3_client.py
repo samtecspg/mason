@@ -1,25 +1,19 @@
 from botocore.errorfactory import ClientError
 from typing import Optional, List, Union, Tuple, Any
 import s3fs
-from pandas_profiling import ProfileReport
+from pandas import DataFrame
 from returns.result import Result, Success, Failure
 from s3fs import S3FileSystem
 
 from mason.clients.aws_client import AWSClient
-from mason.clients.engines.execution import ExecutionClient
-from mason.clients.local.execution import LocalExecutionClient
-from mason.clients.local.local_client import LocalClient
 from mason.clients.response import Response
-from mason.engines.metastore.models.deferred.table.summary import DeferredTableSummary
-from mason.engines.metastore.models.deferred.table.table import DeferredTable
 from mason.engines.metastore.models.table import InvalidTable, Table, TableNotFound, InvalidTables, TableList
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.storage.models.path import Path, construct
 from mason.util.exception import message
-from mason.util.logger import logger
 from mason.engines.metastore.models.schemas import schemas
 from mason.engines.metastore.models.schemas import check_schemas as CheckSchemas
-from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema, SchemaConflict
+from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema
 from mason.util.list import get, sequence
 
 class S3Client(AWSClient):
@@ -112,149 +106,85 @@ class S3Client(AWSClient):
 
         return final, response
     
-    def expand_path(self, path: Path, execution: Optional[ExecutionClient], response: Response = Response()) -> Tuple[List[Path], Response]:
+    def expand_path(self, path: Path, response: Response = Response(), sample_size: Optional[Any] = None) -> Tuple[List[Path], Response]:
         paths: List[Path] = []
-        if execution and isinstance(execution, LocalExecutionClient):
-            full_path = path.full_path()
-            response.add_info(f"Fetching keys at {full_path}")
-            keys = self.client().find(full_path)
-            response.add_response({'keys': keys})
+        full_path = path.full_path()
+        response.add_info(f"Fetching keys at {full_path}")
+        keys = self.client().find(full_path)
+        response.add_response({'keys': keys})
 
-            if len(keys) > 0:
-                paths = list(map(lambda k: Path(k, "s3"), keys))
-        else:
-            #  Spark, Dask  -> just return the path since they expand themselves? 
-            paths = []
-            response.add_error("Only Local execution client is supported for expand_path currently")
+        if len(keys) > 0:
+            paths = list(map(lambda k: Path(k, "s3"), keys))
+
+        if sample_size:
+            import random
+            try:
+                ss = int(sample_size)
+            except TypeError:
+                response.add_warning(f"Invalid sample size (int): {sample_size}")
+                ss = 3
+
+            response.add_warning(f"Sampling keys to determine schema. Sample size: {ss}.")
+            if ss < len(paths):
+                paths = random.sample(paths, ss)
 
         return paths, response
 
     def get_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
         path = construct([database_name, table_name], "s3")
-        execution = options.get("execution")
-        paths, response = self.expand_path(path, execution, (response or Response()))
-        response.add_debug(f"{len(paths)} sub paths at {path}")
+        paths, response = self.expand_path(path, (response or Response()), options.get("sample_size"))
+        response.add_debug(f"{len(paths)} sub paths sampled at {path.full_path()}")
         final: Union[Table, InvalidTables]
-        
-        if isinstance(execution, LocalExecutionClient):
-            #  TODO: Check limits on sample_size for local client
-            sample_size = options.get("sample_size")
-            if sample_size:
-                import random
-                try: 
-                    ss = int(sample_size)
-                except TypeError:
-                    response.add_warning(f"Invalid sample size (int): {sample_size}")
-                    ss = 3
-
-                response.add_warning(f"Sampling keys to determine schema. Sample size: {ss}.")
-                if ss < len(paths):
-                    paths = random.sample(paths, ss)
-                
-            #  TODO:  Add limits to sample size for local client
-            if len(paths) > 0:
-                try:
-                    valid, invalid_schemas = sequence(list(map(lambda path: schemas.from_file(self.client().open(path.full_path()), options), paths)), Schema, InvalidSchema)
-                    non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
-                    validated, paths =  CheckSchemas.find_conflicts(non_empty)
-                    table = CheckSchemas.get_table(table_name, validated, paths)
-                    invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
-                    if isinstance(table, Table):
-                        final = table
-                    else:
-                        invalid_tables.append(table)
-                        final = InvalidTables(invalid_tables)
-                except (ClientError, PermissionError) as e:
-                    final = InvalidTables([InvalidTable(f"Not able to infer table: {message(e)}")])
-            else:
-                response.set_status(404)
-                final = InvalidTables([TableNotFound(f"No keys at {path}")])
-        elif execution:
-            final, response = DeferredTable(table_name, path, self.credentials()).run(execution, response)
+            
+        #  TODO:  Add limits to sample size for local client
+        if len(paths) > 0:
+            try:
+                valid, invalid_schemas = sequence(list(map(lambda path: schemas.from_path(path, self.client(), options), paths)), Schema, InvalidSchema)
+                non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
+                validated, paths = CheckSchemas.find_conflicts(non_empty)
+                table = CheckSchemas.get_table(table_name, validated, paths)
+                invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
+                if isinstance(table, Table):
+                    final = table
+                else:
+                    invalid_tables.append(table)
+                    final = InvalidTables(invalid_tables)
+            except (ClientError, PermissionError) as e:
+                final = InvalidTables([InvalidTable(f"Not able to infer table: {message(e)}")])
         else:
-            final = InvalidTables([], "S3Client is not a full metastore.  Requires an execution client to infer tables.")
+            response.set_status(404)
+            final = InvalidTables([TableNotFound(f"No keys at {path.full_path()}")])
             
         return final, response
     
-    # def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
-    #     pass
+    def summarize_table(self, table: Table, path: Path, options = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+        df: Optional[DataFrame] = schemas.df_from_path(path, self.client(), options, response)
+        if isinstance(df, DataFrame):
+            # summary_query = """SELECT test_column_1 from df"""
+            # summary = ps.sqldf(summary_query)
+            # table.schema.columns()
+            print("HERE")
+            return InvalidTables([], "Could not initialize dataframe."), response
+        else:
+            return InvalidTables([], "Could not initialize dataframe."), response
+
+       import great_expectations as ge
+        
+        
+        # return TableSummary(), response
+        # blank/nulls
+        # duplicates
+        # shape
+        # outlier
+        # sql-rule
+        
         
     def get_name(self, name: Optional[str], path: str) -> str:
         if not name or name == "":
             return path.rstrip("/").split("/")[-1]
         else:
             return name
-        # execution: Optional[Any] = None
-        # path_obj = self.get_path(path)
-        # response: Response = resp or Response()
-        # 
-        # if options:
-        #     execution = options.get("execution")
-        # table_name = self.get_name(name, path)
-        # 
-        # if execution and isinstance(execution, LocalExecutionClient):
-        #     # TODO:  Pull and respect number of threads from local execution
-        #     opt = options or {}
-        #     logger.info(f"Fetching keys at {path}")
-        #     
-        #     path = path_obj.full_path()
-        #     keys, response = self.list_keys(path, response)
-        # 
-        #     response.add_debug(f"{len(keys)} keys at {path}")
-        # 
-        #     final: Union[Table, InvalidTables]
-        #     
-        #     sample_size = opt.get("sample_size")
-        #     if sample_size:
-        #         import random
-        #         try: 
-        #             ss = int(sample_size)
-        #         except TypeError:
-        #             response.add_warning(f"Invalid sample size (int): {sample_size}")
-        #             ss = 3
-        #             
-        #         response.add_warning(f"Sampling keys to determine schema. Sample size: {ss}.")
-        #         if ss < len(keys):
-        #             keys = random.sample(keys, ss)
-        # 
-        #     if len(keys) > 0:
-        #         try:
-        #             valid, invalid_schemas = sequence(list(map(lambda key: schemas.from_file(self.client().open(key.full_path()), opt), keys)), Schema, InvalidSchema)
-        #             non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
-        #             validated, paths = CheckSchemas.find_conflicts(non_empty)
-        #             table = CheckSchemas.get_table(table_name, validated, paths)
-        #             invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
-        #             if isinstance(table, Table):
-        #                 final = table
-        #             else:
-        #                 invalid_tables.append(table)
-        #                 final = InvalidTables(invalid_tables)
-        #         except (ClientError, PermissionError) as e:
-        #             final = InvalidTables([InvalidTable(f"Not able to infer table: {message(e)}")])
-        #     else:
-        #         response.set_status(404)
-        #         final = InvalidTables([TableNotFound(f"No keys at {path}")])
-        # elif execution:
-        #     final, resp = DeferredTable(table_name, path_obj, self.credentials()).run(execution, response)
-        # else:
-        #     final = InvalidTables([], "S3Client is not a full metastore.  Requires an execution client to infer tables.")
-        #     
-        # return final, resp or Response()
         
-        # def list_keys(self, path: str,  response: Optional[Response] = None) -> Tuple[List[Path], Response]:
-        #     resp: Response = response or Response()
-        #     keys = self.client().find(path)
-        #     resp.add_response({'keys': keys})
-        #     if len(keys) > 0:
-        #         paths = list(map(lambda k: self.get_path(k), keys))
-        #     else:
-        #         paths = []
-        #     
-        #     return paths, resp
-
-        # def path(self, path: str):
-        #     return Path(path.replace("s3://", ""), "s3")
-
     def save_to(self, inpath: Path, outpath: Path, response: Response):
         try:
             self.client().upload(inpath.path_str, outpath.path_str)

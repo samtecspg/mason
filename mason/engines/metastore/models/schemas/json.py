@@ -1,6 +1,6 @@
 from itertools import islice
 from json import JSONDecodeError
-from typing import List, Union, Optional
+from typing import List, Union
 import json
 import fsspec
 from genson import SchemaBuilder
@@ -18,7 +18,6 @@ class JsonSchema(Schema):
         super().__init__(columns, type, path)
 
 def from_file(path: Path) -> Union[JsonSchema, InvalidSchema]:
-    
     # TODO: This code does not scale for large single json file (not jsonl)
     try:
         with fsspec.open(path.full_path(), "r") as f:

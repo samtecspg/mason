@@ -1,4 +1,4 @@
-from typing import Optional, Union, Tuple, List
+from typing import Tuple, List, Optional, Union
 from abc import abstractmethod
 
 from mason.clients.base import Client
@@ -16,6 +16,10 @@ class StorageClient:
     @abstractmethod
     def path(self, path: str) -> Path:
         raise NotImplementedError("Client path not implemented")
+    
+    @abstractmethod
+    def table_path(self, database_name: str, table_name: str) -> Path:
+        raise NotImplementedError("Client table_path not implemented")
 
     @abstractmethod
     def save_to(self, inpath: str, outpath: str, response: Response) -> Response:
@@ -24,8 +28,5 @@ class StorageClient:
     @abstractmethod
     def infer_table(self, path: str, name: Optional[str], options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table,InvalidTables], Response]:
         raise NotImplementedError("Client infer_table not implemented")
-    
-    @abstractmethod
-    def expand_path(self, path: Path, execution: ExecutionClient) -> Tuple[List[Path], Response]:
-        raise NotImplementedError("Client expand_path not implemented")
+
 

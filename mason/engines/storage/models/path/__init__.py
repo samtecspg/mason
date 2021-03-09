@@ -1,7 +1,6 @@
 import re
 from typing import List, Optional
 
-
 class Path:
 
     def __init__(self, path_str: str, protocal: str = "file"):
