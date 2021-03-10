@@ -8,6 +8,9 @@ from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
 
 class ExecutionClient:
     
+    def is_async(self) -> bool:
+        return True
+    
     @abstractmethod
     def __init__(self, client: Client):
         self.client = client

@@ -1,5 +1,6 @@
 from mason_dask.jobs.executed import ExecutedJob
 
+from mason.clients.engines.execution import ExecutionClient
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
@@ -18,9 +19,16 @@ class TableGet(OperatorDefinition):
         
         metastore = config.metastore()
         storage = config.storage()
+        execution = config.execution()
         
-        if isinstance(metastore, MetastoreClient) and isinstance(storage, StorageClient):
+        if isinstance(metastore, MetastoreClient) and isinstance(storage, StorageClient) and isinstance(execution, ExecutionClient):
             job = InferJob(database_name, table_name, metastore, storage, read_headers)
+            
+            if execution.is_async():
+                InferJob(database_name, table_name)
+                execution.run_job()
+                table, reseponse = self.metastore.get_table(self.database_name, self.table_name, {"read_headers": self.read_headers}, response)
+
             run, response = config.execution().run_job(job)
             oR = OperatorResponse(response, run)
         else:

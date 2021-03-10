@@ -11,6 +11,9 @@ class LocalExecutionClient(ExecutionClient):
     
     def __init__(self, client: LocalClient):
         self.client = client 
+        
+    def is_async(self) -> bool:
+        return True
 
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         resp: Response = response or Response()
