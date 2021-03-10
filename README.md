@@ -253,14 +253,30 @@ table        infer      Infers schema for metastore tables
 table        fake       Create fake table data
 table        query      Query metastore tables
 
-mason get operator table get
-+-----------------------------------+
-| Available Operator table Methods  |
-+-----------------------------------+
+> mason get operator table get
+{
+    "namespace": "table",
+    "command": "get",
+    "description": "Get metastore table contents",
+    "parameters": {
+        "required": [
+            "database_name",
+            "table_name"
+        ],
+        "optional": [
+            "read_headers"
+        ]
+    },
+    "supported_configurations": [
+        {
+            "metastore": "glue"
+        },
+        {
+            "metastore": "s3"
+        }
+    ]
+}
 
-namespace    command    description
------------  ---------  ----------------------------
-table        get        Get metastore table contents
 ```
 Similarly for configs you can specify a `config_id` which will give you a more detailed readout of the configuration:
 
