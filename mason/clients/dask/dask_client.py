@@ -1,14 +1,18 @@
 from typing import Union, Tuple, Optional
 
-from mason.clients.dask.runner.dask_runner import EmptyDaskRunner
-from mason.clients.dask.runner.kubernetes_worker.kubernetes_worker import KubernetesWorker
+from mason.clients.base import Client
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 
-class DaskClient:
-    def __init__(self, dask_config: dict):
-        self.runner_config = dask_config.get("runner", {})
-        self.runner_type = self.runner_config.get("type")
+class DaskClient(Client):
+    def __init__(self, runner: dict):
+        self.runner_config = runner 
+        self.runner_type = runner.get("type") or ""
+
+    def to_dict(self) -> dict:
+        return {
+            'client_name': super().name()
+        }
 
     def client(self):
         return self.get_runner(self.runner_type, self.runner_config)
@@ -21,7 +25,9 @@ class DaskClient:
 
     def get_runner(self, runner: str, config: dict):
         if runner == "kubernetes_worker":
+            from mason.clients.dask.runner.kubernetes_worker.kubernetes_worker import KubernetesWorker
             return KubernetesWorker(config)
         else:
+            from mason.clients.dask.runner.dask_runner import EmptyDaskRunner
             return EmptyDaskRunner()
         

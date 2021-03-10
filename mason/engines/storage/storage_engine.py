@@ -1,30 +1,32 @@
-from typing import Union
+import importlib
+from typing import Union, List, Optional
 
-from mason.clients.engines.storage import InvalidStorageClient, StorageClient
-from mason.clients.engines.valid_client import EmptyClient
+from mason.clients.base import Client
+from mason.clients.engines.storage import StorageClient
+from mason.clients.engines.invalid_client import InvalidClient
 from mason.engines.engine import Engine
+from mason.util.string import to_class_case
+from mason.util.exception import message
 
 class StorageEngine(Engine):
-
-    def __init__(self, config: dict):
-        super().__init__("storage", config)
-        self.client: Union[StorageClient, EmptyClient, InvalidStorageClient] = self.get_client()
-
-    def get_client(self):
-        from mason.clients.engines.valid_client import ValidClient
-        client = self.validate()
-        if isinstance(client, ValidClient):
-            if client.client_name == "s3":
-                from mason.clients.s3.storage import S3StorageClient
-                return S3StorageClient(client.config)
-            else:
-                return InvalidStorageClient(f"Client type not supported {client.client_name}")
-        elif isinstance(client, EmptyClient):
-            return client
+    
+    def get_clients(self, storage_clients: Optional[List[str]], all_clients: List[Client], client_module: str) -> List[Union[StorageClient, InvalidClient]]:
+        if storage_clients:
+            return list(map(lambda c: self.get_client(c, all_clients, client_module), storage_clients))
         else:
-            return InvalidStorageClient(client.reason)
+            return []
 
-
-
-
+    def get_client(self, name: str, clients: List[Client], client_module: str) -> Union[StorageClient, InvalidClient]:
+        cl = [c for c in clients if c.name() == name]
+        if len(cl) > 0:
+            client = cl[0]
+            try:
+                mod = importlib.import_module(f'{client_module}.{name}.storage')
+                class_name = to_class_case(name + "_storage_client")
+                ms_client = getattr(mod, class_name)(client)
+                return ms_client
+            except Exception as e:
+                return InvalidClient(f"Could not instantiate storage client for: {name}: {message(e)}")
+        else:
+            return InvalidClient(f"Client not configured: {name}")
 

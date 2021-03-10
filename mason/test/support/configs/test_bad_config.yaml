@@ -1,5 +1,7 @@
-id: 2
-metastore_engine: test
+type: config
+id: "2"
+metastore_clients: 
+  - "test"
 bad_engine: test
 clients:
   test:

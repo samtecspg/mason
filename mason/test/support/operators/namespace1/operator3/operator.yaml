@@ -1,0 +1,4 @@
+type: "operator"
+namespace: "namespace1"
+command: "operator3"
+description:  "Test Operator"

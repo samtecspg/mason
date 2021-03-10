@@ -1,15 +1,21 @@
 from typing import Union, Tuple, Optional
 
+from mason.clients.base import Client
 from mason.clients.response import Response
 from mason.clients.spark.config import SparkConfig
 from mason.clients.spark.runner.spark_runner import EmptySparkRunner
 from mason.clients.spark.runner.kubernetes_operator.kubernetes_operator import KubernetesOperator
 from mason.engines.execution.models.jobs import ExecutedJob, Job, InvalidJob
 
-class SparkClient:
-    def __init__(self, spark_config: dict):
-        self.runner_type = spark_config.get("runner", {}).get("type", "")
-        self.config = SparkConfig(spark_config)
+class SparkClient(Client):
+    def __init__(self, runner: dict):
+        self.runner_type = runner["type"]
+        self.config = SparkConfig(runner)
+
+    def to_dict(self) -> dict:
+        return {
+            'client_name': super().name()
+        }
 
     def client(self):
         return self.get_runner(self.runner_type)

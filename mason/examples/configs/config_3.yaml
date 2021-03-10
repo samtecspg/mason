@@ -1,7 +1,11 @@
-id: 3
-metastore_engine: athena
-storage_engine: s3
-scheduler_engine: local
+id: "3"
+type: "config"
+metastore_clients: 
+  - athena
+storage_clients: 
+  - s3
+scheduler_clients: 
+  - local
 clients:
   s3:
     configuration:
@@ -13,3 +17,6 @@ clients:
       aws_region: "{{AWS_REGION}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+  local:
+    configuration:
+      threads: 4

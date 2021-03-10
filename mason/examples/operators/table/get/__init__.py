@@ -1,19 +1,18 @@
+
 from mason.clients.response import Response
-from mason.configurations.valid_config import ValidConfig
-from mason.api import operator_api as OperatorApi
+from mason.configurations.config import Config
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
-def api(*args, **kwargs): return OperatorApi.get("table", "get", *args, **kwargs)
-
 class TableGet(OperatorDefinition):
-    def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, resp: Response) -> OperatorResponse:
+    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> OperatorResponse:
         database_name: str = parameters.get_required("database_name")
         table_name: str = parameters.get_required("table_name")
+        read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
 
-        table, response = config.metastore.client.get_table(database_name, table_name, response=resp)
+        table, response = config.metastore().get_table(database_name, table_name, options={"read_headers": read_headers}, response=resp)
         oR = OperatorResponse(response, table)
         return oR 
 

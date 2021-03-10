@@ -1,8 +1,13 @@
-id: 1
-metastore_engine: glue
-storage_engine: s3
-scheduler_engine: glue
-execution_engine: athena
+id: "1"
+type: config
+metastore_clients: 
+  - glue
+storage_clients: 
+  - s3
+scheduler_clients: 
+  - glue
+execution_clients: 
+  - athena
 clients:
   glue:
     configuration:

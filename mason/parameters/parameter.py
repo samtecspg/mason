@@ -5,7 +5,6 @@ from mason.parameters.validated_parameter import ValidatedParameter
 from mason.parameters.optional_parameter import OptionalParameter
 from mason.util.logger import logger
 
-
 class Parameter:
 
     def __init__(self, key: str, value: Any):

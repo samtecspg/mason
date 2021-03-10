@@ -18,7 +18,6 @@ class AthenaMock:
         elif (kwargs["QueryExecutionContext"]["Database"] == "crawler-poc" and clean_string(kwargs["QueryString"]) == clean_string(ddl)):
             return {"QueryExecutionId": "test_id", "ResponseMetadata": {"HTTPStatusCode": 200}}
         else:
-            print("HERE")
             raise Exception(f"Unmocked athena api call made")
 
     def get_query_execution(*args, **kwargs):

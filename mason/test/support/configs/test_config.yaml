@@ -1,8 +1,13 @@
-id: 3
-metastore_engine: test
-storage_engine: test
-scheduler_engine: test2
-execution_engine: test2
+type: config
+id: "3"
+metastore_clients: 
+  - "test"
+storage_clients: 
+  - "test"
+scheduler_clients: 
+  - "test2"
+execution_clients: 
+  - "test2"
 clients:
   test:
     configuration:

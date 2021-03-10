@@ -9,7 +9,7 @@ from mason.util.exception import message
 
 from mason.util.json import parse_json
 
-from mason.util.yaml import parse_yaml, parse_yaml_invalid
+from mason.util.yaml import parse_yaml_invalid
 
 
 class InvalidSchemaDict:
@@ -35,6 +35,7 @@ def object_from_json_schema(attr: dict, schema_file: str, cls: Type[T]) -> Union
     #  TODO: Fix this
     if "type" in attr:
         attr.pop("type")
+        
     obj: Optional[T] = None
 
     if isinstance(schema, ValidSchemaDict):

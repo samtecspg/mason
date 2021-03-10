@@ -1,20 +1,17 @@
 from typing import Optional
+
 import click
 
-@click.command("config", short_help="Configures mason clients and engines")
-@click.argument('config_file', required=False)
+@click.command("config", short_help="Interact with mason configs")
+@click.argument("config_id", required=False)
+@click.option("-s", "--set_current", help="Sets config as current session config", is_flag=True)
 @click.option("-l", "--log_level", help="Log level for mason")
-@click.option("-s", "--set_current", help="Set current config to config id")
-def config(config_file: Optional[str] = None, set_current: Optional[str] = None, log_level: Optional[str] = None):
+
+def config(config_id: Optional[str], set_current: bool = False, log_level: Optional[str] = None):
+    from mason.cli.cli_printer import CliPrinter
+    from mason.api.config import config as api_config
     """
-    Configures mason according to [CONFIG_FILE].
-
-    [CONFIG_FILE] is a yaml file.  See examples/config/ for reference implementations.
+    Sets mason config for session.  Alias for get:namespace=config_id, with added ability to set session config
+    [CONFIG_ID] is a config_id 
     """
-
-    from mason.configurations.actions import run_configuration_actions
-    from mason.util.environment import MasonEnvironment, initialize_environment
-
-    env = MasonEnvironment()
-    initialize_environment(env)
-    run_configuration_actions(env, config_file=config_file, set_current=set_current, log_level=log_level)
+    api_config(config_id, set_current, log_level, printer=CliPrinter())

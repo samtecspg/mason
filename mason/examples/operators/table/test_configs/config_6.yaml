@@ -1,7 +1,7 @@
 id: 6
-metastore_engine: s3
-storage_engine: s3
-execution_engine: dask
+metastore_clients: s3
+storage_clients: s3
+execution_clients: dask
 clients:
   s3:
     configuration:

@@ -8,12 +8,11 @@ from mason.clients.local.local_client import LocalClient
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.environment import MasonEnvironment
 
-
 class LocalSchedulerClient(SchedulerClient):
     
     #  This is a local synchronous scheduler.   For asynchronous see AsyncLocal (WIP)
-    def __init__(self, config: dict):
-        self.client: LocalClient = LocalClient(config)
+    def __init__(self, client: LocalClient):
+        self.client: LocalClient = client
         self.dag: Optional[ValidDag] = None
     
     def register_dag(self, schedule_name: str, valid_dag: ValidDag, schedule: Optional[Schedule], response: Response) -> Tuple[str, Response, Optional[ClientDag]]:

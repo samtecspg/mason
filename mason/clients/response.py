@@ -3,17 +3,15 @@ from typing import List, Tuple, Optional
 
 from mason.util.logger import logger
 
-#  This class is only intended to 
 class Response:
     def __init__(self):
         self.responses: List[dict] = []
         self.warnings: List[str] = []
         self.info: List[str] = []
         self.errors: List[str] = []
-        self.configs = []
-        self.current_config = None
         self.status_code: int = 200
         self.data: List[dict] = []
+        self.response = {}
         
     def merge(self, response: 'Response') -> 'Response':
         self.responses = self.responses + response.responses
@@ -35,6 +33,9 @@ class Response:
 
     def errored(self):
         return not (len(self.errors) == 0)
+
+    def add(self, key: str, value: list):
+        self.response[key] = value
 
     def add_warning(self, warning: str, log: bool = True):
         warning = self.add_timestamp(warning)
@@ -60,15 +61,6 @@ class Response:
         response["timestamp"] = self.add_timestamp()
         self.responses.append(response)
 
-    def add_config(self, i: str, config: dict):
-        config["id"] = i
-        self.configs.append(config)
-
-    def add_current_config(self, config, log: bool = True):
-        if log and config:
-            logger.debug(f"Setting current config to {config.id}")
-        self.current_config = config
-
     def set_status(self, status: int):
         self.status_code = status
 
@@ -76,16 +68,14 @@ class Response:
         self.data.append(data)
 
     def formatted(self):
-        returns = {}
-        returns['Errors'] = self.errors
-        returns['Info'] = self.info
-        returns['Warnings'] = self.warnings
-
-        if len(self.configs) > 0:
-            returns['Configs'] = self.configs
-
-        if self.current_config:
-            returns['Current Config'] = self.current_config.engines
+        returns = self.response
+        
+        if len(self.errors) > 0:
+            returns['Errors'] = self.errors
+        if len(self.info) > 0:
+            returns['Info'] = self.info
+        if len(self.warnings) > 0:
+            returns['Warnings'] = self.warnings
 
         d = [i for i in self.data if len(i) > 0]
         if len(d) > 0:

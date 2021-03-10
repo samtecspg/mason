@@ -1,14 +1,15 @@
 from typing import Union, List, Optional
 
-
-from mason.configurations.configurations import get_config_by_id
+from mason.configurations.config import Config
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
-from mason.operators.operators import get_operator
+from mason.operators.operator import Operator
 from mason.operators.valid_operator import ValidOperator
-from mason.parameters.input_parameters import InputParameters
+from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
+from mason import resources
 from mason.util.environment import MasonEnvironment
+
 
 class DagStep:
     def __init__(self, step_config: dict):
@@ -24,22 +25,33 @@ class DagStep:
         if len(diff) == 0:
             wfp = parameters.get(self.id)
             if wfp:
-                config = get_config_by_id(env, wfp.config_id)
-                if config:
-                    operator_params: InputParameters = wfp.parameters
-                    operator = get_operator(env, self.namespace or "", self.command or "")
-                    if operator:
+                res = resources.base.Resources(env) # type: ignore   #TODO: fix this
+                config = res.get_config(wfp.config_id)
+                if isinstance(config, Config):
+                    operator_params: OperatorParameters = wfp.parameters
+                    operator = res.get_operator(self.namespace, self.command)
+                    if isinstance(operator, Operator):
                         valid = operator.validate(config, operator_params)
                         if isinstance(valid, ValidOperator):
                             return ValidDagStep(self.id, valid, self.dependencies, self.retry_method, self.retry_max)
                         else:
                             return InvalidDagStep(f"Invalid Dag Step {self.id}: Invalid Operator Definition: {valid.reason}")
                     else:
-                        return InvalidDagStep(f"Invalid Dag Step {self.id}: Operator not found {self.namespace}:{self.command}")
+                        return InvalidDagStep(f"Invalid Dag Step {self.id}: {operator.get_message()}")
                 else:
-                    return InvalidDagStep(f"Invalid Dag Step {self.id}: Config not found with id {wfp.config_id}")
+                    return InvalidDagStep(f"Invalid Dag Step {self.id}: {config.get_message()}")
             else:
                 messages = ", ".join(list(map(lambda p: p.reason, parameters.invalid)))
                 return InvalidDagStep(f"Workflow Parameters for step:{self.id} not specified. Invalid Parameters: {messages}")
         else:
             return InvalidDagStep(f"Undefined dependent steps: {diff}")
+        
+    def to_dict(self) -> dict:
+        return {
+            'id': self.id,
+            'namespace': self.namespace,
+            'command': self.command,
+            'dependencies': self.dependencies,
+            'retry_method': self.retry_method,
+            'retry_max': self.retry_max,
+        }

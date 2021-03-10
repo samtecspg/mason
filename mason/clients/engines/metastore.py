@@ -1,11 +1,10 @@
 
 from abc import abstractmethod
-from typing import List, Union, Optional, Tuple
+from typing import Union, Optional, Tuple
 
 from returns.result import Result
 
-from mason.clients.client import Client
-from mason.clients.engines.invalid_client import InvalidClient
+from mason.clients.base import Client
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
@@ -14,8 +13,11 @@ from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table import Table, InvalidTables, TableList
 from mason.engines.storage.models.path import Path
 
+class MetastoreClient:
 
-class MetastoreClient(Client):
+    @abstractmethod
+    def __init__(self, client: Client):
+        self.client = client
 
     @abstractmethod
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
@@ -50,30 +52,3 @@ class MetastoreClient(Client):
     #     raise NotImplementedError("Client list_partitions not implemented")
 
 
-class InvalidMetastoreClient(InvalidClient, MetastoreClient):
-    
-    def __init__(self, reason: str):
-        super().__init__(reason)
-
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
-        raise NotImplementedError("Client get_database not implemented")
-
-    def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]: 
-        raise NotImplementedError("Client list_tables not implemented")
-
-    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None,
-                  response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
-        raise NotImplementedError("Client get_table not implemented")
-
-    def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
-        raise NotImplementedError("Client delete_table not implemented")
-
-    def credentials(self) -> Union[MetastoreCredentials, InvalidCredentials]:
-        raise NotImplementedError("Client credentials not implemented")
-
-    def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
-        raise NotImplementedError("Client generate_table_ddl not implemented")
-
-    def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[
-        Union[ExecutedJob, InvalidJob], Response]:
-        raise NotImplementedError("Client execute_ddl not implemented")

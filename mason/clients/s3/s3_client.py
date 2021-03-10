@@ -1,7 +1,7 @@
 from botocore.errorfactory import ClientError
 from typing import Optional, List, Union, Tuple
 import s3fs
-from returns.result import safe, Result, Success, Failure
+from returns.result import Result, Success, Failure
 from s3fs import S3FileSystem
 
 from mason.clients.aws_client import AWSClient
@@ -16,8 +16,8 @@ from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema,
 from mason.util.list import get, sequence
 
 class S3Client(AWSClient):
-    def __init__(self, s3_config: dict):
-        super().__init__(**s3_config)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         
     def client(self) -> S3FileSystem:
         s3 = s3fs.S3FileSystem(key=self.access_key, secret=self.secret_key, client_kwargs={'region_name': self.aws_region})
@@ -148,7 +148,6 @@ class S3Client(AWSClient):
                 non_empty = [v for v in valid if not isinstance(v, EmptySchema)]
                 validated, paths = CheckSchemas.find_conflicts(non_empty)
                 table = CheckSchemas.get_table(self.get_name(name, path), validated, paths)
-                logger.info(f"Table Inferred: {table.to_response(Response()).formatted()}")
                 invalid_tables = list(map(lambda i: InvalidTable("Invalid Schema", invalid_schema=i), invalid_schemas))
                 if isinstance(table, Table):
                     final = table
@@ -166,6 +165,7 @@ class S3Client(AWSClient):
     def list_keys(self, path: str,  response: Optional[Response] = None) -> Tuple[List[Path], Response]:
         resp: Response = response or Response()
         keys = self.client().find(path)
+        resp.add_response({'keys': keys})
         if len(keys) > 0:
             paths = list(map(lambda k: self.get_path(k), keys))
         else:

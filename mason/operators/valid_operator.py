@@ -1,19 +1,22 @@
-from importlib import import_module
+import importlib
 from typing import List, Optional, Union
 
 from mason.clients.response import Response
-from mason.configurations.valid_config import ValidConfig
+from mason.configurations.config import Config
 from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.operators.supported_engines import SupportedEngineSet
 from mason.parameters.validated_parameters import ValidatedParameters
+from mason.resources.valid import ValidResource
 from mason.util.environment import MasonEnvironment
+from mason.util.exception import message
+from mason.util.string import to_class_case
 
 
-class ValidOperator:
+class ValidOperator(ValidResource):
 
-    def __init__(self, namespace: str, command: str, supported_configurations: List[SupportedEngineSet], description: str,  params: ValidatedParameters, config: ValidConfig, source_path: Optional[str] = None):
+    def __init__(self, namespace: str, command: str, supported_configurations: List[SupportedEngineSet], description: str,  params: ValidatedParameters, config: Config, source_path: Optional[str] = None):
         self.namespace = namespace
         self.command = command
         self.description = description
@@ -29,37 +32,53 @@ class ValidOperator:
         return f"{self.namespace}:{self.command}"
 
     def module(self, env: MasonEnvironment) -> Union[OperatorDefinition, InvalidOperator]:
+        operator_path = env.state_store.operator_home + self.namespace + "/" + self.command + "/"
+        classname = to_class_case(f"{self.namespace}_{self.command}")
         try:
-            mod = import_module(env.operator_module + f".{self.namespace}.{self.command}")
-            try:
-                classname = f"{self.namespace.capitalize()}{self.command.capitalize()}"
-                operator_definition = getattr(mod, classname)()
-                if isinstance(operator_definition, OperatorDefinition):
-                    return operator_definition
+            spec = importlib.util.spec_from_file_location(f"mason.operator.{self.namespace}.{self.command}", operator_path + "__init__.py") # type: ignore
+            mod = importlib.util.module_from_spec(spec) # type: ignore
+            if spec:
+                spec.loader.exec_module(mod) #type: ignore
+                operator_class = getattr(mod, classname)()
+                if isinstance(operator_class, OperatorDefinition):
+                    return operator_class
                 else:
                     return InvalidOperator("Invalid Operator definition.  See operators/operator_definition.py")
-            except AttributeError as e:
-                return InvalidOperator(f"Operator has no attribute {classname}")
-        except ModuleNotFoundError as e:
-            return InvalidOperator(f"Module not found: {env.operator_module}")
+            else:
+                return InvalidOperator(f"Could not load importlib from {operator_path + '__init__.py'}")
+        except AttributeError as e:
+            return InvalidOperator(f"Operator has no attribute {classname}")
+        except Exception as e:
+            return InvalidOperator(f"Error initializing operator module: {message(e)}")
 
-    def run(self, env: MasonEnvironment, response: Response) -> OperatorResponse:
+    def execute(self, env: MasonEnvironment, response: Response, dry_run: bool = True) -> OperatorResponse:
         try:
             module = self.module(env)
             if isinstance(module, OperatorDefinition):
-                operator_response: OperatorResponse = module.run(env, self.config, self.parameters, response) 
+                if dry_run:
+                    response.add_info(f"Valid Operator: {self.namespace}:{self.command} with specified parameters.")
+                    return OperatorResponse(response)
+                else:
+                    operator_response: OperatorResponse = module.run(env, self.config, self.parameters, response)
             else:
-                operator_response = module.run(env, response)
+                response.add_error(f"Module does not contain a valid OperatorDefinition. See /examples for sample operator implementations. \nMessage: {module.reason}")
+                operator_response = OperatorResponse(response)
         except ModuleNotFoundError as e:
             response.add_error(f"Module Not Found: {e}")
             operator_response = OperatorResponse(response)
 
         return operator_response
 
+    def run(self, env: MasonEnvironment, response: Response=Response()) -> OperatorResponse:
+        return self.execute(env, response, False)
+
+    def dry_run(self, env: MasonEnvironment, response: Response = Response()) -> OperatorResponse:
+        return self.execute(env, response)
+
     def to_dict(self):
         return {
-            'cmd': self.namespace,
-            'subcommand': self.command,
+            'namespace': self.namespace,
+            'command': self.command,
             'description': self.description,
             'parameters': self.parameters,
             'supported_configurations': list(map(lambda x: x.all, self.supported_configurations))

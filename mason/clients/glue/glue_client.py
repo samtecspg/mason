@@ -17,13 +17,11 @@ from mason.util.list import sequence
 
 class GlueClient(AWSClient):
 
-    def __init__(self, config: dict):
-        self.aws_role_arn = config.get("aws_role_arn")
-        super().__init__(**config)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def client(self) -> BaseClient:
-        return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key,
-                            aws_secret_access_key=self.secret_key)
+        return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         resp = response or Response()

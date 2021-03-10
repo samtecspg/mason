@@ -1,3 +1,4 @@
+import importlib
 from importlib import import_module
 from typing import List, Union
 
@@ -8,6 +9,7 @@ from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep
 from mason.util.environment import MasonEnvironment
+from mason.util.exception import message
 from mason.util.list import flatten_array
 from mason.util.string import to_class_case
 from mason.workflows.invalid_workflow import InvalidWorkflow
@@ -100,17 +102,23 @@ class WorkflowRun:
         return all_steps
 
     def module(self, env: MasonEnvironment) -> Union[WorkflowDefinition, InvalidWorkflow]:
+        namespace = self.dag.namespace
+        command = self.dag.command
+        workflow_path = env.state_store.workflow_home + namespace + "/" + command + "/"
+        classname = to_class_case(f"{namespace}_{command}")
         try:
-            mod = import_module(env.workflow_module + f".{self.dag.namespace}.{self.dag.command}")
-            try:
-                classname = to_class_case(f"{self.dag.namespace}_{self.dag.command}")
+            spec = importlib.util.spec_from_file_location(f"mason.workflow.{namespace}.{command}", workflow_path + "__init__.py")
+            mod = importlib.util.module_from_spec(spec)
+            if spec:
+                spec.loader.exec_module(mod) #type: ignore
                 workflow_class = getattr(mod, classname)()
                 if isinstance(workflow_class, WorkflowDefinition):
                     return workflow_class
                 else:
-                    return InvalidWorkflow("Invalid Workflow definition.  See operators/workflow_definition.py")
-            except AttributeError as e:
-                return InvalidWorkflow(f"Workflow has no attribute {classname}")
-        except ModuleNotFoundError as e:
-            return InvalidWorkflow(f"Module not found: {env.operator_module}")
-
+                    return InvalidWorkflow("Invalid Workflow definition.  See examples/workflows/ for examples")
+            else:
+                return InvalidWorkflow(f"Invalid Workflow.  Workflow has no attribute {classname}")
+        except AttributeError as e:
+            return InvalidWorkflow(f"Workflow has no attribute {classname}")
+        except Exception as e:
+            return InvalidWorkflow(f"Error initializing workflow module {message(e)}")

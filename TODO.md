@@ -28,29 +28,30 @@ Legend
     - [ ] Cli (started, progress made)
 - [x] :arrow_up: Clean up rest api implementation C:03/13/2020
 - [x] create "mason run" cli command C: 03/09/2020
-- [ ] Pull rest api responses through to swagger spec (200 status example)
+- [x] ~~Pull rest api responses through to swagger spec (200 status example)~~ Redid rest api interface to not need this
 - [x] :arrow_up: Advanced Operator Registration Documentation 
 - [x] :arrow_up: New Client Documentation 
 - [ ] :arrow_down: New Engine Documentation 
 - [x] :arrow_up: Dockerize mason implementation C: 03/09/2020
 - [x] Build and refine "Engines" first order concept C: 03/06/2020
-- [ ] Establish docker style sha registration for installed operators to fix version conflicts  
+- [x] Establish docker style sha registration for installed operators to fix version conflicts  
 - [x] ~~Explore graphql for the api? Note found a way around this for now.~~ wont do
 - [ ] Generalize Engines to be "registerable" and serial
-- [ ] Support multiple clients for a single engine type.
-- [ ] Parameter aliases:   ex: database_name -> bucket_name
+- [x] Support multiple clients for a single engine type.
 - [x] Establish common interfaces for metastore engine objects.   Metastore engine models, IE Table, Database, Schedule, etc C: 03/20/2020
 - [x] Allow operator definitions to have valid "engine set" configurations C:03/22/2020
 - [x] Allow for multiple configurations C: 04/08/2020
 - [x] Clean up multiple configurations -> add id, don't use enumerate. C:05/10/2020
 - [x] ~~Allow operators to only be one level deep, ie not have a namespace (both in definition and folder configuration)~~: not going to do right now
-- [X] :arrow_up: Consolidate response.add_  actions and logger._ actions into one command C: 04/13/2020
+- [x] :arrow_up: Consolidate response.add_  actions and logger._ actions into one command C: 04/13/2020
 - [x] Interpolate environment variables into config and have that affect config validation: C: 04/23/2020
 - [x] Clean up mock implementations: C: 04/23/2020
 - [ ] Consolidate all AWS response error parsing methods.
 - [x] Improve performance by moving around imports. C: 06/15/2020
-- [ ] Version checking in installed operators
-- [ ] Replace operator installation method with something more robust
+- [x] Version checking in installed operators
+- [x] Replace operator installation method with something more robust (Done, kind of)
+- [ ] Parameter type inference and checking
+- [ ] Parameter aliases:   ex: database_name -> bucket_name
 
 ## Test Cases
 
@@ -59,11 +60,11 @@ Legend
 - [x] Better errors around Permission errors C: 03/13/2020
 
 ## Execution Engine
-- [ ] Look into using calcite or coral to extend spark operators to presto and hive
+- [ ] Look into using calcite or coral to extend spark operators to presto and hive (***)
 - [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
 
 ## Workflows
-- [ ] Validated Infer Workflow (5-step)
+- [x] Validated Infer Workflow (5-step)
 - [x] Infer Workflow (1-step)
     - [x] Glue Support C: 05/10/2020
     - [x] Athena Support with local scheduler (this ended up just being local instantiating of underlying infer operator)

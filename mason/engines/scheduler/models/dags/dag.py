@@ -1,7 +1,6 @@
 from typing import List, Union, Set, Tuple
 
 from mason.engines.scheduler.models.dags.dag_step import DagStep
-
 from mason.engines.scheduler.models.dags.invalid_dag import InvalidDag
 from mason.engines.scheduler.models.dags.invalid_dag_step import InvalidDagStep
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
@@ -10,7 +9,6 @@ from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.util.environment import MasonEnvironment
 from mason.util.list import flatten, sequence
 
-
 class Dag:
 
     def __init__(self, namespace: str, command: str, dag_config: List[dict]):
@@ -18,7 +16,7 @@ class Dag:
         self.command = command
         self.steps = flatten(list(map(lambda step: DagStep(step), dag_config)))
 
-    def validate(self, env: MasonEnvironment, all_parameters: WorkflowParameters, strict: bool = True) -> Union[ValidDag, InvalidDag]:
+    def validate(self, env: MasonEnvironment, all_parameters: WorkflowParameters) -> Union[ValidDag, InvalidDag]:
         all_steps = self.steps
         all_step_ids = list(map(lambda s: s.id,all_steps))
         validated: List[Union[ValidDagStep, InvalidDagStep]] = flatten(list(map(lambda s: s.validate(env, all_parameters, all_step_ids), self.steps)))
@@ -26,8 +24,8 @@ class Dag:
         
         roots: List[ValidDagStep] = [v for v in valid_steps if len(v.dependencies) == 0]
         
-        if strict and len(invalid_steps) > 0:
-            return InvalidDag("Invalid DAG, contains invalid steps.  Turn strict to false to allow more permissive validation. ", valid_steps, invalid_steps)
+        if all_parameters.strict_mode and len(invalid_steps) > 0:
+            return InvalidDag("Invalid DAG, contains invalid steps.  Specify strict:false to allow more permissive validation. ", valid_steps, invalid_steps)
         else:
             return self.validate_dag(valid_steps, invalid_steps, roots)
 
@@ -71,3 +69,5 @@ class Dag:
         stack.remove(step)
         return False, visited, stack
 
+    def to_dict(self) -> dict:
+        return {'steps': list(map(lambda s: s.to_dict(), self.steps))}

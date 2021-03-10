@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "MasonConfiguration",
+  "properties": {
+    "id": { "type": ["string", "integer"]}, 
+    "source": {"type": "string" },
+    "type": { 
+      "type": "string",
+      "enum": ["config", "Config", "Configuration", "configuration"]
+    },
+    "metastore_clients": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [ "test" ]
+      }
+    },
+    "execution_clients": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [ "test2" ]
+      }
+    },
+    "storage_clients": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [ "test" ]
+      }
+    },
+    "scheduler_clients": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [ "test2", "local" ]
+      }
+    },
+    "clients": {
+      "type": "object",
+      "patternProperties": {
+        "^.*": { 
+          "type": "object",
+          "properties": {
+            "configuration": {"type":  "object"}
+          },
+          "required": ["configuration"]
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [ "id" , "type"]
+}
+

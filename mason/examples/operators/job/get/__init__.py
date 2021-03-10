@@ -1,17 +1,15 @@
 from mason.clients.response import Response
-from mason.configurations.valid_config import ValidConfig
-from mason.api import operator_api as OperatorApi
+from mason.configurations.config import Config
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
-def api(*args, **kwargs): return OperatorApi.get("job", "get", *args, **kwargs)
-
 class JobGet(OperatorDefinition):
 
-    def run(self, env: MasonEnvironment, config: ValidConfig, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
+    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
         job_id: str = parameters.get_required("job_id")
-        job, response = config.execution.client.get_job(job_id, response)
+        execution = config.execution()
+        job, response = config.execution().get_job(job_id, response)
         return OperatorResponse(response, job)
 

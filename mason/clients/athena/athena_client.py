@@ -17,15 +17,15 @@ from mason.util.uuid import uuid4
 
 class AthenaClient(AWSClient):
 
-    def __init__(self, config: dict):
-        super().__init__(**config)
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
     def client(self):
         return boto3.client('athena', region_name=self.aws_region, aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
-
+    
     def get_database(self, database_name: str, response: Optional[Response]) -> Tuple[Result[Database, InvalidDatabase], Response]:
         # Parlaying over to glue for now
-        glue_client = GlueClient({"access_key": self.access_key, "secret_key": self.secret_key, "aws_region": self.aws_region, "aws_role_arn": ""})
+        glue_client = GlueClient(access_key=self.access_key, secret_key=self.secret_key, aws_region=self.aws_region)
         return glue_client.get_database(database_name, response)
 
     def parse_execution_response(self, athena_response: dict) -> Tuple[str, str, int, str, str]:

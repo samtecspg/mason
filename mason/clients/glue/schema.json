@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "GlueConfiguration",
   "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["glue"]
+    },
     "aws_region": {
       "type": "string"
     },

@@ -2,7 +2,7 @@ from typing import List, Dict
 
 from mason.definitions import from_root
 from mason.operators.operator import Operator
-from mason.parameters.input_parameters import InputParameters
+from mason.parameters.operator_parameters import OperatorParameters
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.parameters.workflow_parameters import WorkflowParameters
 from mason.test.support import testing_base as base
@@ -22,7 +22,7 @@ class TestInit:
         }
 
         for param_string, result in good_tests.items():
-            assert(InputParameters(param_string).to_dict() == result)
+            assert(OperatorParameters(param_string).to_dict() == result)
 
     def test_bad_parameter_strings(self):
 
@@ -34,19 +34,19 @@ class TestInit:
         ]
 
         for bad in bad_tests:
-            assert(InputParameters(bad).parameters == [])
+            assert(OperatorParameters(bad).parameters == [])
 
     def test_no_parameters(self):
-        params = InputParameters()
+        params = OperatorParameters()
         assert(params.invalid == [])
         assert(params.parameters == [])
 
     def test_from_path(self):
-        params = InputParameters(parameter_path=from_root("/test/support/parameters/good_params.yaml"))
+        params = OperatorParameters(parameter_path=from_root("/test/support/parameters/good_params.yaml"))
         assert(list(map(lambda p: p.value, params.parameters)) == ["test_value", "test_value_2"])
 
     def test_bad_from_path(self):
-        params = InputParameters(parameter_path=from_root("/test/support/parameters/bad_params.yaml"))
+        params = OperatorParameters(parameter_path=from_root("/test/support/parameters/bad_params.yaml"))
         message = "Parameters do not conform to specified schema in parameters/schema.json.  Must be of form key:value"
         assert(params.invalid[0].reason == message)
 
@@ -66,8 +66,8 @@ class TestValidation:
             "param:value,other_param:stuff": [["other_param"], ["param"], ["stuff"], ["value"], ["value", "stuff"]]
         }
         for param_string, results in tests.items():
-            input_param = InputParameters(param_string)
-            op = Operator("cmd", "subcmd", "", {"required": results[0], "optional": results[1]}, [])
+            input_param = OperatorParameters(param_string)
+            op = Operator("cmd", "subcmd", {"required": results[0], "optional": results[1]}, [])
             validated = op.parameters.validate(input_param)
             assert(isinstance(validated, ValidatedParameters))
             assert(list(map(lambda v: v.value, validated.validated_parameters)) == results[2])

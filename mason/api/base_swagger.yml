@@ -9,42 +9,141 @@ produces:
 - application/json
 swagger: '2.0'
 paths:
-  /configs:
+  /get/{resource_type}:
     get:
-      operationId: "mason.api.config_api.get"
+      operationId: "mason.api.get.get"
+      tags:
+        - "Get"
+      summary: "Get mason resource"
+      description: "Get mason resource"
+      consumes:
+        - "application/json"
       parameters:
-        - name: log_level
+        - name: resource_type
+          in: path
+          required: true
+          type: string
+          enum:
+            - all
+            - operator
+            - workflow
+            - config
+        - name: namespace
           in: query
-          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
-          default: "info"
           required: false
           type: string
-      tags:
-        - "Config"
-      summary: "List out current mason configuration"
-      description: "List out mason configuration"
+        - name: command
+          in: query
+          required: false
+          type: string
+        - name: log_level
+          in: query
+          default: info
+          enum:
+            - info
+            - warning
+            - error
+            - debug
+            - trace
+            - fatal
+          required: false
+          type: string
       responses:
         200:
           description: "Successful list"
-  /config:
+  /run/{resource_type}:
     post:
-      operationId: "mason.api.config_api.set"
+      operationId: "mason.api.run.run"
+      tags:
+        - "Run"
+      summary: "Run mason resource"
+      description: "Run mason resource"
+      consumes:
+        - "application/json"
       parameters:
-        - name: set_current
+        - name: resource_type
+          in: path
+          required: true
+          type: string
+          enum:
+            - operator
+            - workflow
+        - name: namespace
           in: query
           required: true
-          description: "Config id you wish to set as current config"
+          type: string
+        - name: command
+          in: query
+          required: true
           type: string
         - name: log_level
           in: query
-          enum: [ "info", "warning", "error", "debug", "trace", "fatal"]
-          default: "info"
+          default: info
+          enum:
+            - info
+            - warning
+            - error
+            - debug
+            - trace
+            - fatal
           required: false
           type: string
-      tags:
-        - "Config"
-      summary: "Set current mason config"
-      description: "Set current mason config by set_current id"
+        - name: config_id
+          in: query
+          type: string
+          required: false
+        - name: parameters
+          in: body
+          schema:
+            type: object
       responses:
         200:
-          description: "Successful list"
+          description: "Successful Run"
+  /validate/{resource_type}:
+    post:
+      operationId: "mason.api.validate.validate"
+      tags:
+        - "Validate"
+      summary: "Validate mason resource"
+      description: "Validate mason resource and perform a dry run"
+      consumes:
+        - "application/json"
+      parameters:
+        - name: resource_type
+          in: path
+          required: true
+          type: string
+          enum:
+            - operator
+            - workflow
+        - name: namespace
+          in: query
+          required: true
+          type: string
+        - name: command
+          in: query
+          required: true
+          type: string
+        - name: log_level
+          in: query
+          default: info
+          enum:
+            - info
+            - warning
+            - error
+            - debug
+            - trace
+            - fatal
+          required: false
+          type: string
+        - name: config_id
+          in: query
+          type: string
+          required: false
+        - name: parameters
+          in: body
+          schema:
+            type: object
+      responses:
+        200:
+          description: "Successful Validate"

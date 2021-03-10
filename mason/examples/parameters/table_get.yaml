@@ -1,2 +1,2 @@
-database_name: "crawler-poc"
-table_name: "catalog_poc_data"
+database_name: "mason-test-data"
+table_name: "/csv/test.csv"

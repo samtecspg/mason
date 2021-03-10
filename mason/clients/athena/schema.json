@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "AthenaConfiguration",
   "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["athena"]
+    },
     "access_key": {
       "type": "string"
     },

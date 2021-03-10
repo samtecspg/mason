@@ -1,13 +1,12 @@
 from os import path
-
-from click.testing import CliRunner
-from dotenv import load_dotenv
-
-from mason.cli import config, register, operator, workflow
-from mason.definitions import from_root
 import os
 import pytest  # type: ignore
-import shutil
+from click.testing import CliRunner
+
+from mason.cli import config
+from mason.cli.run import run
+from mason.definitions import from_root
+
 
 def print_result(result):
     print()
@@ -20,16 +19,14 @@ class TestCLI:
 
     @pytest.fixture(autouse=True)
     def run_around_tests(self):
-        os.environ["MASON_HOME"] = ".tmp/"
+        examples = from_root("/examples/")
+        os.environ["MASON_HOME"] = examples
         yield
-        if path.exists(".tmp/"):
-            shutil.rmtree(".tmp/")
+        current_config = examples + "configs/CURRENT_CONFIG"
+        if path.exists(current_config):
+            os.remove(current_config)
 
     def test_play(self):
-        load_dotenv(from_root("/../.env"), override=True)
         runner = CliRunner()
-        print_result(runner.invoke(config, [from_root('/examples/configs/')]))
-        print_result(runner.invoke(register, [ from_root('/examples/') ]))
-        print_result(runner.invoke(config, ["-s", "3"]))
-        print_result(runner.invoke(workflow, ['table', 'export', '-f', from_root("/examples/parameters/table_export.yaml"), '-d', '-r'], catch_exceptions=False))
-
+        print_result(runner.invoke(config, ["-s", "5"]))
+        print_result(runner.invoke(run, ["operator", "table", "get",  "-p", "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"]))

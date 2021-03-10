@@ -8,7 +8,6 @@ PyAthena>=1.10
 Pygments>=2.6.1
 jsonschema>=2.5.1
 requests>=2.9.1
-pytest-spec==2.0.0
 python-dotenv>=0.13.0
 tabulate>=0.8.7
 pandas>=1.0.2
@@ -26,14 +25,14 @@ pyexcelerate==0.9.0
 distributed==2.22.0
 dask==2.22.0
 numpy==1.18.1
-pytest>=6.0.1
 cloudpickle==1.5.0
 connexion>=2.6
 swagger-ui-bundle
 connexion[swagger-ui]>2.6
-mason_dask==0.1.25
+mason_dask==0.1.26
 Markdown==3.2.2
 lambdas==0.1.0
-returns==0.14.0
+returns==0.15.0
 partd>=0.3.10
 asciidag==0.1.0
+typistry==0.0.11
