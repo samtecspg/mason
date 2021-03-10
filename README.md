@@ -2,6 +2,8 @@
 
 # Mason Data Operator Framework 
 
+NOTE:  Mason is still in early development.   It is in many ways in a "stake in the sand" milestone and thus is subject to heavy change and development.
+
 What is Mason?  Mason is a federated data pipeline tool that serves as the connecting tissue for your data projects.  
 1.  It creates a configuration driven data-aware alternative to Airflow operators that depends less heavily on Python scripting.
 2.  It's like react components, but for data pipelines.
