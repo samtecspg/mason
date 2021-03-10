@@ -7,7 +7,7 @@ What is Mason?  Mason is a federated data pipeline tool that serves as the conne
 2.  It's like react components, but for data pipelines.
 3.  It's an open source answer to Glue.
 4.  It gives you self-contained, composable, parameterized, and functional data operators.
-5.  It bridges between various concenrs in data pipelines such as between federated metadata introspection and federated query execution.
+5.  It bridges between various concerns in data pipelines such as between federated metadata introspection and federated query execution.
 
 Mason is a curated library of data pipeline components with abstracted backend implementations for various big data clients.
 
@@ -131,25 +131,25 @@ Apply applies mason yaml files for resources in mason (operators, workflows and 
 +------------------------------------------------------+
 | Creating CONFIG_HOME at ~/.mason/configs/            |
 +------------------------------------------------------+
-2021-02-23 20:20:22.989394: Successfully saved Operator schedule:delete
-2021-02-23 20:20:22.990765: Successfully saved Operator table:delete
-2021-02-23 20:20:22.991810: Successfully saved Operator table:merge
-2021-02-23 20:20:22.992958: Successfully saved Operator table:refresh
-2021-02-23 20:20:22.994201: Successfully saved Operator table:get
-2021-02-23 20:20:22.995193: Successfully saved Operator table:list
-2021-02-23 20:20:22.995998: Successfully saved Operator table:format
-2021-02-23 20:20:22.996749: Successfully saved Operator table:infer
-2021-02-23 20:20:22.997471: Successfully saved Operator table:fake
-2021-02-23 20:20:22.998230: Successfully saved Operator table:query
-2021-02-23 20:20:22.999078: Successfully saved Operator job:get
-2021-02-23 20:20:22.999957: Successfully saved Workflow table:validated_infer
-2021-02-23 20:20:23.000717: Successfully saved Workflow table:infer
-2021-02-23 20:20:23.001528: Successfully saved Workflow table:export
-2021-02-23 20:20:23.001839: Succesfully saved Config 
-2021-02-23 20:20:23.002122: Succesfully saved Config 
-2021-02-23 20:20:23.002415: Succesfully saved Config 
-2021-02-23 20:20:23.002690: Succesfully saved Config 
-2021-02-23 20:20:23.002971: Succesfully saved Config 
+2021-03-10 14:19:42.299077: Successfully saved Operator schedule:delete
+2021-03-10 14:19:42.300765: Successfully saved Operator table:delete
+2021-03-10 14:19:42.302171: Successfully saved Operator table:merge
+2021-03-10 14:19:42.303191: Successfully saved Operator table:refresh
+2021-03-10 14:19:42.304331: Successfully saved Operator table:get
+2021-03-10 14:19:42.305280: Successfully saved Operator table:list
+2021-03-10 14:19:42.306157: Successfully saved Operator table:format
+2021-03-10 14:19:42.306967: Successfully saved Operator table:infer
+2021-03-10 14:19:42.307824: Successfully saved Operator table:fake
+2021-03-10 14:19:42.308729: Successfully saved Operator table:query
+2021-03-10 14:19:42.309792: Successfully saved Operator job:get
+2021-03-10 14:19:42.311005: Successfully saved Workflow table:validated_infer
+2021-03-10 14:19:42.312041: Successfully saved Workflow table:infer
+2021-03-10 14:19:42.313003: Successfully saved Workflow table:export
+2021-03-10 14:19:42.313319: Succesfully saved Config 1
+2021-03-10 14:19:42.313639: Succesfully saved Config 3
+2021-03-10 14:19:42.313964: Succesfully saved Config 2
+2021-03-10 14:19:42.314277: Succesfully saved Config 5
+2021-03-10 14:19:42.314575: Succesfully saved Config 4
 ```
 
 Note that mason initializes your mason home at `~/.mason` if you haven't previously initialized mason.  Apply verifies that the yaml configuration conforms to the needed format for mason resources and saves the resources to the specified mason home according to mason's specified state store.   See `mason/examples/` for example yaml configurations.
