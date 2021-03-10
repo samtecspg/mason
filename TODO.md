@@ -25,7 +25,7 @@ Legend
     - [x] Operators C: 03/12/2020
     - [x] Engines C: 03/13/2020
     - [x] Clients C: 03/23/2020
-    - [ ] Cli (started, progress made)
+    - [x] Cli (started, progress made)
 - [x] :arrow_up: Clean up rest api implementation C:03/13/2020
 - [x] create "mason run" cli command C: 03/09/2020
 - [x] ~~Pull rest api responses through to swagger spec (200 status example)~~ Redid rest api interface to not need this
@@ -62,6 +62,9 @@ Legend
 ## Execution Engine
 - [ ] Look into using calcite or coral to extend spark operators to presto and hive (***)
 - [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
+
+## Metastore
+- [ ] Look into datahub internal schema representation
 
 ## Workflows
 - [x] Validated Infer Workflow (5-step)

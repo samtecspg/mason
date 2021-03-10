@@ -69,7 +69,7 @@ class Config(Saveable, Resource):
 
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
-            result = state_store.cp_source(self.source_path, "config", overwrite=overwrite)
+            result = state_store.cp_source(self.source_path, "config", self.id, overwrite=overwrite)
             if isinstance(result, FailedOperation):
                 response.add_error(f"{result.message}")
             else:
