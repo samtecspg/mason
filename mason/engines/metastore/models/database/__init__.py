@@ -1,4 +1,5 @@
-from mason.engines.metastore.models.table import TableList
+from mason.engines.metastore.models.table.table import TableList
+
 
 class Database:
 

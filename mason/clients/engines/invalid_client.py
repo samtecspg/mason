@@ -14,6 +14,9 @@ class InvalidClient(Client):
             return response
         return _missing
 
+    def to_dict(self) -> dict:
+        return {'name': self.name(), 'error': self.reason}
+
 
 class NullClient:
     def __init__(self, message: str):

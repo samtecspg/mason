@@ -10,8 +10,9 @@ from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table import Table, InvalidTables, TableList
+from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
+from mason.engines.metastore.models.table.table import Table, TableList
 from mason.engines.storage.models.path import Path
 
 class AthenaMetastoreClient(MetastoreClient):
@@ -25,10 +26,6 @@ class AthenaMetastoreClient(MetastoreClient):
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         return self.client.get_database(database_name, response)
-    
-    def summarize_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
-        response.add_error("Client summarize_table not implemented")
-        return InvalidTables([]), response
 
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         raise NotImplementedError("Athena Client list_tables not implemented")
@@ -51,5 +48,8 @@ class AthenaMetastoreClient(MetastoreClient):
     def list_partitions(self, table: Table, response: Optional[Response] = None) ->  Tuple[List[Path], Response]:
         # SELECT "$path" FROM "my_database"."my_table" WHERE year=2019;
         raise NotImplementedError("Athena Client list_partitions not implemented")
+    
+    def summarize_table(self, table: Table, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+        raise NotImplementedError("Client summarize_table not implemented")
 
 

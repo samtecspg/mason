@@ -13,7 +13,7 @@ from mason.util.environment import MasonEnvironment
 
 class TableMerge(OperatorDefinition):
 
-    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> Union[ExecutedJob, InvalidJob]:
         SUPPORTED_SCHEMAS = {
             "parquet",
             "csv",
@@ -24,8 +24,9 @@ class TableMerge(OperatorDefinition):
         input_path = parameters.get_required("input_path")
         output_path = parameters.get_required("output_path")
         parse_headers = parameters.get_optional("parse_headers")
+        path = config.storage().path(input_path)
 
-        table, response = config.storage().infer_table(input_path, "input_table", {"read_headers": parse_headers}, response)
+        table, response = config.storage().infer_table(path, "input_table", {"read_headers": parse_headers}, response)
         final: Union[ExecutedJob, InvalidJob]
 
         if isinstance(table, Table):
@@ -49,5 +50,5 @@ class TableMerge(OperatorDefinition):
                     final = InvalidJob(f"Unsupported schemas for merge operator: {', '.join(list(schema_types.difference(SUPPORTED_SCHEMAS)))}")
             else:
                 final = InvalidJob(f"No conflicting schemas found at {input_path}. Merge unecessary. Invalid Schemas {table.message()}")
-                
-        return OperatorResponse(response, final) 
+
+        return final

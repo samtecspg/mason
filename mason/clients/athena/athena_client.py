@@ -11,7 +11,7 @@ from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
 from mason.engines.execution.models.jobs.query_job import QueryJob
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table import Table
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.util.uuid import uuid4
 

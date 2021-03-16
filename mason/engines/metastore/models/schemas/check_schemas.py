@@ -4,7 +4,8 @@ from functools import reduce
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema
 from mason.engines.metastore.models.schemas.json import merge_json_schemas, JsonSchema
 from mason.engines.metastore.models.schemas.schema import SchemaConflict
-from mason.engines.metastore.models.table import Table, InvalidTable, ConflictingTable
+from mason.engines.metastore.models.table.invalid_table import InvalidTable, ConflictingTable
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.util.list import get
 
@@ -44,9 +45,9 @@ def find_conflicts(schemas: List[Schema]) -> Tuple[Union[Schema, SchemaConflict,
                 return InvalidSchema("No valid schemas found"), paths
 
 
-def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema], paths: List[Path], database: Optional[str] = None) -> Union[Table, InvalidTable]:
+def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema], paths: List[Path], database: Optional[str] = None, source_path: Optional[Path] = None) -> Union[Table, InvalidTable]:
     if isinstance(schema, Schema):
-        return Table(name, schema, created_by="mason", paths=paths, database_name=database)
+        return Table(name, schema, created_by="mason", paths=paths, database_name=database, source_path=source_path)
     else:
         if isinstance(schema, InvalidSchema):
             return InvalidTable(f"Invalid Schema: {schema.reason}")

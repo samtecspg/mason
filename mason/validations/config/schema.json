@@ -15,7 +15,8 @@
         "enum": [
           "glue",
           "s3",
-          "athena"
+          "athena",
+          "local"
         ]
       }
     },

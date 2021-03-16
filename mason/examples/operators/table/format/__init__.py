@@ -1,4 +1,6 @@
-from typing import Optional
+from typing import Optional, Union
+
+from mason_dask.jobs.executed import ExecutedJob
 
 from mason.configurations.config import Config
 from mason.engines.execution.models.jobs import InvalidJob
@@ -13,7 +15,7 @@ from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableFormat(OperatorDefinition):
-    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> Union[ExecutedJob, InvalidJob]:
         table_name: str = parameters.get_required("table_name")
         database_name: str = parameters.get_required("database_name")
         output_path: str = parameters.get_required("output_path")
@@ -39,5 +41,5 @@ class TableFormat(OperatorDefinition):
             message = f"Invalid Metastore Credentials: {credentials.reason}"
             executed = InvalidJob(message)
 
-        return OperatorResponse(response, executed)
+        return executed
 

@@ -10,7 +10,7 @@ class TableSummary(Responsable):
         pass
     
     def to_response(self, response: Response):
-        response.add_data()
+        response.add_data({"test": "123"})
         return response
     
 def from_df(dataframe: DataFrame) -> TableSummary:

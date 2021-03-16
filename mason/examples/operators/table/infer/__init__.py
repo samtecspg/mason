@@ -19,7 +19,8 @@ class TableInfer(OperatorDefinition):
         storage_path: str = parameters.get_required("storage_path")
         table_name: Optional[str] = parameters.get_optional("table_name")
 
-        table, response = config.storage().infer_table(storage_path, table_name, response=response)
+        path = config.storage().path(storage_path)
+        table, response = config.storage().infer_table(path, table_name, response=response)
         job = Job("query")
         final: Union[ExecutedJob, InvalidJob]
 
@@ -28,7 +29,6 @@ class TableInfer(OperatorDefinition):
             database, response = config.metastore().get_database(database_name, response)
             db = compute(database)
             if isinstance(db, Database):
-                path = config.storage().path(storage_path)
                 ddl = config.metastore().generate_table_ddl(table, path, db)
                 if isinstance(ddl, DDLStatement):
                     final, response = config.metastore().execute_ddl(ddl, db, response)

@@ -20,7 +20,7 @@ class SparkClient(Client):
     def client(self):
         return self.get_runner(self.runner_type)
 
-    def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
+    def run_job(self, job: Job, response: Response = Response()) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         r: Tuple[Union[ExecutedJob, InvalidJob], Response] = self.client().run(self.config, job, response)
         return r[0], r[1]
 

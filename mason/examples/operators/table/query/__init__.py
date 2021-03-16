@@ -6,15 +6,14 @@ from mason.configurations.config import Config
 from mason.engines.execution.models.jobs import InvalidJob
 from mason.engines.execution.models.jobs.executed_job import ExecutedJob
 from mason.engines.execution.models.jobs.query_job import QueryJob
-from mason.engines.metastore.models.table import Table
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableQuery(OperatorDefinition):
-    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> Union[ExecutedJob, InvalidJob]:
         query_string = parameters.get_required("query_string")
         database_name = parameters.get_required("database_name")
         table_name = parameters.get_required("table_name")
@@ -38,7 +37,7 @@ class TableQuery(OperatorDefinition):
         else:
             final = InvalidJob(table.message())
 
-        return OperatorResponse(response, final)
+        return final
 
 
 

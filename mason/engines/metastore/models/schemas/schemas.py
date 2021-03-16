@@ -1,9 +1,10 @@
 from typing import Union, Tuple, Optional
 import magic
-from pandas import DataFrame
+from great_expectations.dataset import PandasDataset
 from s3fs import S3File, S3FileSystem
 from fsspec.spec import AbstractBufferedFile
 
+from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.schemas import json as JsonSchema, text as TextSchema, parquet as ParquetSchema
 from mason.engines.metastore.models.schemas.text import SUPPORTED_TYPES as supported_text_types
@@ -49,25 +50,29 @@ def from_file(file: AbstractBufferedFile, options: dict = {}) -> Union[Schema, I
     else:
         return InvalidSchema(f"File type not supported for file {path.path_str}.  Type: {file_type}")
 
-def from_path(path: Path, client: S3FileSystem, options: dict = {}) -> Union[Schema, InvalidSchema]:
-    file = client.open(path.full_path())
-    return from_file(file, options)
+def from_path(path: Path, client: StorageClient, options: dict = {}, response: Response = Response()) -> Union[Schema, InvalidSchema]:
+    try:
+        file: Union[AbstractBufferedFile] = client.open(path)
+        return from_file(file, options)
+    except FileNotFoundError as e:
+        response.set_status(404)
+        return InvalidSchema(f"File not found: {path.full_path()}")
     
-def df_from_path(path: Path, client: S3FileSystem, options: dict = {}, response: Response = Response()) -> Optional[DataFrame]:
-    import pandas as pd
+def df_from_path(path: Path, client: S3FileSystem, options: dict = {}, response: Response = Response()) -> Optional[PandasDataset]:
+    import great_expectations as ge
     file = client.open(path.full_path())
     file_type, sample = get_file_type(file)
 
     if file_type == "Apache Parquet":
-        return pd.read_parquet(file)
+        return ge.read_parquet(file)
     elif file_type == "JSON data":
-        return pd.read_json(file) 
+        return ge.read_json(file) 
     elif file_type in list(supported_text_types.keys()):
         df, terminator = TextSchema.df_from(file, file_type, options.get("read_headers")) 
         return df
     else:
-        return None 
-    
+        response.add_error(f"File type not supported: {file_type}")
+        return None
 
 def get_path(file: AbstractBufferedFile) -> Path:
     if isinstance(file, S3File):

@@ -13,13 +13,14 @@ from pandas import DataFrame as PDataFrame
 
 class Table(Responsable):
 
-    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None, paths: List[Path] = []):
+    def __init__(self, name: str, schema: Schema, created_at: Optional[datetime] = None, created_by: Optional[str] = None, database_name: Optional[str] = None, paths: List[Path] = [], source_path: Optional[Path] = None):
         self.name = name
         self.database_name = database_name
         self.schema = schema
         self.created_at = created_at
         self.created_by = created_by
         self.paths = paths
+        self.source_path = source_path
 
         lt: Optional[str]
         if (isinstance(schema, TextSchema)):
@@ -61,4 +62,3 @@ class TableList(Responsable):
         response.add_data(data)
         return response
             
-

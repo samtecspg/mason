@@ -1,27 +1,10 @@
 id: "1"
-type: config
+type: "config"
 metastore_clients: 
-  - glue
-storage_clients: 
-  - s3
-scheduler_clients: 
-  - glue
+  - local
 execution_clients: 
-  - athena
+  - local
 clients:
-  glue:
-    configuration:
-      aws_region: "{{AWS_REGION}}"
-      aws_role_arn: "{{GLUE_ROLE_ARN}}"
-      access_key: "{{AWS_ACCESS_KEY_ID}}"
-      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  s3:
-    configuration:
-      aws_region: "{{AWS_REGION}}"
-      access_key: "{{AWS_ACCESS_KEY_ID}}"
-      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  athena:
-    configuration:
-      aws_region: "{{AWS_REGION}}"
-      access_key: "{{AWS_ACCESS_KEY_ID}}"
-      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+  local:
+    configuration: {}
+

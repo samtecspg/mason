@@ -1,6 +1,7 @@
 import importlib
 from typing import List, Optional, Union
 
+
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.operators.invalid_operator import InvalidOperator
@@ -59,7 +60,11 @@ class ValidOperator(ValidResource):
                     response.add_info(f"Valid Operator: {self.namespace}:{self.command} with specified parameters.")
                     return OperatorResponse(response)
                 else:
-                    operator_response: OperatorResponse = module.run(env, self.config, self.parameters, response)
+                    if (self.config.execution().is_async() == True):
+                        run = module.run_async(env, self.config, self.parameters, response)
+                        operator_response  = OperatorResponse(response, run)
+                    else:
+                        operator_response  = module.run(env, self.config, self.parameters, response)
             else:
                 response.add_error(f"Module does not contain a valid OperatorDefinition. See /examples for sample operator implementations. \n Message: {module.reason}")
                 operator_response = OperatorResponse(response)

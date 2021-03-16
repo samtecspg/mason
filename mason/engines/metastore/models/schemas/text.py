@@ -6,7 +6,6 @@ from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema,
 from mason.engines.storage.models.path import Path
 from mason.util.exception import message
 from io import StringIO
-import pandas as pd
 
 
 SUPPORTED_TYPES = {
@@ -47,8 +46,11 @@ def df_from(text: StringIO, type: str, read_headers: Optional[bool]) -> Tuple[Da
         line_terminator = "\r"
     else:
         line_terminator = "\n"
-
-    return pd.read_csv(text, lineterminator=line_terminator, header=header), line_terminator
+        
+    import great_expectations as ge
+    from great_expectations.dataset import PandasDataset
+    
+    return ge.read_csv(text, lineterminator=line_terminator, header=header, dataset_class=PandasDataset), line_terminator
 
 def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
     text = StringIO(sample.decode("utf-8"))

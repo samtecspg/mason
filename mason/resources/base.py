@@ -13,6 +13,7 @@ from mason.util.list import sequence_4
 from mason.resources.malformed import MalformedResource
 from mason.util.environment import MasonEnvironment
 from mason.workflows.workflow import Workflow
+from mason.resources.resource import Resource
 
 class Resources:
 

@@ -23,10 +23,10 @@ class Job:
         else:
             return FailedJob(error)
 
-    def running(self, message: Optional[str] = None, past=False, object: Optional[Responsable] = None) -> ExecutedJob:
+    def running(self, message: Optional[str] = None, past=False) -> ExecutedJob:
         if not past:
             self.add_log(f"Running job id={self.id}")
-        return ExecutedJob(self.id, message, self.logs, object)
+        return ExecutedJob(self.id, message, self.logs)
 
     def set_id(self, id: Optional[str] = None):
         self.id = id or str(uuid4())

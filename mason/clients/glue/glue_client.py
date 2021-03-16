@@ -5,13 +5,14 @@ from botocore.client import BaseClient
 from botocore.errorfactory import ClientError
 from returns.result import Result, Failure, Success
 
+from mason.engines.metastore.models.table.invalid_table import InvalidTables, TableNotFound, InvalidTable
+from mason.engines.metastore.models.table.table import Table, TableList
 from mason.engines.scheduler.models.schedule import Schedule
 
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.schemas.schema import SchemaElement, InvalidSchemaElement, Schema
-from mason.engines.metastore.models.table import Table, InvalidTable, InvalidTables, TableNotFound, TableList
 from mason.engines.storage.models.path import Path
 from mason.util.list import sequence
 

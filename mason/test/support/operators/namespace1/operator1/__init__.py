@@ -1,9 +1,8 @@
 from mason.configurations.config import Config
 from mason.engines.metastore.models.schemas.schema import EmptySchema
 
-from mason.engines.metastore.models.table import Table
-
 from mason.clients.response import Response
+from mason.engines.metastore.models.table.table import Table
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 

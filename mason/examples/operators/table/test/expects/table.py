@@ -1,6 +1,8 @@
 import datetime
 from dateutil.tz import tzlocal
 
+from mason.definitions import from_root
+
 
 def index(client_type: str, exists=True):
     # TODO: Unify s3 and glue responses here
@@ -34,11 +36,18 @@ def get(client_type: str, switch: int):
             return {}
     elif client_type == "s3":
         if switch == 1:
-            return ({'Data': [{'Name': 'catalog_poc_data', 'CreatedAt': '', 'CreatedBy': 'mason', 'Schema': {'SchemaType': 'parquet', 'Columns': [ {'Name': 'test_column_1', 'Type': 'INT32', 'ConvertedType': 'REQUIRED', 'RepititionType': None}, {'Name': 'test_column_2', 'Type': 'BYTE_ARRAY', 'ConvertedType': 'UTF8', 'RepititionType': 'OPTIONAL'}]}}]}, 200)
+            return ({'Data': [{'CreatedAt': '', 'CreatedBy': 'mason', 'Name': 'catalog_poc_data', 'Schema': {'Columns': [{'ConvertedType': 'REQUIRED', 'Name': 'test_column_1', 'RepititionType': None,'Type': 'INT32'}, {'ConvertedType': 'UTF8', 'Name': 'test_column_2', 'RepititionType': 'OPTIONAL', 'Type': 'BYTE_ARRAY'}], 'SchemaType': 'parquet'}}], 'Info': ['Fetching keys at s3://crawler-poc/catalog_poc_data'],'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 200)
         elif switch == 2:
-            return ({'Errors': ['No keys at s3://bad-database/catalog_poc_data']}, 404)
+            return ({'Errors': ['No keys at s3://bad-database/catalog_poc_data'], 'Info': ['Fetching keys at s3://bad-database/catalog_poc_data'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404)
         elif switch == 3:
-            return ({'Errors': ['No keys at s3://crawler-poc/bad-table']}, 404)
+            return ({'Errors': ['No keys at s3://crawler-poc/bad-table'],'Info': ['Fetching keys at s3://crawler-poc/bad-table'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404)
+    elif client_type == "local":
+        if switch == 1:
+            return ({'Data': [{'CreatedAt': '', 'CreatedBy': 'mason', 'Name': 'csv_sample.csv', 'Schema': {'Columns': [{'Name': 0, 'Type': 'object'}, {'Name': 1, 'Type': 'object'}],'SchemaType': 'csv'}}]},200)
+        elif switch == 2:
+            return ({'Errors': ['Invalid Schema:File not found: /test/bad/csv_sample.csv','Invalid Schema: No valid schemas found']},404)
+        elif switch == 3:
+            return ({'Errors': ['Invalid Schema:File not found: /test/sample_data/bad.csv','Invalid Schema: No valid schemas found']}, 404)
 
 def post(exists = True):
     if exists:
@@ -62,3 +71,18 @@ def refresh(refreshing = True):
         return ({'Info': ['Refreshing Table Crawler: test_crawler']}, 201)
 
 
+def parameters(config_id: str):
+    if config_id == "1":
+        return [
+            f"database_name:{from_root('/test/sample_data/')},table_name:csv_sample.csv",
+            f"database_name:{from_root('/test/bad/')},table_name:csv_sample.csv",
+            f"database_name:{from_root('/test/sample_data/')},table_name:bad.csv"
+        ]
+    else:
+        return [
+            "database_name:crawler-poc,table_name:catalog_poc_data",
+            "database_name:bad-database,table_name:catalog_poc_data",
+            "database_name:crawler-poc,table_name:bad-table"
+        ]
+        
+    

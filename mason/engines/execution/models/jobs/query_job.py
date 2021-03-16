@@ -1,6 +1,6 @@
 from typing import Optional
 
-from mason.engines.metastore.models.table import Table
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.engines.execution.models.jobs import Job
 

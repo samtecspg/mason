@@ -4,8 +4,6 @@ from mason.clients.local.local_client import LocalClient
 from mason.clients.response import Response
 from mason.clients.engines.execution import ExecutionClient
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
-from mason.engines.execution.models.jobs.infer_job import InferJob
-from mason.engines.execution.models.jobs.summary_job import SummaryJob
 
 class LocalExecutionClient(ExecutionClient):
     
@@ -13,18 +11,10 @@ class LocalExecutionClient(ExecutionClient):
         self.client = client 
         
     def is_async(self) -> bool:
-        return True
-
+        return False
+    
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
-        resp: Response = response or Response()
-        if isinstance(job, InferJob):
-            final, response = job.run(resp)
-        elif isinstance(job, SummaryJob):
-            final, response = job.run(resp)
-        else:
-            final = InvalidJob(f"Job type {job.type} not supported")
-            
-        return final, resp
+        raise NotImplementedError("Client run_job not implemented")
 
     def get_job(self, job_id: str, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         raise NotImplementedError("Client not implemented")

@@ -1,8 +1,15 @@
+from typing import Union
+
+from mason_dask.jobs.executed import ExecutedJob, InvalidJob
+
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.engines.execution.models.jobs.summary_job import SummaryJob
+from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
+from mason.engines.metastore.models.table import Table
+from mason.engines.storage.models.path import Path
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
@@ -13,16 +20,25 @@ class TableSummarize(OperatorDefinition):
         database_name: str = parameters.get_required("database_name")
         table_name: str = parameters.get_required("table_name")
         read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
+        options = {"read_headers": read_headers}
         
-        metastore = config.metastore()
-        storage = config.storage()
-        
-        if isinstance(metastore, MetastoreClient) and isinstance(storage, StorageClient):
-            job = SummaryJob(database_name, table_name, metastore, storage, read_headers)
-            run, response = config.execution().run_job(job)
-            oR = OperatorResponse(response, run)
+        table, response = config.metastore().get_table(database_name, table_name, options, resp)
+        if isinstance(table, Table):
+            summary, response = config.metastore().summarize_table(table, options, response)
         else:
-            # TODO
-            response = Response().add_error("BAD")
-            oR = OperatorResponse(response)
-        return oR 
+            summary = table
+            
+        return OperatorResponse(response, summary)
+    
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> Union[ExecutedJob, InvalidJob]:
+        database_name: str = parameters.get_required("database_name")
+        table_name: str = parameters.get_required("table_name")
+        read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
+
+        path: Path = config.storage().table_path(database_name, table_name)
+        credentials: Union[MetastoreCredentials, InvalidCredentials] = config.metastore().credentials()
+        
+        job = SummaryJob(path, credentials, read_headers)
+        run, response = config.execution().run_job(job)
+        
+        return run

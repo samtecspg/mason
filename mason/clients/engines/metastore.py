@@ -1,8 +1,7 @@
 
 from abc import abstractmethod
-from typing import Union, Optional, Tuple, List
+from typing import Union, Optional, Tuple
 
-from fsspec.spec import AbstractBufferedFile
 from returns.result import Result
 
 from mason.clients.base import Client
@@ -11,7 +10,8 @@ from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
 from mason.engines.metastore.models.database import InvalidDatabase, Database
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table import Table, InvalidTables, TableList
+from mason.engines.metastore.models.table.table import Table, TableList
+from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.storage.models.path import Path
 
@@ -34,7 +34,7 @@ class MetastoreClient:
         raise NotImplementedError("Client get_table not implemented")
 
     @abstractmethod
-    def summarize_table(self, table: Table, path: Path, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+    def summarize_table(self, table: Table, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
         raise NotImplementedError("Client summarize_table not implemented")
 
     @abstractmethod
@@ -52,9 +52,3 @@ class MetastoreClient:
     @abstractmethod
     def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         raise NotImplementedError("Client execute_ddl not implemented")
-
-    # @abstractmethod
-    # def list_partitions(self, database_name: str, table: Table, response: Optional[Response] = None) -> Tuple[List[Partition], Response]:
-    #     raise NotImplementedError("Client list_partitions not implemented")
-
-

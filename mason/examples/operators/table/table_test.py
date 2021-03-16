@@ -2,7 +2,6 @@ import shutil
 from os import path
 from typing import List
 
-import pytest
 from dotenv import load_dotenv
 
 from mason.clients.response import Response
@@ -12,11 +11,10 @@ from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
 from mason.operators.operator import Operator
 from mason.examples.operators.table.test.expects import table
 from mason.parameters.operator_parameters import OperatorParameters
-from mason.test.support.testing_base import run_tests, clean_uuid, clean_string
+from mason.test.support.testing_base import run_tests, clean, clean_path
 from mason.util.environment import MasonEnvironment
 
 load_dotenv(from_root("/../.env.example"), override=True)
-
 
 def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
@@ -32,27 +30,29 @@ def test_index():
         dne = op.validate(config, params).run(env, Response())
         assert(dne.with_status() == table.index(config.metastore().client.name(), False))
 
-    run_tests("table", "list", True, "fatal", ["1", "2"], tests)
+    # run_tests("table", "list", True, "fatal", ["1", "2"], tests)
+    run_tests("table", "list", True, "fatal", ["2", "3"], tests)
 
 def test_get():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # Database and table Exist
-        params = OperatorParameters(parameter_string="database_name:crawler-poc,table_name:catalog_poc_data")
+        parameters = table.parameters(config.id)
+        params = OperatorParameters(parameter_string=parameters[0])
         exists = op.validate(config, params).run(env, Response())
         assert(exists.with_status() == table.get(config.metastore().client.name(), 1))
 
         # Database DNE
-        params = OperatorParameters(parameter_string="database_name:bad-database,table_name:catalog_poc_data")
+        params = OperatorParameters(parameter_string=parameters[1])
         dne = op.validate(config, params).run(env, Response())
-        assert(dne.with_status() == table.get(config.metastore().client.name(), 2))
+        assert(clean_path(dne.with_status()) == table.get(config.metastore().client.name(), 2))
 
         # Table DNE
-        params = OperatorParameters(parameter_string="database_name:crawler-poc,table_name:bad-table")
-        dne2 = op.validate(config,params).run(env, Response())
-        assert(dne2.with_status() == table.get(config.metastore().client.name(), 3))
+        params = OperatorParameters(parameter_string=parameters[2])
+        dne2 = op.validate(config, params).run(env, Response())
+        assert(clean_path(dne2.with_status()) == table.get(config.metastore().client.name(), 3))
 
-    run_tests("table", "get", True, "fatal", ["1", "2"],  tests)
+    run_tests("table", "get", True, "fatal", ["1", "2", "3"],  tests)
 
 
 def test_refresh():
@@ -179,8 +179,6 @@ def test_infer():
         # valid path
         params = OperatorParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/catalog_poc_data,output_path:crawler-poc/athena/")
         good = op.validate(config, params).run(env, Response())
-        def clean(s: List[str]):
-            return list(map(lambda i: clean_uuid(clean_string(i)), s))
 
         infos = clean(good.formatted()["Info"])
         expect = [

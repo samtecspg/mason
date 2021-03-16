@@ -56,7 +56,7 @@ def merge_config(config: SparkConfig, job: Job):
 
 class KubernetesOperator(SparkRunner):
 
-    def run(self, config: SparkConfig, job: Job, resp: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
+    def run(self, config: SparkConfig, job: Job, resp: Response = Response()) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         #  TODO: Replace with python kubernetes api
         #  TODO: Set up kubernetes configuration, run on docker version
         response: Response = resp or Response()

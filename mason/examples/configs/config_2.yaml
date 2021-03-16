@@ -1,19 +1,15 @@
 id: "2"
-metastore_clients: 
-  - s3
-storage_clients: 
-  - s3
-execution_clients: 
-  - spark
 type: config
+metastore_clients:
+  - glue
+execution_clients:
+  - local
 clients:
-  s3:
+  glue:
     configuration:
       aws_region: "{{AWS_REGION}}"
+      aws_role_arn: "{{AWS_ROLE_ARN}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  spark:
-    configuration:
-      runner:
-        spark_version: "2.4.5"
-        type: "kubernetes-operator"
+  local:
+    configuration: {}

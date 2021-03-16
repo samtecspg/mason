@@ -7,4 +7,6 @@ parameters:
     - "database_name"
 supported_configurations:
   - metastore: "s3"
+    execution: "local"
   - metastore: "glue"
+    execution: "local"

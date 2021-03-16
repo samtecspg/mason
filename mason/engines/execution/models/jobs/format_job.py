@@ -1,8 +1,8 @@
 from typing import Optional, List
 
 from mason.engines.metastore.models.credentials import MetastoreCredentials
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
-from mason.engines.metastore.models.table import Table
 from mason.engines.execution.models.jobs import Job
 
 class FormatJob(Job):

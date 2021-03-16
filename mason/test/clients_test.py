@@ -11,6 +11,7 @@ from mason.clients.glue.glue_client import GlueClient
 from mason.clients.glue.metastore import GlueMetastoreClient
 from mason.clients.glue.scheduler import GlueSchedulerClient
 from mason.clients.local.execution import LocalExecutionClient
+from mason.clients.local.metastore import LocalMetastoreClient
 from mason.clients.local.scheduler import LocalSchedulerClient
 from mason.clients.response import Response
 from mason.clients.s3.metastore import S3MetastoreClient
@@ -215,6 +216,7 @@ class TestOthers:
         local_client = LocalClient()
         local_execution_client = LocalExecutionClient(local_client)
         local_scheduler_client = LocalSchedulerClient(local_client)
+        local_metastore_client = LocalMetastoreClient(local_client)
 
 
 

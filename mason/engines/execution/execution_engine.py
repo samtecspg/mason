@@ -33,11 +33,3 @@ class ExecutionEngine(Engine):
         else:
             return InvalidClient(f"Client not configured: {name}")
 
-    # def set_mode(self, mode: str):
-    #     if mode.lower() == "async":
-    #         self.mode = "async"
-    #     elif mode.lower() == "sync":
-    #         self.mode = "sync"
-    #     else:
-    #         logger.error(f"Invalid Mode: {mode}")
-    #         pass

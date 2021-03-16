@@ -12,5 +12,7 @@ supported_configurations:
   - metastore: "glue"
     scheduler: "glue"
     storage: "s3"
+    execution: "local"
   - metastore: "athena"
     storage: "s3"
+    execution: "local"
