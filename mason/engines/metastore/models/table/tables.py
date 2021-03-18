@@ -1,17 +1,20 @@
 from typing import Optional, Tuple, Union
 
+from pandas import DataFrame
+
 from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.schemas import schemas
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema
 from mason.engines.metastore.models.table.invalid_table import InvalidTables, InvalidTable, TableNotFound
+from mason.engines.metastore.models.table.summary import TableSummary, from_ddf
 from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.util.exception import message
 from mason.util.list import sequence
 
 def infer(path: Path, client: StorageClient, name: Optional[str] = None, options: dict = {}, response: Response=Response()) -> Tuple[Union[Table, InvalidTables], Response]:
-    table_name = name or client.get_name(name, path.full_path())
+    table_name = name or client.get_name(path, name)
     ss = options.get("sample_size")
     if not isinstance(ss, int):
         # response.add_warning(f"Invalid sample_size: {ss}")
@@ -44,3 +47,17 @@ def infer(path: Path, client: StorageClient, name: Optional[str] = None, options
     return final, response
 
 
+def summarize(table: Table, client: StorageClient, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
+    sp = table.source_path
+    if sp:
+        df: Optional[DataFrame] = schemas.df_from_path(sp, client, options, response)
+        if isinstance(df, DataFrame):
+            # dask_sql is more mature than other options in this space
+            # also has benefit of getting dask version for free
+            import dask.dataframe as dd
+            ddf = dd.from_pandas(df, 1)
+            return from_ddf(table, ddf, response)
+        else:
+            return InvalidTables([], "Could not initialize dataframe."), response
+    else:
+        return InvalidTables([], "Could not find table source path."), response

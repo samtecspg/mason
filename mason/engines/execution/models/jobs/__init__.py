@@ -1,6 +1,5 @@
 from typing import Optional, List, Union
 
-from mason.clients.responsable import Responsable
 from mason.engines.execution.models.jobs.executed_job import ExecutedJob
 from mason.engines.execution.models.jobs.invalid_job import InvalidJob, RetryableJob, FailedJob
 from mason.util.uuid import uuid4

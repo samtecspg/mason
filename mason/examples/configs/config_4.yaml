@@ -1,5 +1,7 @@
 id: "4"
 type: "config"
+storage_clients:
+  - s3
 metastore_clients: 
   - s3
 execution_clients: 

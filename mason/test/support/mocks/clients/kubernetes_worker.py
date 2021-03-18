@@ -20,7 +20,7 @@ class KubernetesWorkerMock():
                 return (InvalidJob('Invalid Dask Job: Invalid Schema'), r)
         elif isinstance(job, QueryJob):
             job.output_path.protocal  = "file"
-            return (KubernetesWorker({"scheduler": "local:8786"}).run_job(job.type, job.spec(), "local:8786", mode), r)
+            return (KubernetesWorker({"scheduler": "local:8786"}).run_job(job, "local:8786", mode), r)
         else:
             raise Exception(f"Mock job not implemented: {job.type}")
 

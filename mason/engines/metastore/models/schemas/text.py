@@ -2,7 +2,7 @@ from typing import Sequence, Optional, Union, List, Tuple
 
 from pandas import DataFrame
 
-from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema, InvalidSchemaElement
+from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema
 from mason.engines.storage.models.path import Path
 from mason.util.exception import message
 from io import StringIO
@@ -47,10 +47,11 @@ def df_from(text: StringIO, type: str, read_headers: Optional[bool]) -> Tuple[Da
     else:
         line_terminator = "\n"
         
-    import great_expectations as ge
-    from great_expectations.dataset import PandasDataset
-    
-    return ge.read_csv(text, lineterminator=line_terminator, header=header, dataset_class=PandasDataset), line_terminator
+    # import great_expectations as ge
+    # from great_expectations.dataset import PandasDataset
+    # return ge.read_csv(text, lineterminator=line_terminator, header=header, dataset_class=PandasDataset), line_terminator
+    import pandas as pd
+    return pd.read_csv(text, lineterminator=line_terminator, header=header, skipinitialspace=True), line_terminator
 
 def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
     text = StringIO(sample.decode("utf-8"))

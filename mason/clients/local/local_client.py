@@ -1,7 +1,11 @@
 from botocore.client import BaseClient
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
+
 
 from mason.clients.base import Client
+from mason.engines.metastore.models.table.invalid_table import InvalidTables
+from mason.engines.metastore.models.table.summary import TableSummary
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.scheduler.models.dags.client_dag import ClientDag
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.schedule import Schedule
@@ -43,4 +47,5 @@ class LocalClient(Client):
 
     def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
+    
 

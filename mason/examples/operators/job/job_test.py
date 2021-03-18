@@ -37,4 +37,4 @@ def test_get():
         assert (bad.with_status() == (expect[config.execution().client.name()], 400))
 
 
-    run_tests("job", "get", True, "fatal", ["1", "2"], tests)
+    run_tests("job", "get", True, "fatal", ["5", "6"], tests)

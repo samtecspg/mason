@@ -6,7 +6,7 @@ from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse
+from mason.operators.operator_response import OperatorResponse, DelayedOperatorResponse
 from mason.operators.supported_engines import SupportedEngineSet
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.resources.valid import ValidResource
@@ -52,7 +52,7 @@ class ValidOperator(ValidResource):
         except Exception as e:
             return InvalidOperator(f"Error initializing operator module: {message(e)}")
 
-    def execute(self, env: MasonEnvironment, response: Response, dry_run: bool = True) -> OperatorResponse:
+    def execute(self, env: MasonEnvironment, response: Response, dry_run: bool = True) -> Union[OperatorResponse, DelayedOperatorResponse]:
         try:
             module = self.module(env)
             if isinstance(module, OperatorDefinition):
@@ -61,8 +61,7 @@ class ValidOperator(ValidResource):
                     return OperatorResponse(response)
                 else:
                     if (self.config.execution().is_async() == True):
-                        run = module.run_async(env, self.config, self.parameters, response)
-                        operator_response  = OperatorResponse(response, run)
+                        operator_response: Union[OperatorResponse, DelayedOperatorResponse] = module.run_async(env, self.config, self.parameters, response)
                     else:
                         operator_response  = module.run(env, self.config, self.parameters, response)
             else:

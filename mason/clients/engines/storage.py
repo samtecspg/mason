@@ -1,7 +1,6 @@
-from typing import Tuple, List, Optional, Union, Any
+from typing import Tuple, List, Optional, Union
 from abc import abstractmethod
 
-from fsspec.core import OpenFile
 from fsspec.spec import AbstractBufferedFile
 
 from mason.clients.base import Client
@@ -17,7 +16,7 @@ class StorageClient:
         self.client = client
         
     @abstractmethod
-    def open(self, path: Path) -> Union[AbstractBufferedFile, OpenFile]:
+    def open(self, path: Path) -> AbstractBufferedFile:
         raise NotImplementedError("Client open not implemented")
 
     @abstractmethod
@@ -32,9 +31,9 @@ class StorageClient:
     def save_to(self, inpath: str, outpath: str, response: Response) -> Response:
         raise NotImplementedError("Client save_to not implemented")
 
-    # @abstractmethod
-    # def infer_table(self, path: Path, name: Optional[str], options: dict={}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
-    #     raise NotImplementedError("Client infer_table not implemented")
+    @abstractmethod
+    def infer_table(self, path: Path, table_name: Optional[str], options: dict={}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+        raise NotImplementedError("Client infer_table not implemented")
 
     def get_name(self, path: Path, name: Optional[str] = None) -> str:
         full_path = path.full_path()

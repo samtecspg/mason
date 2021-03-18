@@ -1,26 +1,30 @@
 from typing import Optional, Union
 
 from mason.configurations.config import Config
+from mason.engines.execution.models.jobs.query_job import QueryJob
+from mason.engines.metastore.models.table.table import Table
 from mason.util.result import compute
 
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 from mason.engines.metastore.models.database import Database
 from mason.engines.metastore.models.ddl import DDLStatement
-from mason.engines.metastore.models.table import Table
 from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse
+from mason.operators.operator_response import OperatorResponse, DelayedOperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableInfer(OperatorDefinition):
-    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
+    
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> DelayedOperatorResponse:
         database_name: str = parameters.get_required("database_name")
-        storage_path: str = parameters.get_required("storage_path")
         table_name: Optional[str] = parameters.get_optional("table_name")
+        storage_path: str = parameters.get_required("storage_path")
+        read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
 
         path = config.storage().path(storage_path)
-        table, response = config.storage().infer_table(path, table_name, response=response)
+        table, response = config.storage().infer_table(path, table_name, {"read_headers": read_headers}, response)
+        
         job = Job("query")
         final: Union[ExecutedJob, InvalidJob]
 
@@ -31,7 +35,8 @@ class TableInfer(OperatorDefinition):
             if isinstance(db, Database):
                 ddl = config.metastore().generate_table_ddl(table, path, db)
                 if isinstance(ddl, DDLStatement):
-                    final, response = config.metastore().execute_ddl(ddl, db, response)
+                    job = QueryJob(ddl.statement, db.tables.tables[0])
+                    final, response = config.execution().run_job(job, response)
                 else:
                     final = job.errored(f"Invalid DDL generated: {ddl.reason}")
             else:
@@ -40,5 +45,5 @@ class TableInfer(OperatorDefinition):
             response = table.to_response(response)
             final = job.errored(f"Invalid Tables: {table.message()}")
             
-        return OperatorResponse(response, final)
+        return DelayedOperatorResponse(final, response)
 

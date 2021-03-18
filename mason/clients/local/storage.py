@@ -9,6 +9,7 @@ from mason.clients.local.local_client import LocalClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.table import Table
+from mason.engines.metastore.models.table.tables import infer
 from mason.engines.storage.models.path import Path, construct
 
 class LocalStorageClient(StorageClient):
@@ -22,9 +23,9 @@ class LocalStorageClient(StorageClient):
     def table_path(self, database_name: str, table_name: str) -> Path:
         return construct(["/", database_name, table_name], "file")
 
-    def infer_table(self, path: Path, name: Optional[str] = None, options: dict = {}, response=Response()) -> Tuple[Union[Table, InvalidTables], Response]:
-        raise NotImplementedError("not implemented")
-
+    def infer_table(self, path: Path, table_name: Optional[str], options: dict = {}, response=Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+        return infer(path, self, table_name, options, response)
+        
     def save_to(self, inpath: str, outpath: str, response: Response) -> Response:
         raise NotImplementedError("not implemented")
 

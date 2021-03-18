@@ -30,7 +30,6 @@ def test_index():
         dne = op.validate(config, params).run(env, Response())
         assert(dne.with_status() == table.index(config.metastore().client.name(), False))
 
-    # run_tests("table", "list", True, "fatal", ["1", "2"], tests)
     run_tests("table", "list", True, "fatal", ["2", "3"], tests)
 
 def test_get():
@@ -68,11 +67,10 @@ def test_refresh():
         refreshing = op.validate(config, params).run(env, Response())
         assert(refreshing.with_status() == table.refresh(True))
 
-    run_tests("table", "refresh", True, "fatal", ["1"],  tests)
+    run_tests("table", "refresh", True, "fatal", ["2"],  tests)
 
 def test_merge():
     pass
-    # TODO: fix
     # def tests(env: MasonEnvironment, config: Config, op: Operator):
     #     # unsupported merge schema
     #     params = OperatorParameters(parameter_string="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
@@ -115,7 +113,7 @@ def test_query():
         params = OperatorParameters(parameter_string=f"query_string:{query},database_name:good_database,table_name:good_table,output_path:{output_path}")
         result = op.validate(config, params).run(env, Response())
         exp = {
-            "1": ['Running Query "SELECT * from $table limit 3"', 'Running Athena query.  query_id: test', 'Running job id=test'],
+            "6": ['Running Query "SELECT * from $table limit 3"', 'Running Athena query.  query_id: test', 'Running job id=test'],
             "4": [f'Table succesfully formatted as parquet and exported to {output_path}']
         }
 
@@ -127,14 +125,13 @@ def test_query():
         params = OperatorParameters(parameter_string=f"query_string:{query},database_name:access_denied,table_name:good_table,output_path:{output_path}")
         result = op.validate(config, params).run(env, Response())
         exp_2 = {
-            "1": ({'Errors': ['Job errored: Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena'], 'Info': ['Running Query "SELECT * from $table limit 3"']}, 403),
+            "6": ({'Errors': ['Job errored: Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena'], 'Info': ['Running Query "SELECT * from $table limit 3"']}, 403),
             "4": ({'Info': [f'Table succesfully formatted as parquet and exported to {output_path}']}, 200)
         }
 
         assert(result.with_status() == exp_2[config.id])
 
-
-    run_tests("table", "query", True, "fatal", ["1", "4"], tests)
+    run_tests("table", "query", True, "fatal", ["4", "6"], tests)
 
     tmp_folder = from_root("/.tmp/")
     if path.exists(tmp_folder):
@@ -142,7 +139,6 @@ def test_query():
 
 
 def test_delete():
-
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # valid delete
@@ -161,7 +157,7 @@ def test_delete():
         assert(bad.with_status() == ({'Errors': ['Table bad_table not found.']}, 400))
 
 
-    run_tests("table", "delete", True, "fatal", ["1"], tests)
+    run_tests("table", "delete", True, "fatal", ["2"], tests)
 
 def test_infer():
 
@@ -169,26 +165,28 @@ def test_infer():
         # database DNE
         params = OperatorParameters(parameter_string=f"database_name:bad-database,storage_path:crawler-poc/catalog_poc_data")
         good = op.validate(config, params).run(env, Response())
-        assert(good.with_status() == ({'Errors': ['Job errored: Metastore database bad-database not found'], 'Info': ['Table inferred: catalog_poc_data']}, 404))
+
+        assert(good.with_status() == ({'Errors': ['Job errored: Metastore database bad-database not found'], 'Info': ['Fetching keys at s3://crawler-poc/catalog_poc_data', 'Table inferred: catalog_poc_data'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
 
         # bad path
         params = OperatorParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/bad-table")
         good = op.validate(config, params).run(env, Response())
-        assert(good.with_status() == ({'Errors': ['No keys at s3://crawler-poc/bad-table', 'Job errored: Invalid Tables: No keys at s3://crawler-poc/bad-table']}, 404))
+        assert(good.with_status() == ({  'Info': ['Fetching keys at s3://crawler-poc/bad-table'], 'Errors': ['No keys at s3://crawler-poc/bad-table', 'Job errored: Invalid Tables: No keys at s3://crawler-poc/bad-table'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
 
         # valid path
         params = OperatorParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/catalog_poc_data,output_path:crawler-poc/athena/")
         good = op.validate(config, params).run(env, Response())
 
-        infos = clean(good.formatted()["Info"])
-        expect = [
-            'Tableinferred:catalog_poc_data',
-            'RunningAthenaquery.query_id:test_id',
-            'Runningjobid=test_id'
-        ]
-        assert(infos == expect)
+        result = good.formatted()
+        expect = {'Info': ['Fetching keys at s3://crawler-poc/catalog_poc_data',
+                  'Table inferred: catalog_poc_data',
+                  'Running Athena query.  query_id: test_id',
+                  'Running job id=test_id'],
+         'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}
+        
+        assert(result == expect)
 
-    run_tests("table", "infer", True, "fatal", ["3"], tests)
+    run_tests("table", "infer", True, "fatal", ["6"], tests)
 
 
 def test_format():

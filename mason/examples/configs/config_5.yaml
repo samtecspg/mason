@@ -1,8 +1,6 @@
 id: "5"
 metastore_clients: 
   - s3
-storage_clients: 
-  - s3
 execution_clients: 
   - spark
 type: config

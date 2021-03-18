@@ -186,7 +186,7 @@ class TestOthers:
     
     #  These tests ensure metatore clients are explicitely instantiated to ensure that they are hit at least once for mypy
     def test_s3_client(self):
-        s3_client = S3Client()
+        s3_client = S3Client("test", "test", "test")
         s3_metastore = S3MetastoreClient(s3_client)
         s3_storage = S3StorageClient(s3_client)
 
@@ -199,7 +199,7 @@ class TestOthers:
         airflow_scheduler = AirflowSchedulerClient(airflow_client)
     
     def test_athena_client(self):
-        athena_client = AthenaClient()
+        athena_client = AthenaClient("test", "test", "test")
         athena_metastore_client = AthenaMetastoreClient(athena_client)
         athena_execution_client = AthenaExecutionClient(athena_client)
 
@@ -208,7 +208,7 @@ class TestOthers:
         dask_execution_client = DaskExecutionClient(dask_client)
     
     def test_glue_client(self):
-        glue_client = GlueClient()
+        glue_client = GlueClient("test", "test", "test")
         glue_metastore_client = GlueMetastoreClient(glue_client)
         glue_scheduler_client = GlueSchedulerClient(glue_client)
     

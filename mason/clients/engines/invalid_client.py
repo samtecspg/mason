@@ -7,6 +7,9 @@ class InvalidClient(Client):
     def __init__(self, reason: str):
         self.reason = reason
         self.client = NullClient(reason)
+    
+    def is_async(self) -> bool:
+        return False
         
     def __getattr__(self, name):
         def _missing(response: Response, *args, **kwargs) -> Response:

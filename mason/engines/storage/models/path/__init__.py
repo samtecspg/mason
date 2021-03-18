@@ -18,6 +18,8 @@ class Path:
         
 
 def construct(parts: List[str], protocal: Optional[str] = None) -> Path:
-    strp = list(map(lambda p: p.strip("/"), parts))
-    return Path("/".join(strp), protocal or "file")
+    # TODO: use os path methods for this
+    join = "/".join(parts)
+    clean = re.sub(r'/+', '/', join)
+    return Path(clean, protocal or "file")
     

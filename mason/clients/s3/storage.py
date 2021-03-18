@@ -1,10 +1,13 @@
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Union
 
 from fsspec.spec import AbstractBufferedFile
 
 from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
 from mason.clients.s3.s3_client import S3Client
+from mason.engines.metastore.models.table.invalid_table import InvalidTables
+from mason.engines.metastore.models.table.table import Table
+from mason.engines.metastore.models.table.tables import infer
 from mason.engines.storage.models.path import Path, construct
 
 class S3StorageClient(StorageClient):
@@ -29,4 +32,6 @@ class S3StorageClient(StorageClient):
     
     def expand_path(self, path: Path, response: Response = Response(), sample_size: int = 3) -> Tuple[List[Path], Response]:
         return self.client.expand_path(path, response, sample_size)
-    
+
+    def infer_table(self, path: Path, table_name: Optional[str], options: dict={}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+        return infer(path, self, table_name, options, response)

@@ -104,5 +104,7 @@ class CliPrinter(Printer):
 
     def print_invalid(self, invalid: List[MalformedResource]):
         for i in invalid:
-            logger.error(i.get_message())
+            message = i.get_message()
+            if message:
+                logger.error(message)
 

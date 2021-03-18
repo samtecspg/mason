@@ -1,7 +1,7 @@
 from typing import Union, Tuple, Optional
 import magic
-from great_expectations.dataset import PandasDataset
-from s3fs import S3File, S3FileSystem
+from pandas import DataFrame
+from s3fs import S3File
 from fsspec.spec import AbstractBufferedFile
 
 from mason.clients.engines.storage import StorageClient
@@ -58,15 +58,15 @@ def from_path(path: Path, client: StorageClient, options: dict = {}, response: R
         response.set_status(404)
         return InvalidSchema(f"File not found: {path.full_path()}")
     
-def df_from_path(path: Path, client: S3FileSystem, options: dict = {}, response: Response = Response()) -> Optional[PandasDataset]:
-    import great_expectations as ge
-    file = client.open(path.full_path())
+def df_from_path(path: Path, client: StorageClient, options: dict = {}, response: Response = Response()) -> Optional[DataFrame]:
+    file = client.open(path)
     file_type, sample = get_file_type(file)
+    import pandas as pd
 
     if file_type == "Apache Parquet":
-        return ge.read_parquet(file)
+        return pd.read_parquet(file)
     elif file_type == "JSON data":
-        return ge.read_json(file) 
+        return pd.read_json(file) 
     elif file_type in list(supported_text_types.keys()):
         df, terminator = TextSchema.df_from(file, file_type, options.get("read_headers")) 
         return df

@@ -1,24 +1,25 @@
 id: "6"
 type: "config"
-metastore_clients:
-  - athena
 storage_clients:
   - s3
-scheduler_clients:
-  - local
+metastore_clients:
+  - glue
 execution_clients:
-  - local
+  - athena
 clients:
-  s3:
-    configuration:
-      aws_region: "{{AWS_REGION}}"
-      access_key: "{{AWS_ACCESS_KEY_ID}}"
-      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
   athena:
     configuration:
       aws_region: "{{AWS_REGION}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  local:
+  glue:
     configuration:
-      threads: 4
+      aws_region: "{{AWS_REGION}}"
+      aws_role_arn: "{{AWS_ROLE_ARN}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
+  s3:
+    configuration:
+      aws_region: "{{AWS_REGION}}"
+      access_key: "{{AWS_ACCESS_KEY_ID}}"
+      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"

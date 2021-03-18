@@ -2,13 +2,11 @@ from typing import Union
 
 from mason_dask.jobs.executed import ExecutedJob, InvalidJob
 
-from mason.clients.engines.metastore import MetastoreClient
-from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.engines.execution.models.jobs.summary_job import SummaryJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
-from mason.engines.metastore.models.table import Table
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.operators.operator_definition import OperatorDefinition
 from mason.operators.operator_response import OperatorResponse
@@ -38,7 +36,10 @@ class TableSummarize(OperatorDefinition):
         path: Path = config.storage().table_path(database_name, table_name)
         credentials: Union[MetastoreCredentials, InvalidCredentials] = config.metastore().credentials()
         
-        job = SummaryJob(path, credentials, read_headers)
-        run, response = config.execution().run_job(job)
+        if isinstance(credentials, MetastoreCredentials):
+            job = SummaryJob(path, credentials, read_headers)
+            run, response = config.execution().run_job(job)
+        else:
+            run = InvalidJob("Invalid Metastore Credentials")
         
         return run

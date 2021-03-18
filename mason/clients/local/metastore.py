@@ -1,6 +1,5 @@
 from urllib.parse import urlparse
 from typing import Tuple, Union, Optional
-
 from returns.result import Result
 
 from mason.clients.engines.metastore import MetastoreClient
@@ -16,7 +15,7 @@ from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.metastore.models.table.table import TableList, Table
-from mason.engines.metastore.models.table.tables import infer
+from mason.engines.metastore.models.table.tables import infer, summarize
 from mason.engines.storage.models.path import Path
 
 class LocalMetastoreClient(MetastoreClient):
@@ -25,7 +24,8 @@ class LocalMetastoreClient(MetastoreClient):
         self.client: LocalClient = client
 
     def summarize_table(self, table: Table, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
-        raise NotImplementedError("summarize_table not implemented")
+        storage = LocalStorageClient(self.client)
+        return summarize(table, storage, options, response)
 
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
         raise NotImplementedError("delete_table not implemented")
@@ -39,9 +39,8 @@ class LocalMetastoreClient(MetastoreClient):
     def get_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
         storage = LocalStorageClient(self.client)
         path: Path = storage.table_path(database_name, table_name)
-        name = storage.get_name(path)
-        return infer(path, storage, name, options, response)
-
+        return storage.infer_table(path, table_name, options, response)
+    
     def full_path(self, path: str) -> str:
         return "s3a://" + path
 

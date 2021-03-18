@@ -51,6 +51,9 @@ class Table(Responsable):
     def to_response(self, response: Response):
         response.add_data(self.to_dict())
         return response
+    
+    def column_names(self) -> List[str]:
+        return self.schema.column_names()
 
 class TableList(Responsable):
     

@@ -11,7 +11,7 @@ class KubernetesMock:
 
     def run(self, config: SparkConfig, job: Job, resp: Response = Response()) -> Optional[Job]:
         params = job.parameters
-        if isinstance(job, MergeJob):
+        if isinstance(job, MergeJob) and isinstance(params, dict):
             if params["input_path"] == "s3a://good_input_bucket/good_input_path" and params["output_path"] == "s3a://good_output_bucket/good_output_path":
                 log = 'sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created'
                 job = Job("merge")

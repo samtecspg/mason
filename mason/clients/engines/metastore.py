@@ -6,7 +6,6 @@ from returns.result import Result
 
 from mason.clients.base import Client
 from mason.clients.response import Response
-from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
 from mason.engines.metastore.models.database import InvalidDatabase, Database
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
@@ -49,6 +48,3 @@ class MetastoreClient:
     def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
         raise NotImplementedError("Client generate_table_ddl not implemented")
 
-    @abstractmethod
-    def execute_ddl(self, ddl: DDLStatement, database: Database, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        raise NotImplementedError("Client execute_ddl not implemented")

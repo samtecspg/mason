@@ -5,15 +5,15 @@ from mason.configurations.config import Config
 from mason.engines.execution.models.jobs import InvalidJob
 from mason.engines.execution.models.jobs.executed_job import ExecutedJob
 from mason.engines.execution.models.jobs.merge_job import MergeJob
-from mason.engines.metastore.models.table import Table
+from mason.engines.metastore.models.table.table import Table
 from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse
+from mason.operators.operator_response import DelayedOperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableMerge(OperatorDefinition):
 
-    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> Union[ExecutedJob, InvalidJob]:
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> DelayedOperatorResponse:
         SUPPORTED_SCHEMAS = {
             "parquet",
             "csv",
@@ -51,4 +51,4 @@ class TableMerge(OperatorDefinition):
             else:
                 final = InvalidJob(f"No conflicting schemas found at {input_path}. Merge unecessary. Invalid Schemas {table.message()}")
 
-        return final
+        return DelayedOperatorResponse(final, response)

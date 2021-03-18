@@ -1,14 +1,10 @@
-from typing import Union
-
-from mason_dask.jobs.executed import ExecutedJob
-
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.engines.execution.models.jobs import InvalidJob
 from mason.engines.execution.models.jobs.infer_job import InferJob
 from mason.engines.metastore.models.credentials import MetastoreCredentials
 from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse
+from mason.operators.operator_response import OperatorResponse, DelayedOperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
@@ -23,7 +19,7 @@ class TableGet(OperatorDefinition):
         oR = OperatorResponse(response, table)
         return oR
     
-    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> Union[ExecutedJob, InvalidJob]:
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> DelayedOperatorResponse:
         database_name: str = parameters.get_required("database_name")
         table_name: str = parameters.get_required("table_name")
         read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
@@ -37,6 +33,6 @@ class TableGet(OperatorDefinition):
         else:
             run = InvalidJob(f"Invalid MetastoreCredentials: {credentials.reason}")
             
-        return run
+        return DelayedOperatorResponse(run, resp or Response())
 
 

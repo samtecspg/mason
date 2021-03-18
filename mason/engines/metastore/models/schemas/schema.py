@@ -56,6 +56,9 @@ class Schema(object):
 
     def to_pd_dict(self) -> Dict:
         return merge(list(map(lambda c: c.to_pd_dict(), self.columns)))
+    
+    def column_names(self) -> List[str]:
+        return list(map(lambda c: c.name , self.columns))
 
 class EmptySchema(Schema):
 

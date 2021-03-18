@@ -9,11 +9,12 @@ from mason.engines.execution.models.jobs.query_job import QueryJob
 from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.operators.operator_definition import OperatorDefinition
+from mason.operators.operator_response import DelayedOperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableQuery(OperatorDefinition):
-    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> Union[ExecutedJob, InvalidJob]:
+    def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> DelayedOperatorResponse:
         query_string = parameters.get_required("query_string")
         database_name = parameters.get_required("database_name")
         table_name = parameters.get_required("table_name")
@@ -23,6 +24,7 @@ class TableQuery(OperatorDefinition):
         query = query_string
         final: Union[ExecutedJob, InvalidJob]
 
+        # Todo:  This isn't really delayed
         table, response = config.metastore().get_table(database_name, table_name)
         
         if output_path and isinstance(config.storage(), StorageClient):
@@ -37,7 +39,7 @@ class TableQuery(OperatorDefinition):
         else:
             final = InvalidJob(table.message())
 
-        return final
+        return DelayedOperatorResponse(final, response)
 
 
 

@@ -9,6 +9,8 @@ parameters:
   optional:
     - "read_headers"
 supported_configurations:
+  - metastore: "local"
+    execution: "local"
   - metastore: "s3"
     execution: "local"
   - metastore: "s3"
