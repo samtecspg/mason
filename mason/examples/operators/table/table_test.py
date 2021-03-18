@@ -8,6 +8,8 @@ from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.definitions import from_root
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
+from mason.engines.metastore.models.table.invalid_table import InvalidTables
+from mason.engines.metastore.models.table.summary import TableSummary
 from mason.operators.operator import Operator
 from mason.examples.operators.table.test.expects import table
 from mason.parameters.operator_parameters import OperatorParameters
@@ -205,3 +207,24 @@ def test_format():
         assert(isinstance(executed_job, ExecutedJob))
 
     run_tests("table", "format", True, "fatal", ["4"], tests)
+    
+def test_summarize():
+    load_dotenv(from_root("/../.env"), override=True)
+
+    def tests(env: MasonEnvironment, config: Config, op: Operator):
+        parameters = f"database_name:{from_root('/test/sample_data/')},table_name:csv_bad.csv,read_headers:true"
+        params = OperatorParameters(parameter_string=parameters)
+        bad = op.validate(config, params).run(env, Response())
+        invalid_job = bad.object
+        assert(isinstance(invalid_job, InvalidTables))
+
+        parameters = f"database_name:{from_root('/test/sample_data/')},table_name:csv_sample.csv,read_headers:true"
+        params = OperatorParameters(parameter_string=parameters)
+        good = op.validate(config, params).run(env, Response())
+        summary = good.object
+        assert(isinstance(summary, TableSummary))
+        expect = {'Summaries': {'type': {'non_null': 10, 'max': 'wrench5', 'min': 'hammer', 'distinct_count': 10}, 'price': {'non_null': 10, 'max': 30.0, 'min': 5.0, 'distinct_count': 9}}}
+        assert(summary.to_dict() == expect)
+
+    run_tests("table", "summarize", True, "fatal", ["1"], tests)
+    
