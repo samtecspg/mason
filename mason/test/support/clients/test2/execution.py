@@ -5,3 +5,6 @@ class Test2ExecutionClient(ExecutionClient):
 
     def __init__(self, client: Test2Client):
         self.client = client
+        
+    def is_async(self) -> bool:
+        return False
