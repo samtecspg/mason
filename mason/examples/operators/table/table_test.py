@@ -224,7 +224,5 @@ def test_summarize():
         summary = good.object
         assert(isinstance(summary, TableSummary))
 
-
-    # run_tests("table", "summarize", True, "fatal", ["1", "2"], tests)
     run_tests("table", "summarize", True, "fatal", ["1", "3"], tests)
 
