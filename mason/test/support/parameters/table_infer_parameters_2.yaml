@@ -2,5 +2,5 @@ schedule_name: test_crawler
 step_1:
   config_id: 1
   parameters:
-    database_name: crawler-poc
+    database_name: test-database
     storage_path: test_bucket/test_path 

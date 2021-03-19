@@ -39,15 +39,12 @@ class TableSummary(Responsable):
         }
 
 def from_ddf(table: Table, ddf: DDataFrame, response: Response) -> Tuple[TableSummary, Response]:
-    from dask_sql import Context
-    c = Context()
-    c.create_table("df", ddf)
 
     # TODO: Combine into a single query
-    non_null = execute_query(non_null_query(table), response, c)
-    max = execute_query(max_query(table), response, c)
-    min = execute_query(min_query(table), response, c)
-    distinct_count = execute_query(distinct_count_query(table), response, c)
+    non_null = execute_query(ddf, non_null_query(table), response)
+    max = execute_query(ddf, max_query(table), response)
+    min = execute_query(ddf, min_query(table), response)
+    distinct_count = execute_query(ddf, distinct_count_query(table), response)
     # average = execute_query(average_query(table), response, c) 
     
     summaries = list(map(lambda col: BaseSummary(col, safe_get_value(non_null, col), safe_get_value(max, col), safe_get_value(min, col), safe_get_value(distinct_count, col)), table.column_names()))
@@ -61,9 +58,12 @@ def safe_get_value(df: Optional[DataFrame], col: str):
         if value:
             return value.get(0)
     
-def execute_query(query: str, response: Response, context) -> Optional[DataFrame]:
+def execute_query(ddf: DDataFrame, query: str, response: Response) -> Optional[DataFrame]:
     try:
-        return context.sql(query).compute()
+        from dask_sql import Context
+        c = Context()
+        c.create_table("df", ddf)
+        return c.sql(query).compute()
     except Exception as e:
         response.add_error(f"Error executing SQL query: {message(e)}")
         return None

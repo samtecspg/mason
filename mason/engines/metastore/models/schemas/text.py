@@ -39,8 +39,10 @@ class TextSchema(Schema):
 def df_from(text: StringIO, type: str, read_headers: Optional[bool]) -> Tuple[DataFrame, str]:
     headers = read_headers or False
     header: Optional[int] = None
+    prefix: Optional[str] = "col_"
     if headers:
         header = 0
+        prefix = None
 
     if (SUPPORTED_TYPES.get(type) == "csv-crlf"):
         line_terminator = "\r"
@@ -50,8 +52,11 @@ def df_from(text: StringIO, type: str, read_headers: Optional[bool]) -> Tuple[Da
     # import great_expectations as ge
     # from great_expectations.dataset import PandasDataset
     # return ge.read_csv(text, lineterminator=line_terminator, header=header, dataset_class=PandasDataset), line_terminator
+    
     import pandas as pd
-    return pd.read_csv(text, lineterminator=line_terminator, header=header, skipinitialspace=True), line_terminator
+    #  Note: prefix -> casts to string, if this is passed into dask ddf then it won't like default integer column headers
+    
+    return pd.read_csv(text, lineterminator=line_terminator, header=header, skipinitialspace=True, prefix=prefix), line_terminator
 
 def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
     text = StringIO(sample.decode("utf-8"))

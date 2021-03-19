@@ -1,2 +1,2 @@
-database_name: "crawler-poc"
+database_name: "test-database"
 table_name: "catalog_data_poc"

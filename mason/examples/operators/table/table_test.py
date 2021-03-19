@@ -1,6 +1,5 @@
 import shutil
 from os import path
-from typing import List
 
 from dotenv import load_dotenv
 
@@ -8,12 +7,12 @@ from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.definitions import from_root
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
-from mason.engines.metastore.models.table.invalid_table import InvalidTables
+from mason.engines.metastore.models.table.invalid_table import InvalidTables, TableNotFound
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.operators.operator import Operator
 from mason.examples.operators.table.test.expects import table
 from mason.parameters.operator_parameters import OperatorParameters
-from mason.test.support.testing_base import run_tests, clean, clean_path
+from mason.test.support.testing_base import run_tests, clean_path
 from mason.util.environment import MasonEnvironment
 
 load_dotenv(from_root("/../.env.example"), override=True)
@@ -22,7 +21,7 @@ def test_index():
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         
         # Database Exists
-        params = OperatorParameters(parameter_string="database_name:crawler-poc")
+        params = OperatorParameters(parameter_string="database_name:test-database")
         valid = op.validate(config, params)
         exists = valid.run(env, Response())
         assert exists.with_status() == table.index(config.metastore().client.name())
@@ -60,12 +59,12 @@ def test_refresh():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # valid refresh
-        params = OperatorParameters(parameter_string="table_name:catalog_poc_data,database_name:crawler-poc")
+        params = OperatorParameters(parameter_string="table_name:test-table,database_name:test-database")
         refresh = op.validate(config, params).run(env, Response())
         assert(refresh.with_status() == table.refresh(False))
 
         # already refreshing
-        params = OperatorParameters(parameter_string="table_name:catalog_poc_data_refreshing,database_name:crawler-poc")
+        params = OperatorParameters(parameter_string="table_name:test-table_refreshing,database_name:test-database")
         refreshing = op.validate(config, params).run(env, Response())
         assert(refreshing.with_status() == table.refresh(True))
 
@@ -165,23 +164,23 @@ def test_infer():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         # database DNE
-        params = OperatorParameters(parameter_string=f"database_name:bad-database,storage_path:crawler-poc/catalog_poc_data")
+        params = OperatorParameters(parameter_string=f"database_name:bad-database,storage_path:test-database/test-table")
         good = op.validate(config, params).run(env, Response())
 
-        assert(good.with_status() == ({'Errors': ['Job errored: Metastore database bad-database not found'], 'Info': ['Fetching keys at s3://crawler-poc/catalog_poc_data', 'Table inferred: catalog_poc_data'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
+        assert(good.with_status() == ({'Errors': ['Job errored: Metastore database bad-database not found'], 'Info': ['Fetching keys at s3://test-database/test-table', 'Table inferred: test-table'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
 
         # bad path
-        params = OperatorParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/bad-table")
+        params = OperatorParameters(parameter_string=f"database_name:test-database,storage_path:test-database/bad-table")
         good = op.validate(config, params).run(env, Response())
-        assert(good.with_status() == ({  'Info': ['Fetching keys at s3://crawler-poc/bad-table'], 'Errors': ['No keys at s3://crawler-poc/bad-table', 'Job errored: Invalid Tables: No keys at s3://crawler-poc/bad-table'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
+        assert(good.with_status() == ({  'Info': ['Fetching keys at s3://test-database/bad-table'], 'Errors': ['No keys at s3://test-database/bad-table', 'Job errored: Invalid Tables: No keys at s3://test-database/bad-table'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
 
         # valid path
-        params = OperatorParameters(parameter_string=f"database_name:crawler-poc,storage_path:crawler-poc/catalog_poc_data,output_path:crawler-poc/athena/")
+        params = OperatorParameters(parameter_string=f"database_name:test-database,storage_path:test-database/test-table,output_path:test-database/athena/")
         good = op.validate(config, params).run(env, Response())
 
         result = good.formatted()
-        expect = {'Info': ['Fetching keys at s3://crawler-poc/catalog_poc_data',
-                  'Table inferred: catalog_poc_data',
+        expect = {'Info': ['Fetching keys at s3://test-database/test-table',
+                  'Table inferred: test-table',
                   'Running Athena query.  query_id: test_id',
                   'Running job id=test_id'],
          'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}
@@ -197,8 +196,8 @@ def test_format():
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         params = OperatorParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:boogo,output_path:mason-sample-data/tests/out/csv/")
-        good = op.validate(config, params).run(env, Response())
-        invalid_job = good.object
+        bad = op.validate(config, params).run(env, Response())
+        invalid_job = bad.object
         assert(isinstance(invalid_job, InvalidJob))
 
         params = OperatorParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:csv,output_path:good_output_path")
@@ -212,21 +211,20 @@ def test_summarize():
     load_dotenv(from_root("/../.env"), override=True)
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
-        parameters = f"database_name:{from_root('/test/sample_data/')},table_name:csv_bad.csv,read_headers:true"
+        parameters = table.parameters(config.id)[1]
         params = OperatorParameters(parameter_string=parameters)
         bad = op.validate(config, params).run(env, Response())
-        invalid_job = bad.object
-        print("HERE")
-        # assert(isinstance(invalid_job, InvalidTables))
-        
-        # parameters = f"database_name:{from_root('/test/sample_data/')},table_name:csv_sample.csv,read_headers:true"
-        # params = OperatorParameters(parameter_string=parameters)
-        # good = op.validate(config, params).run(env, Response())
-        # summary = good.object
-        # assert(isinstance(summary, TableSummary))
-        # expect = {'Summaries': {'type': {'non_null': 10, 'max': 'wrench5', 'min': 'hammer', 'distinct_count': 10}, 'price': {'non_null': 10, 'max': 30.0, 'min': 5.0, 'distinct_count': 9}}}
-        # assert(summary.to_dict() == expect)
+        invalid_tables = bad.object
+        assert(isinstance(invalid_tables, InvalidTables))
+        # assert(isinstance(invalid_tables.invalid_tables[0], TableNotFound))
+
+        parameters = table.parameters(config.id)[0]
+        params = OperatorParameters(parameter_string=parameters)
+        good = op.validate(config, params).run(env, Response())
+        summary = good.object
+        assert(isinstance(summary, TableSummary))
+
 
     # run_tests("table", "summarize", True, "fatal", ["1", "2"], tests)
-    run_tests("table", "summarize", True, "fatal", ["2"], tests)
+    run_tests("table", "summarize", True, "fatal", ["1", "3"], tests)
 

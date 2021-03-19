@@ -14,13 +14,13 @@ from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableSummarize(OperatorDefinition):
-    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, resp: Response) -> OperatorResponse:
+    def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
         database_name: str = parameters.get_required("database_name")
         table_name: str = parameters.get_required("table_name")
         read_headers: bool = isinstance(parameters.get_optional("read_headers"), str)
         options = {"read_headers": read_headers}
         
-        table, response = config.metastore().get_table(database_name, table_name, options, resp)
+        table, response = config.metastore().get_table(database_name, table_name, options, response)
         if isinstance(table, Table):
             summary, response = config.metastore().summarize_table(table, options, response)
         else:
