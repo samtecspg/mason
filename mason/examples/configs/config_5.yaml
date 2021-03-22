@@ -1,4 +1,6 @@
 id: "5"
+storage_clients:
+  - s3
 metastore_clients: 
   - s3
 execution_clients: 

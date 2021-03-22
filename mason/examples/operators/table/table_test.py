@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.definitions import from_root
-from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob
-from mason.engines.metastore.models.table.invalid_table import InvalidTables, TableNotFound
+from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
+from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.operators.operator import Operator
 from mason.examples.operators.table.test.expects import table
@@ -225,4 +225,26 @@ def test_summarize():
         assert(isinstance(summary, TableSummary))
 
     run_tests("table", "summarize", True, "fatal", ["1", "3"], tests)
+    
+def test_summarize_async():
+
+    load_dotenv(from_root("/../.env"), override=True)
+
+    def tests(env: MasonEnvironment, config: Config, op: Operator):
+        # no output_path
+        parameters = table.parameters(config.id)[0]
+        params = OperatorParameters(parameter_string=parameters)
+        bad = op.validate(config, params).run(env, Response())
+        assert(isinstance(bad.object, InvalidJob))
+
+        parameters = table.parameters(config.id)[1]
+        params = OperatorParameters(parameter_string=parameters)
+        good = op.validate(config, params).run(env, Response())
+        print("HERE")
+        
+        # assert(isinstance(bad.object, InvalidJob))
+        # invalid_tables = bad.object
+        # assert(isinstance(invalid_tables, InvalidTables))
+
+    run_tests("table", "summarize", True, "fatal", ["5"], tests)
 

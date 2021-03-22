@@ -78,11 +78,18 @@ def parameters(config_id: str):
             f"database_name:{from_root('/test/bad/')},table_name:csv_sample.csv,",
             f"database_name:{from_root('/test/sample_data/')},table_name:bad.csv"
         ]
-    else:
+    elif config_id == "3":
         return [
             "database_name:test-database,table_name:test-table,read_headers:true",
             "database_name:bad-database,table_name:test-table",
             "database_name:test-database,table_name:bad-table"
         ]
+    else:
+        return [
+            "database_name:test-database,table_name:test-table,read_headers:true",
+            "database_name:test-database,table_name:test-table,read_headers:true,output_path:test-database/test-summary",
+            "database_name:test-database,table_name:bad-table"
+        ]
+
         
     

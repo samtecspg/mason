@@ -6,7 +6,6 @@ from mason.clients.spark.spark_client import SparkConfig
 from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 from mason.engines.execution.models.jobs.merge_job import MergeJob
 
-
 class KubernetesMock:
 
     def run(self, config: SparkConfig, job: Job, resp: Response = Response()) -> Optional[Job]:
