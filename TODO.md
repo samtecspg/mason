@@ -62,6 +62,7 @@ Legend
 ## Execution Engine
 - [ ] Look into using calcite or coral to extend spark operators to presto and hive (***)
 - [ ] Look into using protos to communicate metastore schema to execution engine or possibly look into other serialization formats (avro)
+- [ ] 'job_proxy' execution client which hits a mason client running against a job queue for requests
 
 ## Metastore
 - [ ] Look into datahub internal schema representation
