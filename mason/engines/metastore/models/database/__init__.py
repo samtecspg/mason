@@ -13,6 +13,12 @@ class Database(Responsable):
         
     def to_response(self, response: Response):
         return self.tables.to_response(response)
+    
+    def to_dict(self) -> dict:
+        d =  self.tables.to_dict()
+        d['Name'] = self.name
+        return d
+        
 
 class InvalidDatabase(Responsable):
 
@@ -35,7 +41,7 @@ class DatabaseList(Responsable):
             response = invalid.to_response(response)
 
         if len(self.databases) > 0:
-            data = {'Databases': list(map(lambda t: t.to_response(response), self.databases))}
+            data = {'Databases': list(map(lambda t: t.to_dict(), self.databases))}
             response.add_data(data)
         else:
             response.add_error("No databases found for configured metastore")

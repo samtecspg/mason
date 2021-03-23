@@ -60,8 +60,11 @@ class TableList(Responsable):
     def __init__(self, tables: List[Table]):
         self.tables = tables
         
+    def to_dict(self) -> dict:
+        return {'Tables': list(map(lambda t: t.to_dict(), self.tables))}
+        
     def to_response(self, response: Response):
-        data = {'Tables': list(map(lambda t: t.to_dict(), self.tables))}
+        data = self.to_dict() 
         response.add_data(data)
         return response
             
