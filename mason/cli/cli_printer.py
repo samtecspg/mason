@@ -1,4 +1,5 @@
 import json
+import datetime
 from typing import List, Union, Optional
 
 from tabulate import tabulate
@@ -22,9 +23,14 @@ from pygments.formatters import TerminalFormatter
 class CliPrinter(Printer):
     
     def print_response(self, response: Response):
+
+        def default(o):
+            if isinstance(o, (datetime.date, datetime.datetime)):
+                return o.isoformat()
+            
         resp, status = response.with_status()
         logger.info(f"Response status: {status}")
-        str_resp = json.dumps(resp, indent=4, sort_keys=True)
+        str_resp = json.dumps(resp, indent=4, sort_keys=True, default=default)
         logger.info(highlight(str_resp, JsonLexer(), TerminalFormatter()))
 
     def print_resources(self, resources: List[Union[Operator, Workflow, Config, MalformedResource]], type: Optional[str] = None, namespace: Optional[str] = None, command: Optional[str] = None, environment: Optional[MasonEnvironment] = None) -> Response:

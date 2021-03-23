@@ -1,13 +1,13 @@
 
 from abc import abstractmethod
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, List
 
 from returns.result import Result
 
 from mason.clients.base import Client
 from mason.clients.response import Response
 from mason.engines.metastore.models.credentials import MetastoreCredentials, InvalidCredentials
-from mason.engines.metastore.models.database import InvalidDatabase, Database
+from mason.engines.metastore.models.database import InvalidDatabase, Database, DatabaseList
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table.table import Table, TableList
 from mason.engines.metastore.models.table.invalid_table import InvalidTables
@@ -19,6 +19,10 @@ class MetastoreClient:
     @abstractmethod
     def __init__(self, client: Client):
         self.client = client
+
+    @abstractmethod
+    def get_databases(self,response: Optional[Response] = None) -> Tuple[DatabaseList, Response]:
+        raise NotImplementedError
 
     @abstractmethod
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:

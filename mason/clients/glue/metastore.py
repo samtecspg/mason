@@ -1,4 +1,4 @@
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, List
 
 from returns.result import Result
 
@@ -8,7 +8,7 @@ from mason.clients.glue.glue_client import GlueClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
-from mason.engines.metastore.models.database import Database, InvalidDatabase
+from mason.engines.metastore.models.database import Database, InvalidDatabase, DatabaseList
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
@@ -21,6 +21,9 @@ class GlueMetastoreClient(MetastoreClient):
         self.client: GlueClient = client
         self.athena_client = AthenaClient(self.client.access_key, self.client.secret_key, self.client.aws_region)
 
+    def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
+        return self.client.get_databases(response)
+    
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
         return self.client.get_database(database_name, response)
     
