@@ -7,10 +7,11 @@ from mason.engines.execution.models.jobs import Job
 class QueryJob(Job):
 
     def __init__(self, query_string: str, table: Table, output_path: Optional[Path] = None):
-        super().__init__("query")
         self.query_string = query_string
         self.table = table
         self.output_path = output_path or Path("")
+        
+        super().__init__("query")
         
     def spec(self) -> dict:
         spec = {

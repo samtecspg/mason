@@ -52,6 +52,12 @@ class S3Mock:
         elif (key == "s3://test-database/test-table"):
             fs = LocalFileSystem()
             return fs.open(from_root('/test/sample_data/csv_sample.csv'))
+        elif (key == "s3://test-data/test-path/csv-merge-1"):
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/csv_sample.csv'))
+        elif (key == "s3://test-data/test-path/csv-merge-2"):
+            fs = LocalFileSystem()
+            return fs.open(from_root('/test/sample_data/csv_sample_2.csv'))
         else:
             raise Exception(f"Unmocked S3 API endpoint: {key}")
 
@@ -63,7 +69,7 @@ class S3Mock:
         elif path == "s3://good_input_bucket/good_input_path":
             return ["test-data/test-path/test1.usf", "test-data/test-path/test2.usf"]
         elif path == "s3://good_input_bucket_2/good_input_path":
-            return ["test-data/test-path/sample.snappy.parquet"]
+            return ["test-data/test-path/csv-merge-1", "test-data/test-path/csv-merge-2"]
         elif path == "s3://good_database/good_table" or path == "s3://access_denied/good_table":
             return ["tests/in/csv/sample.csv", "tests/in/csv/sample2.csv"]
         elif path == "s3://mason-sample-data/tests/in/csv/":

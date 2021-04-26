@@ -7,10 +7,16 @@ class SummaryJob(Job):
     
     def __init__(self, input_path: Path, output_path: Path, credentials: MetastoreCredentials, read_headers: bool = False):
         self.read_headers = read_headers
+        self.input_path = input_path
+        self.output_path = output_path
+        self.credentials = credentials
 
-        parameters = credentials.to_dict()
-        parameters['input_path'] = input_path.full_path()
-        parameters['output_path'] = output_path.full_path()
-        parameters['read_headers'] = read_headers
+        super().__init__("summary")
 
-        super().__init__("summary", parameters)
+    def spec(self) -> dict:
+        parameters = self.credentials.to_dict()
+        parameters['input_path'] = self.input_path.full_path()
+        parameters['output_path'] = self.output_path.full_path()
+        parameters["read_headers"] = self.read_headers
+
+        return parameters

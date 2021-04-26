@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from typing import Union
 
 from mason.clients.response import Response
 from mason.configurations.config import Config

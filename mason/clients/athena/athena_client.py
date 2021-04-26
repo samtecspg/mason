@@ -8,6 +8,7 @@ from mason.clients.glue.glue_client import GlueClient
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
+from mason.engines.execution.models.jobs.generic_job import GenericJob
 from mason.engines.execution.models.jobs.query_job import QueryJob
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
@@ -43,9 +44,8 @@ class AthenaClient(AWSClient):
         return error, status, message
 
     def get_job(self, job_id: str, resp: Optional[Response]) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        job = Job("query")
-        job.set_id(job_id)
         response: Response = resp or Response()
+        job = GenericJob(job_id)
 
         try:
             athena_response = self.client().get_query_execution(
@@ -91,7 +91,7 @@ class AthenaClient(AWSClient):
                     rows = results.get("Rows") or []
                     if len(rows) > 0:
                         response.add_data(results)
-                    final = job.running(past=True) 
+                    final = ExecutedJob(job_id) 
                 else:
                     final = job.errored("No job results returned from athena")
 

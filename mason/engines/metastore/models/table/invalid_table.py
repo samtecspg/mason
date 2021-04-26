@@ -5,6 +5,7 @@ from mason.engines.metastore.models.schemas.schema import SchemaConflict, Invali
 from mason.clients.response import Response
 
 from mason.clients.responsable import Responsable
+from mason.engines.storage.models.path import Path
 
 
 class InvalidTable(Responsable):

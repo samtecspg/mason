@@ -30,7 +30,7 @@ def test_get():
 
 
         expect = {
-            'spark': {'Errors': ['Error from server (NotFound): pods "bad_job_id-driver" not found']},
+            'spark': {'Data': [{'Logs': ['Error from server (NotFound): pods "bad_job_id-driver" not found']}]},
             'athena': {'Errors': ['QueryExecution bad_job_id was not found', 'Job errored: Invalid Job: QueryExecution bad_job_id was not found']}
         }
 

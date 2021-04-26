@@ -3,7 +3,6 @@ import datetime
 from typing import List, Union, Optional
 
 from tabulate import tabulate
-from typistry.protos.invalid_object import InvalidObject
 
 from mason.clients.response import Response
 from mason.configurations.config import Config

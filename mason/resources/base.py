@@ -37,6 +37,10 @@ class Resources:
         validated = validate_files(path, self.env.validation_path, include_source=True)
         return self.to_resources(validated)
     
+    def get_all_seq(self, file: Optional[str] = None) -> Tuple[List[Operator], List[Workflow], List[Config], List[MalformedResource]]:
+        all = self.get_all(file)
+        return sequence_4(all, Operator, Workflow, Config, MalformedResource)
+    
     def get_resources(self, type: str, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Union[Operator, Workflow, Config, MalformedResource]]:
         all: List[Union[Operator, Workflow, Config, MalformedResource]] = []
         if self.type_any(type):
@@ -44,28 +48,30 @@ class Resources:
                 if namespace and command:
                     all += [self.get_operator(namespace, command)]
                 else:
-                    all += self.get_operators(namespace, command)
-                    all += self.get_bad()
+                    operators, bad = self.get_operators(namespace, command)
+                    all += operators
+                    all += bad
             if self.type_workflow(type):
                 if namespace and command:
                     all += [self.get_workflow(namespace, command)]
                 else:
-                    all += self.get_workflows(namespace, command)
-                    all += self.get_bad()
+                    workflows, bad = self.get_workflows(namespace, command)
+                    all += workflows
+                    all += bad
             if self.type_config(type):
                 if namespace:
                     all += [self.get_config(namespace)]
                 else:
-                    all += self.get_configs(namespace)
-                    all += self.get_bad()
+                    configs, bad = self.get_configs(namespace)
+                    all += configs 
+                    all += bad
         else:
             all += [MalformedResource(message=f"Unsupported type: {type}")]
         relevant = [a for a in all if not(isinstance(a, MalformedResource) and a.ignorable())]
         return relevant
         
-    def get_operators(self, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Operator]:
-        ops, bad = self.filter_resource(Operator, namespace, command)
-        return ops
+    def get_operators(self, namespace: Optional[str] = None, command: Optional[str] = None) -> Tuple[List[Operator], List[MalformedResource]]:
+        return self.filter_resource(Operator, namespace, command)
     
     def get_operator(self, namespace: str, command: str) -> Union[Operator, MalformedResource]:
         op = self.get_resource("operator", namespace, command)
@@ -74,9 +80,8 @@ class Resources:
         else:
             return MalformedResource(message="Bad type cast")
 
-    def get_workflows(self, namespace: Optional[str] = None, command: Optional[str] = None) -> List[Workflow]:
-        workflows, bad = self.filter_resource(Workflow, namespace, command)
-        return workflows
+    def get_workflows(self, namespace: Optional[str] = None, command: Optional[str] = None) -> Tuple[List[Workflow], List[MalformedResource]]:
+        return self.filter_resource(Workflow, namespace, command)
 
     def get_workflow(self, namespace: str, command: str) -> Union[Workflow, MalformedResource]:
         op = self.get_resource("workflow", namespace, command)
@@ -85,9 +90,8 @@ class Resources:
         else:
             return MalformedResource(message="Bad type cast")
 
-    def get_configs(self, config_id: Optional[str] = None) -> List[Config]:
-        configs, bad = self.filter_resource(Config, config_id)
-        return configs
+    def get_configs(self, config_id: Optional[str] = None) -> Tuple[List[Config], List[MalformedResource]]:
+        return self.filter_resource(Config, config_id)
 
     def get_config(self, config_id: str) -> Union[Config, MalformedResource]:
         conf: Union[Operator, Config, Workflow, MalformedResource] = self.get_resource("config", config_id)
@@ -117,7 +121,7 @@ class Resources:
             return None
 
     def get_first_config(self) -> Union[Config, MalformedResource]:
-        configs: List[Config] = self.get_configs()
+        configs, bad = self.get_configs()
         configs.sort(key=lambda c: c.id)
         if len(configs) > 0:
             return configs[0]
@@ -220,18 +224,25 @@ class Resources:
 
     T = TypeVar("T", bound="Resource")
     def filter_resource(self, cls: Type[T], namespace: Optional[str] = None, command: Optional[str] = None) -> Tuple[List[T], List[MalformedResource]]:
-        all = self.get_all()
-        operators, workflows, configs, malformed = sequence_4(all, Operator, Workflow, Config, MalformedResource)
+        file: Optional[str] = None
+        
         if cls == Operator:
+            file = self.env.state_store.operator_home
+            operators, workflows, configs, malformed = self.get_all_seq(file)
             ops = [o for o in operators if self.matches(o, namespace, command)]
             return ops, malformed # type: ignore
         elif cls == Workflow:
+            file = self.env.state_store.workflow_home
+            operators, workflows, configs, malformed = self.get_all_seq(file)
             wfs = [w for w in workflows if self.matches(w, namespace, command)]
             return wfs, malformed # type: ignore
         elif cls == Config:
+            file = self.env.state_store.config_home
+            operators, workflows, configs, malformed = self.get_all_seq(file)
             cfg = [c for c in configs if self.matches(c, namespace, command)]
             return cfg, malformed # type: ignore
         elif cls == MalformedResource:
+            operators, workflows, configs, malformed = self.get_all_seq(file)
             return [], malformed
         else:
             return [], [MalformedResource(message=f"Undefined resource: {cls}")]

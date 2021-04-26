@@ -10,7 +10,7 @@ from mason.clients.s3.storage import S3StorageClient
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
-from mason.engines.metastore.models.database import Database, InvalidDatabase
+from mason.engines.metastore.models.database import Database, InvalidDatabase, DatabaseList
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table.invalid_table import InvalidTables, InvalidTable
 from mason.engines.metastore.models.table.summary import TableSummary
@@ -33,7 +33,10 @@ class S3MetastoreClient(MetastoreClient):
         resp = (response or Response()).add_error("Client delete_table not implemented")
         return resp
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
+    def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
+        raise NotImplementedError("S3 client get_databases not implemented")
+
+    def get_database(self, database_name: str, response: Optional[Response] = Response()) -> Tuple[Result[Database, InvalidDatabase], Response]:
         tables, response =  self.list_tables(database_name, response or Response())
         database = tables.map(lambda a: Database("s3_table", a)).alt(lambda b: InvalidDatabase(b.error or b.message()))
         return database, response

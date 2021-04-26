@@ -10,13 +10,13 @@ class OperatorResponse:
     
     def __init__(self, resp: Response, object: Optional[Responsable] = None):   #TODO: Generalize object
         self.object = object
-        self.response = self.to_response(resp, object)
-
-    def to_response(self, response: Response, object: Optional[Responsable] = None) -> Response:
+        response = resp
         if object:
-            self.response = object.to_response(response)
-        else:
-            self.response = response
+            response = object.to_response(response)
+        self.response = response
+        
+
+    def to_response(self) -> Response:
         return self.response
 
     def formatted(self) -> dict:

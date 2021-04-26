@@ -71,39 +71,26 @@ def test_refresh():
     run_tests("table", "refresh", True, "fatal", ["2"],  tests)
 
 def test_merge():
-    pass
-    # def tests(env: MasonEnvironment, config: Config, op: Operator):
-    #     # unsupported merge schema
-    #     params = OperatorParameters(parameter_string="input_path:good_input_bucket/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
-    #     unsupported = op.validate(config, params).run(env, Response()).response
-    #     assert('No conflicting schemas found at good_input_bucket/good_input_path. Merge unecessary. ' in unsupported.formatted()["Errors"][0])
-    # 
-    #     # invalid merge params
-    #     # params = InputParameters(parameter_string="input_path:test,bad:test")
-    #     # invalid = op.validate(config, params).run(env, Response())
-    #     # assert(invalid.with_status() == ({'Errors': ['Invalid Operator.  Reason:  Invalid parameters.  Required parameter not specified: output_path'], 'Info': [], 'Warnings': []}, 400))
-    # 
-    #     # valid merge
-    #     # params = InputParameters(parameter_string="input_path:good_input_bucket_2/good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
-    #     # valid = op.validate(config, params).run(env, Response())
-    #     # expect = ({'Data': [{'Schema': {'Columns': [{'ConvertedType': 'REQUIRED', 'Name': 'test_column_1',
-    #     #                                    'RepititionType': None,
-    #     #                                    'Type': 'INT32'},
-    #     #                                   {'ConvertedType': 'UTF8',
-    #     #                                    'Name': 'test_column_2',
-    #     #                                    'RepititionType': 'OPTIONAL',
-    #     #                                    'Type': 'BYTE_ARRAY'}],
-    #     #                       'SchemaType': 'parquet'}},
-    #     #     {'Logs': ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge- created']}],
-    #     #   'Errors': [],
-    #     #   'Info': ['Running job id=merge'],
-    #     #   'Warnings': []},
-    #     #  200)
-    #     # assert(valid.with_status() == expect)
-    # 
-    # environ["AWS_SECRET_ACCESS_KEY"] = "test"
-    # environ["AWS_ACCESS_KEY_ID"] = "test"
-    # run_tests("table", "merge", True, "fatal", ["config_4"],  tests)
+    def tests(env: MasonEnvironment, config: Config, op: Operator):
+        # unsupported merge schema
+        params = OperatorParameters(parameter_string="database_name:good_input_bucket,table_name:good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
+        unsupported = op.validate(config, params).run(env, Response()).response
+        assert('No conflicting schemas found at good_input_bucket,good_input_path. Merge unecessary. ' in unsupported.formatted()["Errors"][0])
+
+        # invalid merge params
+        params = OperatorParameters(parameter_string="input_path:test,database_name:test,table_name:test")
+        invalid = op.validate(config, params).run(env, Response())
+        assert(invalid.with_status() == ({'Errors': ['Invalid Operator.  Reason:  Invalid parameters.  Required parameter not specified: output_path']}, 400))
+
+        # valid merge
+        params = OperatorParameters(parameter_string="database_name:good_input_bucket_2,table_name:good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
+        valid = op.validate(config, params).run(env, Response())
+        expect = ({'Data': [{'Logs': ['sparkapplication.sparkoperator.k8s.io/mason-spark-merge created']}],
+          'Info': ['Fetching keys at s3://good_input_bucket_2/good_input_path'],
+          'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 200)
+        assert(valid.with_status() == expect)
+
+    run_tests("table", "merge", True, "fatal", ["5"],  tests)
 
 def test_query():
 
@@ -114,12 +101,11 @@ def test_query():
         params = OperatorParameters(parameter_string=f"query_string:{query},database_name:good_database,table_name:good_table,output_path:{output_path}")
         result = op.validate(config, params).run(env, Response())
         exp = {
-            "6": ['Running Query "SELECT * from $table limit 3"', 'Running Athena query.  query_id: test', 'Running job id=test'],
+            "6": ['Running Query "SELECT * from $table limit 3"', 'Running Athena query.  query_id: test'],
             "4": [f'Table succesfully formatted as parquet and exported to {output_path}']
         }
 
-        expect = {'Info': exp[config.id]}
-        assert(result.with_status() == (expect, 200))
+        assert((result.formatted()["Info"], result.status_code()) == (exp[config.id], 200))
 
         # bad permissions
         query = "SELECT * from $table limit 3"
@@ -167,7 +153,7 @@ def test_infer():
         params = OperatorParameters(parameter_string=f"database_name:bad-database,storage_path:test-database/test-table")
         good = op.validate(config, params).run(env, Response())
 
-        assert(good.with_status() == ({'Errors': ['Job errored: Metastore database bad-database not found'], 'Info': ['Fetching keys at s3://test-database/test-table', 'Table inferred: test-table'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
+        assert(good.with_status() == ({'Errors': ['Job errored: Metastore database bad-database not found'], 'Info': ['Fetching keys at s3://test-database/test-table', 'Table inferred: test-table', 'Fetching Database: bad-database'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404))
 
         # bad path
         params = OperatorParameters(parameter_string=f"database_name:test-database,storage_path:test-database/bad-table")
@@ -179,12 +165,13 @@ def test_infer():
         good = op.validate(config, params).run(env, Response())
 
         result = good.formatted()
-        expect = {'Info': ['Fetching keys at s3://test-database/test-table',
+        expect = {'Data': [{'Logs': ['Running job id=test_id']}],
+                  'Info': ['Fetching keys at s3://test-database/test-table',
                   'Table inferred: test-table',
-                  'Running Athena query.  query_id: test_id',
-                  'Running job id=test_id'],
+                  'Fetching Database: test-database',
+                  'Running Athena query.  query_id: test_id'],
          'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}
-        
+
         assert(result == expect)
 
     run_tests("table", "infer", True, "fatal", ["6"], tests)
@@ -192,7 +179,6 @@ def test_infer():
 
 def test_format():
 
-    load_dotenv(from_root("/../.env"), override=True)
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         params = OperatorParameters(parameter_string=f"database_name:mason-sample-data,table_name:tests/in/csv/,format:boogo,output_path:mason-sample-data/tests/out/csv/")
@@ -208,7 +194,6 @@ def test_format():
     run_tests("table", "format", True, "fatal", ["4"], tests)
     
 def test_summarize():
-    load_dotenv(from_root("/../.env"), override=True)
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
         parameters = table.parameters(config.id)[1]
@@ -231,20 +216,16 @@ def test_summarize_async():
     load_dotenv(from_root("/../.env"), override=True)
 
     def tests(env: MasonEnvironment, config: Config, op: Operator):
-        # no output_path
+        # good
         parameters = table.parameters(config.id)[0]
         params = OperatorParameters(parameter_string=parameters)
-        bad = op.validate(config, params).run(env, Response())
-        assert(isinstance(bad.object, InvalidJob))
+        good = op.validate(config, params).run(env, Response())
+        assert(isinstance(good.object, ExecutedJob))
 
         parameters = table.parameters(config.id)[1]
         params = OperatorParameters(parameter_string=parameters)
-        good = op.validate(config, params).run(env, Response())
-        print("HERE")
-        
-        # assert(isinstance(bad.object, InvalidJob))
-        # invalid_tables = bad.object
-        # assert(isinstance(invalid_tables, InvalidTables))
+        bad = op.validate(config, params).run(env, Response())
+        assert(isinstance(bad.object, InvalidJob))
 
     run_tests("table", "summarize", True, "fatal", ["5"], tests)
 

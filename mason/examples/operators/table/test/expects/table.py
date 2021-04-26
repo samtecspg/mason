@@ -86,8 +86,8 @@ def parameters(config_id: str):
         ]
     else:
         return [
-            "database_name:test-database,table_name:test-table,read_headers:true",
             "database_name:test-database,table_name:test-table,read_headers:true,output_path:test-database/test-summary",
+            "database_name:bad-database,table_name:test-table",
             "database_name:test-database,table_name:bad-table"
         ]
 

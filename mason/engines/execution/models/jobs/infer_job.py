@@ -9,8 +9,14 @@ class InferJob(Job):
         self.table_name = table_name
         self.database_name = database_name
         self.read_headers = read_headers
+        self.credentials = credentials
+        self.path = path
+        super().__init__("infer")
+        
+    def spec(self) -> dict:
+        parameters = self.credentials.to_dict()
+        parameters['path'] = self.path.full_path()
+        return parameters
 
-        parameters = credentials.to_dict()
-        parameters['path'] = path.full_path()
+        
 
-        super().__init__("infer", parameters)

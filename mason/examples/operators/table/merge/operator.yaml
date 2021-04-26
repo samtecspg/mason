@@ -4,11 +4,13 @@ command: "merge"
 description:  "Merge metastore tables"
 parameters:
   required:
+    - database_name
+    - table_name
     - output_path
-    - input_path
   optional:
     - extract_paths
-    - parse_headers
+    - read_headers
 supported_configurations:
-  - storage: "s3"
+  - metastore: "s3"
+    storage: "s3"
     execution: "spark"

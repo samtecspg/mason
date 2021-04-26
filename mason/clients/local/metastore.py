@@ -10,7 +10,7 @@ from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
-from mason.engines.metastore.models.database import Database, InvalidDatabase
+from mason.engines.metastore.models.database import Database, InvalidDatabase, DatabaseList
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
@@ -30,7 +30,10 @@ class LocalMetastoreClient(MetastoreClient):
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
         raise NotImplementedError("delete_table not implemented")
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
+    def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
+        raise NotImplementedError("Local client get_databases not implemented")
+
+    def get_database(self, database_name: str, response: Optional[Response] = Response()) -> Tuple[Result[Database, InvalidDatabase], Response]:
         raise NotImplementedError("get_database not implemented")
 
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
@@ -40,15 +43,6 @@ class LocalMetastoreClient(MetastoreClient):
         storage = LocalStorageClient(self.client)
         path: Path = storage.table_path(database_name, table_name)
         return storage.infer_table(path, table_name, options, response)
-    
-    def full_path(self, path: str) -> str:
-        return "s3a://" + path
-
-    def parse_path(self, path: str) -> Tuple[str, str]:
-        parsed = urlparse(self.full_path(path), allow_fragments=False)
-        key = parsed.path.lstrip("/")
-        bucket = parsed.netloc
-        return bucket, key
 
     def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
         raise NotImplementedError("credentials not implemented")

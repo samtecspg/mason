@@ -23,10 +23,10 @@ def run(resource_type: str, namespace: str, command: str, parameter_string: Opti
 
     if isinstance(resource, Resource) and isinstance(config, Config) and isinstance(params, Parameters):
         if dry_run:
-            response = validate_resource(resource, config, params, environment).dry_run(environment, response).to_response(response)
+            response = validate_resource(resource, config, params, environment).dry_run(environment, response).to_response()
         else:
             runned = validate_resource(resource, config, params, environment).run(environment, response)
-            response = runned.to_response(response)
+            response = runned.to_response()
     else:
         if isinstance(resource, MalformedResource):
             response.add_error(f"Malformed Resource: {resource.get_message()}")

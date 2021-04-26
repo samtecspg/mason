@@ -1,6 +1,6 @@
 
 from abc import abstractmethod
-from typing import Union, Optional, Tuple, List
+from typing import Union, Optional, Tuple
 
 from returns.result import Result
 
@@ -21,7 +21,7 @@ class MetastoreClient:
         self.client = client
 
     @abstractmethod
-    def get_databases(self,response: Optional[Response] = None) -> Tuple[DatabaseList, Response]:
+    def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
         raise NotImplementedError
 
     @abstractmethod

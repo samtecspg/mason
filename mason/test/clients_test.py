@@ -50,7 +50,7 @@ class TestSpark:
             'executor_cores': 20
         })
 
-        job = MergeJob(Path("test-input"), Path("test-output"), "parquet")
+        job = MergeJob("parquet", Path("test-input"), Path("test-output"))
         job.set_id("mason-spark-test_job")
 
         merged = merge_config(config, job)
@@ -59,6 +59,7 @@ class TestSpark:
         expects = """
             apiVersion: sparkoperator.k8s.io/v1beta2
             kind: SparkApplication
+            mainClass:test.main.Class
             metadata:
               name: mason-spark-test_job
               namespace: default
@@ -70,6 +71,8 @@ class TestSpark:
               - test-output 
               - --input_format
               - parquet
+              - --read_headers
+              -'false'
               - --job
               - merge 
               driver:
@@ -94,7 +97,7 @@ class TestSpark:
               image: docker/test-docker-image
               imagePullPolicy: Always
               mainApplicationFile: local://test/jar/file/location/assembly.jar
-              mainClass: test.main.Class
+              mainClass: mason.spark.Main 
               mode: cluster
               restartPolicy:
                 type: Never

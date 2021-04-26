@@ -10,7 +10,7 @@ from mason.engines.execution.models.jobs import Job, ExecutedJob, InvalidJob
 from mason.engines.metastore.models.database import Database
 from mason.engines.metastore.models.ddl import DDLStatement
 from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse, DelayedOperatorResponse
+from mason.operators.operator_response import DelayedOperatorResponse
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
@@ -25,7 +25,6 @@ class TableInfer(OperatorDefinition):
         path = config.storage().path(storage_path)
         table, response = config.storage().infer_table(path, table_name, {"read_headers": read_headers}, response)
         
-        job = Job("query")
         final: Union[ExecutedJob, InvalidJob]
 
         if isinstance(table, Table):
@@ -38,12 +37,12 @@ class TableInfer(OperatorDefinition):
                     job = QueryJob(ddl.statement, db.tables.tables[0])
                     final, response = config.execution().run_job(job, response)
                 else:
-                    final = job.errored(f"Invalid DDL generated: {ddl.reason}")
+                    final = InvalidJob(f"Invalid DDL generated: {ddl.reason}")
             else:
-                final = job.errored(f"Metastore database {database_name} not found")
+                final = InvalidJob(f"Metastore database {database_name} not found")
         else:
             response = table.to_response(response)
-            final = job.errored(f"Invalid Tables: {table.message()}")
+            final = InvalidJob(f"Invalid Tables: {table.message()}")
             
         return DelayedOperatorResponse(final, response)
 

@@ -66,7 +66,7 @@ class GlueClient(AWSClient):
 
         if error == "EntityNotFoundException":
             response.set_status(404)
-            return Failure(InvalidDatabase(f"Database {database_name} not found")), resp
+            return Failure(InvalidDatabase(f"Database {database_name} not found")), response
         elif 200 <= status < 300:
 
             table_list = result.get("TableList")

@@ -52,7 +52,7 @@ def get_table(name: str, schema: Union[Schema, SchemaConflict, InvalidSchema], p
         if isinstance(schema, InvalidSchema):
             return InvalidTable(f"Invalid Schema: {schema.reason}")
         else:
-            return ConflictingTable(schema, "Conflicting Schemas")
+            return ConflictingTable(schema, f"Conflicting Schemas: ${schema.to_dict()}")
 
 
 

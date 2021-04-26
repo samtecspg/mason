@@ -12,3 +12,4 @@ supported_configurations:
   - metastore: "glue"
     storage: "s3"
     execution: "athena"
+

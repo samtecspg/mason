@@ -8,7 +8,7 @@ from mason.clients.glue.glue_client import GlueClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
-from mason.engines.metastore.models.database import Database, InvalidDatabase
+from mason.engines.metastore.models.database import Database, InvalidDatabase, DatabaseList
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
@@ -26,7 +26,7 @@ class AthenaMetastoreClient(MetastoreClient):
     def generate_table_ddl(self, table: Table, path: Path, database: Database) -> Union[DDLStatement, InvalidDDLStatement]:
         return self.client.generate_table_ddl(table, path, database)
 
-    def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
+    def get_database(self, database_name: str, response: Optional[Response] = Response()) -> Tuple[Result[Database, InvalidDatabase], Response]:
         return self.glue_client.get_database(database_name, response)
 
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
@@ -37,6 +37,9 @@ class AthenaMetastoreClient(MetastoreClient):
 
     def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
         return self.glue_client.delete_table(database_name, table_name, response)
+
+    def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
+        raise NotImplementedError("Athena client get_databases not implemented")
 
     def full_path(self, path: str) -> str:
         raise NotImplementedError("Athena Client full_path not implemented")
