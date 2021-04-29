@@ -93,7 +93,6 @@ class TestJSONSchema:
             schema6 = from_file(f)
             assert(isinstance(schema6, JsonSchema))
 
-
         with fs.open(from_root('/test/sample_data/json_lines2.jsonl')) as f:
             schema7 = from_file(f)
             assert(isinstance(schema7, JsonSchema))

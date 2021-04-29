@@ -53,7 +53,7 @@ def interpolate_value(value: Union[str, dict], credentials: Optional[dict]) -> O
                 interpolated = sub or environ.get(key)
                 
                 if interpolated is None:
-                    logger.warning(
+                    logger.debug(
                         f"Undefined environment interpolation for key {{{key}}}.  Check that {key} is defined in your .env")
             else:
                 logger.error(f"Unpermitted Interpolation for key {{{key}}}.  Must be one of {','.join(SAFE_KEYS)}")

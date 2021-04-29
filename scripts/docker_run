@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+
+docker run -it --env-file=.env -p 5000:5000 samtecspg/mason:v$(cat VERSION) /bin/bash

@@ -24,7 +24,7 @@ setup(
             'mason = mason.cli:cli'
         ]
     },
-    #  install_requires=requirements,
+    install_requires=requirements,
     zip_safe=False,
     include_package_data=True,
     python_requires='>=3.6',
