@@ -7,6 +7,7 @@ from mason.util.environment import MasonEnvironment
 
 class TableFake(OperatorDefinition):
     def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
+        response.add_error("Not implemented")
         return OperatorResponse(response)
 
 
