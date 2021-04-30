@@ -4,17 +4,16 @@ from mason.clients.responsable import Responsable
 from mason.clients.response import Response
 
 class ExecutedJob(Responsable):
-    def __init__(self, id: str, message: Optional[str] = None, logs: Optional[List[Union[str, dict]]] = None):
+    def __init__(self, id: str, message: Optional[str] = None, logs: Optional[Union[List[Union[str, dict]], List[str]]] = None):
         self.id = id
         self.message = message or ""
-        self.logs = logs or []
+        default: List[str] = []
+        self.logs: Union[List[Union[str, dict]], List[str]] = logs or default
     
     def to_response(self, response: Response) -> Response:
         if self.message != "":
             response.add_info(self.message)
-        for l in self.logs:
-            if isinstance(l, str):
-                response.add_info(l)
-            else:
-                response.add_data(l)
+        if len(self.logs) > 0:
+            response.add_data({"Logs": self.logs})
+            
         return response

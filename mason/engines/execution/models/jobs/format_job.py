@@ -1,10 +1,9 @@
 from typing import Optional, List
 
 from mason.engines.metastore.models.credentials import MetastoreCredentials
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
-from mason.engines.metastore.models.table import Table
 from mason.engines.execution.models.jobs import Job
-
 
 class FormatJob(Job):
 
@@ -28,12 +27,8 @@ class FormatJob(Job):
         self.filter_columns = fc
         self.partitions = partitions
         self.credentials = credentials
-        
-        super().__init__("format")
 
-
-    def spec(self) -> dict:
-        spec =  {
+        parameters = {
             'input_paths': list(map(lambda p: p.full_path(), self.table.paths)),
             'input_format': self.table.schema.type,
             'output_format': self.format,
@@ -43,8 +38,27 @@ class FormatJob(Job):
             'filter_columns': self.filter_columns,
             'credentials': self.credentials.to_dict()
         }
-        
+
         if self.partitions:
-            spec['partitions'] = self.partitions
+            parameters['partitions'] = self.partitions
+
+        super().__init__("format")
+        
+    def spec(self) -> dict:
+
+        parameters = {
+            'input_paths': list(map(lambda p: p.full_path(), self.table.paths)),
+            'input_format': self.table.schema.type,
+            'output_format': self.format,
+            'line_terminator': self.table.line_terminator or "",
+            'output_path': self.output_path.full_path(),
+            'partition_columns': self.partition_columns,
+            'filter_columns': self.filter_columns,
+            'credentials': self.credentials.to_dict()
+        }
+
+        if self.partitions:
+            parameters['partitions'] = self.partitions
             
-        return spec
+        return parameters
+

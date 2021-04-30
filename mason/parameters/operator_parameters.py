@@ -33,9 +33,13 @@ class OperatorParameters(Parameters):
         return list(map(lambda p: p.to_dict(), self.parameters))
 
     def unsafe_get(self, attr: str) -> Optional[str]:
-        op = get([p for p in self.parameters if p.key == attr], 0)
+        op: Optional[Parameter] = get([p for p in self.parameters if p.key == attr], 0)
         if op:
-            return op.value
+            val =  op.value
+            if isinstance(val, str):
+                return val
+            else:
+                return None
         else:
             return None
 

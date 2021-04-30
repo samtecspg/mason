@@ -5,15 +5,17 @@ from botocore.client import BaseClient
 from botocore.errorfactory import ClientError
 from returns.result import Result, Failure, Success
 
+from mason.engines.metastore.models.table.invalid_table import InvalidTables, TableNotFound, InvalidTable
+from mason.engines.metastore.models.table.table import Table, TableList
 from mason.engines.scheduler.models.schedule import Schedule
 
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
-from mason.engines.metastore.models.database import Database, InvalidDatabase
+from mason.engines.metastore.models.database import Database, InvalidDatabase, DatabaseList
 from mason.engines.metastore.models.schemas.schema import SchemaElement, InvalidSchemaElement, Schema
-from mason.engines.metastore.models.table import Table, InvalidTable, InvalidTables, TableNotFound, TableList
 from mason.engines.storage.models.path import Path
-from mason.util.list import sequence
+from mason.util.exception import message
+from mason.util.list import sequence, flatten
 
 class GlueClient(AWSClient):
 
@@ -22,9 +24,37 @@ class GlueClient(AWSClient):
 
     def client(self) -> BaseClient:
         return boto3.client('glue', region_name=self.aws_region, aws_access_key_id=self.access_key, aws_secret_access_key=self.secret_key)
+    
+    def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
+        try:
+            raw_response = self.client().get_databases()
+            db_list = raw_response.get('DatabaseList')
+            if isinstance(db_list, list):
+                names = flatten(list(map(lambda d: d.get('Name'), db_list)))
+                if len(names) > 0:
+                    databases: List[Database] = []
+                    invalid: List[InvalidDatabase] = []
+                    for n in names:
+                        result, response = self.get_database(n, response)
+                        db = result._inner_value
+                        if isinstance(db, Database):
+                            databases.append(db)
+                        elif isinstance(db, InvalidDatabase):
+                            invalid.append(db)
+                    return DatabaseList(databases, invalid), response
+                else:
+                    response.add_error("No names returned from client response 'DatabaseList'")
+                    return DatabaseList([],[]), response
+            else:
+                response.add_error("Invalid 'DatabaseList' client response 'DatabaseList'")
+                return DatabaseList([], []), response
+        except Exception as e:
+            response.add_error(f"Error fetching glue client response: {message(e)}")
+            return DatabaseList([], []), response
 
     def get_database(self, database_name: str, response: Optional[Response] = None) -> Tuple[Result[Database, InvalidDatabase], Response]:
-        resp = response or Response()
+        response = response or Response()
+        response.add_info(f"Fetching Database: {database_name}")
 
         try:
             result = self.client().get_tables(DatabaseName=database_name)
@@ -32,28 +62,36 @@ class GlueClient(AWSClient):
             result = e.response
 
         error, status, message = self.parse_response(result)
-        resp.add_response(result)
+        response.add_response(result)
 
         if error == "EntityNotFoundException":
-            resp.set_status(404)
-            return Failure(InvalidDatabase(f"Database {database_name} not found")), resp
+            response.set_status(404)
+            return Failure(InvalidDatabase(f"Database {database_name} not found")), response
         elif 200 <= status < 300:
 
             table_list = result.get("TableList")
             if table_list:
-                valid, invalid = sequence(list(map(lambda x: self.parse_table(x, Path(database_name, "glue"), database_name), table_list)), Table, InvalidTable)
+                table_names = flatten(list(map(lambda d: d.get('Name'), table_list)))
+                valid: List[Table] = []
+                invalid: List[InvalidTable] = []
+                for table_name in table_names:
+                    result, response = self.get_table(database_name, table_name, response)
+                    if isinstance(result, Table):
+                        valid.append(result)
+                    elif isinstance(result, InvalidTable):
+                        invalid.append(result)
                 if len(invalid) > 0:
                     invalid_messages = ", ".join(list(map(lambda i: i.reason, invalid)))
-                    resp.add_warning(f"Invalid Tables in glue response: {invalid_messages}")
+                    response.add_warning(f"Invalid Tables in glue response: {invalid_messages}")
                 if len(valid) == 0:
-                    return Failure(InvalidDatabase(f"No valid tables")), resp
+                    return Failure(InvalidDatabase(f"No valid tables")), response
                 else:
-                    return Success(Database(database_name, TableList(valid))), resp
+                    return Success(Database(database_name, TableList(valid))), response
             else:
-                return Failure(InvalidDatabase("TableList not found in glue response")), resp
+                return Failure(InvalidDatabase("TableList not found in glue response")), response
         else:
-            resp.set_status(status)
-            return Failure(InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}")), resp
+            response.set_status(status)
+            return Failure(InvalidDatabase(f"Invalid response from glue: {message}.  Status: {status}")), response
 
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         try:

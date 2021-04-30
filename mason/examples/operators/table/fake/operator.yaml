@@ -7,4 +7,4 @@ parameters:
     - size
 supported_configurations:
   - execution: "dask"
-  - storage: "s3"
+    storage: "s3"

@@ -1,13 +1,12 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import threading
 import subprocess
 
-def run_sys_call(command: List[str]):
+def run_sys_call(command: List[str]) -> Tuple[List[str], List[str]]:
     sys_call = SysCall(command)
     sys_call.run()
-    stdout = (sys_call.stdout or b"").decode("utf-8").replace("\n", '')
-    stderr = (sys_call.stderr or b"").decode("utf-8").replace("\n", '')
-
+    stdout = (sys_call.stdout or b"").decode("utf-8").split("\n")
+    stderr = (sys_call.stderr or b"").decode("utf-8").split("\n")
 
     return stdout, stderr
 

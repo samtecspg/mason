@@ -28,6 +28,21 @@ def clean_string(s1: str):
     f1 = e.sub('', ansi_escape(s1))
     return f1
 
+def clean_path(o):
+    if isinstance(o, dict):
+        return {k: clean_path(v) for (k, v) in o.items()}
+    elif isinstance(o, tuple):
+        return clean_path(o[0]), clean_path(o[1])
+    elif isinstance(o, list):
+        return list(map(lambda l: clean_path(l), o))
+    elif isinstance(o, str):
+        root = from_root("")
+        return o.replace(root, "")
+    else:
+        return o
+        
+        
+
 def run_tests(namespace: str, command: str, do_mock: bool, log_level: str, configs: List[str], callable, *args, **kwargs):
     logger.set_level(log_level)
     env = get_env()
@@ -55,10 +70,6 @@ def run_test(env: MasonEnvironment, namespace: str, command: str, configs: List[
     if not isinstance(op, MalformedResource) and (op != None):
         for config in configs:
             conf = res.get_config(config)
-            # invalid = res.get_bad()
-            # for inv in invalid:
-            #     print(f"Invalid Config: {inv.get_message()}")
-            # conf = get_config(env, config)
             if isinstance(conf, Config):
                 callable(env, conf, op)
             else:
@@ -72,3 +83,5 @@ def set_log_level(level: str = None):
 def get_env(home: Optional[str] = None, validations: Optional[str] = None):
     return MasonEnvironment(from_root(home or "/examples/"), from_root(validations or "/validations/"))
 
+def clean(s: List[str]):
+    return list(map(lambda i: clean_uuid(clean_string(i)), s))

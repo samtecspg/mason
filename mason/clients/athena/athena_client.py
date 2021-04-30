@@ -8,10 +8,11 @@ from mason.clients.glue.glue_client import GlueClient
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
 from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
+from mason.engines.execution.models.jobs.generic_job import GenericJob
 from mason.engines.execution.models.jobs.query_job import QueryJob
 from mason.engines.metastore.models.database import Database, InvalidDatabase
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table import Table
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path
 from mason.util.uuid import uuid4
 
@@ -24,7 +25,6 @@ class AthenaClient(AWSClient):
         return boto3.client('athena', region_name=self.aws_region, aws_secret_access_key=self.secret_key, aws_access_key_id=self.access_key)
     
     def get_database(self, database_name: str, response: Optional[Response]) -> Tuple[Result[Database, InvalidDatabase], Response]:
-        # Parlaying over to glue for now
         glue_client = GlueClient(access_key=self.access_key, secret_key=self.secret_key, aws_region=self.aws_region)
         return glue_client.get_database(database_name, response)
 
@@ -44,9 +44,8 @@ class AthenaClient(AWSClient):
         return error, status, message
 
     def get_job(self, job_id: str, resp: Optional[Response]) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        job = Job("query")
-        job.set_id(job_id)
         response: Response = resp or Response()
+        job = GenericJob(job_id)
 
         try:
             athena_response = self.client().get_query_execution(
@@ -92,7 +91,7 @@ class AthenaClient(AWSClient):
                     rows = results.get("Rows") or []
                     if len(rows) > 0:
                         response.add_data(results)
-                    final = job.running(past=True) 
+                    final = ExecutedJob(job_id) 
                 else:
                     final = job.errored("No job results returned from athena")
 
@@ -144,9 +143,9 @@ class AthenaClient(AWSClient):
         
         final: Union[ExecutedJob, InvalidJob]
         if isinstance(job, QueryJob):
-            final, response =  self.query(job, resp)
+            final, response = self.query(job, resp)
         else:
-            final =  job.errored(f"Job type {job.type} not supported for Athena client")
+            final = job.errored(f"Job type {job.type} not supported for Athena client")
             
         return final, response
 

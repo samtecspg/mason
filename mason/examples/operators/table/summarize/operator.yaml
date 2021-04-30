@@ -1,0 +1,19 @@
+type: "operator"
+namespace: "table"
+command: "summarize"
+description:  "Provide summary statistics for a table"
+parameters:
+  required:
+    - "database_name"
+    - "table_name"
+  optional:
+    - "read_headers"
+    - "output_path"
+supported_configurations:
+  - metastore: "local"
+    execution: "local"
+  - metastore: "s3"
+    execution: "local"
+  - metastore: "s3"
+    execution: "spark"
+    storage: "s3"

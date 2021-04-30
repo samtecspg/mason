@@ -1,10 +1,8 @@
 id: "3"
 type: "config"
-metastore_clients: 
-  - athena
-storage_clients: 
+metastore_clients:
   - s3
-scheduler_clients: 
+execution_clients:
   - local
 clients:
   s3:
@@ -12,11 +10,5 @@ clients:
       aws_region: "{{AWS_REGION}}"
       access_key: "{{AWS_ACCESS_KEY_ID}}"
       secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
-  athena:
-    configuration:
-      aws_region: "{{AWS_REGION}}"
-      access_key: "{{AWS_ACCESS_KEY_ID}}"
-      secret_key: "{{AWS_SECRET_ACCESS_KEY}}"
   local:
-    configuration:
-      threads: 4
+    configuration: {}

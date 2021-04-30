@@ -10,7 +10,6 @@ parameters:
     - "table_name"
 supported_configurations:
   - metastore: "glue"
-    scheduler: "glue"
     storage: "s3"
-  - metastore: "athena"
-    storage: "s3"
+    execution: "athena"
+

@@ -2,19 +2,19 @@ from os import path
 import os
 import pytest  # type: ignore
 from click.testing import CliRunner
+from dotenv import load_dotenv
 
-from mason.cli import config
+from mason.cli import config, get
 from mason.cli.run import run
 from mason.definitions import from_root
 
 
 def print_result(result):
-    print()
     print(result.output)
     if result.exception:
         print(result.exception)
 
-@pytest.mark.skip(reason="This is not mocked, hits live endpoints")
+# @pytest.mark.skip(reason="This is not mocked, hits live endpoints")
 class TestCLI:
 
     @pytest.fixture(autouse=True)
@@ -28,5 +28,6 @@ class TestCLI:
 
     def test_play(self):
         runner = CliRunner()
-        print_result(runner.invoke(config, ["-s", "5"]))
-        print_result(runner.invoke(run, ["operator", "table", "get",  "-p", "database_name:mason-test-data,table_name:csv/test.csv,read_headers:true"]))
+        load_dotenv(from_root("/../.env"), override=True)
+        print_result(runner.invoke(get, ["operator"], catch_exceptions=False))
+

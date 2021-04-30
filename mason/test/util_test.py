@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from typing import List
 
 from mason.definitions import from_root

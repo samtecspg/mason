@@ -3,7 +3,6 @@ import datetime
 from typing import List, Union, Optional
 
 from tabulate import tabulate
-from typistry.protos.invalid_object import InvalidObject
 
 from mason.clients.response import Response
 from mason.configurations.config import Config
@@ -40,12 +39,15 @@ class CliPrinter(Printer):
             operators, workflows, configs, bad = sequence_4(resources, Operator, Workflow, Config, MalformedResource)
             type_name = type or "all"
             # TODO: dry up with resources
+            self.print_invalid(bad)
             if type in ["all", "operator", "operators"]:
                 self.print_operators(operators, namespace, command)
             if type in ["all", "workflow", "workflows"]:
                 self.print_workflows(workflows, namespace, command)
             if type in ["all", "config", "configs"]:
                 self.print_configs(configs, environment)
+            if len(bad) > 0:
+                self.print_invalid(bad)
                 
         return Response()
 
@@ -105,7 +107,9 @@ class CliPrinter(Printer):
         else:
             logger.error("No configs.  Register configs by running \"mason apply\"")
 
-    def print_invalid(self, invalid: List[InvalidObject]):
+    def print_invalid(self, invalid: List[MalformedResource]):
         for i in invalid:
-            logger.error(i.message)
+            message = i.get_message()
+            if message:
+                logger.error(message)
 

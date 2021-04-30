@@ -51,9 +51,9 @@ class KubernetesWorker(DaskRunner):
         try:
             if self.scheduler:
                 if isinstance(job, FormatJob):
-                    final = self.run_job(job.type, job.spec(), self.scheduler, mode) or ExecutedJob("format_job", f"Job queued to format {job.table.schema.type} table as {job.format} and save to {job.output_path.path_str}")
+                    final = self.run_job(job, self.scheduler, mode) or ExecutedJob("format_job", f"Job queued to format {job.table.schema.type} table as {job.format} and save to {job.output_path.path_str}")
                 elif isinstance(job, QueryJob):
-                    final = self.run_job(job.type, job.spec(), self.scheduler)
+                    final = self.run_job(job, self.scheduler)
                 else:
                     final = job.errored("Job type not supported for Dask")
             else:
@@ -64,7 +64,7 @@ class KubernetesWorker(DaskRunner):
         return final, response
 
 
-    def run_job(self, job_type: str, spec: dict, scheduler: str, mode: str = "async") -> Union[ExecutedJob, InvalidJob]:
+    def run_job(self, job: Job, scheduler: str, mode: str = "async") -> Union[ExecutedJob, InvalidJob]:
 
         from distributed import fire_and_forget
         import dask
@@ -74,16 +74,17 @@ class KubernetesWorker(DaskRunner):
 
         from mason_dask.utils.cluster_spec import ClusterSpec
 
-        if job_type == "format":
+        if isinstance(job, FormatJob):
             from mason_dask.jobs.format import FormatJob as DaskFormatJob
-            job = DaskFormatJob(spec)
-        elif job_type == "query":
+            job = DaskFormatJob(job.spec())
+        elif isinstance(job, QueryJob):
             from mason_dask.jobs.query import QueryJob as DaskQueryJob
-            job = DaskQueryJob(spec)
+            job = DaskQueryJob(job.spec())
         else:
-            raise NotImplementedError(f"Job not implemented: {job_type}")
+            raise NotImplementedError(f"Job not implemented: {job.type}")
 
-        dask_job = job.validate()
+        # TODO: fix this in mason - dask
+        dask_job = job.validate() # type: ignore  
 
         def to_mason_job(job: Result[ExecutedDaskJob, InvalidDaskJob]):
             j = compute(job)

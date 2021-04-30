@@ -1,6 +1,8 @@
 
-from typing import Sequence, Set, List, Dict
+from typing import Sequence, Set, List, Dict, Optional, Any
 from abc import ABCMeta, abstractmethod
+
+from pandas import DataFrame
 
 from mason.engines.storage.models.path import Path
 from mason.util.dict import merge
@@ -27,10 +29,11 @@ class Schema(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self, columns: Sequence[SchemaElement], type: str, path: Path):
+    def __init__(self, columns: Sequence[SchemaElement], type: str, path: Path, dataframe: Optional[DataFrame] = None):
         self.path = path
         self.type = type
         self.columns = columns
+        self.df = dataframe 
 
     def __hash__(self):
         return 0
@@ -53,6 +56,9 @@ class Schema(object):
 
     def to_pd_dict(self) -> Dict:
         return merge(list(map(lambda c: c.to_pd_dict(), self.columns)))
+    
+    def column_names(self) -> List[str]:
+        return list(map(lambda c: c.name , self.columns))
 
 class EmptySchema(Schema):
 

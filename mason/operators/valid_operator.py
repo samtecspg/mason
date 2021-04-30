@@ -1,11 +1,12 @@
 import importlib
 from typing import List, Optional, Union
 
+
 from mason.clients.response import Response
 from mason.configurations.config import Config
 from mason.operators.invalid_operator import InvalidOperator
 from mason.operators.operator_definition import OperatorDefinition
-from mason.operators.operator_response import OperatorResponse
+from mason.operators.operator_response import OperatorResponse, DelayedOperatorResponse
 from mason.operators.supported_engines import SupportedEngineSet
 from mason.parameters.validated_parameters import ValidatedParameters
 from mason.resources.valid import ValidResource
@@ -51,7 +52,7 @@ class ValidOperator(ValidResource):
         except Exception as e:
             return InvalidOperator(f"Error initializing operator module: {message(e)}")
 
-    def execute(self, env: MasonEnvironment, response: Response, dry_run: bool = True) -> OperatorResponse:
+    def execute(self, env: MasonEnvironment, response: Response, dry_run: bool = True) -> Union[OperatorResponse, DelayedOperatorResponse]:
         try:
             module = self.module(env)
             if isinstance(module, OperatorDefinition):
@@ -59,9 +60,12 @@ class ValidOperator(ValidResource):
                     response.add_info(f"Valid Operator: {self.namespace}:{self.command} with specified parameters.")
                     return OperatorResponse(response)
                 else:
-                    operator_response: OperatorResponse = module.run(env, self.config, self.parameters, response)
+                    if (self.config.execution().is_async() == True):
+                        operator_response: Union[OperatorResponse, DelayedOperatorResponse] = module.run_async(env, self.config, self.parameters, response)
+                    else:
+                        operator_response  = module.run(env, self.config, self.parameters, response)
             else:
-                response.add_error(f"Module does not contain a valid OperatorDefinition. See /examples for sample operator implementations. \nMessage: {module.reason}")
+                response.add_error(f"Module does not contain a valid OperatorDefinition. See /examples for sample operator implementations. \n Message: {module.reason}")
                 operator_response = OperatorResponse(response)
         except ModuleNotFoundError as e:
             response.add_error(f"Module Not Found: {e}")

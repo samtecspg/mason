@@ -1,9 +1,11 @@
-from typing import Sequence, Optional, Union, List
+from typing import Sequence, Optional, Union, List, Tuple
 
-from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema, InvalidSchemaElement
+from pandas import DataFrame
+
+from mason.engines.metastore.models.schemas.schema import SchemaElement, Schema, InvalidSchema
 from mason.engines.storage.models.path import Path
 from mason.util.exception import message
-import pandas as pd
+from io import StringIO
 
 
 SUPPORTED_TYPES = {
@@ -34,21 +36,31 @@ class TextSchema(Schema):
         self.line_terminator = line_terminator
         super().__init__(columns, SUPPORTED_TYPES.get(type, ""), path)
 
-def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
+def df_from(text: StringIO, type: str, read_headers: Optional[bool]) -> Tuple[DataFrame, str]:
     headers = read_headers or False
-    header_list: Union[List[str], bool]
-    
     header: Optional[int] = None
+    prefix: Optional[str] = "col_"
     if headers:
         header = 0
+        prefix = None
 
     if (SUPPORTED_TYPES.get(type) == "csv-crlf"):
         line_terminator = "\r"
     else:
         line_terminator = "\n"
+        
+    # import great_expectations as ge
+    # from great_expectations.dataset import PandasDataset
+    # return ge.read_csv(text, lineterminator=line_terminator, header=header, dataset_class=PandasDataset), line_terminator
+    
+    import pandas as pd
+    #  Note: prefix -> casts to string, if this is passed into dask ddf then it won't like default integer column headers
+    
+    return pd.read_csv(text, lineterminator=line_terminator, header=header, skipinitialspace=True, prefix=prefix), line_terminator
 
-    from io import StringIO
-    df = pd.read_csv(StringIO(sample.decode("utf-8")), lineterminator=line_terminator, header=header)
+def from_file(type: str, sample: bytes, path: Path, read_headers: Optional[bool]) -> Union[TextSchema, InvalidSchema]:
+    text = StringIO(sample.decode("utf-8"))
+    df, line_terminator = df_from(text, type, read_headers)
     
     try:
 

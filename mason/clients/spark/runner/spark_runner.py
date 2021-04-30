@@ -15,5 +15,5 @@ class SparkRunner:
 class EmptySparkRunner(SparkRunner):
 
     def run(self, config: SparkConfig, job: Job) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        raise NotImplementedError("Runner not implemented")
+        return InvalidJob("No Spark Runner Specified"), Response()
 

@@ -9,25 +9,12 @@ class LocalExecutionClient(ExecutionClient):
     
     def __init__(self, client: LocalClient):
         self.client = client 
-
+        
+    def is_async(self) -> bool:
+        return False
+    
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
-
-        resp: Response = response or Response()
-        # if isinstance(job, FormatJob):
-            # for path in job.paths:
-            #     workbook = Workbook(path.path_str + '.xlsx')
-            #     worksheet = workbook.add_worksheet()
-            #     with fsspec.open(path.full_path(), mode='rt') as f:
-            #         f.read()
-                #     for col in split:
-                #         worksheet.writer(row,col, i)
-                #         i+=1
-                #             
-                # workbook.close()
-        # else:
-        final = InvalidJob(f"Job type {job.type} not supported")
-            
-        return final, resp
+        raise NotImplementedError("Client run_job not implemented")
 
     def get_job(self, job_id: str, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         raise NotImplementedError("Client not implemented")

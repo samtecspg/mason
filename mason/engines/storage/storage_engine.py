@@ -5,6 +5,7 @@ from mason.clients.base import Client
 from mason.clients.engines.storage import StorageClient
 from mason.clients.engines.invalid_client import InvalidClient
 from mason.engines.engine import Engine
+from mason.engines.storage.models.path import Path
 from mason.util.string import to_class_case
 from mason.util.exception import message
 
@@ -23,10 +24,14 @@ class StorageEngine(Engine):
             try:
                 mod = importlib.import_module(f'{client_module}.{name}.storage')
                 class_name = to_class_case(name + "_storage_client")
-                ms_client = getattr(mod, class_name)(client)
-                return ms_client
+                storage_client = getattr(mod, class_name)(client)
+                if isinstance(storage_client, StorageClient):
+                    return storage_client
+                else:
+                    return InvalidClient("Could not fetch storage client")
             except Exception as e:
                 return InvalidClient(f"Could not instantiate storage client for: {name}: {message(e)}")
         else:
             return InvalidClient(f"Client not configured: {name}")
-
+    
+    

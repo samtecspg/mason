@@ -1,4 +1,5 @@
 recursive-include mason *.yml
 recursive-include mason *.yaml
 recursive-include mason *.json
+recursive-include mason *.jsonl
 recursive-include mason *.csv

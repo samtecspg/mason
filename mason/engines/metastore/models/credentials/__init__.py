@@ -8,4 +8,6 @@ class MetastoreCredentials:
 class InvalidCredentials:
     def __init__(self, reason: str):
         self.reason = reason
+        
+    def to_dict(self): return {}
 

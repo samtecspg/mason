@@ -10,8 +10,6 @@ from mason.clients.response import Response
 from mason.resources.resource import Resource
 from mason.resources.saveable import Saveable
 from mason.state.base import MasonStateStore, FailedOperation
-# from mason.configurations import REDACTED_KEYS
-# from mason.util.dict import sanitize
 from mason.util.exception import message
 
 class Config(Saveable, Resource):
@@ -93,12 +91,18 @@ class Config(Saveable, Resource):
         storage_clients = list(map(lambda c: c.client.to_dict(), self.storage_clients))
         scheduler_clients = list(map(lambda c: c.client.to_dict(), self.scheduler_clients))
         metastore_clients = list(map(lambda c: c.client.to_dict(), self.metastore_clients))
+        invalid = list(map(lambda c: c.client.to_dict(), self.invalid_clients))
         
         id = self.id
         if current_id and current_id == id:
             current = True
         else:
             current = False
-        return {'current': current, 'id': id, 'execution_client': execution_clients, 'metastore_client': metastore_clients, 'storage_client': storage_clients, 'scheduler_client': scheduler_clients}
+        value = {'current': current, 'id': id, 'execution_client': execution_clients, 'metastore_client': metastore_clients, 'storage_client': storage_clients, 'scheduler_client': scheduler_clients}
+        
+        if len(invalid) > 0:
+            value['invalid_clients'] = invalid
+            
+        return value
 
 

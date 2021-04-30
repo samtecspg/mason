@@ -1,5 +1,5 @@
 import re
-
+from typing import List, Optional
 
 class Path:
 
@@ -15,3 +15,11 @@ class Path:
             return "://".join([self.protocal, self.path_str])
         else:
             return self.path_str
+        
+
+def construct(parts: List[str], protocal: Optional[str] = None) -> Path:
+    # TODO: use os path methods for this
+    join = "/".join(parts)
+    clean = re.sub(r'/+', '/', join)
+    return Path(clean, protocal or "file")
+    

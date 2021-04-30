@@ -1,7 +1,6 @@
 from typing import Union
 
-from mason.engines.metastore.models.table import Table
-
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.scheduler.models.dags.failed_dag_step import FailedDagStep
 from mason.engines.scheduler.models.dags.executed_dag_step import ExecutedDagStep
 from mason.engines.scheduler.models.dags.valid_dag_step import ValidDagStep

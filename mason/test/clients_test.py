@@ -1,5 +1,24 @@
 from hiyapyco import dump as hdump
+
+from mason.clients.airflow.airflow_client import AirflowClient
+from mason.clients.airflow.scheduler import AirflowSchedulerClient
+from mason.clients.athena.athena_client import AthenaClient
+from mason.clients.athena.execution import AthenaExecutionClient
+from mason.clients.athena.metastore import AthenaMetastoreClient
+from mason.clients.dask.dask_client import DaskClient
+from mason.clients.dask.execution import DaskExecutionClient
+from mason.clients.glue.glue_client import GlueClient
+from mason.clients.glue.metastore import GlueMetastoreClient
+from mason.clients.glue.scheduler import GlueSchedulerClient
+from mason.clients.local.execution import LocalExecutionClient
+from mason.clients.local.metastore import LocalMetastoreClient
+from mason.clients.local.scheduler import LocalSchedulerClient
 from mason.clients.response import Response
+from mason.clients.s3.metastore import S3MetastoreClient
+from mason.clients.s3.s3_client import S3Client
+from mason.clients.s3.storage import S3StorageClient
+from mason.clients.spark.execution import SparkExecutionClient
+from mason.clients.local.local_client import LocalClient
 from mason.resources.malformed import MalformedResource
 from mason.resources.base import Resources
 
@@ -7,7 +26,7 @@ from mason.util.environment import MasonEnvironment
 from mason.workflows.valid_workflow import ValidWorkflow
 from mason.parameters.workflow_parameters import WorkflowParameters
 
-from mason.clients.spark.spark_client import SparkConfig
+from mason.clients.spark.spark_client import SparkConfig, SparkClient
 from mason.clients.spark.runner.kubernetes_operator.kubernetes_operator import merge_config
 from mason.engines.execution.models.jobs.merge_job import MergeJob
 from mason.engines.storage.models.path import Path
@@ -31,7 +50,7 @@ class TestSpark:
             'executor_cores': 20
         })
 
-        job = MergeJob(Path("test-input"), Path("test-output"), "parquet")
+        job = MergeJob("parquet", Path("test-input"), Path("test-output"))
         job.set_id("mason-spark-test_job")
 
         merged = merge_config(config, job)
@@ -40,6 +59,7 @@ class TestSpark:
         expects = """
             apiVersion: sparkoperator.k8s.io/v1beta2
             kind: SparkApplication
+            mainClass:test.main.Class
             metadata:
               name: mason-spark-test_job
               namespace: default
@@ -51,6 +71,8 @@ class TestSpark:
               - test-output 
               - --input_format
               - parquet
+              - --read_headers
+              -'false'
               - --job
               - merge 
               driver:
@@ -75,7 +97,7 @@ class TestSpark:
               image: docker/test-docker-image
               imagePullPolicy: Always
               mainApplicationFile: local://test/jar/file/location/assembly.jar
-              mainClass: test.main.Class
+              mainClass: mason.spark.Main 
               mode: cluster
               restartPolicy:
                 type: Never
@@ -162,6 +184,42 @@ class TestLocal:
         assert(len(response.errors)  == 0)
         assert(clean_uuid(clean_string("\n".join(response.info))) == clean_uuid(clean_string(info)))
 
+
+class TestOthers:
+    
+    #  These tests ensure metatore clients are explicitely instantiated to ensure that they are hit at least once for mypy
+    def test_s3_client(self):
+        s3_client = S3Client("test", "test", "test")
+        s3_metastore = S3MetastoreClient(s3_client)
+        s3_storage = S3StorageClient(s3_client)
+
+    def test_spark_client(self):
+        spark_client = SparkClient({"type": "operator"})
+        spark_execution = SparkExecutionClient(spark_client)
+        
+    def test_airflow_client(self):
+        airflow_client = AirflowClient("endpoint", "user", "password")
+        airflow_scheduler = AirflowSchedulerClient(airflow_client)
+    
+    def test_athena_client(self):
+        athena_client = AthenaClient("test", "test", "test")
+        athena_metastore_client = AthenaMetastoreClient(athena_client)
+        athena_execution_client = AthenaExecutionClient(athena_client)
+
+    def test_dask_client(self):
+        dask_client = DaskClient({})
+        dask_execution_client = DaskExecutionClient(dask_client)
+    
+    def test_glue_client(self):
+        glue_client = GlueClient("test", "test", "test")
+        glue_metastore_client = GlueMetastoreClient(glue_client)
+        glue_scheduler_client = GlueSchedulerClient(glue_client)
+    
+    def test_local_client(self):
+        local_client = LocalClient()
+        local_execution_client = LocalExecutionClient(local_client)
+        local_scheduler_client = LocalSchedulerClient(local_client)
+        local_metastore_client = LocalMetastoreClient(local_client)
 
 
 

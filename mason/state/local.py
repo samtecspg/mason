@@ -108,7 +108,7 @@ class LocalStateStore(MasonStateStore):
             with open(self.config_home + "CURRENT_CONFIG", 'r') as f:
                 return str(f.read())
         except FileNotFoundError as e:
-            logger.warning("Current Mason config not set.  Run \"mason run config <ID>\" to set session config.")
+            logger.warning("Current Mason config not set.  Run \"mason config -s <ID>\" to set session config.")
         return None
 
 

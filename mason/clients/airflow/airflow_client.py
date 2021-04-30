@@ -9,10 +9,10 @@ from mason.clients.response import Response
 
 class AirflowClient(Client):
 
-    def __init__(self, config: dict):
-        self.endpoint = config.get("endpoint")
-        self.user = config.get("user")
-        self.password = config.get("password")
+    def __init__(self, endpoint: str, user: str, password: str):
+        self.endpoint = endpoint 
+        self.user = user 
+        self.password = password 
         
     def to_dict(self) -> dict:
         return {

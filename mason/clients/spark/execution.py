@@ -11,7 +11,7 @@ class SparkExecutionClient(ExecutionClient):
         self.client: SparkClient = client 
 
     def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
-        return self.client.run_job(job, response)
+        return self.client.run_job(job, response or Response())
 
     def get_job(self, job_id: str, response: Optional[Response] = None) -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
         return self.client.get_job(job_id, response)

@@ -8,6 +8,17 @@ parameters:
     - "table_name"
   optional:
     - "read_headers"
+    - "output_path"
 supported_configurations:
-  - metastore: "glue"
+  - metastore: "local"
+    execution: "local"
   - metastore: "s3"
+    execution: "local"
+  - metastore: "glue"
+    execution: "local"
+  - metastore: "s3"
+    storage: "s3"
+    execution: "spark"
+    
+    
+    

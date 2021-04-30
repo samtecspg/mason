@@ -9,7 +9,7 @@ from mason.test.support import testing_base as base
 from os import path, mkdir
 
 class TestGetConfiguration:
-
+    
     def test_config_exists(self):
         env = base.get_env("/test/support/", "/test/support/validations/")
         response, status = get("config", '5', env=env) 

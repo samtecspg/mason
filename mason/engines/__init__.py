@@ -16,7 +16,7 @@ def safe_interpolate_environment(config_doc: dict, credential_file:str = "~/.aws
         logger.warning("AWS Config not found")
         config = None
 
-    return {k: interpolate_value(v, config) for k, v in config_doc.items()}
+    return {k: interpolate_value(v, config) for k, v in config_doc.items() if interpolate_value(v, config)}
 
 def interpolate_value(value: Union[str, dict], credentials: Optional[dict]) -> Optional[Union[str, dict]]:
 
@@ -26,7 +26,7 @@ def interpolate_value(value: Union[str, dict], credentials: Optional[dict]) -> O
         'AWS_REGION',
         'MASON_HOME',
         'KUBECONFIG',
-        'GLUE_ROLE_ARN',
+        'AWS_ROLE_ARN',
         'DASK_SCHEDULER'
         'AIRLFLOW_SCHEDULER',
         'AIRFLOW_USER',
@@ -53,7 +53,7 @@ def interpolate_value(value: Union[str, dict], credentials: Optional[dict]) -> O
                 interpolated = sub or environ.get(key)
                 
                 if interpolated is None:
-                    logger.warning(
+                    logger.debug(
                         f"Undefined environment interpolation for key {{{key}}}.  Check that {key} is defined in your .env")
             else:
                 logger.error(f"Unpermitted Interpolation for key {{{key}}}.  Must be one of {','.join(SAFE_KEYS)}")

@@ -1,0 +1,10 @@
+type: "operator"
+namespace: "database"
+command: "list"
+description:  "List databases"
+parameters: 
+  optional:
+    - "limit"
+supported_configurations:
+  - metastore: "glue"
+    execution: "local"

@@ -1,4 +1,4 @@
-from typing import Union, Tuple, Optional, TypeVar, Type
+from typing import Union, Tuple, Optional
 
 from abc import abstractmethod
 
@@ -7,6 +7,9 @@ from mason.clients.response import Response
 from mason.engines.execution.models.jobs import InvalidJob, ExecutedJob, Job
 
 class ExecutionClient:
+    
+    def is_async(self) -> bool:
+        return True
     
     @abstractmethod
     def __init__(self, client: Client):

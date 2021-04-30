@@ -18,4 +18,4 @@ def test_delete():
         good = op.validate(config, params).run(env, Response())
         assert(good.with_status() == ({'Errors': ["Crawler entry with name bad_schedule does not exist"]}, 400))
 
-    run_tests("schedule", "delete", True, "fatal", ["1"], tests)
+    run_tests("schedule", "delete", True, "fatal", ["2"], tests)

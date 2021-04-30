@@ -93,7 +93,6 @@ class TestJSONSchema:
             schema6 = from_file(f)
             assert(isinstance(schema6, JsonSchema))
 
-
         with fs.open(from_root('/test/sample_data/json_lines2.jsonl')) as f:
             schema7 = from_file(f)
             assert(isinstance(schema7, JsonSchema))
@@ -155,7 +154,7 @@ class TestTextSchema:
         with fs.open(from_root('/test/sample_data/csv_no_header.csv')) as f:
             schema = from_file(f)
             assert(isinstance(schema, TextSchema))
-            assert(list(map(lambda c: c.name,schema.columns)) == [0,1])
+            assert(list(map(lambda c: c.name,schema.columns)) == ["col_0", "col_1"])
             assert(list(map(lambda c: c.type,schema.columns)) == ["object","float64"])
 
 class TestParquetSchema:
