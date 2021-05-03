@@ -36,34 +36,26 @@ class Config(Saveable, Resource):
     def metastore(self) -> Union[MetastoreClient, InvalidClient]:
         if len(self.metastore_clients) >= 1:
             return self.metastore_clients[0]
-        elif len(self.metastore_clients) == 0:
-            return InvalidClient("No metastores")
         else:
-            return InvalidClient("Multiple metastore clients configured. Please specify metastore_client by name")
+            return InvalidClient("No metastores")
         
     def execution(self) -> Union[ExecutionClient, InvalidClient]:
         if len(self.execution_clients) >= 1:
             return self.execution_clients[0]
-        elif len(self.execution_clients) == 0:
-            return InvalidClient("No executions")
         else:
-            return InvalidClient("Multiple execution clients configured. Please specify execution_client by name")
+            return InvalidClient("No executions")
 
     def scheduler(self) -> Union[SchedulerClient, InvalidClient]:
         if len(self.scheduler_clients) >= 1:
             return self.scheduler_clients[0]
-        elif len(self.scheduler_clients) == 0:
-            return InvalidClient("No schedulers")
         else:
-            return InvalidClient("Multiple scheduler clients configured. Please specify scheduler_client by name")
+            return InvalidClient("No schedulers")
         
     def storage(self) -> Union[StorageClient, InvalidClient]:
         if len(self.storage_clients) >= 1:
             return self.storage_clients[0]
-        elif len(self.storage_clients) == 0:
-            return InvalidClient("Not storages")
         else:
-            return InvalidClient("Multiple storage clients configured. Please specify storage_client by name")
+            return InvalidClient("Not storages")
 
     def save(self, state_store: MasonStateStore, overwrite: bool = False, response: Response = Response()) -> Response:
         try:
