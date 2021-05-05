@@ -78,7 +78,7 @@ def run_test(env: MasonEnvironment, namespace: str, command: str, configs: List[
         raise Exception(f"No operator found: {namespace}:{command}")
 
 def set_log_level(level: str = None):
-    logger.set_level(level or "fatal", False)
+    logger.set_level(level or "fatal")
 
 def get_env(home: Optional[str] = None, validations: Optional[str] = None):
     return MasonEnvironment(from_root(home or "/examples/"), from_root(validations or "/validations/"))

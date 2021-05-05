@@ -28,7 +28,7 @@ class Logger:
     def __init__(self, log_level: LogLevel):
         self.log_level = log_level
 
-    def set_level(self, log_level: Optional[str], print_message: bool = True):
+    def set_level(self, log_level: Optional[str]):
         ll = LogLevel(log_level or "info")
         if ll.debug():
             print(f"Set log level to {log_level}")
