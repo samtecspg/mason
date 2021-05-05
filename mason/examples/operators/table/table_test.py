@@ -102,7 +102,7 @@ def test_query():
         result = op.validate(config, params).run(env, Response())
         exp = {
             "6": ['Running Query "SELECT * from $table limit 3"', 'Running Athena query.  query_id: test'],
-            "4": [f'Table succesfully formatted as parquet and exported to {output_path}']
+            "4": [f'Table successfully formatted as parquet and exported to {output_path}']
         }
 
         assert((result.formatted()["Info"], result.status_code()) == (exp[config.id], 200))
@@ -113,7 +113,7 @@ def test_query():
         result = op.validate(config, params).run(env, Response())
         exp_2 = {
             "6": ({'Errors': ['Job errored: Access denied for credentials.  Ensure associated user or role has permission to CreateNamedQuery on athena'], 'Info': ['Running Query "SELECT * from $table limit 3"']}, 403),
-            "4": ({'Info': [f'Table succesfully formatted as parquet and exported to {output_path}']}, 200)
+            "4": ({'Info': [f'Table successfully formatted as parquet and exported to {output_path}']}, 200)
         }
 
         assert(result.with_status() == exp_2[config.id])
