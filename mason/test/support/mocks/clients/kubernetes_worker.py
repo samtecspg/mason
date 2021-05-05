@@ -6,7 +6,6 @@ from mason.engines.execution.models.jobs import ExecutedJob, InvalidJob, Job
 from mason.engines.execution.models.jobs.format_job import FormatJob
 from mason.engines.execution.models.jobs.query_job import QueryJob
 
-
 class KubernetesWorkerMock():
 
     def run(self, job: Job, resp: Optional[Response] = None, mode: str = "sync") -> Tuple[Union[ExecutedJob, InvalidJob], Response]:
@@ -15,11 +14,11 @@ class KubernetesWorkerMock():
         r = resp or Response()
         if isinstance(job, FormatJob):
             if job.format == "csv" and job.output_path.path_str == "good_output_path":
-                return (ExecutedJob('Table succesfully formatted as csv'), r)
+                return (ExecutedJob('Table successfully formatted as csv'), r)
             else:
                 return (InvalidJob('Invalid Dask Job: Invalid Schema'), r)
         elif isinstance(job, QueryJob):
-            job.output_path.protocal  = "file"
+            job.output_path.protocol  = "file"
             return (KubernetesWorker({"scheduler": "local:8786"}).run_job(job, "local:8786", mode), r)
         else:
             raise Exception(f"Mock job not implemented: {job.type}")

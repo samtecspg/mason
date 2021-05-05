@@ -6,4 +6,4 @@ class Responsable:
     
     @abstractmethod
     def to_response(self, prior: Response) -> Response:
-        raise NotImplementedError("to_response Not Implmeneted for object")
+        raise NotImplementedError("to_response Not Implemented for object")

@@ -22,7 +22,7 @@ class TableMerge(OperatorDefinition):
             "jsonl"
         }
 
-        # TODO: Replace db_name, tb_name with protocal path, ie s3://bucket/path, athena://database:table
+        # TODO: Replace db_name, tb_name with protocol path, ie s3://bucket/path, athena://database:table
         database_name = parameters.get_required("database_name")
         table_name = parameters.get_required("table_name")
         output_path = parameters.get_required("output_path")
@@ -33,7 +33,7 @@ class TableMerge(OperatorDefinition):
         final: Union[ExecutedJob, InvalidJob]
 
         if isinstance(table, Table):
-            final = InvalidJob("No conflicting schemas found. Merge Unecessary")
+            final = InvalidJob("No conflicting schemas found. Merge Unnecessary")
         else:
             conflicting_table = table.conflicting_table()
             if conflicting_table:
@@ -55,6 +55,6 @@ class TableMerge(OperatorDefinition):
                 else:
                     final = InvalidJob(f"Unsupported schemas for merge operator: {', '.join(list(schema_types.difference(SUPPORTED_SCHEMAS)))}")
             else:
-                final = InvalidJob(f"No conflicting schemas found at {database_name},{table_name}. Merge unecessary. Invalid Schemas {table.message()}")
+                final = InvalidJob(f"No conflicting schemas found at {database_name},{table_name}. Merge unnecessary. Invalid Schemas {table.message()}")
 
         return DelayedOperatorResponse(final, response)

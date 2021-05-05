@@ -38,7 +38,7 @@ class TableValidatedInfer(WorkflowDefinition):
         elif current_step_id == "step_4":
             if isinstance(object, ExecutedJob):
                 resp = current.operator_response.response
-                resp.add_info("Query Succesful, not cleaning up table")
+                resp.add_info("Query Successful, not cleaning up table")
                 resp.add_info("Workflow Successful")
                 resp.set_status(200)
                 return current

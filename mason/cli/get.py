@@ -12,7 +12,7 @@ def get(resource: Optional[str], namespace: Optional[str] = None, command: Optio
     Configs are identified via their config id
     Workflows and operators are identified by their namespace and command
    
-    [RESOURCE] is the resouce type, current supported: [config, operator, workflow] 
+    [RESOURCE] is the resource type, current supported: [config, operator, workflow] 
     [NAMESPACE] is a namespace string. For configs, NAMESPACE==config_id  See examples/ for reference implementations.
     [COMMAND] is a command string.  See examples/ for reference implementations.
     """

@@ -56,7 +56,7 @@ class LocalStateStore(MasonStateStore):
                 return FailedOperation(f"Config {config_id} already exists.")
         else:
             shutil.copy(source, destination + config_name)
-            return f"Succesfully saved Config {config_id}"
+            return f"Successfully saved Config {config_id}"
 
     # TODO: Copy to tmp instead of tracking source, and copy from tmp
     # TODO: Clean up type switches, serialize internal representation
@@ -97,7 +97,7 @@ class LocalStateStore(MasonStateStore):
             banner(f"Creating CONFIG_HOME at {self.config_home}", "fatal")
             os.mkdir(self.config_home)
 
-        return "Succesfully initialized"
+        return "Successfully initialized"
 
     def set_session_config(self, config_id: str):
         with open(self.config_home + "CURRENT_CONFIG", 'w+') as f:

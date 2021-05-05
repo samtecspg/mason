@@ -2,7 +2,7 @@ type: "workflow"
 namespace: "table"
 command: "infer"
 name: "table_infer"
-description: "One step workfow for table infer operator"
+description: "One step workflow for table infer operator"
 dag:
     - id: "step_1"
       type: "operator"

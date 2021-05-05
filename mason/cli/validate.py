@@ -16,7 +16,7 @@ def validate(resource: str, namespace: str, command: str, parameters: Optional[s
     Validates mason workflow or operator with specified configuration and parameters and performs a dry run
     Example:
         
-    [RESOURCE] is the resouce type, current supported: [config, operator, workflow] 
+    [RESOURCE] is the resource type, current supported: [config, operator, workflow] 
     [NAMESPACE] is a namespace string. See examples/ for reference implementations.
     [COMMAND] is a command string.  See examples/ for reference implementations.
     """

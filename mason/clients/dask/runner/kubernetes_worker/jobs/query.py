@@ -24,7 +24,7 @@ def run(spec: dict, scheduler: str):
             # df: DataFrame = dd.read_sql_table(self.query_string)
             if self.output_path:
                 # df.to_parquet(self.output_path)
-                return CompleteDaskJob(f"Job to query via Dask succesfully queued to scheduler")
+                return CompleteDaskJob(f"Job to query via Dask successfully queued to scheduler")
             else:
                 return InvalidDaskJob("Output path required for Dask implementation of table query")
 

@@ -75,7 +75,7 @@ def test_merge():
         # unsupported merge schema
         params = OperatorParameters(parameter_string="database_name:good_input_bucket,table_name:good_input_path,output_path:good_output_bucket/good_output_path,parse_headers:true")
         unsupported = op.validate(config, params).run(env, Response()).response
-        assert('No conflicting schemas found at good_input_bucket,good_input_path. Merge unecessary. ' in unsupported.formatted()["Errors"][0])
+        assert('No conflicting schemas found at good_input_bucket,good_input_path. Merge unnecessary. ' in unsupported.formatted()["Errors"][0])
 
         # invalid merge params
         params = OperatorParameters(parameter_string="input_path:test,database_name:test,table_name:test")
