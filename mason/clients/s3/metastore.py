@@ -16,9 +16,8 @@ from mason.engines.metastore.models.table.invalid_table import InvalidTables, In
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.metastore.models.table.table import Table, TableList
 from mason.engines.metastore.models.table.tables import infer, summarize
-from mason.engines.storage.models.path import Path
+from mason.engines.storage.models.path import Path, InvalidPath
 from mason.util.list import sequence
-
 
 class S3MetastoreClient(MetastoreClient):
 
@@ -29,9 +28,8 @@ class S3MetastoreClient(MetastoreClient):
         storage = S3StorageClient(self.client)
         return summarize(table, storage, options, response)
 
-    def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
-        resp = (response or Response()).add_error("Client delete_table not implemented")
-        return resp
+    def delete_table(self, table_path: str, response: Response = Response()) -> Response:
+        raise NotImplementedError("Client delete table not implemented")
 
     def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
         raise NotImplementedError("S3 client get_databases not implemented")
@@ -54,7 +52,8 @@ class S3MetastoreClient(MetastoreClient):
                 for c in contents:
                     key: Optional[str] = c.get("Key")
                     if key:
-                        table, response = self.get_table(database_name.split("/")[0], key, response=response)
+                        table_path = "/".join([database_name.split("/")[0], key])
+                        table, response = self.get_table(table_path , response=response)
                         tables.append(table)
                 valid, invalid = sequence(tables, Table, InvalidTables)
                 if len(valid) > 0:
@@ -77,19 +76,14 @@ class S3MetastoreClient(MetastoreClient):
 
         return final, response
 
-    def get_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+    def get_table(self, table_path: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
         storage = S3StorageClient(self.client)
-        path: Path = storage.table_path(database_name, table_name)
-        return infer(path, storage, table_name, options, response)
+        path: Union[Path, InvalidPath] = self.parse_table_path(table_path, "s3")
+        
+        return infer(path, storage, None, options, response)
 
     def full_path(self, path: str) -> str:
         return "s3a://" + path
-
-    def parse_path(self, path: str) -> Tuple[str, str]:
-        parsed = urlparse(self.full_path(path), allow_fragments=False)
-        key = parsed.path.lstrip("/")
-        bucket = parsed.netloc
-        return bucket, key
 
     def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
         return self.client.credentials()

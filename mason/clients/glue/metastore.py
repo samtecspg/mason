@@ -1,4 +1,4 @@
-from typing import Union, Optional, Tuple, List
+from typing import Union, Optional, Tuple
 
 from returns.result import Result
 
@@ -10,10 +10,11 @@ from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
 from mason.engines.metastore.models.database import Database, InvalidDatabase, DatabaseList
 from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
-from mason.engines.metastore.models.table.invalid_table import InvalidTables
+from mason.engines.metastore.models.table.invalid_table import InvalidTables, InvalidTable
 from mason.engines.metastore.models.table.summary import TableSummary
 from mason.engines.metastore.models.table.table import TableList, Table
-from mason.engines.storage.models.path import Path
+from mason.engines.storage.models.path import Path, parse_table_path, InvalidPath
+
 
 class GlueMetastoreClient(MetastoreClient):
     
@@ -30,14 +31,24 @@ class GlueMetastoreClient(MetastoreClient):
     def summarize_table(self, table: Table, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
         raise NotImplementedError("Client summarize_table not implemented")
 
-    def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
-        return self.client.delete_table(database_name, table_name, response)
+    def delete_table(self, table_path: str, response: Response = Response()) -> Response:
+        path = parse_table_path(table_path, "glue")
+        if isinstance(path, InvalidPath):
+            response.add_error(f"Invalid Path: ${path.reason}")
+            return response
+        else:
+            return self.client.delete_table(path, response)
 
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         return self.client.list_tables(database_name, response)
 
-    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
-        return self.client.get_table(database_name, table_name, response)
+    def get_table(self, table_path: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+        path = self.parse_table_path(table_path, "glue")
+
+        if isinstance(path, Path):
+            return self.client.get_table(path, response)
+        else:
+            return InvalidTables([InvalidTable(f"Invalid Path: {path.reason}")]), response
 
     def credentials(self) -> Union[AWSCredentials, InvalidCredentials]:
         return self.client.credentials()

@@ -5,6 +5,7 @@ from returns.result import Result
 from mason.clients.athena.athena_client import AthenaClient
 from mason.clients.engines.metastore import MetastoreClient
 from mason.clients.glue.glue_client import GlueClient
+from mason.clients.glue.metastore import GlueMetastoreClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.credentials import InvalidCredentials
 from mason.engines.metastore.models.credentials.aws import AWSCredentials
@@ -32,11 +33,13 @@ class AthenaMetastoreClient(MetastoreClient):
     def list_tables(self, database_name: str, response: Response) -> Tuple[Result[TableList, InvalidTables], Response]:
         return self.glue_client.list_tables(database_name, response)
 
-    def get_table(self, database_name: str, table_name: str, options: Optional[dict] = None, response: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
-        return self.glue_client.get_table(database_name, table_name, response)
+    def get_table(self, table_path: str, options: Optional[dict] = None, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+        metastore = GlueMetastoreClient(self.glue_client)
+        return metastore.get_table(table_path, options, response)
 
-    def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
-        return self.glue_client.delete_table(database_name, table_name, response)
+    def delete_table(self, table_path: str, response: Response = Response()) -> Response:
+        glue_metastore = GlueMetastoreClient(self.glue_client)
+        return glue_metastore.delete_table(table_path, response)
 
     def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
         raise NotImplementedError("Athena client get_databases not implemented")

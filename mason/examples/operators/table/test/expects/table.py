@@ -3,7 +3,6 @@ from dateutil.tz import tzlocal
 
 from mason.definitions import from_root
 
-
 def index(client_type: str, exists=True):
     # TODO: Unify s3 and glue responses here
     if client_type == "glue":
@@ -43,11 +42,11 @@ def get(client_type: str, switch: int):
             return ({'Errors': ['No keys at s3://test-database/bad-table'],'Info': ['Fetching keys at s3://test-database/bad-table'], 'Warnings': ['Sampling keys to determine schema. Sample size: 3.']}, 404)
     elif client_type == "local":
         if switch == 1:
-            return ({'Data': [{'CreatedAt': '', 'CreatedBy': 'mason', 'Name': 'csv_sample.csv', 'Schema': {'Columns': [{'Name': "type", 'Type': 'object'}, {'Name': "price", 'Type': 'float64'}],'SchemaType': 'csv'}}]},200)
+            return ({'Data': [{'CreatedAt': '', 'CreatedBy': 'mason', 'Name': 'csv_sample', 'Schema': {'Columns': [{'Name': "type", 'Type': 'object'}, {'Name': "price", 'Type': 'float64'}],'SchemaType': 'csv'}}]},200)
         elif switch == 2:
-            return ({'Errors': ['Invalid Schema:File not found: /test/bad/csv_sample.csv','Invalid Schema: No valid schemas found']},404)
+            return ({'Errors': ['Invalid Schema:File not found: file:///test/bad/csv_sample.csv','Invalid Schema: No valid schemas found']},404)
         elif switch == 3:
-            return ({'Errors': ['Invalid Schema:File not found: /test/sample_data/bad.csv','Invalid Schema: No valid schemas found']}, 404)
+            return ({'Errors': ['Invalid Schema:File not found: file:///test/sample_data/bad.csv','Invalid Schema: No valid schemas found']}, 404)
 
 def post(exists = True):
     if exists:
@@ -74,21 +73,21 @@ def refresh(refreshing = True):
 def parameters(config_id: str):
     if config_id == "1":
         return [
-            f"database_name:{from_root('/test/sample_data/')},table_name:csv_sample.csv,read_headers:true",
-            f"database_name:{from_root('/test/bad/')},table_name:csv_sample.csv,",
-            f"database_name:{from_root('/test/sample_data/')},table_name:bad.csv"
+            f"table_path:{from_root('/test/sample_data/csv_sample.csv')},read_headers:true",
+            f"table_path:{from_root('/test/bad/csv_sample.csv')}",
+            f"table_path:{from_root('/test/sample_data/bad.csv')}"
         ]
     elif config_id == "3":
         return [
-            "database_name:test-database,table_name:test-table,read_headers:true",
-            "database_name:bad-database,table_name:test-table",
-            "database_name:test-database,table_name:bad-table"
+            "table_path:'s3://test-database/test-table',read_headers:true",
+            "table_path:bad-database/test-table", 
+            "table_path:'s3://test-database/bad-table'"
         ]
     else:
         return [
-            "database_name:test-database,table_name:test-table,read_headers:true,output_path:test-database/test-summary",
-            "database_name:bad-database,table_name:test-table",
-            "database_name:test-database,table_name:bad-table"
+            "table_path:test-database/test-table,read_headers:true,output_path:test-database/test-summary",
+            "table_path:bad-database/test-table",
+            "table_path:test-database/bad-table",
         ]
 
         

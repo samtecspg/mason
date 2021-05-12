@@ -4,8 +4,7 @@ command: "refresh"
 description:  "Refresh metastore tables"
 parameters:
   required:
-    - "database_name"
-    - "table_name"
+    - table_path
 supported_configurations:
   - scheduler: "glue"
     execution: "local"

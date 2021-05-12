@@ -4,8 +4,7 @@ command: "query"
 description:  "Query metastore tables"
 parameters:
   required:
-    - database_name
-    - table_name
+    - table_path
     - query_string
   optional:
     - output_path
@@ -14,3 +13,4 @@ supported_configurations:
     execution: "athena"
   - metastore: "s3"
     execution: "dask"
+

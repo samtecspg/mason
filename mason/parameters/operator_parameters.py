@@ -55,15 +55,15 @@ class OperatorParameters(Parameters):
         return valid, invalid
 
     def parse_string(self, param_string: str) -> Tuple[List[Parameter], List[InvalidParameter]]:
-        pattern = r"([^,^:]+:[^,^:]+)"
+        pattern = r"([^,^:]+:[^,]+)"
         pattern_guide = "<param1>:<value1>,<param2>:<value2>"
-        matches = re.findall(pattern, param_string)
+        matches = re.findall(pattern, param_string.replace("'", ""))
         parameters: List[Parameter] = []
         invalid: List[InvalidParameter] = []
 
         if len(matches) > 0:
             for m in matches:
-                s = m.split(":")
+                s = m.split(":", 1)
                 a: Optional[Parameter]
                 if len(s) == 2:
                     parameters.append(Parameter(s[0], s[1]))

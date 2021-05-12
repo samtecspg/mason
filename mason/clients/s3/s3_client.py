@@ -6,7 +6,7 @@ from s3fs import S3FileSystem
 
 from mason.clients.aws_client import AWSClient
 from mason.clients.response import Response
-from mason.engines.storage.models.path import Path, construct
+from mason.engines.storage.models.path import Path, parse_path, InvalidPath
 from mason.util.exception import message
 from mason.util.list import get
 
@@ -87,8 +87,8 @@ class S3Client(AWSClient):
 
         return paths, response
     
-    def table_path(self, database_name: str, table_name: str) -> Path:
-        return construct([database_name, table_name], "s3")
+    def get_path(self, table_path: str) -> Union[Path, InvalidPath]:
+        return parse_path(table_path, "s3")
 
     def save_to(self, inpath: Path, outpath: Path, response: Response):
         try:

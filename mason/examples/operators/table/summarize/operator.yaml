@@ -4,11 +4,10 @@ command: "summarize"
 description:  "Provide summary statistics for a table"
 parameters:
   required:
-    - "database_name"
-    - "table_name"
+    - table_path
   optional:
-    - "read_headers"
-    - "output_path"
+    - read_headers
+    - output_path
 supported_configurations:
   - metastore: "local"
     execution: "local"

@@ -66,9 +66,9 @@ class TestSpark:
             spec:
               arguments:
               - --input_path
-              - test-input 
+              - file://test-input 
               - --output_path
-              - test-output 
+              - file://test-output 
               - --input_format
               - parquet
               - --read_headers

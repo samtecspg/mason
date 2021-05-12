@@ -1,6 +1,8 @@
 from typing import Optional, Union
 
 from mason.clients.engines.storage import StorageClient
+from mason.clients.glue.metastore import GlueMetastoreClient
+from mason.engines.metastore.models.table.table import Table
 from mason.engines.scheduler.models.dags.valid_dag import ValidDag
 from mason.engines.scheduler.models.schedule import Schedule, InvalidSchedule
 from mason.util.environment import MasonEnvironment
@@ -25,10 +27,13 @@ class GlueSchedulerClient(SchedulerClient):
 
             storage_engine = op.config.storage()
             if isinstance(storage_engine, StorageClient):
-                storage_path = storage_engine.path(params.get_required("storage_path"))
+                storage_path = storage_engine.get_path(params.get_required("storage_path"))
+                if isinstance(storage_path, Path):
+                    response = self.register_schedule(db_name, storage_path, schedule_name, schedule, response)
+                else:
+                    response.add_error(f"Invalid Path: {storage_path.reason}")
             else:
                 response = response.add_error(f"Attempted to register_dag for invalid client: {storage_engine.reason}")
-            response = self.register_schedule(db_name, storage_path, schedule_name, schedule, response)
         else:
             response.add_error("Glue Scheduler only defined for TableInfer type which registers a glue crawler")
 
@@ -53,7 +58,26 @@ class GlueSchedulerClient(SchedulerClient):
             return None
 
     # TODO: Remove
-    def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
-        response = self.client.trigger_schedule_for_table(table_name, database_name, response)
-        return response
+    def trigger_schedule_for_table(self, table_path: str, response: Response):
+        metastore = GlueMetastoreClient(self.client)
+        path = metastore.parse_table_path(table_path, "glue")
+        if isinstance(path, Path):
+            table, response = self.client.get_table(path, response)
 
+            crawler_name = None
+            if isinstance(table, Table):
+                created_by = table.created_by
+                cb = created_by or ""
+                if "crawler:" in cb:
+                    crawler_name = cb.replace("crawler:", "")
+                    self.client.trigger_schedule(crawler_name, response)
+                else:
+                    response.add_error(f"Table not created by crawler. created_by: {created_by}")
+            else:
+                response.add_error(f"Could not find table {path.table_name}")
+                response.set_status(404)
+        else:
+            response.add_error(path.reason)
+            response.set_status(400)
+
+        return response

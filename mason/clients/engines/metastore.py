@@ -12,13 +12,23 @@ from mason.engines.metastore.models.ddl import DDLStatement, InvalidDDLStatement
 from mason.engines.metastore.models.table.table import Table, TableList
 from mason.engines.metastore.models.table.invalid_table import InvalidTables
 from mason.engines.metastore.models.table.summary import TableSummary
-from mason.engines.storage.models.path import Path
+from mason.engines.storage.models.path import Path, parse_path, InvalidPath, parse_database_path, parse_table_path
+
 
 class MetastoreClient:
     
     @abstractmethod
     def __init__(self, client: Client):
         self.client = client
+
+    def parse_path(self, path: str, protocol: str) -> Union[Path, InvalidPath]:
+        return parse_path(path, protocol)
+
+    def parse_database_path(self, database_path: str, protocol: str) -> Union[Path, InvalidPath]:
+        return parse_database_path(database_path, protocol)
+        
+    def parse_table_path(self, table_path: str, protocol: str) -> Union[Path, InvalidPath]:
+        return parse_table_path(table_path, protocol)
 
     @abstractmethod
     def get_databases(self, response: Response = Response()) -> Tuple[DatabaseList, Response]:
@@ -33,7 +43,7 @@ class MetastoreClient:
         raise NotImplementedError("Client list_tables not implemented")
 
     @abstractmethod
-    def get_table(self, database_name: str, table_name: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+    def get_table(self, table_path: str, options: dict = {}, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
         raise NotImplementedError("Client get_table not implemented")
 
     @abstractmethod
@@ -41,7 +51,7 @@ class MetastoreClient:
         raise NotImplementedError("Client summarize_table not implemented")
 
     @abstractmethod
-    def delete_table(self, database_name: str, table_name: str, response: Optional[Response] = None) -> Response:
+    def delete_table(self, table_path: str, response: Response = Response()) -> Response:
         raise NotImplementedError("Client delete_table not implemented")
 
     @abstractmethod

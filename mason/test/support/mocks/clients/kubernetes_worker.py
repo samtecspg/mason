@@ -13,7 +13,7 @@ class KubernetesWorkerMock():
         # InvalidJob Timed out trying to connect # OSError: Timed out trying to connect to 'tcp://dask-scheduler:8786'
         r = resp or Response()
         if isinstance(job, FormatJob):
-            if job.format == "csv" and job.output_path.path_str == "good_output_path":
+            if job.format == "csv" and job.output_path.path_str == "s3://good_output_path":
                 return (ExecutedJob('Table successfully formatted as csv'), r)
             else:
                 return (InvalidJob('Invalid Dask Job: Invalid Schema'), r)

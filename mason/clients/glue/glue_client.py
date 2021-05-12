@@ -75,7 +75,8 @@ class GlueClient(AWSClient):
                 valid: List[Table] = []
                 invalid: List[InvalidTable] = []
                 for table_name in table_names:
-                    result, response = self.get_table(database_name, table_name, response)
+                    path = Path("", "glue", database_name, table_name)
+                    result, response = self.get_table(path, response)
                     if isinstance(result, Table):
                         valid.append(result)
                     elif isinstance(result, InvalidTable):
@@ -117,7 +118,9 @@ class GlueClient(AWSClient):
             response.set_status(status)
             return Failure(InvalidTables(message)), response
 
-    def delete_table(self, database_name: str, table_name: str, resp: Optional[Response] = None) -> Response:
+    def delete_table(self, path: Path, resp: Optional[Response] = None) -> Response:
+        table_name = path.display_table_name()
+        database_name = path.database_name
         response = resp or Response()
         
         try:
@@ -209,35 +212,19 @@ class GlueClient(AWSClient):
             response.set_status(status)
         return response
 
-    def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response):
-        table, response = self.get_table(database_name, table_name)
 
-        crawler_name = None
-        if isinstance(table, Table):
-            created_by = table.created_by
-            cb = created_by or ""
-            if "crawler:" in cb:
-                crawler_name = cb.replace("crawler:", "")
-                self.trigger_schedule(crawler_name, response)
-            else:
-                response.add_error(f"Table not created by crawler. created_by: {created_by}")
-        else:
-            response.add_error(f"Could not find table {table_name}")
-            response.set_status(404)
-
-        return response
-
-    def get_table(self, database_name: str, table_name: str,  resp: Optional[Response] = None) -> Tuple[Union[Table, InvalidTables], Response]:
+    def get_table(self, path: Path, response: Response = Response()) -> Tuple[Union[Table, InvalidTables], Response]:
+        database_name = path.database_name
+        table_name = path.display_table_name()
         try:
             result = self.client().get_table(DatabaseName=database_name, Name=table_name)
         except ClientError as e:
             result = e.response
 
-        response: Response = resp or Response()
         response.add_response(result)
 
         error, status, message = self.parse_response(result)
-        table = self.parse_table(result.get("Table", {}), Path(database_name + ":" + table_name, "glue"), database_name=database_name)
+        table = self.parse_table(result.get("Table", {}), path, database_name=database_name)
 
         final: Union[Table, InvalidTables]
         if error == "EntityNotFoundException":

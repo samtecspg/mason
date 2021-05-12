@@ -4,10 +4,9 @@ command: "format"
 description:  "Reformat and partition table data"
 parameters:
   required:
-    - database_name
-    - table_name
-    - format
+    - table_path
     - output_path
+    - format
   optional:
     - partition_columns
     - filter_columns

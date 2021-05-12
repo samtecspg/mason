@@ -1,4 +1,4 @@
-from mason.engines.storage.models.path import Path
+from mason.engines.storage.models.path import Path, parse_path, InvalidPath, parse_database_path, parse_table_path
 
 from mason.engines.metastore.models.schemas.check_schemas import find_conflicts
 from mason.engines.metastore.models.schemas.parquet import ParquetElement, ParquetSchema
@@ -64,7 +64,7 @@ class TestJSONSchema:
     def test_file_dne(self):
         schema = json_from_file(Path('test/sample_data/dne.json'))
         assert (isinstance(schema, InvalidSchema))
-        message = 'File not found test/sample_data/dne.json'
+        message = 'File not found file://test/sample_data/dne.json'
         assert(schema.reason[0:97] == message)
 
     def test_check_schemas(self):
@@ -192,4 +192,71 @@ class TestParquetSchema:
         with fs.open(from_root('/test/sample_data/sample.snappy.parquet')) as f:
             schema = from_file(f)
             assert(isinstance(schema, ParquetSchema))
+
+
+class TestPath:
+    
+    def test_parse_path(self):
+        path = parse_path("s3://test_bucket/test_path/more_stuff/file.csv", "s3")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "s3")
+        assert(path.table_name == "/test_path/more_stuff/file.csv")
+        assert(path.database_name == "test_bucket")
+
+        path = parse_path("s3://test_bucket/test_path/", "s3")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "s3")
+        assert(path.table_name == "/test_path/")
+        assert(path.database_name == "test_bucket")
+
+        path = parse_path("test_bucket/test_path/", "s3")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "s3")
+        assert(path.table_name == "/test_path/")
+        assert(path.database_name == "test_bucket")
+
+        path = parse_path("://test_bucket/test_path/", "s3")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "s3")
+        assert(path.table_name == "/test_path/")
+        assert(path.database_name == "test_bucket")
+
+        path = parse_path("s3://test_bucket/test_path/", "athena")
+        assert(isinstance(path, InvalidPath))
+        assert(path.reason == "Specified protocol for path does not match engine: s3 != athena.")
+
+        path = parse_path("random)#(*%@", "athena")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "athena")
+        assert(path.table_name == "#(*%@")
+        assert(path.database_name == "random)")
+
+        path = parse_path("athena:///", "athena")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "athena")
+        assert(path.table_name == "/")
+        assert(isinstance(path, Path))
+        
+    def test_parse_database_path(self):
+        path = parse_database_path("s3://test_bucket/test_path/more_stuff/file.csv", "s3")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "s3")
+        assert(path.table_name == "/test_path/more_stuff/file.csv")
+        assert(path.database_name == "test_bucket")
+
+        path = parse_database_path("s3://", "s3")
+        assert(isinstance(path, InvalidPath))
+        assert(path.reason == "Database not specified")
+
+    def test_parse_table_path(self):
+        path = parse_table_path("s3://test_bucket/test_path/more_stuff/file.csv", "s3")
+        assert(isinstance(path, Path))
+        assert(path.protocol == "s3")
+        assert(path.table_name == "/test_path/more_stuff/file.csv")
+        assert(path.database_name == "test_bucket")
+
+        path = parse_table_path("s3://bucket_name", "s3")
+        assert(isinstance(path, InvalidPath))
+        assert(path.reason == "Table not specified")
+
 

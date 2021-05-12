@@ -7,10 +7,9 @@ from mason.util.environment import MasonEnvironment
 
 class TableDelete(OperatorDefinition):
     def run(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> OperatorResponse:
-        database_name: str = parameters.get_required("database_name")
-        table_name: str = parameters.get_required("table_name")
+        table_path: str = parameters.get_required("table_path")
 
-        response = config.metastore().delete_table(database_name, table_name, response)
+        response = config.metastore().delete_table(table_path, response)
 
         return OperatorResponse(response)
 

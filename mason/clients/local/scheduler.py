@@ -24,7 +24,7 @@ class LocalSchedulerClient(SchedulerClient):
     def delete_schedule(self, schedule_name: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
 
-    def trigger_schedule_for_table(self, table_name: str, database_name: str, response: Response) -> Response:
+    def trigger_schedule_for_table(self, table_path: str, response: Response) -> Response:
         raise NotImplementedError("Client method not implemented")
 
     def validate_schedule(self, schedule: Optional[str]) -> Union[Optional[Schedule], InvalidSchedule]:

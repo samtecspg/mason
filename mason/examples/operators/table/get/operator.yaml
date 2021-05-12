@@ -4,8 +4,7 @@ command: "get"
 description:  "Get metastore table contents"
 parameters:
   required:
-    - "database_name"
-    - "table_name"
+    - "table_path"
   optional:
     - "read_headers"
     - "output_path"

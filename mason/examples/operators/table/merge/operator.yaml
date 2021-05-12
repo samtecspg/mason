@@ -4,8 +4,7 @@ command: "merge"
 description:  "Merge metastore tables"
 parameters:
   required:
-    - database_name
-    - table_name
+    - table_path
     - output_path
   optional:
     - extract_paths
