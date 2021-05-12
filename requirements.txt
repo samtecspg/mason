@@ -28,7 +28,7 @@ cloudpickle==1.5.0
 connexion>=2.6
 swagger-ui-bundle
 connexion[swagger-ui]>2.6
-mason_dask==0.1.26
+mason_dask==0.1.27
 Markdown==3.2.2
 lambdas==0.1.0
 returns==0.15.0
