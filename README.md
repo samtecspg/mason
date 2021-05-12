@@ -2,16 +2,14 @@
 
 # Mason Data Operator Framework 
 
-NOTE:  Mason is still in early development.   It is in many ways in a "stake in the sand" milestone and thus is subject to heavy change and development.
-
-What is Mason?  Mason is a federated data pipeline tool that serves as the connecting tissue for your data projects.  
-1.  It creates a configuration driven data-aware alternative to Airflow operators that depends less heavily on Python scripting.
-2.  It's like react components, but for data pipelines.
-3.  It's an open source answer to Glue.
-4.  It gives you self-contained, composable, parameterized, and functional data operators.
-5.  It bridges between various concerns in data pipelines such as between federated metadata introspection and federated query execution.
-
 Mason is a curated library of data pipeline components with abstracted backend implementations for various big data clients.
+What this gives you is a federated data pipeline tool that serves as the connecting tissue for your data projects.
+
+1.  It creates a configuration driven data-aware alternative to Airflow operators that depends less heavily on Python scripting. Defines models which map directly to SQL (eventually Calcite).
+2.  It's like react components, but for data pipelines.
+3.  It gives you self-contained, composable, parameterized, and functional data operators.
+4.  It bridges between various concerns in data pipelines such as between federated metadata introspection and federated query execution.
+
 
 Mason interfaces with clients using abstractions called Engines. These Engines broker the relationship between Operators and Workflows, which define a particular job, and the various Clients that get the job done. Out of the box, Mason defines four Engines - Storage, Execution, Metastore, and Scheduler.
 
