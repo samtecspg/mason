@@ -7,8 +7,9 @@ What this gives you is a federated data pipeline tool that serves as the connect
 
 1.  It creates a configuration driven data-aware alternative to Airflow operators that depends less heavily on Python scripting. Defines models which map directly to SQL (eventually Calcite).
 2.  It's like react components, but for data pipelines.
-3.  It gives you self-contained, composable, parameterized, and functional data operators.
-4.  It bridges between various concerns in data pipelines such as between federated metadata introspection and federated query execution.
+3.  Its an open source alternative to Glue ETL
+4.  It gives you self-contained, composable, parameterized, and functional data operators.
+5.  It bridges between various concerns in data pipelines such as between federated metadata introspection and federated query execution.
 
 
 Mason interfaces with clients using abstractions called Engines. These Engines broker the relationship between Operators and Workflows, which define a particular job, and the various Clients that get the job done. Out of the box, Mason defines four Engines - Storage, Execution, Metastore, and Scheduler.
