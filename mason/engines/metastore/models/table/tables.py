@@ -2,18 +2,18 @@ from typing import Optional, Tuple, Union
 
 from pandas import DataFrame
 
+from engines.metastore.models.table.populated_table import PopulatedTable
 from mason.clients.engines.storage import StorageClient
 from mason.clients.response import Response
 from mason.engines.metastore.models.schemas import schemas
 from mason.engines.metastore.models.schemas.schema import Schema, InvalidSchema, EmptySchema
 from mason.engines.metastore.models.table.invalid_table import InvalidTables, InvalidTable, TableNotFound
-from mason.engines.metastore.models.table.summary import TableSummary, from_ddf
+from mason.engines.metastore.models.table.summary import TableSummary, from_table
 from mason.engines.metastore.models.table.table import Table
 from mason.engines.storage.models.path import Path, InvalidPath
 from mason.util.exception import message
 from mason.util.list import sequence
 from mason.util.uuid import uuid4
-
 
 def generate_table_name(table_name: Optional[str]):
     if table_name:
@@ -61,14 +61,20 @@ def infer(path: Union[Path, InvalidPath], client: StorageClient, name: Optional[
 def summarize(table: Table, client: StorageClient, options: dict = {}, response: Response = Response()) -> Tuple[Union[TableSummary, InvalidTables], Response]:
     sp = table.source_path
     if sp:
-        df: Optional[DataFrame] = schemas.df_from_path(sp, client, options, response)
-        if isinstance(df, DataFrame):
-            # dask_sql is more mature than other options in this space
-            # also has benefit of getting dask version for free
-            import dask.dataframe as dd
-            ddf = dd.from_pandas(df, 1)
-            return from_ddf(table, ddf, response)
+        populated = table.populate(sp, client)
+        if isinstance(populated, PopulatedTable):
+            return from_table(populated, response)
         else:
-            return InvalidTables([], "Could not initialize dataframe."), response
+            return InvalidTables([populated]), response
     else:
-        return InvalidTables([], "Could not find table source path."), response
+        return InvalidTables([], "Source path not found"), response
+
+def query(table: PopulatedTable, query: str, response: Response) -> Optional[DataFrame]:
+    try:
+        from dask_sql import Context
+        c = Context()
+        c.create_table("df", table.ddf())
+        return c.sql(query).compute()
+    except Exception as e:
+        response.add_error(f"Error executing SQL query: {message(e)}")
+        return None

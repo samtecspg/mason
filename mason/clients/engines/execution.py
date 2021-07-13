@@ -16,10 +16,10 @@ class ExecutionClient:
         self.client = client
     
     @abstractmethod
-    def run_job(self, job: Job, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
+    def run_job(self, job: Job, response: Response = Response()) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         raise NotImplementedError("Client not implemented")
 
     @abstractmethod
-    def get_job(self, job_id: str, response: Optional[Response] = None) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
+    def get_job(self, job_id: str, response: Response = Response()) -> Tuple[Union[InvalidJob, ExecutedJob], Response]:
         raise NotImplementedError("Client not implemented")
 

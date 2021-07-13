@@ -9,8 +9,12 @@ parameters:
   optional:
     - output_path
 supported_configurations:
+  - metastore: "local"
+    execution: "local"
   - metastore: "glue"
     execution: "athena"
   - metastore: "s3"
     execution: "dask"
+  - metastore: "s3"
+    execution: "local"
 

@@ -14,6 +14,7 @@ from mason.parameters.validated_parameters import ValidatedParameters
 from mason.util.environment import MasonEnvironment
 
 class TableFormat(OperatorDefinition):
+    
     def run_async(self, env: MasonEnvironment, config: Config, parameters: ValidatedParameters, response: Response) -> DelayedOperatorResponse:
         table_path: str = parameters.get_required("table_path")
         output_path: str = parameters.get_required("output_path")

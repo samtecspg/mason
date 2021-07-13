@@ -29,5 +29,5 @@ class TestCLI:
     def test_play(self):
         runner = CliRunner()
         load_dotenv(from_root("/../.env"), override=True)
-        print_result(runner.invoke(get, ["operator"], catch_exceptions=False))
+        print_result(runner.invoke(run, ["operator", "table", "query", "-p", "table_path:/Users/kyle/dev/mason/mason/test/sample_data/csv_sample.csv,query_string:'SELECT * FROM csv_sample'"], catch_exceptions=False))
 

@@ -14,7 +14,6 @@ class OperatorResponse:
         if object:
             response = object.to_response(response)
         self.response = response
-        
 
     def to_response(self) -> Response:
         return self.response

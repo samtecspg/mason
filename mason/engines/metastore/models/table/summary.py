@@ -3,10 +3,11 @@ from typing import Optional, List, Tuple
 from dask.dataframe import DataFrame as DDataFrame
 from pandas import DataFrame
 
+from engines.metastore.models.table.populated_table import PopulatedTable
+from engines.metastore.models.table.tables import query
 from mason.clients.responsable import Responsable
 from mason.clients.response import Response
 from mason.engines.metastore.models.table.table import Table
-from mason.util.exception import message
 
 class BaseSummary():
     
@@ -38,13 +39,14 @@ class TableSummary(Responsable):
             "Summaries": {s.name: s.to_dict() for s in self.summaries}
         }
 
-def from_ddf(table: Table, ddf: DDataFrame, response: Response) -> Tuple[TableSummary, Response]:
+def from_table(table: PopulatedTable, response: Response) -> Tuple[TableSummary, Response]:
 
     # TODO: Combine into a single query
-    non_null = execute_query(ddf, non_null_query(table), response)
-    max = execute_query(ddf, max_query(table), response)
-    min = execute_query(ddf, min_query(table), response)
-    distinct_count = execute_query(ddf, distinct_count_query(table), response)
+    ddf = table.ddf()
+    non_null = query(table, non_null_query(table.table), response)
+    max = query(table, max_query(table.table), response)
+    min = query(table, min_query(table.table), response)
+    distinct_count = query(table, distinct_count_query(table.table), response)
     # average = execute_query(average_query(table), response, c) 
     
     summaries = list(map(lambda col: BaseSummary(col, safe_get_value(non_null, col), safe_get_value(max, col), safe_get_value(min, col), safe_get_value(distinct_count, col)), table.column_names()))
@@ -58,15 +60,6 @@ def safe_get_value(df: Optional[DataFrame], col: str):
         if value:
             return value.get(0)
     
-def execute_query(ddf: DDataFrame, query: str, response: Response) -> Optional[DataFrame]:
-    try:
-        from dask_sql import Context
-        c = Context()
-        c.create_table("df", ddf)
-        return c.sql(query).compute()
-    except Exception as e:
-        response.add_error(f"Error executing SQL query: {message(e)}")
-        return None
 
 def for_each_column_query(table: Table, statement: str) -> str:
     query = "SELECT "

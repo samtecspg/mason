@@ -41,7 +41,7 @@ class TableGet(OperatorDefinition):
                             job = PreviewJob(ip, table.schema.type, op, credentials, read_headers)
                             final, response = config.execution().run_job(job, response)
                     else:
-                        final = InvalidJob("Metastore credentials required for asynchronous execution engine.")
+                        final = InvalidJob(f"Input path invalid not found")
                 else:
                     final = InvalidJob("Metastore credentials required for asynchronous execution engine.")
             else:

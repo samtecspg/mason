@@ -60,10 +60,10 @@ class ValidOperator(ValidResource):
                     response.add_info(f"Valid Operator: {self.namespace}:{self.command} with specified parameters.")
                     return OperatorResponse(response)
                 else:
-                    if (self.config.execution().is_async() == True):
-                        operator_response: Union[OperatorResponse, DelayedOperatorResponse] = module.run_async(env, self.config, self.parameters, response)
-                    else:
-                        operator_response  = module.run(env, self.config, self.parameters, response)
+                    # if (self.config.execution().is_async() == True):
+                    #     operator_response: Union[OperatorResponse, DelayedOperatorResponse] = module.run_async(env, self.config, self.parameters, response)
+                    # else:
+                    operator_response  = module.run(env, self.config, self.parameters, response)
             else:
                 response.add_error(f"Module does not contain a valid OperatorDefinition. See /examples for sample operator implementations. \n Message: {module.reason}")
                 operator_response = OperatorResponse(response)
